@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "bun run build.ts",
-    "dev": "bun run build && bun run server.ts",
+    "dev": "bun run dev.ts",
+    "preview": "bun run build && bun run server.ts",
     "docker:dev": "docker compose up",
     "docker:build": "docker compose build",
     "docker:down": "docker compose down"
