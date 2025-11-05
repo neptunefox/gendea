@@ -1,3 +1,4 @@
+.vscode
 public/app.bundle.js*
 node_modules/
 dist/
