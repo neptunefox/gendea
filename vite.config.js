@@ -17,7 +17,9 @@ export default defineConfig({
     outDir: 'public',
     emptyOutDir: false,
     rollupOptions: {
-      input: './src/main.js',
+      input: {
+        app: './index.html'
+      },
       output: {
         entryFileNames: 'app.bundle.js',
         assetFileNames: '[name][extname]'

@@ -9,10 +9,10 @@ services:
       - PORT=3000
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
     volumes:
-      # Mount source files for live updates
       - ./public:/app/public:ro
+      - ./src:/app/src:ro
       - ./server.ts:/app/server.ts:ro
-      # Mount node_modules as a volume to persist dependencies
+      - ./index.html:/app/index.html:ro
       - node_modules:/app/node_modules
     extra_hosts:
       - "host.docker.internal:host-gateway"

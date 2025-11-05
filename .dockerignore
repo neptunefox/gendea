@@ -1,6 +1,10 @@
 node_modules
 .git
 .gitignore
+.kiro
 *.md
 .DS_Store
-scripts
+*.log
+public/app.bundle.js*
+public/index.html
+public/main.css

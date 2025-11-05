@@ -36,7 +36,7 @@ docker compose up -d
 
 ## Features
 
-- **Tree-based idea canvas** with automatic layout (ELK.js)
+- **Node-based idea canvas** with VueFlow
 - **Auto mode detection** - AI determines diverge vs converge thinking
 - **Research-backed prompts** - Applies cognitive science principles
 - **Smooth interactions** - Gesture-based dragging, pan & zoom
