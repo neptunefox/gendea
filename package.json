@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "litellm": "^0.12.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@vue-flow/core": "^1.47.0",
+    "drizzle-orm": "^0.44.7",
+    "nuxt": "^4.2.0",
+    "postgres": "^3.4.7",
+    "xstate": "^5.24.0"
+  }
+}
