@@ -1,0 +1,233 @@
+# Implementation Plan
+
+- [ ] 1. Implement data model for nodes
+  - [ ] 1.1 Create Node data structure
+    - Define node types: Idea, Assumption, Plan, Test, Result, Decision, Lesson
+    - Store fields: text, rationale, constraints, metric, threshold, if-then plan, date, time, place, energy rating, expectancy rating, parent and child links
+    - _Requirements: 15.1, 15.2_
+  
+  - [ ] 1.2 Add North Star and Ladder storage
+    - Store one pinned North Star per branch
+    - Maintain Ladder of next steps that stays visible
+    - _Requirements: 15.3, 15.4_
+
+- [ ] 2. Build state machine for workflow
+  - [ ] 2.1 Implement state transitions
+    - Support states: Seeded, Diverging, Clarifying, Planning, Testing, Reviewing, Stalled, Action crisis, Archived
+    - Transition Seeded to Diverging on save
+    - Transition Diverging to Clarifying when slots filled or timer ends
+    - Transition Clarifying to Planning when North Star and steps pinned
+    - Transition Planning to Testing when thresholds and plan exist
+    - Transition Testing to Reviewing on log entry
+    - Transition any state to Stalled after two missed plans
+    - Transition Stalled to Action crisis on low expectancy
+    - Transition any state to Archived on exit or completion
+    - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 13.10_
+
+- [ ] 3. Create Tree Canvas interface
+  - [ ] 3.1 Build grid interface for initial capture
+    - Display top cell for one-line problem or wish input
+    - Provide three small fields for assumptions
+    - Pre-select Save button for automatic capture
+    - _Requirements: 1.1, 1.2, 1.3_
+  
+  - [ ] 3.2 Implement node save functionality
+    - Store dump on save
+    - Name the node
+    - Suggest optional tags
+    - _Requirements: 1.4_
+
+- [ ] 4. Build parallel ideation interface
+  - [ ] 4.1 Create six idea slots
+    - Open six slots when idea is saved
+    - Require user to fill at least three before showing AI
+    - Hide AI suggestions until minimum user slots filled
+    - _Requirements: 2.1, 2.2, 16.2_
+  
+  - [ ] 4.2 Implement Diverger agent
+    - Generate five options avoiding common answers
+    - Include one weird option
+    - Keep one constrained to one hour
+    - Keep one under 100 dollars
+    - Fill three AI slots in parallel using anti-prototype and constraint-first prompts
+    - _Requirements: 2.3, 13.1, 14.1_
+  
+  - [ ] 4.3 Add timer for incubation
+    - Display timer for short walk or light activity after first pass
+    - Resurface same node when timer ends
+    - Use short timers and bring back same node
+    - _Requirements: 2.4, 2.5, 16.3_
+
+- [ ] 5. Create North Star and Ladder interface
+  - [ ] 5.1 Build North Star card
+    - Display why in one line
+    - Keep pinned and visible
+    - _Requirements: 3.1, 3.2, 3.4_
+  
+  - [ ] 5.2 Build Ladder beside North Star
+    - List first three concrete steps
+    - Keep pinned and visible
+    - _Requirements: 3.1, 3.3, 3.4_
+  
+  - [ ] 5.3 Add Mars-adjacent alternatives
+    - Allow user to swap any step for alternative
+    - Ensure alternative points at same North Star
+    - _Requirements: 3.5_
+
+- [ ] 6. Implement constraint-based planning
+  - [ ] 6.1 Create constraint toggles
+    - Provide toggles for time cap, money cap, skills on hand
+    - Frame plans by user-selected constraints
+    - _Requirements: 4.2_
+  
+  - [ ] 6.2 Display constraint reminder banner
+    - Show banner that moderate meaningful constraints help originality
+    - Show note when constraint raises creativity odds
+    - _Requirements: 4.3, 16.6_
+  
+  - [ ] 6.3 Implement Planner agent
+    - Offer two or three micro-plans per idea
+    - Produce two micro-plans per option under chosen constraints
+    - Include one smallest honest test per plan with metric, pass threshold, fail threshold
+    - _Requirements: 4.1, 13.1, 14.2_
+
+- [ ] 7. Build risk assessment interface
+  - [ ] 7.1 Create pre-mortem card
+    - Display two-minute pre-mortem card before big push
+    - Prompt user to write why this could fail
+    - _Requirements: 5.1, 5.2_
+  
+  - [ ] 7.2 Implement Skeptic agent
+    - Imagine six months later failure
+    - List three most likely causes with one test each
+    - Ask which assumption would change first
+    - _Requirements: 13.1, 14.3_
+  
+  - [ ] 7.3 Create outside-view card
+    - Pull base rates from similar projects
+    - If data scarce, ask user to draw rough reference class
+    - _Requirements: 5.3, 5.4_
+  
+  - [ ] 7.4 Implement Statistician agent
+    - List comparable efforts
+    - Estimate base rates for success or time to first milestone
+    - If no data, ask user to pick three nearest cases and rate similarity
+    - _Requirements: 13.1, 14.4_
+
+- [ ] 8. Create test selection interface
+  - [ ] 8.1 Propose smallest honest tests
+    - Propose two or three smallest honest tests per plan
+    - Allow user to select tests
+    - _Requirements: 6.1, 6.2_
+  
+  - [ ] 8.2 Capture test criteria
+    - Prompt for metric
+    - Prompt for pass or fail threshold
+    - Record test definitions in node
+    - _Requirements: 6.3, 6.4_
+
+- [ ] 9. Build if-then planning interface
+  - [ ] 9.1 Prompt for if-then plan
+    - Prompt after any dump or plan change
+    - Include date, time, place fields
+    - Store if-then plan with node
+    - _Requirements: 7.1, 7.2, 7.3_
+  
+  - [ ] 9.2 Implement Coach agent for planning
+    - Turn user actions into if-then plans with date, time, place
+    - _Requirements: 13.1, 14.5_
+
+- [ ] 10. Create progress logging interface
+  - [ ] 10.1 Display Log progress button
+    - Show one-tap button after planned test window
+    - Ask what happened, what learned, what next
+    - _Requirements: 8.1, 8.2_
+  
+  - [ ] 10.2 Implement accountability reporting
+    - Offer optional accountability sending weekly report to user or partner
+    - Show only recorded outcomes and learning notes
+    - Avoid streaks or likes
+    - Show clear progress lines and learning notes
+    - _Requirements: 8.3, 16.4_
+
+- [ ] 11. Implement Coach agent critique
+  - [ ] 11.1 Create critique scaffolding
+    - State the bar
+    - Affirm ability to reach it
+    - Give specific process changes
+    - Rewrite critique into high standards with assurance and concrete steps
+    - _Requirements: 9.1, 13.1, 14.5_
+  
+  - [ ] 11.2 Avoid harmful feedback patterns
+    - Avoid person labels
+    - Keep focus on assumptions and evidence
+    - _Requirements: 9.2_
+
+- [ ] 12. Build incubation support
+  - [ ] 12.1 Detect stall or low energy
+    - Monitor when user stalls or returns low-energy
+    - _Requirements: 10.1_
+  
+  - [ ] 12.2 Recommend breaks
+    - Recommend 10 to 15 minute undemanding break or short walk
+    - Reopen same node for second pass when user returns
+    - _Requirements: 10.1, 10.2_
+
+- [ ] 13. Create action crisis interface
+  - [ ] 13.1 Detect stalled progress
+    - Open Action crisis card if repeated logs show little movement or low expectancy
+    - _Requirements: 11.1_
+  
+  - [ ] 13.2 Offer recommit or exit
+    - Offer two week recommit or exit test with clear metrics
+    - If exit, provide fast re-engage path to different route serving same North Star
+    - _Requirements: 11.2, 11.3_
+
+- [ ] 14. Implement learning archive
+  - [ ] 14.1 Create archive page on completion
+    - When branch finished or exited, write page with tests, evidence, one sentence advice to future self
+    - _Requirements: 12.1_
+  
+  - [ ] 14.2 Feed archive into outside view
+    - Use archive to feed outside-view step next time
+    - _Requirements: 12.2_
+
+- [ ] 15. Add post-capture UX patterns
+  - [ ] 15.1 Show save confirmation
+    - Show Save confirmed after capture
+    - Display nudge to plan
+    - _Requirements: 16.1_
+
+- [ ] 16. Implement team features
+  - [ ] 16.1 Add anonymous idea collection
+    - Offer anonymous idea collection in teams to reduce evaluation fear
+    - _Requirements: 16.5_
+
+- [ ] 17. Build metrics tracking
+  - [ ] 17.1 Track acquisition metrics
+    - Track number of seeds per user
+    - Track percent that reach planning
+    - Track percent that set date and place
+    - _Requirements: 17.1_
+  
+  - [ ] 17.2 Track execution metrics
+    - Track tests scheduled within seven days
+    - Track planned tests that actually run
+    - Track pass or fail rates
+    - Track time to first result
+    - _Requirements: 17.2_
+  
+  - [ ] 17.3 Track learning metrics
+    - Track average number of lessons per branch
+    - Track number of archive pages read before new planning
+    - _Requirements: 17.3_
+  
+  - [ ] 17.4 Track motivation metrics
+    - Track energy and expectancy slider values after sessions
+    - Track trend lines per branch
+    - Track number of novelty injections chosen
+    - _Requirements: 17.4_
+  
+  - [ ] 17.5 Track quality metrics
+    - Track share of ideas that progressed from seed to at least one honest test then to decision
+    - _Requirements: 17.5_
