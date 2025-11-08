@@ -1,0 +1,26 @@
+import { db } from '../db'
+import { northStars } from '../../db/schema'
+
+export default defineEventHandler(async event => {
+  const body = await readBody(event)
+  const { branchId, text } = body
+
+  if (!branchId || !text) {
+    throw createError({
+      statusCode: 400,
+      message: 'branchId and text are required'
+    })
+  }
+
+  const [northStar] = await db
+    .insert(northStars)
+    .values({
+      branchId,
+      text,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
+    .returning()
+
+  return { northStar }
+})
