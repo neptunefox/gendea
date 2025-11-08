@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   const { problem, userIdeas } = body
 
@@ -33,7 +33,13 @@ Generate ONE weird, unconventional, or playful solution. Don't worry about pract
 
 Generate ONE solution using only skills and resources you already have. No new purchases or learning required.`
 
-  const prompts = [antiPrototypePrompt, oneHourPrompt, under100Prompt, weirdPrompt, constraintPrompt]
+  const prompts = [
+    antiPrototypePrompt,
+    oneHourPrompt,
+    under100Prompt,
+    weirdPrompt,
+    constraintPrompt
+  ]
 
   for (const prompt of prompts) {
     const idea = await generateSingleIdea(prompt)

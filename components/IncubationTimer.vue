@@ -3,19 +3,18 @@
     <div class="timer-card">
       <h2 class="timer-title">Take a Break</h2>
       <p class="timer-description">
-        Go for a short walk or do a light activity. We'll bring you back to this idea when the timer ends.
+        Go for a short walk or do a light activity. We'll bring you back to this idea when the timer
+        ends.
       </p>
-      
+
       <div class="timer-display">
         <div class="time-circle">
           <span class="time-text">{{ formattedTime }}</span>
         </div>
       </div>
-      
+
       <div class="timer-actions">
-        <button class="skip-button" @click="skipTimer">
-          Skip Break
-        </button>
+        <button class="skip-button" @click="skipTimer">Skip Break</button>
       </div>
     </div>
   </div>
@@ -39,7 +38,7 @@ const formattedTime = computed(() => {
 onMounted(() => {
   intervalId = setInterval(() => {
     remainingSeconds.value--
-    
+
     if (remainingSeconds.value <= 0) {
       completeTimer()
     }

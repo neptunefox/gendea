@@ -16,7 +16,7 @@ export const workflowMachine = setup({
   },
   guards: {
     hasTwoMissedPlans: ({ context }) => context.missedPlans >= 2,
-    hasLowExpectancy: ({ context }) => 
+    hasLowExpectancy: ({ context }) =>
       context.expectancyRating !== undefined && context.expectancyRating < 3
   }
 }).createMachine({
@@ -50,7 +50,7 @@ export const workflowMachine = setup({
     },
     Testing: {
       on: {
-        LOG_ENTRY: { 
+        LOG_ENTRY: {
           target: 'Reviewing',
           actions: 'resetMissedPlans'
         },

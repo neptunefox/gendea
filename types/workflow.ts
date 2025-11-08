@@ -1,4 +1,4 @@
-export type WorkflowState = 
+export type WorkflowState =
   | 'Seeded'
   | 'Diverging'
   | 'Clarifying'

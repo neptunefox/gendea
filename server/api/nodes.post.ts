@@ -2,7 +2,7 @@ import { db } from '~/server/db'
 import { nodes, branches } from '~/db/schema'
 import { eq } from 'drizzle-orm'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   const { idea, assumptions } = body
 
@@ -13,32 +13,40 @@ export default defineEventHandler(async (event) => {
     state: 'Seeded'
   })
 
-  await db.update(branches)
-    .set({ 
+  await db
+    .update(branches)
+    .set({
       state: 'Diverging',
       updatedAt: new Date()
     })
     .where(eq(branches.id, branchId))
 
-  const [savedIdea] = await db.insert(nodes).values({
-    ...idea,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }).returning()
+  const [savedIdea] = await db
+    .insert(nodes)
+    .values({
+      ...idea,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })
+    .returning()
 
   const savedAssumptions = []
   for (const assumption of assumptions) {
-    const [saved] = await db.insert(nodes).values({
-      ...assumption,
-      parentId: savedIdea.id,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning()
+    const [saved] = await db
+      .insert(nodes)
+      .values({
+        ...assumption,
+        parentId: savedIdea.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning()
     savedAssumptions.push(saved)
   }
 
-  await db.update(nodes)
-    .set({ 
+  await db
+    .update(nodes)
+    .set({
       childIds: savedAssumptions.map(a => a.id),
       updatedAt: new Date()
     })

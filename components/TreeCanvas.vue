@@ -26,13 +26,7 @@
         </div>
       </div>
 
-      <button
-        class="save-button selected"
-        :disabled="!canSave"
-        @click="handleSave"
-      >
-        Save
-      </button>
+      <button class="save-button selected" :disabled="!canSave" @click="handleSave">Save</button>
     </div>
   </div>
 </template>
@@ -49,7 +43,7 @@ const emit = defineEmits<{
 
 const handleSave = () => {
   if (!canSave.value) return
-  
+
   emit('save', {
     problem: problemText.value,
     assumptions: assumptions.value.filter(a => a.trim().length > 0)

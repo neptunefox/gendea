@@ -5,7 +5,6 @@
     - Define node types: Idea, Assumption, Plan, Test, Result, Decision, Lesson
     - Store fields: text, rationale, constraints, metric, threshold, if-then plan, date, time, place, energy rating, expectancy rating, parent and child links
     - _Requirements: 15.1, 15.2_
-  
   - [x] 1.2 Add North Star and Ladder storage
     - Store one pinned North Star per branch
     - Maintain Ladder of next steps that stays visible
@@ -30,7 +29,6 @@
     - Provide three small fields for assumptions
     - Pre-select Save button for automatic capture
     - _Requirements: 1.1, 1.2, 1.3_
-  
   - [x] 3.2 Implement node save functionality
     - Store dump on save
     - Name the node
@@ -43,7 +41,6 @@
     - Require user to fill at least three before showing AI
     - Hide AI suggestions until minimum user slots filled
     - _Requirements: 2.1, 2.2, 16.2_
-  
   - [x] 4.2 Implement Diverger agent
     - Generate five options avoiding common answers
     - Include one weird option
@@ -51,25 +48,22 @@
     - Keep one under 100 dollars
     - Fill three AI slots in parallel using anti-prototype and constraint-first prompts
     - _Requirements: 2.3, 13.1, 14.1_
-  
   - [x] 4.3 Add timer for incubation
     - Display timer for short walk or light activity after first pass
     - Resurface same node when timer ends
     - Use short timers and bring back same node
     - _Requirements: 2.4, 2.5, 16.3_
 
-- [ ] 5. Create North Star and Ladder interface
-  - [ ] 5.1 Build North Star card
+- [x] 5. Create North Star and Ladder interface
+  - [x] 5.1 Build North Star card
     - Display why in one line
     - Keep pinned and visible
     - _Requirements: 3.1, 3.2, 3.4_
-  
-  - [ ] 5.2 Build Ladder beside North Star
+  - [x] 5.2 Build Ladder beside North Star
     - List first three concrete steps
     - Keep pinned and visible
     - _Requirements: 3.1, 3.3, 3.4_
-  
-  - [ ] 5.3 Add Mars-adjacent alternatives
+  - [x] 5.3 Add Mars-adjacent alternatives
     - Allow user to swap any step for alternative
     - Ensure alternative points at same North Star
     - _Requirements: 3.5_
@@ -79,12 +73,10 @@
     - Provide toggles for time cap, money cap, skills on hand
     - Frame plans by user-selected constraints
     - _Requirements: 4.2_
-  
   - [ ] 6.2 Display constraint reminder banner
     - Show banner that moderate meaningful constraints help originality
     - Show note when constraint raises creativity odds
     - _Requirements: 4.3, 16.6_
-  
   - [ ] 6.3 Implement Planner agent
     - Offer two or three micro-plans per idea
     - Produce two micro-plans per option under chosen constraints
@@ -96,18 +88,15 @@
     - Display two-minute pre-mortem card before big push
     - Prompt user to write why this could fail
     - _Requirements: 5.1, 5.2_
-  
   - [ ] 7.2 Implement Skeptic agent
     - Imagine six months later failure
     - List three most likely causes with one test each
     - Ask which assumption would change first
     - _Requirements: 13.1, 14.3_
-  
   - [ ] 7.3 Create outside-view card
     - Pull base rates from similar projects
     - If data scarce, ask user to draw rough reference class
     - _Requirements: 5.3, 5.4_
-  
   - [ ] 7.4 Implement Statistician agent
     - List comparable efforts
     - Estimate base rates for success or time to first milestone
@@ -119,7 +108,6 @@
     - Propose two or three smallest honest tests per plan
     - Allow user to select tests
     - _Requirements: 6.1, 6.2_
-  
   - [ ] 8.2 Capture test criteria
     - Prompt for metric
     - Prompt for pass or fail threshold
@@ -132,7 +120,6 @@
     - Include date, time, place fields
     - Store if-then plan with node
     - _Requirements: 7.1, 7.2, 7.3_
-  
   - [ ] 9.2 Implement Coach agent for planning
     - Turn user actions into if-then plans with date, time, place
     - _Requirements: 13.1, 14.5_
@@ -142,7 +129,6 @@
     - Show one-tap button after planned test window
     - Ask what happened, what learned, what next
     - _Requirements: 8.1, 8.2_
-  
   - [ ] 10.2 Implement accountability reporting
     - Offer optional accountability sending weekly report to user or partner
     - Show only recorded outcomes and learning notes
@@ -157,7 +143,6 @@
     - Give specific process changes
     - Rewrite critique into high standards with assurance and concrete steps
     - _Requirements: 9.1, 13.1, 14.5_
-  
   - [ ] 11.2 Avoid harmful feedback patterns
     - Avoid person labels
     - Keep focus on assumptions and evidence
@@ -167,7 +152,6 @@
   - [ ] 12.1 Detect stall or low energy
     - Monitor when user stalls or returns low-energy
     - _Requirements: 10.1_
-  
   - [ ] 12.2 Recommend breaks
     - Recommend 10 to 15 minute undemanding break or short walk
     - Reopen same node for second pass when user returns
@@ -177,7 +161,6 @@
   - [ ] 13.1 Detect stalled progress
     - Open Action crisis card if repeated logs show little movement or low expectancy
     - _Requirements: 11.1_
-  
   - [ ] 13.2 Offer recommit or exit
     - Offer two week recommit or exit test with clear metrics
     - If exit, provide fast re-engage path to different route serving same North Star
@@ -187,7 +170,6 @@
   - [ ] 14.1 Create archive page on completion
     - When branch finished or exited, write page with tests, evidence, one sentence advice to future self
     - _Requirements: 12.1_
-  
   - [ ] 14.2 Feed archive into outside view
     - Use archive to feed outside-view step next time
     - _Requirements: 12.2_
@@ -209,25 +191,21 @@
     - Track percent that reach planning
     - Track percent that set date and place
     - _Requirements: 17.1_
-  
   - [ ] 17.2 Track execution metrics
     - Track tests scheduled within seven days
     - Track planned tests that actually run
     - Track pass or fail rates
     - Track time to first result
     - _Requirements: 17.2_
-  
   - [ ] 17.3 Track learning metrics
     - Track average number of lessons per branch
     - Track number of archive pages read before new planning
     - _Requirements: 17.3_
-  
   - [ ] 17.4 Track motivation metrics
     - Track energy and expectancy slider values after sessions
     - Track trend lines per branch
     - Track number of novelty injections chosen
     - _Requirements: 17.4_
-  
   - [ ] 17.5 Track quality metrics
     - Track share of ideas that progressed from seed to at least one honest test then to decision
     - _Requirements: 17.5_

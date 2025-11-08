@@ -8,6 +8,7 @@ Idea generation and exploration tool.
 - `main` - Empty default branch
 
 Switch to the prototype branch to see the code:
+
 ```bash
 git checkout prototype
 ```

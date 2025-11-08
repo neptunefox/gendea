@@ -2,19 +2,19 @@
   <div class="ideation-container">
     <h2 class="title">Generate Ideas</h2>
     <p class="subtitle">Fill at least 3 slots with your ideas</p>
-    
+
     <div class="slots-grid">
       <div
         v-for="(slot, index) in slots"
         :key="index"
         class="idea-slot"
-        :class="{ 'filled': slot.text.trim().length > 0, 'ai-slot': slot.isAI }"
+        :class="{ filled: slot.text.trim().length > 0, 'ai-slot': slot.isAI }"
       >
         <div class="slot-header">
           <span class="slot-number">{{ index + 1 }}</span>
           <span v-if="slot.isAI" class="ai-badge">AI</span>
         </div>
-        
+
         <textarea
           v-if="!slot.isAI || showAI"
           v-model="slot.text"
@@ -23,21 +23,22 @@
           class="slot-input"
           rows="3"
         />
-        
+
         <div v-else class="ai-hidden">
-          <p>Fill {{ 3 - userFilledCount }} more slot{{ 3 - userFilledCount !== 1 ? 's' : '' }} to unlock AI suggestions</p>
+          <p>
+            Fill {{ 3 - userFilledCount }} more slot{{ 3 - userFilledCount !== 1 ? 's' : '' }} to
+            unlock AI suggestions
+          </p>
         </div>
       </div>
     </div>
-    
+
     <div class="progress-info">
       <p>{{ userFilledCount }} of 3 minimum slots filled</p>
     </div>
-    
+
     <div v-if="showAI && allSlotsFilled" class="actions">
-      <button class="incubation-button" @click="startIncubation">
-        Take a Break
-      </button>
+      <button class="incubation-button" @click="startIncubation">Take a Break</button>
     </div>
   </div>
 </template>
@@ -70,9 +71,7 @@ const slots = ref<IdeaSlot[]>([
 ])
 
 const userFilledCount = computed(() => {
-  return slots.value
-    .filter(slot => !slot.isAI && slot.text.trim().length > 0)
-    .length
+  return slots.value.filter(slot => !slot.isAI && slot.text.trim().length > 0).length
 })
 
 const showAI = computed(() => userFilledCount.value >= 3)
@@ -86,18 +85,19 @@ const startIncubation = () => {
   emit('incubate')
 }
 
-watch(showAI, async (shouldShow) => {
+watch(showAI, async shouldShow => {
   if (shouldShow && !aiGenerated.value) {
     aiGenerated.value = true
     await generateAIIdeas()
-    emit('complete', slots.value.filter(s => !s.isAI).map(s => s.text))
+    emit(
+      'complete',
+      slots.value.filter(s => !s.isAI).map(s => s.text)
+    )
   }
 })
 
 const generateAIIdeas = async () => {
-  const userIdeas = slots.value
-    .filter(s => !s.isAI && s.text.trim().length > 0)
-    .map(s => s.text)
+  const userIdeas = slots.value.filter(s => !s.isAI && s.text.trim().length > 0).map(s => s.text)
 
   try {
     const response = await $fetch<{ ideas: string[] }>('/api/diverge', {
@@ -235,7 +235,9 @@ const generateAIIdeas = async () => {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 

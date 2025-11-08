@@ -13,7 +13,7 @@ interface SaveNodeResult {
 export const useNodeSave = () => {
   const saveNode = async (input: SaveNodeInput): Promise<SaveNodeResult> => {
     const branchId = crypto.randomUUID()
-    
+
     const ideaNode: Partial<Node> = {
       type: 'Idea',
       text: input.problem,

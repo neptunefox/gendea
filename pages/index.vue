@@ -1,12 +1,12 @@
 <template>
   <div class="page-container">
     <TreeCanvas v-if="currentView === 'capture'" @save="handleSave" />
-    
+
     <div v-else-if="currentView === 'confirmation'" class="save-confirmation">
       <div class="confirmation-message">
         <h2>✓ Save confirmed</h2>
         <p class="node-name">{{ nodeName }}</p>
-        
+
         <div v-if="suggestedTags.length > 0" class="tags-section">
           <p class="tags-label">Suggested tags:</p>
           <div class="tags">
@@ -15,15 +15,13 @@
             </span>
           </div>
         </div>
-        
+
         <p class="nudge">Ready to plan your next steps?</p>
-        
-        <button class="continue-button" @click="startIdeation">
-          Continue
-        </button>
+
+        <button class="continue-button" @click="startIdeation">Continue</button>
       </div>
     </div>
-    
+
     <IdeationSlots
       v-else-if="currentView === 'ideation'"
       :branch-id="savedNode?.branchId || ''"
@@ -31,12 +29,9 @@
       @complete="handleIdeationComplete"
       @incubate="handleIncubation"
     />
-    
-    <IncubationTimer
-      v-else-if="currentView === 'incubation'"
-      @complete="handleTimerComplete"
-    />
-    
+
+    <IncubationTimer v-else-if="currentView === 'incubation'" @complete="handleTimerComplete" />
+
     <IdeationSlots
       v-else-if="currentView === 'ideation-second'"
       :branch-id="savedNode?.branchId || ''"
