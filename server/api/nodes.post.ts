@@ -1,7 +1,6 @@
 import { db } from '~/server/db'
 import { nodes, branches } from '~/db/schema'
 import { eq } from 'drizzle-orm'
-import type { Node } from '~/types/node'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -13,6 +12,13 @@ export default defineEventHandler(async (event) => {
     id: branchId,
     state: 'Seeded'
   })
+
+  await db.update(branches)
+    .set({ 
+      state: 'Diverging',
+      updatedAt: new Date()
+    })
+    .where(eq(branches.id, branchId))
 
   const [savedIdea] = await db.insert(nodes).values({
     ...idea,
