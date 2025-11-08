@@ -1,8 +1,8 @@
 <template>
   <div class="page-container">
-    <TreeCanvas v-if="!savedNode" @save="handleSave" />
+    <TreeCanvas v-if="currentView === 'capture'" @save="handleSave" />
     
-    <div v-else class="save-confirmation">
+    <div v-else-if="currentView === 'confirmation'" class="save-confirmation">
       <div class="confirmation-message">
         <h2>✓ Save confirmed</h2>
         <p class="node-name">{{ nodeName }}</p>
@@ -18,38 +18,85 @@
         
         <p class="nudge">Ready to plan your next steps?</p>
         
-        <button @click="resetForm" class="new-idea-button">
-          Start New Idea
+        <button class="continue-button" @click="startIdeation">
+          Continue
         </button>
       </div>
     </div>
+    
+    <IdeationSlots
+      v-else-if="currentView === 'ideation'"
+      :branch-id="savedNode?.branchId || ''"
+      :problem-text="problemText"
+      @complete="handleIdeationComplete"
+      @incubate="handleIncubation"
+    />
+    
+    <IncubationTimer
+      v-else-if="currentView === 'incubation'"
+      @complete="handleTimerComplete"
+    />
+    
+    <IdeationSlots
+      v-else-if="currentView === 'ideation-second'"
+      :branch-id="savedNode?.branchId || ''"
+      :problem-text="problemText"
+      @complete="handleSecondPassComplete"
+      @incubate="handleSecondIncubation"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Node } from '~/types/node'
+import { useNodeSave } from '../composables/useNodeSave'
+
+type ViewState = 'capture' | 'confirmation' | 'ideation' | 'incubation' | 'ideation-second'
 
 const { saveNode, generateNodeName } = useNodeSave()
 
+const currentView = ref<ViewState>('capture')
 const savedNode = ref<Node | null>(null)
 const nodeName = ref('')
 const suggestedTags = ref<string[]>([])
+const problemText = ref('')
 
-const handleSave = async (data: { problem: string; assumptions: string[] }) => {
+async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {
     const result = await saveNode(data)
     savedNode.value = result.node
     nodeName.value = generateNodeName(data.problem)
     suggestedTags.value = result.suggestedTags
+    problemText.value = data.problem
+    currentView.value = 'confirmation'
   } catch (error) {
     console.error('Failed to save node:', error)
   }
 }
 
-const resetForm = () => {
-  savedNode.value = null
-  nodeName.value = ''
-  suggestedTags.value = []
+function startIdeation() {
+  currentView.value = 'ideation'
+}
+
+function handleIdeationComplete(ideas: string[]) {
+  console.log('User ideas:', ideas)
+}
+
+function handleIncubation() {
+  currentView.value = 'incubation'
+}
+
+function handleTimerComplete() {
+  currentView.value = 'ideation-second'
+}
+
+function handleSecondPassComplete(ideas: string[]) {
+  console.log('Second pass ideas:', ideas)
+}
+
+function handleSecondIncubation() {
+  console.log('User wants another break')
 }
 </script>
 
@@ -116,7 +163,7 @@ const resetForm = () => {
   margin-bottom: 1.5rem;
 }
 
-.new-idea-button {
+.continue-button {
   padding: 0.75rem 1.5rem;
   background-color: #3b82f6;
   color: white;
@@ -127,7 +174,7 @@ const resetForm = () => {
   transition: background-color 0.2s;
 }
 
-.new-idea-button:hover {
+.continue-button:hover {
   background-color: #2563eb;
 }
 </style>
