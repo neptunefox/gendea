@@ -1,18 +1,18 @@
 # Implementation Plan
 
-- [ ] 1. Implement data model for nodes
-  - [ ] 1.1 Create Node data structure
+- [x] 1. Implement data model for nodes
+  - [x] 1.1 Create Node data structure
     - Define node types: Idea, Assumption, Plan, Test, Result, Decision, Lesson
     - Store fields: text, rationale, constraints, metric, threshold, if-then plan, date, time, place, energy rating, expectancy rating, parent and child links
     - _Requirements: 15.1, 15.2_
   
-  - [ ] 1.2 Add North Star and Ladder storage
+  - [x] 1.2 Add North Star and Ladder storage
     - Store one pinned North Star per branch
     - Maintain Ladder of next steps that stays visible
     - _Requirements: 15.3, 15.4_
 
-- [ ] 2. Build state machine for workflow
-  - [ ] 2.1 Implement state transitions
+- [x] 2. Build state machine for workflow
+  - [x] 2.1 Implement state transitions
     - Support states: Seeded, Diverging, Clarifying, Planning, Testing, Reviewing, Stalled, Action crisis, Archived
     - Transition Seeded to Diverging on save
     - Transition Diverging to Clarifying when slots filled or timer ends
@@ -24,14 +24,14 @@
     - Transition any state to Archived on exit or completion
     - _Requirements: 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 13.10_
 
-- [ ] 3. Create Tree Canvas interface
-  - [ ] 3.1 Build grid interface for initial capture
+- [x] 3. Create Tree Canvas interface
+  - [x] 3.1 Build grid interface for initial capture
     - Display top cell for one-line problem or wish input
     - Provide three small fields for assumptions
     - Pre-select Save button for automatic capture
     - _Requirements: 1.1, 1.2, 1.3_
   
-  - [ ] 3.2 Implement node save functionality
+  - [x] 3.2 Implement node save functionality
     - Store dump on save
     - Name the node
     - Suggest optional tags
