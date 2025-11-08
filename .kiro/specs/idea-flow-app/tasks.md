@@ -68,22 +68,22 @@
     - Ensure alternative points at same North Star
     - _Requirements: 3.5_
 
-- [ ] 6. Implement constraint-based planning
+- [x] 6. Implement constraint-based planning
   - [x] 6.1 Wire up LLM service integration
     - Create LLM service wrapper with direct API calls
     - Support Ollama for local development
     - Support OpenRouter for cloud access to multiple models
     - Add configuration for provider and model selection
     - _Requirements: 13.1, 14.1, 14.2, 14.3, 14.4, 14.5_
-  - [ ] 6.2 Create constraint toggles
+  - [x] 6.2 Create constraint toggles
     - Provide toggles for time cap, money cap, skills on hand
     - Frame plans by user-selected constraints
     - _Requirements: 4.2_
-  - [ ] 6.3 Display constraint reminder banner
+  - [x] 6.3 Display constraint reminder banner
     - Show banner that moderate meaningful constraints help originality
     - Show note when constraint raises creativity odds
     - _Requirements: 4.3, 16.6_
-  - [ ] 6.4 Implement Planner agent
+  - [x] 6.4 Implement Planner agent
     - Offer two or three micro-plans per idea
     - Produce two micro-plans per option under chosen constraints
     - Include one smallest honest test per plan with metric, pass threshold, fail threshold

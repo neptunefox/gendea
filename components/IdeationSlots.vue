@@ -42,7 +42,13 @@
       <p>{{ userFilledCount }} of 3 minimum slots filled</p>
     </div>
 
-    <div v-if="showAI && allSlotsFilled" class="actions">
+    <div v-if="showAI && !aiGenerated" class="actions">
+      <button class="generate-button" :disabled="isGenerating" @click="triggerAIGeneration">
+        {{ isGenerating ? 'Generating...' : 'Generate AI Ideas' }}
+      </button>
+    </div>
+
+    <div v-if="showAI && aiGenerated && allSlotsFilled" class="actions">
       <button class="incubation-button" @click="startIncubation">Take a Break</button>
     </div>
   </div>
@@ -91,18 +97,18 @@ const startIncubation = () => {
   emit('incubate')
 }
 
-watch(showAI, async shouldShow => {
-  if (shouldShow && !aiGenerated.value) {
-    aiGenerated.value = true
-    isGenerating.value = true
-    await generateAIIdeas()
-    isGenerating.value = false
-    emit(
-      'complete',
-      slots.value.filter(s => !s.isAI).map(s => s.text)
-    )
-  }
-})
+async function triggerAIGeneration() {
+  if (aiGenerated.value || isGenerating.value) return
+
+  aiGenerated.value = true
+  isGenerating.value = true
+  await generateAIIdeas()
+  isGenerating.value = false
+  emit(
+    'complete',
+    slots.value.filter(s => !s.isAI).map(s => s.text)
+  )
+}
 
 const generateAIIdeas = async () => {
   const userIdeas = slots.value.filter(s => !s.isAI && s.text.trim().length > 0).map(s => s.text)
@@ -232,6 +238,27 @@ const generateAIIdeas = async () => {
   display: flex;
   justify-content: center;
   margin-top: 2rem;
+}
+
+.generate-button {
+  padding: 0.875rem 2rem;
+  background-color: #a855f7;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.generate-button:hover:not(:disabled) {
+  background-color: #9333ea;
+}
+
+.generate-button:disabled {
+  background-color: #c4b5fd;
+  cursor: not-allowed;
 }
 
 .incubation-button {
