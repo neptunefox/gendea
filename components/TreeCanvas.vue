@@ -9,7 +9,7 @@
           type="text"
           placeholder="Describe in one line..."
           class="problem-field"
-        />
+        >
       </div>
 
       <div class="assumptions-section">
@@ -22,14 +22,14 @@
             type="text"
             :placeholder="`Assumption ${i}`"
             class="assumption-field"
-          />
+          >
         </div>
       </div>
 
       <button
         class="save-button selected"
-        @click="handleSave"
         :disabled="!canSave"
+        @click="handleSave"
       >
         Save
       </button>
