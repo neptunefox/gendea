@@ -109,109 +109,158 @@
     - If no data, ask user to pick three nearest cases and rate similarity
     - _Requirements: 13.1, 14.4_
 
-- [ ] 8. Create test selection interface
-  - [ ] 8.1 Propose smallest honest tests
+- [ ] 8. Integrate Clarification, Planning, and Risk stages
+  - [ ] 8.1 Surface Clarification view after ideation
+    - Render the Clarification view immediately after the second ideation pass so users can pin a North Star and record three Ladder steps for the active branch
+    - Keep Mars-adjacent swaps available while maintaining the pinned North Star context
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 8.2 Continue into planning and risk assessment
+    - Flow directly from Clarification to Planning so users can pick constraints and request Planner output before leaving the canvas
+    - Route successful plan generation into the Risk Assessment sequence so the Pre-mortem, Skeptic, Outside View, and Statistician steps run in order
+    - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 5.4, 14.2, 14.3, 14.4_
+  - [ ] 8.3 Persist branch context across stages
+    - Pass `branchId`, North Star, Ladder, and plan details between components
+    - Store resulting records so downstream stages can reference the same branch artifacts
+    - _Requirements: 3.4, 4.1, 5.1, 5.2_
+
+- [ ] 9. Implement workflow transitions in the UI
+  - [ ] 9.1 Emit workflow events from user actions
+    - Send SAVE, SLOTS_FILLED, TIMER_ENDED, NORTH_STAR_PINNED, and THRESHOLDS_SET events when the corresponding milestones occur
+    - Trigger LOG_ENTRY, PLAN_MISSED, and LOW_EXPECTANCY events from progress logs and energy inputs
+    - _Requirements: 13.3, 13.4, 13.5, 13.6, 13.7_
+  - [ ] 9.2 Persist branch state and missed-plan counts
+    - Update branch records with the latest workflow state and `missedPlans` count after each transition
+    - Expose live branch state to the UI so later stages stay gated until prior requirements are met
+    - _Requirements: 13.2, 13.8, 13.9, 13.10_
+
+- [ ] 10. Complete Diverger coverage and AI slot handling
+  - [ ] 10.1 Return the five required AI suggestions
+    - Populate anti-prototype, one-hour, under-$100, weird, and skills-on-hand slots instead of truncating to three
+    - Label each AI slot so users see which constraint produced it
+    - _Requirements: 2.3, 14.1_
+  - [ ] 10.2 Keep AI results available after prerequisites
+    - Continue hiding AI suggestions until three user ideas exist, then retain the generated ideas when the node resurfaces
+    - _Requirements: 2.2, 16.2_
+
+- [ ] 11. Enforce purposeful incubation and resurfacing
+  - [ ] 11.1 Auto-start incubation timer on completion
+    - Trigger the short walk / light activity timer once first-pass ideation finishes and nudge breaks when users report low energy
+    - _Requirements: 2.4, 10.1_
+  - [ ] 11.2 Restore the same node after incubation
+    - Reopen the original ideation slots with previously entered ideas and AI suggestions after the timer ends
+    - _Requirements: 2.5, 10.2, 16.3_
+
+- [ ] 12. Persist node naming on save
+  - [ ] 12.1 Add node name storage
+    - Extend the node schema and save API to store the generated node name alongside the text dump
+    - _Requirements: 1.4_
+  - [ ] 12.2 Return stored names to the UI
+    - Use the persisted name in confirmation, tree views, and later stages instead of recomputing client-side
+    - _Requirements: 1.4_
+
+- [ ] 13. Create test selection interface
+  - [ ] 13.1 Propose smallest honest tests
     - Propose two or three smallest honest tests per plan
     - Allow user to select tests
     - _Requirements: 6.1, 6.2_
-  - [ ] 8.2 Capture test criteria
+  - [ ] 13.2 Capture test criteria
     - Prompt for metric
     - Prompt for pass or fail threshold
     - Record test definitions in node
     - _Requirements: 6.3, 6.4_
 
-- [ ] 9. Build if-then planning interface
-  - [ ] 9.1 Prompt for if-then plan
+- [ ] 14. Build if-then planning interface
+  - [ ] 14.1 Prompt for if-then plan
     - Prompt after any dump or plan change
     - Include date, time, place fields
     - Store if-then plan with node
     - _Requirements: 7.1, 7.2, 7.3_
-  - [ ] 9.2 Implement Coach agent for planning
+  - [ ] 14.2 Implement Coach agent for planning
     - Turn user actions into if-then plans with date, time, place
     - _Requirements: 13.1, 14.5_
 
-- [ ] 10. Create progress logging interface
-  - [ ] 10.1 Display Log progress button
+- [ ] 15. Create progress logging interface
+  - [ ] 15.1 Display Log progress button
     - Show one-tap button after planned test window
     - Ask what happened, what learned, what next
     - _Requirements: 8.1, 8.2_
-  - [ ] 10.2 Implement accountability reporting
+  - [ ] 15.2 Implement accountability reporting
     - Offer optional accountability sending weekly report to user or partner
     - Show only recorded outcomes and learning notes
     - Avoid streaks or likes
     - Show clear progress lines and learning notes
     - _Requirements: 8.3, 16.4_
 
-- [ ] 11. Implement Coach agent critique
-  - [ ] 11.1 Create critique scaffolding
+- [ ] 16. Implement Coach agent critique
+  - [ ] 16.1 Create critique scaffolding
     - State the bar
     - Affirm ability to reach it
     - Give specific process changes
     - Rewrite critique into high standards with assurance and concrete steps
     - _Requirements: 9.1, 13.1, 14.5_
-  - [ ] 11.2 Avoid harmful feedback patterns
+  - [ ] 16.2 Avoid harmful feedback patterns
     - Avoid person labels
     - Keep focus on assumptions and evidence
     - _Requirements: 9.2_
 
-- [ ] 12. Build incubation support
-  - [ ] 12.1 Detect stall or low energy
+- [ ] 17. Build incubation support
+  - [ ] 17.1 Detect stall or low energy
     - Monitor when user stalls or returns low-energy
     - _Requirements: 10.1_
-  - [ ] 12.2 Recommend breaks
+  - [ ] 17.2 Recommend breaks
     - Recommend 10 to 15 minute undemanding break or short walk
     - Reopen same node for second pass when user returns
     - _Requirements: 10.1, 10.2_
 
-- [ ] 13. Create action crisis interface
-  - [ ] 13.1 Detect stalled progress
+- [ ] 18. Create action crisis interface
+  - [ ] 18.1 Detect stalled progress
     - Open Action crisis card if repeated logs show little movement or low expectancy
     - _Requirements: 11.1_
-  - [ ] 13.2 Offer recommit or exit
+  - [ ] 18.2 Offer recommit or exit
     - Offer two week recommit or exit test with clear metrics
     - If exit, provide fast re-engage path to different route serving same North Star
     - _Requirements: 11.2, 11.3_
 
-- [ ] 14. Implement learning archive
-  - [ ] 14.1 Create archive page on completion
+- [ ] 19. Implement learning archive
+  - [ ] 19.1 Create archive page on completion
     - When branch finished or exited, write page with tests, evidence, one sentence advice to future self
     - _Requirements: 12.1_
-  - [ ] 14.2 Feed archive into outside view
+  - [ ] 19.2 Feed archive into outside view
     - Use archive to feed outside-view step next time
     - _Requirements: 12.2_
 
-- [ ] 15. Add post-capture UX patterns
-  - [ ] 15.1 Show save confirmation
+- [ ] 20. Add post-capture UX patterns
+  - [ ] 20.1 Show save confirmation
     - Show Save confirmed after capture
     - Display nudge to plan
     - _Requirements: 16.1_
 
-- [ ] 16. Implement team features
-  - [ ] 16.1 Add anonymous idea collection
+- [ ] 21. Implement team features
+  - [ ] 21.1 Add anonymous idea collection
     - Offer anonymous idea collection in teams to reduce evaluation fear
     - _Requirements: 16.5_
 
-- [ ] 17. Build metrics tracking
-  - [ ] 17.1 Track acquisition metrics
+- [ ] 22. Build metrics tracking
+  - [ ] 22.1 Track acquisition metrics
     - Track number of seeds per user
     - Track percent that reach planning
     - Track percent that set date and place
     - _Requirements: 17.1_
-  - [ ] 17.2 Track execution metrics
+  - [ ] 22.2 Track execution metrics
     - Track tests scheduled within seven days
     - Track planned tests that actually run
     - Track pass or fail rates
     - Track time to first result
     - _Requirements: 17.2_
-  - [ ] 17.3 Track learning metrics
+  - [ ] 22.3 Track learning metrics
     - Track average number of lessons per branch
     - Track number of archive pages read before new planning
     - _Requirements: 17.3_
-  - [ ] 17.4 Track motivation metrics
+  - [ ] 22.4 Track motivation metrics
     - Track energy and expectancy slider values after sessions
     - Track trend lines per branch
     - Track number of novelty injections chosen
     - _Requirements: 17.4_
-  - [ ] 17.5 Track quality metrics
+  - [ ] 22.5 Track quality metrics
     - Track share of ideas that progressed from seed to at least one honest test then to decision
     - _Requirements: 17.5_
