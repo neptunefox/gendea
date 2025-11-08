@@ -37,14 +37,14 @@
     - Suggest optional tags
     - _Requirements: 1.4_
 
-- [ ] 4. Build parallel ideation interface
-  - [ ] 4.1 Create six idea slots
+- [x] 4. Build parallel ideation interface
+  - [x] 4.1 Create six idea slots
     - Open six slots when idea is saved
     - Require user to fill at least three before showing AI
     - Hide AI suggestions until minimum user slots filled
     - _Requirements: 2.1, 2.2, 16.2_
   
-  - [ ] 4.2 Implement Diverger agent
+  - [x] 4.2 Implement Diverger agent
     - Generate five options avoiding common answers
     - Include one weird option
     - Keep one constrained to one hour
@@ -52,7 +52,7 @@
     - Fill three AI slots in parallel using anti-prototype and constraint-first prompts
     - _Requirements: 2.3, 13.1, 14.1_
   
-  - [ ] 4.3 Add timer for incubation
+  - [x] 4.3 Add timer for incubation
     - Display timer for short walk or light activity after first pass
     - Resurface same node when timer ends
     - Use short timers and bring back same node
