@@ -1,3 +1,5 @@
+import { useLLMService } from '../utils/llm'
+
 export default defineEventHandler(async event => {
   const body = await readBody(event)
   const { problem, userIdeas } = body
@@ -50,5 +52,15 @@ Generate ONE solution using only skills and resources you already have. No new p
 }
 
 async function generateSingleIdea(prompt: string): Promise<string> {
-  return `[AI Generated] ${prompt.split('\n')[0].substring(0, 50)}...`
+  const llm = useLLMService()
+  const systemPrompt =
+    'You are a creative ideation assistant. Generate concise, actionable ideas. Respond with just the idea itself, no preamble or explanation.'
+
+  try {
+    const idea = await llm.generate(prompt, systemPrompt)
+    return idea.trim()
+  } catch (error) {
+    console.error('Failed to generate idea:', error)
+    return `[Error generating idea: ${error instanceof Error ? error.message : 'Unknown error'}]`
+  }
 }

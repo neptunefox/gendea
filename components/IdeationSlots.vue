@@ -15,8 +15,13 @@
           <span v-if="slot.isAI" class="ai-badge">AI</span>
         </div>
 
+        <div v-if="slot.isAI && isGenerating" class="ai-loading">
+          <div class="spinner" />
+          <p>AI is generating ideas...</p>
+        </div>
+
         <textarea
-          v-if="!slot.isAI || showAI"
+          v-else-if="!slot.isAI || showAI"
           v-model="slot.text"
           :placeholder="slot.isAI ? 'AI suggestion will appear here...' : 'Your idea...'"
           :disabled="slot.isAI"
@@ -76,6 +81,7 @@ const userFilledCount = computed(() => {
 
 const showAI = computed(() => userFilledCount.value >= 3)
 const aiGenerated = ref(false)
+const isGenerating = ref(false)
 
 const allSlotsFilled = computed(() => {
   return slots.value.every(slot => slot.text.trim().length > 0)
@@ -88,7 +94,9 @@ const startIncubation = () => {
 watch(showAI, async shouldShow => {
   if (shouldShow && !aiGenerated.value) {
     aiGenerated.value = true
+    isGenerating.value = true
     await generateAIIdeas()
+    isGenerating.value = false
     emit(
       'complete',
       slots.value.filter(s => !s.isAI).map(s => s.text)
@@ -244,5 +252,35 @@ const generateAIIdeas = async () => {
 .incubation-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 0.75rem;
+}
+
+.ai-loading p {
+  color: #a855f7;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e9d5ff;
+  border-top-color: #a855f7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

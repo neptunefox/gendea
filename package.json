@@ -6,7 +6,8 @@
     "preview": "nuxt preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:migrate": "bun run scripts/migrate.ts"
   },
   "dependencies": {},
   "devDependencies": {
