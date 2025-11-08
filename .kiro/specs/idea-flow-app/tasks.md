@@ -89,21 +89,21 @@
     - Include one smallest honest test per plan with metric, pass threshold, fail threshold
     - _Requirements: 4.1, 13.1, 14.2_
 
-- [ ] 7. Build risk assessment interface
-  - [ ] 7.1 Create pre-mortem card
+- [x] 7. Build risk assessment interface
+  - [x] 7.1 Create pre-mortem card
     - Display two-minute pre-mortem card before big push
     - Prompt user to write why this could fail
     - _Requirements: 5.1, 5.2_
-  - [ ] 7.2 Implement Skeptic agent
+  - [x] 7.2 Implement Skeptic agent
     - Imagine six months later failure
     - List three most likely causes with one test each
     - Ask which assumption would change first
     - _Requirements: 13.1, 14.3_
-  - [ ] 7.3 Create outside-view card
+  - [x] 7.3 Create outside-view card
     - Pull base rates from similar projects
     - If data scarce, ask user to draw rough reference class
     - _Requirements: 5.3, 5.4_
-  - [ ] 7.4 Implement Statistician agent
+  - [x] 7.4 Implement Statistician agent
     - List comparable efforts
     - Estimate base rates for success or time to first milestone
     - If no data, ask user to pick three nearest cases and rate similarity

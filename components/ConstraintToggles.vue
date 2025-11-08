@@ -5,17 +5,17 @@
 
     <div class="toggles">
       <label class="toggle-item">
-        <input v-model="localConstraints.timeCap" type="checkbox" @change="emitChange" />
+        <input v-model="localConstraints.timeCap" type="checkbox" @change="emitChange" >
         <span class="toggle-label">Time cap (1 hour)</span>
       </label>
 
       <label class="toggle-item">
-        <input v-model="localConstraints.moneyCap" type="checkbox" @change="emitChange" />
+        <input v-model="localConstraints.moneyCap" type="checkbox" @change="emitChange" >
         <span class="toggle-label">Money cap ($100)</span>
       </label>
 
       <label class="toggle-item">
-        <input v-model="localConstraints.skillsOnHand" type="checkbox" @change="emitChange" />
+        <input v-model="localConstraints.skillsOnHand" type="checkbox" @change="emitChange" >
         <span class="toggle-label">Skills on hand only</span>
       </label>
     </div>
