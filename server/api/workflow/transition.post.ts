@@ -15,12 +15,23 @@ export default defineEventHandler(async event => {
     })
   }
 
+  const existingBranch = await db.query.branches.findFirst({
+    where: eq(branches.id, branchId)
+  })
+
+  if (existingBranch) {
+    workflowService.getOrCreateActor(branchId, {
+      missedPlans: existingBranch.missedPlans
+    })
+  }
+
   const snapshot = workflowService.transition(branchId, workflowEvent)
 
   await db
     .update(branches)
     .set({
-      state: snapshot.value as string,
+      state: snapshot.value as any,
+      missedPlans: snapshot.context.missedPlans,
       updatedAt: new Date()
     })
     .where(eq(branches.id, branchId))

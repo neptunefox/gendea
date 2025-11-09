@@ -70,6 +70,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: [ideas: string[]]
   incubate: []
+  slotsFilled: []
 }>()
 
 const slots = ref<IdeaSlot[]>([
@@ -102,6 +103,17 @@ async function triggerAIGeneration() {
 
   aiGenerated.value = true
   isGenerating.value = true
+
+  emit('slotsFilled')
+
+  await $fetch('/api/workflow/transition', {
+    method: 'POST',
+    body: {
+      branchId: props.branchId,
+      event: { type: 'SLOTS_FILLED' }
+    }
+  })
+
   await generateAIIdeas()
   isGenerating.value = false
   emit(

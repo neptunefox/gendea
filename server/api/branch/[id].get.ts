@@ -1,19 +1,19 @@
 import { db } from '../../db'
-import { branches, northStars, ladderSteps, plans } from '../../../db/schema'
+import { branches } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async event => {
-  const branchId = getRouterParam(event, 'id')
+  const id = getRouterParam(event, 'id')
 
-  if (!branchId) {
+  if (!id) {
     throw createError({
       statusCode: 400,
-      message: 'branchId is required'
+      message: 'Branch ID is required'
     })
   }
 
   const branch = await db.query.branches.findFirst({
-    where: eq(branches.id, branchId)
+    where: eq(branches.id, id)
   })
 
   if (!branch) {
@@ -23,23 +23,5 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const northStar = await db.query.northStars.findFirst({
-    where: eq(northStars.branchId, branchId)
-  })
-
-  const ladder = await db.query.ladderSteps.findMany({
-    where: eq(ladderSteps.branchId, branchId),
-    orderBy: (steps, { asc }) => [asc(steps.order)]
-  })
-
-  const plan = await db.query.plans.findFirst({
-    where: eq(plans.branchId, branchId)
-  })
-
-  return {
-    branch,
-    northStar: northStar || null,
-    ladderSteps: ladder,
-    plan: plan || null
-  }
+  return { branch }
 })

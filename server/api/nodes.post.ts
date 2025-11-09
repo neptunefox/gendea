@@ -13,13 +13,13 @@ export default defineEventHandler(async event => {
     state: 'Seeded'
   })
 
-  await db
-    .update(branches)
-    .set({
-      state: 'Diverging',
-      updatedAt: new Date()
-    })
-    .where(eq(branches.id, branchId))
+  await $fetch('/api/workflow/transition', {
+    method: 'POST',
+    body: {
+      branchId,
+      event: { type: 'SAVE' }
+    }
+  })
 
   const [savedIdea] = await db
     .insert(nodes)

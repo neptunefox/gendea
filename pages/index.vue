@@ -30,7 +30,11 @@
       @incubate="handleIncubation"
     />
 
-    <IncubationTimer v-else-if="currentView === 'incubation'" @complete="handleTimerComplete" />
+    <IncubationTimer
+      v-else-if="currentView === 'incubation'"
+      :branch-id="savedNode?.branchId || ''"
+      @complete="handleTimerComplete"
+    />
 
     <IdeationSlots
       v-else-if="currentView === 'ideation-second'"

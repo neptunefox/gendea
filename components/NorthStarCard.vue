@@ -19,7 +19,7 @@
         placeholder="The core purpose or goal..."
         class="input-field"
         @keyup.enter="saveNorthStar"
-      >
+      />
       <div class="button-group">
         <button class="save-button" :disabled="!canSave" @click="saveNorthStar">
           {{ northStar ? 'Update' : 'Pin North Star' }}
@@ -71,13 +71,21 @@ function cancelEditing() {
   editText.value = props.northStar?.text || ''
 }
 
-function saveNorthStar() {
+async function saveNorthStar() {
   if (!canSave.value) return
 
   if (props.northStar) {
     emit('update', editText.value)
   } else {
     emit('save', editText.value)
+
+    await $fetch('/api/workflow/transition', {
+      method: 'POST',
+      body: {
+        branchId: props.branchId,
+        event: { type: 'NORTH_STAR_PINNED' }
+      }
+    })
   }
 
   isEditing.value = false

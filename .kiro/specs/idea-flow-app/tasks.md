@@ -123,12 +123,12 @@
     - Store resulting records so downstream stages can reference the same branch artifacts
     - _Requirements: 3.4, 4.1, 5.1, 5.2_
 
-- [ ] 9. Implement workflow transitions in the UI
-  - [ ] 9.1 Emit workflow events from user actions
+- [x] 9. Implement workflow transitions in the UI
+  - [x] 9.1 Emit workflow events from user actions
     - Send SAVE, SLOTS_FILLED, TIMER_ENDED, NORTH_STAR_PINNED, and THRESHOLDS_SET events when the corresponding milestones occur
     - Trigger LOG_ENTRY, PLAN_MISSED, and LOW_EXPECTANCY events from progress logs and energy inputs
     - _Requirements: 13.3, 13.4, 13.5, 13.6, 13.7_
-  - [ ] 9.2 Persist branch state and missed-plan counts
+  - [x] 9.2 Persist branch state and missed-plan counts
     - Update branch records with the latest workflow state and `missedPlans` count after each transition
     - Expose live branch state to the UI so later stages stay gated until prior requirements are met
     - _Requirements: 13.2, 13.8, 13.9, 13.10_

@@ -20,7 +20,7 @@
             placeholder="Concrete step..."
             class="input-field"
             @keyup.enter="saveStep(index)"
-          >
+          />
           <div class="button-group">
             <button class="save-button" :disabled="!canSave" @click="saveStep(index)">Save</button>
             <button class="cancel-button" @click="cancelEditing">Cancel</button>

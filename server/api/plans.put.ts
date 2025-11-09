@@ -65,5 +65,13 @@ export default defineEventHandler(async event => {
     savedPlan = created
   }
 
+  await $fetch('/api/workflow/transition', {
+    method: 'POST',
+    body: {
+      branchId,
+      event: { type: 'THRESHOLDS_SET' }
+    }
+  })
+
   return { plan: savedPlan }
 })

@@ -21,6 +21,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const props = defineProps<{
+  branchId: string
+}>()
+
 const emit = defineEmits<{
   complete: []
 }>()
@@ -51,10 +57,19 @@ onUnmounted(() => {
   }
 })
 
-const completeTimer = () => {
+const completeTimer = async () => {
   if (intervalId) {
     clearInterval(intervalId)
   }
+
+  await $fetch('/api/workflow/transition', {
+    method: 'POST',
+    body: {
+      branchId: props.branchId,
+      event: { type: 'TIMER_ENDED' }
+    }
+  })
+
   emit('complete')
 }
 
