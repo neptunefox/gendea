@@ -109,7 +109,7 @@
     - If no data, ask user to pick three nearest cases and rate similarity
     - _Requirements: 13.1, 14.4_
 
-- [ ] 8. Integrate Clarification, Planning, and Risk stages
+- [x] 8. Integrate Clarification, Planning, and Risk stages
   - [x] 8.1 Surface Clarification view after ideation
     - Render the Clarification view immediately after the second ideation pass so users can pin a North Star and record three Ladder steps for the active branch
     - Keep Mars-adjacent swaps available while maintaining the pinned North Star context
