@@ -34,6 +34,7 @@ const emit = defineEmits<{
 const TIMER_DURATION = 10 * 60
 const remainingSeconds = ref(TIMER_DURATION)
 let intervalId: NodeJS.Timeout | null = null
+let endTime: number | null = null
 
 const formattedTime = computed(() => {
   const minutes = Math.floor(remainingSeconds.value / 60)
@@ -41,14 +42,22 @@ const formattedTime = computed(() => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 })
 
-onMounted(() => {
-  intervalId = setInterval(() => {
-    remainingSeconds.value--
+const updateTimer = () => {
+  if (!endTime) return
 
-    if (remainingSeconds.value <= 0) {
-      completeTimer()
-    }
-  }, 1000)
+  const now = Date.now()
+  const remaining = Math.max(0, Math.ceil((endTime - now) / 1000))
+  remainingSeconds.value = remaining
+
+  if (remaining <= 0) {
+    completeTimer()
+  }
+}
+
+onMounted(() => {
+  endTime = Date.now() + TIMER_DURATION * 1000
+  
+  intervalId = setInterval(updateTimer, 100)
 })
 
 onUnmounted(() => {

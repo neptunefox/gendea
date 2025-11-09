@@ -1,7 +1,13 @@
 <template>
   <div class="ideation-container">
-    <h2 class="title">Generate Ideas</h2>
-    <p class="subtitle">Fill at least 3 slots with your ideas</p>
+    <h2 class="title">{{ isSecondPass ? 'Refine Your Ideas' : 'Generate Ideas' }}</h2>
+    <p class="subtitle">
+      {{
+        isSecondPass
+          ? 'Review and refine your ideas after your break'
+          : 'Fill at least 3 slots with your ideas'
+      }}
+    </p>
 
     <div class="slots-grid">
       <div
@@ -50,13 +56,18 @@
     </div>
 
     <div v-if="showAI && aiGenerated && allSlotsFilled" class="actions">
-      <button class="incubation-button" @click="startIncubation">Take a Break</button>
+      <button v-if="isSecondPass" class="continue-button" @click="proceedToClarification">
+        Continue to Clarification
+      </button>
+      <button v-else-if="!autoStarted" class="incubation-button" @click="startIncubation">
+        Take a Break
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 
 interface IdeaSlot {
   text: string
@@ -75,6 +86,7 @@ const emit = defineEmits<{
   incubate: []
   slotsFilled: []
   'update:ideas': [ideas: Array<{ text: string; isAI: boolean; label?: string }>]
+  proceed: []
 }>()
 
 const initializeSlots = (): IdeaSlot[] => {
@@ -107,6 +119,8 @@ const hasPreservedAI = computed(() => {
 
 const aiGenerated = ref(hasPreservedAI.value)
 const isGenerating = ref(false)
+const autoStarted = ref(false)
+const isSecondPass = computed(() => !!props.preservedIdeas && props.preservedIdeas.length > 0)
 
 const allSlotsFilled = computed(() => {
   return slots.value.every(slot => slot.text.trim().length > 0)
@@ -125,12 +139,29 @@ watch(
   { deep: true }
 )
 
+watch(allSlotsFilled, filled => {
+  if (filled && aiGenerated.value && !autoStarted.value && !props.preservedIdeas) {
+    autoStarted.value = true
+    nextTick(() => {
+      startIncubation()
+    })
+  }
+})
+
 const startIncubation = () => {
   emit(
     'update:ideas',
     slots.value.map(s => ({ text: s.text, isAI: s.isAI, label: s.label }))
   )
   emit('incubate')
+}
+
+const proceedToClarification = () => {
+  emit(
+    'update:ideas',
+    slots.value.map(s => ({ text: s.text, isAI: s.isAI, label: s.label }))
+  )
+  emit('proceed')
 }
 
 async function triggerAIGeneration() {
@@ -335,6 +366,27 @@ const generateAIIdeas = async () => {
 .incubation-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.continue-button {
+  padding: 0.875rem 2rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.continue-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+  background-color: #2563eb;
 }
 
 .ai-loading {

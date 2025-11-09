@@ -44,6 +44,7 @@
       :preserved-ideas="preservedIdeas"
       @complete="handleSecondPassComplete"
       @incubate="handleSecondIncubation"
+      @proceed="handleSecondPassProceed"
       @update:ideas="preservedIdeas = $event"
     />
 
@@ -130,6 +131,10 @@ function handleSecondPassComplete(ideas: string[]) {
 
 function handleSecondIncubation() {
   console.log('User wants another break')
+}
+
+function handleSecondPassProceed() {
+  currentView.value = 'clarification'
 }
 
 function handleClarificationComplete() {

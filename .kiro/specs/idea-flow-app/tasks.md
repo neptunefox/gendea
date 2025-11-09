@@ -142,11 +142,11 @@
     - Continue hiding AI suggestions until three user ideas exist, then retain the generated ideas when the node resurfaces
     - _Requirements: 2.2, 16.2_
 
-- [ ] 11. Enforce purposeful incubation and resurfacing
-  - [ ] 11.1 Auto-start incubation timer on completion
+- [x] 11. Enforce purposeful incubation and resurfacing
+  - [x] 11.1 Auto-start incubation timer on completion
     - Trigger the short walk / light activity timer once first-pass ideation finishes and nudge breaks when users report low energy
     - _Requirements: 2.4, 10.1_
-  - [ ] 11.2 Restore the same node after incubation
+  - [x] 11.2 Restore the same node after incubation
     - Reopen the original ideation slots with previously entered ideas and AI suggestions after the timer ends
     - _Requirements: 2.5, 10.2, 16.3_
 

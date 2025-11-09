@@ -2,7 +2,8 @@ import { workflowService } from '../../../lib/workflow-service'
 import { db } from '../../db'
 import { branches } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
-import type { WorkflowEvent } from '../../../types/workflow'
+import type { WorkflowEvent, WorkflowState } from '../../../types/workflow'
+import { createError } from 'nuxt/app'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
@@ -30,7 +31,7 @@ export default defineEventHandler(async event => {
   await db
     .update(branches)
     .set({
-      state: snapshot.value as any,
+      state: snapshot.value as WorkflowState,
       missedPlans: snapshot.context.missedPlans,
       updatedAt: new Date()
     })
