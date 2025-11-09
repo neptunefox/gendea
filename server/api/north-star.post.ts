@@ -20,6 +20,13 @@ export default defineEventHandler(async event => {
       createdAt: new Date(),
       updatedAt: new Date()
     })
+    .onConflictDoUpdate({
+      target: northStars.branchId,
+      set: {
+        text,
+        updatedAt: new Date()
+      }
+    })
     .returning()
 
   return { northStar }

@@ -82,7 +82,7 @@ onMounted(async () => {
   await fetchContext()
   if (context.value) {
     northStar.value = context.value.northStar
-    ladderSteps.value = context.value.ladderSteps
+    ladderSteps.value = context.value.ladderSteps || []
   }
 })
 

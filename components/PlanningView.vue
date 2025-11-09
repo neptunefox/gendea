@@ -7,7 +7,7 @@
         <h3 class="context-title">North Star</h3>
         <p class="context-text">{{ context.northStar.text }}</p>
       </div>
-      <div v-if="context.ladderSteps.length > 0" class="context-card">
+      <div v-if="context.ladderSteps && context.ladderSteps.length > 0" class="context-card">
         <h3 class="context-title">Ladder Steps</h3>
         <ol class="ladder-list">
           <li v-for="step in context.ladderSteps" :key="step.id" class="ladder-item">

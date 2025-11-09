@@ -7,6 +7,7 @@ interface SaveNodeInput {
 
 interface SaveNodeResult {
   node: Node
+  nodeName: string
   suggestedTags: string[]
 }
 
@@ -39,12 +40,6 @@ export const useNodeSave = () => {
     return response
   }
 
-  const generateNodeName = (problemText: string): string => {
-    const words = problemText.trim().split(/\s+/)
-    if (words.length <= 3) return problemText
-    return words.slice(0, 3).join(' ') + '...'
-  }
-
   const suggestTags = (problemText: string): string[] => {
     const tags: string[] = []
     const lowerText = problemText.toLowerCase()
@@ -67,7 +62,6 @@ export const useNodeSave = () => {
 
   return {
     saveNode,
-    generateNodeName,
     suggestTags
   }
 }

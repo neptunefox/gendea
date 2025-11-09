@@ -6,6 +6,7 @@ export const nodes = pgTable('nodes', {
     enum: ['Idea', 'Assumption', 'Plan', 'Test', 'Result', 'Decision', 'Lesson']
   }).notNull(),
   text: text('text').notNull(),
+  name: text('name'),
   rationale: text('rationale'),
   constraints: jsonb('constraints').$type<string[]>(),
   metric: text('metric'),

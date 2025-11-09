@@ -21,10 +21,13 @@ export default defineEventHandler(async event => {
     }
   })
 
+  const nodeName = generateNodeName(idea.text)
+
   const [savedIdea] = await db
     .insert(nodes)
     .values({
       ...idea,
+      name: nodeName,
       createdAt: new Date(),
       updatedAt: new Date()
     })
@@ -56,9 +59,16 @@ export default defineEventHandler(async event => {
 
   return {
     node: savedIdea,
+    nodeName,
     suggestedTags
   }
 })
+
+function generateNodeName(text: string): string {
+  const words = text.trim().split(/\s+/)
+  if (words.length <= 3) return text
+  return words.slice(0, 3).join(' ') + '...'
+}
 
 function generateTags(text: string): string[] {
   const tags: string[] = []

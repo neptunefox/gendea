@@ -1,5 +1,5 @@
 import { db } from '../../db'
-import { branches } from '../../../db/schema'
+import { branches, northStars, ladderSteps, plans } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async event => {
@@ -23,5 +23,22 @@ export default defineEventHandler(async event => {
     })
   }
 
-  return { branch }
+  const northStar = await db.query.northStars.findFirst({
+    where: eq(northStars.branchId, id)
+  })
+
+  const steps = await db.query.ladderSteps.findMany({
+    where: eq(ladderSteps.branchId, id)
+  })
+
+  const plan = await db.query.plans.findFirst({
+    where: eq(plans.branchId, id)
+  })
+
+  return {
+    branch,
+    northStar: northStar || null,
+    ladderSteps: steps || [],
+    plan: plan || null
+  }
 })

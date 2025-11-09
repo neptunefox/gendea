@@ -56,7 +56,7 @@ const updateTimer = () => {
 
 onMounted(() => {
   endTime = Date.now() + TIMER_DURATION * 1000
-  
+
   intervalId = setInterval(updateTimer, 100)
 })
 

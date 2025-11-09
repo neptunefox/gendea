@@ -150,11 +150,11 @@
     - Reopen the original ideation slots with previously entered ideas and AI suggestions after the timer ends
     - _Requirements: 2.5, 10.2, 16.3_
 
-- [ ] 12. Persist node naming on save
-  - [ ] 12.1 Add node name storage
+- [x] 12. Persist node naming on save
+  - [x] 12.1 Add node name storage
     - Extend the node schema and save API to store the generated node name alongside the text dump
     - _Requirements: 1.4_
-  - [ ] 12.2 Return stored names to the UI
+  - [x] 12.2 Return stored names to the UI
     - Use the persisted name in confirmation, tree views, and later stages instead of recomputing client-side
     - _Requirements: 1.4_
 

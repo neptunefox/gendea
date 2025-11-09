@@ -4,6 +4,7 @@ export interface Node {
   id: string
   type: NodeType
   text: string
+  name?: string
   rationale?: string
   constraints?: string[]
   metric?: string

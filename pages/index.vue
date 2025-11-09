@@ -85,7 +85,7 @@ type ViewState =
   | 'planning'
   | 'risk-assessment'
 
-const { saveNode, generateNodeName } = useNodeSave()
+const { saveNode } = useNodeSave()
 
 const currentView = ref<ViewState>('capture')
 const savedNode = ref<Node | null>(null)
@@ -99,7 +99,7 @@ async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {
     const result = await saveNode(data)
     savedNode.value = result.node
-    nodeName.value = generateNodeName(data.problem)
+    nodeName.value = result.nodeName
     suggestedTags.value = result.suggestedTags
     problemText.value = data.problem
     currentView.value = 'confirmation'
