@@ -3,7 +3,7 @@ import { db } from '../../db'
 import { branches } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
 import type { WorkflowEvent, WorkflowState } from '../../../types/workflow'
-import { createError } from 'nuxt/app'
+import { createError } from 'h3'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
