@@ -2,6 +2,21 @@
   <div class="planning-view">
     <h2 class="title">Create Your Plan</h2>
 
+    <div v-if="context" class="context-section">
+      <div v-if="context.northStar" class="context-card">
+        <h3 class="context-title">North Star</h3>
+        <p class="context-text">{{ context.northStar.text }}</p>
+      </div>
+      <div v-if="context.ladderSteps.length > 0" class="context-card">
+        <h3 class="context-title">Ladder Steps</h3>
+        <ol class="ladder-list">
+          <li v-for="step in context.ladderSteps" :key="step.id" class="ladder-item">
+            {{ step.text }}
+          </li>
+        </ol>
+      </div>
+    </div>
+
     <ConstraintBanner :has-constraints="hasActiveConstraints" />
 
     <ConstraintToggles v-model="constraints" />
@@ -61,7 +76,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useBranchContext } from '~/composables/useBranchContext'
 
 interface Constraints {
   timeCap: boolean
@@ -83,6 +99,8 @@ const props = defineProps<{
   idea: string
 }>()
 
+const { context, fetchContext } = useBranchContext(props.branchId)
+
 const constraints = ref<Constraints>({
   timeCap: false,
   moneyCap: false,
@@ -99,6 +117,31 @@ const selectedPlanIndex = ref<number | null>(null)
 
 const hasActiveConstraints = computed(() => {
   return constraints.value.timeCap || constraints.value.moneyCap || constraints.value.skillsOnHand
+})
+
+onMounted(async () => {
+  await fetchContext()
+  if (context.value?.plan) {
+    const existingPlan = context.value.plan
+    plans.value = [
+      {
+        description: existingPlan.description,
+        test: {
+          metric: existingPlan.metric,
+          passThreshold: existingPlan.passThreshold,
+          failThreshold: existingPlan.failThreshold
+        }
+      }
+    ]
+    selectedPlanIndex.value = 0
+    if (existingPlan.constraints) {
+      constraints.value = {
+        timeCap: existingPlan.constraints.timeCap || false,
+        moneyCap: existingPlan.constraints.moneyCap || false,
+        skillsOnHand: existingPlan.constraints.skillsOnHand || false
+      }
+    }
+  }
 })
 
 async function generatePlans() {
@@ -129,6 +172,16 @@ async function proceedToRiskAssessment() {
   const plan = plans.value[selectedPlanIndex.value]
 
   try {
+    await $fetch('/api/plans', {
+      method: 'PUT',
+      body: {
+        branchId: props.branchId,
+        description: plan.description,
+        constraints: constraints.value,
+        test: plan.test
+      }
+    })
+
     await $fetch('/api/workflow/transition', {
       method: 'POST',
       body: {
@@ -139,7 +192,7 @@ async function proceedToRiskAssessment() {
 
     emit('proceed', plan.description)
   } catch (error) {
-    console.error('Failed to transition workflow:', error)
+    console.error('Failed to save plan or transition workflow:', error)
   }
 }
 </script>
@@ -156,6 +209,62 @@ async function proceedToRiskAssessment() {
   font-weight: 700;
   color: #111827;
   margin-bottom: 1.5rem;
+}
+
+.context-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .context-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.context-card {
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.context-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.context-text {
+  font-size: 0.9375rem;
+  color: #111827;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.ladder-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.ladder-item {
+  font-size: 0.9375rem;
+  color: #111827;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ladder-item:last-child {
+  margin-bottom: 0;
 }
 
 .idea-section {

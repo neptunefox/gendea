@@ -63,3 +63,19 @@ export const branches = pgTable('branches', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
+
+export const plans = pgTable('plans', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  branchId: uuid('branch_id').notNull().unique(),
+  description: text('description').notNull(),
+  constraints: jsonb('constraints').$type<{
+    timeCap?: boolean
+    moneyCap?: boolean
+    skillsOnHand?: boolean
+  }>(),
+  metric: text('metric').notNull(),
+  passThreshold: text('pass_threshold').notNull(),
+  failThreshold: text('fail_threshold').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})

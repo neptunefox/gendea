@@ -2,6 +2,17 @@
   <div class="risk-assessment-view">
     <h2 class="title">Risk Assessment</h2>
 
+    <div v-if="context" class="context-section">
+      <div v-if="context.northStar" class="context-card">
+        <h3 class="context-title">North Star</h3>
+        <p class="context-text">{{ context.northStar.text }}</p>
+      </div>
+      <div v-if="context.plan" class="context-card">
+        <h3 class="context-title">Selected Plan</h3>
+        <p class="context-text">{{ context.plan.description }}</p>
+      </div>
+    </div>
+
     <div v-if="currentStep === 'pre-mortem'" class="step-container">
       <PreMortemCard @submit="handlePreMortemSubmit" />
     </div>
@@ -23,14 +34,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useBranchContext } from '~/composables/useBranchContext'
 
 type AssessmentStep = 'pre-mortem' | 'skeptic' | 'outside-view' | 'statistician'
 
-defineProps<{
+const props = defineProps<{
   branchId: string
   plan: string
 }>()
+
+const { context, fetchContext } = useBranchContext(props.branchId)
 
 const emit = defineEmits<{
   complete: []
@@ -39,6 +53,10 @@ const emit = defineEmits<{
 const currentStep = ref<AssessmentStep>('pre-mortem')
 const userFailureReason = ref('')
 const referenceClass = ref('')
+
+onMounted(async () => {
+  await fetchContext()
+})
 
 function handlePreMortemSubmit(failureReason: string) {
   userFailureReason.value = failureReason
@@ -72,6 +90,45 @@ function complete() {
   color: #111827;
   margin-bottom: 2rem;
   text-align: center;
+}
+
+.context-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .context-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.context-card {
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.context-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.context-text {
+  font-size: 0.9375rem;
+  color: #111827;
+  margin: 0;
+  line-height: 1.6;
 }
 
 .step-container {

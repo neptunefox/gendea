@@ -52,8 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import type { NorthStar, LadderStep } from '~/types/node'
+import { useBranchContext } from '~/composables/useBranchContext'
 
 interface Props {
   branchId: string
@@ -65,6 +66,8 @@ const emit = defineEmits<{
   proceed: []
 }>()
 
+const { context, fetchContext } = useBranchContext(props.branchId)
+
 const northStar = ref<NorthStar | null>(null)
 const ladderSteps = ref<LadderStep[]>([])
 const showAlternatives = ref(false)
@@ -73,6 +76,14 @@ const swappingStepIndex = ref<number | null>(null)
 
 const canProceed = computed(() => {
   return northStar.value !== null && ladderSteps.value.length >= 3
+})
+
+onMounted(async () => {
+  await fetchContext()
+  if (context.value) {
+    northStar.value = context.value.northStar
+    ladderSteps.value = context.value.ladderSteps
+  }
 })
 
 async function handleNorthStarSave(text: string) {

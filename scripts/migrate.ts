@@ -61,6 +61,20 @@ async function main() {
     );
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS plans (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      branch_id UUID NOT NULL UNIQUE,
+      description TEXT NOT NULL,
+      constraints JSONB,
+      metric TEXT NOT NULL,
+      pass_threshold TEXT NOT NULL,
+      fail_threshold TEXT NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

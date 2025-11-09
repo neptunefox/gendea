@@ -118,7 +118,7 @@
     - Flow directly from Clarification to Planning so users can pick constraints and request Planner output before leaving the canvas
     - Route successful plan generation into the Risk Assessment sequence so the Pre-mortem, Skeptic, Outside View, and Statistician steps run in order
     - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 5.4, 14.2, 14.3, 14.4_
-  - [ ] 8.3 Persist branch context across stages
+  - [x] 8.3 Persist branch context across stages
     - Pass `branchId`, North Star, Ladder, and plan details between components
     - Store resulting records so downstream stages can reference the same branch artifacts
     - _Requirements: 3.4, 4.1, 5.1, 5.2_
