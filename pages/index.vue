@@ -39,6 +39,12 @@
       @complete="handleSecondPassComplete"
       @incubate="handleSecondIncubation"
     />
+
+    <ClarificationView
+      v-else-if="currentView === 'clarification'"
+      :branch-id="savedNode?.branchId || ''"
+      @proceed="handleClarificationComplete"
+    />
   </div>
 </template>
 
@@ -47,7 +53,13 @@ import { ref } from 'vue'
 import type { Node } from '~/types/node'
 import { useNodeSave } from '../composables/useNodeSave'
 
-type ViewState = 'capture' | 'confirmation' | 'ideation' | 'incubation' | 'ideation-second'
+type ViewState =
+  | 'capture'
+  | 'confirmation'
+  | 'ideation'
+  | 'incubation'
+  | 'ideation-second'
+  | 'clarification'
 
 const { saveNode, generateNodeName } = useNodeSave()
 
@@ -88,10 +100,15 @@ function handleTimerComplete() {
 
 function handleSecondPassComplete(ideas: string[]) {
   console.log('Second pass ideas:', ideas)
+  currentView.value = 'clarification'
 }
 
 function handleSecondIncubation() {
   console.log('User wants another break')
+}
+
+function handleClarificationComplete() {
+  console.log('Clarification complete, ready for planning')
 }
 </script>
 

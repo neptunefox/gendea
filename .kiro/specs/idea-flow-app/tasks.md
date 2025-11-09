@@ -110,7 +110,7 @@
     - _Requirements: 13.1, 14.4_
 
 - [ ] 8. Integrate Clarification, Planning, and Risk stages
-  - [ ] 8.1 Surface Clarification view after ideation
+  - [x] 8.1 Surface Clarification view after ideation
     - Render the Clarification view immediately after the second ideation pass so users can pin a North Star and record three Ladder steps for the active branch
     - Keep Mars-adjacent swaps available while maintaining the pinned North Star context
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
