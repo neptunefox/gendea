@@ -114,7 +114,7 @@
     - Render the Clarification view immediately after the second ideation pass so users can pin a North Star and record three Ladder steps for the active branch
     - Keep Mars-adjacent swaps available while maintaining the pinned North Star context
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
-  - [ ] 8.2 Continue into planning and risk assessment
+  - [x] 8.2 Continue into planning and risk assessment
     - Flow directly from Clarification to Planning so users can pick constraints and request Planner output before leaving the canvas
     - Route successful plan generation into the Risk Assessment sequence so the Pre-mortem, Skeptic, Outside View, and Statistician steps run in order
     - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 5.4, 14.2, 14.3, 14.4_

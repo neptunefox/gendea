@@ -26,7 +26,9 @@ export default defineEventHandler(async event => {
 
   const constraintText = buildConstraintText(constraints)
 
-  const systemPrompt = `You are a planning agent that creates practical micro-plans. Each plan should be concrete, actionable, and include a smallest honest test with clear metrics and thresholds.`
+  const systemPrompt = `You are a planning agent that creates practical micro-plans. Each plan should be concrete, actionable, and include a smallest honest test with clear metrics and thresholds.
+
+CRITICAL: You must respond with ONLY valid JSON. No explanations, no markdown, no code blocks. Just the raw JSON array.`
 
   const userPrompt = `Generate 2 micro-plans for this idea: "${idea}"
 
@@ -39,7 +41,7 @@ For each plan:
    - A pass threshold (what success looks like)
    - A fail threshold (what failure looks like)
 
-Format your response as JSON array with this structure:
+Respond with ONLY this JSON structure (no markdown, no code blocks):
 [
   {
     "description": "plan description",
@@ -52,7 +54,15 @@ Format your response as JSON array with this structure:
 ]`
 
   try {
-    const response = await llm.generate(userPrompt, systemPrompt)
+    let response = await llm.generate(userPrompt, systemPrompt)
+
+    response = response.trim()
+    if (response.startsWith('```json')) {
+      response = response.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    } else if (response.startsWith('```')) {
+      response = response.replace(/```\n?/g, '')
+    }
+
     const plans = JSON.parse(response) as MicroPlan[]
 
     return {

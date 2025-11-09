@@ -21,7 +21,9 @@ export default defineEventHandler(async event => {
 
   const llm = useLLMService()
 
-  const systemPrompt = `You are a skeptic agent that helps identify risks through pre-mortem analysis. Imagine the plan has failed six months from now and identify the most likely causes.`
+  const systemPrompt = `You are a skeptic agent that helps identify risks through pre-mortem analysis. Imagine the plan has failed six months from now and identify the most likely causes.
+
+CRITICAL: You must respond with ONLY valid JSON. No explanations, no markdown, no code blocks. Just the raw JSON object.`
 
   const userContext = userFailureReason ? `\n\nUser's concern: "${userFailureReason}"` : ''
 
@@ -31,7 +33,7 @@ Identify the 3 most likely causes of failure, each with one specific test to val
 
 Then, identify which assumption would most likely change first if this plan is heading toward failure.
 
-Format your response as JSON:
+Respond with ONLY this JSON structure (no markdown, no code blocks):
 {
   "failureCauses": [
     {
@@ -43,7 +45,15 @@ Format your response as JSON:
 }`
 
   try {
-    const response = await llm.generate(userPrompt, systemPrompt)
+    let response = await llm.generate(userPrompt, systemPrompt)
+
+    response = response.trim()
+    if (response.startsWith('```json')) {
+      response = response.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    } else if (response.startsWith('```')) {
+      response = response.replace(/```\n?/g, '')
+    }
+
     const analysis = JSON.parse(response) as SkepticResponse
 
     return {

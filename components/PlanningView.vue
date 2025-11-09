@@ -19,7 +19,13 @@
       <h3 class="section-title">Micro-Plans</h3>
 
       <div class="plans-grid">
-        <div v-for="(plan, index) in plans" :key="index" class="plan-card">
+        <div
+          v-for="(plan, index) in plans"
+          :key="index"
+          class="plan-card"
+          :class="{ selected: selectedPlanIndex === index }"
+          @click="selectPlan(index)"
+        >
           <h4 class="plan-title">Plan {{ index + 1 }}</h4>
           <p class="plan-description">{{ plan.description }}</p>
 
@@ -42,6 +48,14 @@
           </div>
         </div>
       </div>
+
+      <button
+        v-if="selectedPlanIndex !== null"
+        class="proceed-button"
+        @click="proceedToRiskAssessment"
+      >
+        Continue to Risk Assessment →
+      </button>
     </div>
   </div>
 </template>
@@ -65,6 +79,7 @@ interface MicroPlan {
 }
 
 const props = defineProps<{
+  branchId: string
   idea: string
 }>()
 
@@ -74,8 +89,13 @@ const constraints = ref<Constraints>({
   skillsOnHand: false
 })
 
+const emit = defineEmits<{
+  proceed: [plan: string]
+}>()
+
 const plans = ref<MicroPlan[]>([])
 const loading = ref(false)
+const selectedPlanIndex = ref<number | null>(null)
 
 const hasActiveConstraints = computed(() => {
   return constraints.value.timeCap || constraints.value.moneyCap || constraints.value.skillsOnHand
@@ -96,6 +116,30 @@ async function generatePlans() {
     console.error('Failed to generate plans:', error)
   } finally {
     loading.value = false
+  }
+}
+
+function selectPlan(index: number) {
+  selectedPlanIndex.value = index
+}
+
+async function proceedToRiskAssessment() {
+  if (selectedPlanIndex.value === null) return
+
+  const plan = plans.value[selectedPlanIndex.value]
+
+  try {
+    await $fetch('/api/workflow/transition', {
+      method: 'POST',
+      body: {
+        branchId: props.branchId,
+        event: { type: 'THRESHOLDS_SET' }
+      }
+    })
+
+    emit('proceed', plan.description)
+  } catch (error) {
+    console.error('Failed to transition workflow:', error)
   }
 }
 </script>
@@ -170,8 +214,21 @@ async function generatePlans() {
 .plan-card {
   padding: 1.5rem;
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
   border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.plan-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.plan-card.selected {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .plan-title {
@@ -230,5 +287,23 @@ async function generatePlans() {
 
 .test-value.fail {
   color: #dc2626;
+}
+
+.proceed-button {
+  width: 100%;
+  padding: 1rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 2rem;
+}
+
+.proceed-button:hover {
+  background: #059669;
 }
 </style>

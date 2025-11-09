@@ -7,16 +7,16 @@
     </div>
 
     <div v-if="currentStep === 'skeptic'" class="step-container">
-      <SkepticView :plan="plan" :user-failure-reason="userFailureReason" />
+      <SkepticView :branch-id="branchId" :plan="plan" :user-failure-reason="userFailureReason" />
       <button class="next-button" @click="nextStep">Continue to Outside View</button>
     </div>
 
     <div v-if="currentStep === 'outside-view'" class="step-container">
-      <OutsideViewCard @submit="handleOutsideViewSubmit" />
+      <OutsideViewCard :branch-id="branchId" @submit="handleOutsideViewSubmit" />
     </div>
 
     <div v-if="currentStep === 'statistician'" class="step-container">
-      <StatisticianView :plan="plan" :reference-class="referenceClass" />
+      <StatisticianView :branch-id="branchId" :plan="plan" :reference-class="referenceClass" />
       <button class="complete-button" @click="complete">Complete Assessment</button>
     </div>
   </div>
@@ -28,6 +28,7 @@ import { ref } from 'vue'
 type AssessmentStep = 'pre-mortem' | 'skeptic' | 'outside-view' | 'statistician'
 
 defineProps<{
+  branchId: string
   plan: string
 }>()
 

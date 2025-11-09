@@ -45,6 +45,20 @@
       :branch-id="savedNode?.branchId || ''"
       @proceed="handleClarificationComplete"
     />
+
+    <PlanningView
+      v-else-if="currentView === 'planning'"
+      :branch-id="savedNode?.branchId || ''"
+      :idea="problemText"
+      @proceed="handlePlanningComplete"
+    />
+
+    <RiskAssessmentView
+      v-else-if="currentView === 'risk-assessment'"
+      :branch-id="savedNode?.branchId || ''"
+      :plan="selectedPlan"
+      @complete="handleRiskAssessmentComplete"
+    />
   </div>
 </template>
 
@@ -60,6 +74,8 @@ type ViewState =
   | 'incubation'
   | 'ideation-second'
   | 'clarification'
+  | 'planning'
+  | 'risk-assessment'
 
 const { saveNode, generateNodeName } = useNodeSave()
 
@@ -68,6 +84,7 @@ const savedNode = ref<Node | null>(null)
 const nodeName = ref('')
 const suggestedTags = ref<string[]>([])
 const problemText = ref('')
+const selectedPlan = ref('')
 
 async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {
@@ -108,7 +125,16 @@ function handleSecondIncubation() {
 }
 
 function handleClarificationComplete() {
-  console.log('Clarification complete, ready for planning')
+  currentView.value = 'planning'
+}
+
+function handlePlanningComplete(plan: string) {
+  selectedPlan.value = plan
+  currentView.value = 'risk-assessment'
+}
+
+function handleRiskAssessmentComplete() {
+  console.log('Risk assessment complete')
 }
 </script>
 

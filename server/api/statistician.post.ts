@@ -30,7 +30,9 @@ export default defineEventHandler(async event => {
 
   const llm = useLLMService()
 
-  const systemPrompt = `You are a statistician agent that provides base rates and realistic expectations based on similar past efforts. Be honest about success rates and timelines.`
+  const systemPrompt = `You are a statistician agent that provides base rates and realistic expectations based on similar past efforts. Be honest about success rates and timelines.
+
+CRITICAL: You must respond with ONLY valid JSON. No explanations, no markdown, no code blocks. Just the raw JSON object.`
 
   let userPrompt: string
 
@@ -48,7 +50,7 @@ Estimate:
 1. Overall success rate
 2. Time to first meaningful milestone
 
-Format your response as JSON:
+Respond with ONLY this JSON structure (no markdown, no code blocks):
 {
   "comparableEfforts": [
     {
@@ -74,7 +76,7 @@ List 3 comparable efforts and estimate base rates for:
 
 If you don't have enough data to provide reliable estimates, set needsUserInput to true.
 
-Format your response as JSON:
+Respond with ONLY this JSON structure (no markdown, no code blocks):
 {
   "comparableEfforts": [
     {
@@ -92,7 +94,15 @@ Format your response as JSON:
   }
 
   try {
-    const response = await llm.generate(userPrompt, systemPrompt)
+    let response = await llm.generate(userPrompt, systemPrompt)
+
+    response = response.trim()
+    if (response.startsWith('```json')) {
+      response = response.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    } else if (response.startsWith('```')) {
+      response = response.replace(/```\n?/g, '')
+    }
+
     const analysis = JSON.parse(response) as StatisticianResponse
 
     return {
