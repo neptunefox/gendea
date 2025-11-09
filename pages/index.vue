@@ -28,6 +28,7 @@
       :problem-text="problemText"
       @complete="handleIdeationComplete"
       @incubate="handleIncubation"
+      @update:ideas="preservedIdeas = $event"
     />
 
     <IncubationTimer
@@ -40,8 +41,10 @@
       v-else-if="currentView === 'ideation-second'"
       :branch-id="savedNode?.branchId || ''"
       :problem-text="problemText"
+      :preserved-ideas="preservedIdeas"
       @complete="handleSecondPassComplete"
       @incubate="handleSecondIncubation"
+      @update:ideas="preservedIdeas = $event"
     />
 
     <ClarificationView
@@ -89,6 +92,7 @@ const nodeName = ref('')
 const suggestedTags = ref<string[]>([])
 const problemText = ref('')
 const selectedPlan = ref('')
+const preservedIdeas = ref<Array<{ text: string; isAI: boolean; label?: string }>>([])
 
 async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {

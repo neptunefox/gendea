@@ -12,7 +12,8 @@
       >
         <div class="slot-header">
           <span class="slot-number">{{ index + 1 }}</span>
-          <span v-if="slot.isAI" class="ai-badge">AI</span>
+          <span v-if="slot.isAI && slot.label" class="ai-badge">{{ slot.label }}</span>
+          <span v-else-if="slot.isAI" class="ai-badge">AI</span>
         </div>
 
         <div v-if="slot.isAI && isGenerating" class="ai-loading">
@@ -55,46 +56,80 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 interface IdeaSlot {
   text: string
   isAI: boolean
+  label?: string
 }
 
 const props = defineProps<{
   branchId: string
   problemText: string
+  preservedIdeas?: Array<{ text: string; isAI: boolean; label?: string }>
 }>()
 
 const emit = defineEmits<{
   complete: [ideas: string[]]
   incubate: []
   slotsFilled: []
+  'update:ideas': [ideas: Array<{ text: string; isAI: boolean; label?: string }>]
 }>()
 
-const slots = ref<IdeaSlot[]>([
-  { text: '', isAI: false },
-  { text: '', isAI: false },
-  { text: '', isAI: false },
-  { text: '', isAI: true },
-  { text: '', isAI: true },
-  { text: '', isAI: true }
-])
+const initializeSlots = (): IdeaSlot[] => {
+  if (props.preservedIdeas && props.preservedIdeas.length > 0) {
+    return props.preservedIdeas.map(idea => ({ ...idea }))
+  }
+  return [
+    { text: '', isAI: false },
+    { text: '', isAI: false },
+    { text: '', isAI: false },
+    { text: '', isAI: true, label: '' },
+    { text: '', isAI: true, label: '' },
+    { text: '', isAI: true, label: '' },
+    { text: '', isAI: true, label: '' },
+    { text: '', isAI: true, label: '' }
+  ]
+}
+
+const slots = ref<IdeaSlot[]>(initializeSlots())
 
 const userFilledCount = computed(() => {
   return slots.value.filter(slot => !slot.isAI && slot.text.trim().length > 0).length
 })
 
 const showAI = computed(() => userFilledCount.value >= 3)
-const aiGenerated = ref(false)
+
+const hasPreservedAI = computed(() => {
+  return props.preservedIdeas?.some(idea => idea.isAI && idea.text.trim().length > 0) || false
+})
+
+const aiGenerated = ref(hasPreservedAI.value)
 const isGenerating = ref(false)
 
 const allSlotsFilled = computed(() => {
   return slots.value.every(slot => slot.text.trim().length > 0)
 })
 
+watch(
+  () => slots.value,
+  () => {
+    if (showAI.value && aiGenerated.value) {
+      emit(
+        'update:ideas',
+        slots.value.map(s => ({ text: s.text, isAI: s.isAI, label: s.label }))
+      )
+    }
+  },
+  { deep: true }
+)
+
 const startIncubation = () => {
+  emit(
+    'update:ideas',
+    slots.value.map(s => ({ text: s.text, isAI: s.isAI, label: s.label }))
+  )
   emit('incubate')
 }
 
@@ -126,20 +161,29 @@ const generateAIIdeas = async () => {
   const userIdeas = slots.value.filter(s => !s.isAI && s.text.trim().length > 0).map(s => s.text)
 
   try {
-    const response = await $fetch<{ ideas: string[] }>('/api/diverge', {
-      method: 'POST',
-      body: {
-        problem: props.problemText,
-        userIdeas
+    const response = await $fetch<{ ideas: Array<{ text: string; label: string }> }>(
+      '/api/diverge',
+      {
+        method: 'POST',
+        body: {
+          problem: props.problemText,
+          userIdeas
+        }
       }
-    })
+    )
 
     const aiSlots = slots.value.filter(s => s.isAI)
     response.ideas.forEach((idea, index) => {
       if (aiSlots[index]) {
-        aiSlots[index].text = idea
+        aiSlots[index].text = idea.text
+        aiSlots[index].label = idea.label
       }
     })
+
+    emit(
+      'update:ideas',
+      slots.value.map(s => ({ text: s.text, isAI: s.isAI, label: s.label }))
+    )
   } catch (error) {
     console.error('Failed to generate AI ideas:', error)
   }

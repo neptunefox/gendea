@@ -133,12 +133,12 @@
     - Expose live branch state to the UI so later stages stay gated until prior requirements are met
     - _Requirements: 13.2, 13.8, 13.9, 13.10_
 
-- [ ] 10. Complete Diverger coverage and AI slot handling
-  - [ ] 10.1 Return the five required AI suggestions
+- [x] 10. Complete Diverger coverage and AI slot handling
+  - [x] 10.1 Return the five required AI suggestions
     - Populate anti-prototype, one-hour, under-$100, weird, and skills-on-hand slots instead of truncating to three
     - Label each AI slot so users see which constraint produced it
     - _Requirements: 2.3, 14.1_
-  - [ ] 10.2 Keep AI results available after prerequisites
+  - [x] 10.2 Keep AI results available after prerequisites
     - Continue hiding AI suggestions until three user ideas exist, then retain the generated ideas when the node resurfaces
     - _Requirements: 2.2, 16.2_
 

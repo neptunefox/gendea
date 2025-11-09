@@ -7,7 +7,10 @@ export default defineEventHandler(async event => {
   const aiIdeas = await generateDivergerIdeas(problem, userIdeas)
 
   return {
-    ideas: aiIdeas
+    ideas: aiIdeas.map((idea, index) => ({
+      text: idea,
+      label: getLabelForSlot(index)
+    }))
   }
 })
 
@@ -48,7 +51,12 @@ Generate ONE solution using only skills and resources you already have. No new p
     ideas.push(idea)
   }
 
-  return ideas.slice(0, 3)
+  return ideas
+}
+
+function getLabelForSlot(index: number): string {
+  const labels = ['Anti-prototype', 'One hour', 'Under $100', 'Weird option', 'Skills on hand']
+  return labels[index] || 'AI suggestion'
 }
 
 async function generateSingleIdea(prompt: string): Promise<string> {
