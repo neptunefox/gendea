@@ -240,27 +240,27 @@
     - Offer anonymous idea collection in teams to reduce evaluation fear
     - _Requirements: 16.5_
 
-- [ ] 22. Build metrics tracking
-  - [ ] 22.1 Track acquisition metrics
+- [x] 22. Build metrics tracking
+  - [x] 22.1 Track acquisition metrics
     - Track number of seeds per user
     - Track percent that reach planning
     - Track percent that set date and place
     - _Requirements: 17.1_
-  - [ ] 22.2 Track execution metrics
+  - [x] 22.2 Track execution metrics
     - Track tests scheduled within seven days
     - Track planned tests that actually run
     - Track pass or fail rates
     - Track time to first result
     - _Requirements: 17.2_
-  - [ ] 22.3 Track learning metrics
+  - [x] 22.3 Track learning metrics
     - Track average number of lessons per branch
     - Track number of archive pages read before new planning
     - _Requirements: 17.3_
-  - [ ] 22.4 Track motivation metrics
+  - [x] 22.4 Track motivation metrics
     - Track energy and expectancy slider values after sessions
     - Track trend lines per branch
     - Track number of novelty injections chosen
     - _Requirements: 17.4_
-  - [ ] 22.5 Track quality metrics
+  - [x] 22.5 Track quality metrics
     - Track share of ideas that progressed from seed to at least one honest test then to decision
     - _Requirements: 17.5_

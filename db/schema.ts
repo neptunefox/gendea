@@ -110,3 +110,21 @@ export const archives = pgTable('archives', {
   adviceToSelf: text('advice_to_self').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })
+
+export const progressLogs = pgTable('progress_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  branchId: uuid('branch_id').notNull(),
+  whatHappened: text('what_happened').notNull(),
+  whatLearned: text('what_learned').notNull(),
+  whatNext: text('what_next').notNull(),
+  energyRating: integer('energy_rating'),
+  expectancyRating: integer('expectancy_rating'),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
+
+export const archiveViews = pgTable('archive_views', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  archiveId: uuid('archive_id').notNull(),
+  userId: text('user_id').notNull(),
+  viewedAt: timestamp('viewed_at').notNull().defaultNow()
+})

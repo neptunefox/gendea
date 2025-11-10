@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { nodes } from '../../db/schema'
+import { nodes, progressLogs } from '../../db/schema'
 
 interface ProgressLogRequest {
   branchId: string
@@ -34,6 +34,16 @@ export default defineEventHandler(async event => {
       updatedAt: new Date()
     })
     .returning()
+
+  await db.insert(progressLogs).values({
+    branchId,
+    whatHappened,
+    whatLearned,
+    whatNext,
+    energyRating,
+    expectancyRating,
+    createdAt: new Date()
+  })
 
   await $fetch('/api/workflow/transition', {
     method: 'POST',

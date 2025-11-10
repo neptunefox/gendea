@@ -110,6 +110,28 @@ async function main() {
     );
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS progress_logs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      branch_id UUID NOT NULL,
+      what_happened TEXT NOT NULL,
+      what_learned TEXT NOT NULL,
+      what_next TEXT NOT NULL,
+      energy_rating INTEGER,
+      expectancy_rating INTEGER,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS archive_views (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      archive_id UUID NOT NULL,
+      user_id TEXT NOT NULL,
+      viewed_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()
