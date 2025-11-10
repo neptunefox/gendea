@@ -54,8 +54,9 @@ const archive = ref<Archive | null>(null)
 
 onMounted(async () => {
   try {
-    const response = (await $fetch(`/api/archive/${props.branchId}`)) as { archive: Archive }
-    archive.value = response.archive
+    const response = await fetch(`/api/archive/${props.branchId}`)
+    const data = (await response.json()) as { archive: Archive }
+    archive.value = data.archive
   } catch (error) {
     console.error('Failed to load archive:', error)
   }

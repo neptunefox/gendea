@@ -43,12 +43,13 @@ async function handleCreate() {
 
   creating.value = true
   try {
-    await $fetch('/api/archive', {
+    await fetch('/api/archive', {
       method: 'POST',
-      body: {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         branchId: props.branchId,
         adviceToSelf: adviceToSelf.value.trim()
-      }
+      })
     })
     emit('created')
   } catch (error) {

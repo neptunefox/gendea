@@ -216,12 +216,13 @@ async function handleIfThenPlanSave(plan: {
   place: string
 }) {
   try {
-    await $fetch('/api/if-then-plan', {
+    await fetch('/api/if-then-plan', {
       method: 'PUT',
-      body: {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         branchId: savedNode.value?.branchId,
         ifThenPlan: plan
-      }
+      })
     })
     currentView.value = 'progress-log'
   } catch (error) {
@@ -235,9 +236,10 @@ async function handleProgressLogComplete() {
   if (!savedNode.value?.branchId) return
 
   try {
-    const crisisCheck = (await $fetch('/api/action-crisis/check', {
-      params: { branchId: savedNode.value.branchId }
-    })) as {
+    const crisisResponse = await fetch(
+      `/api/action-crisis/check?branchId=${savedNode.value.branchId}`
+    )
+    const crisisCheck = (await crisisResponse.json()) as {
       shouldShowCrisis: boolean
       missedPlans: number
       northStar?: string
@@ -253,9 +255,10 @@ async function handleProgressLogComplete() {
       return
     }
 
-    const breakCheck = (await $fetch('/api/break-recommendation', {
-      params: { branchId: savedNode.value.branchId }
-    })) as {
+    const breakResponse = await fetch(
+      `/api/break-recommendation?branchId=${savedNode.value.branchId}`
+    )
+    const breakCheck = (await breakResponse.json()) as {
       shouldRecommendBreak: boolean
       reason?: string
     }
