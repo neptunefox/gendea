@@ -67,17 +67,49 @@ Respond with ONLY this JSON structure (no markdown, no code blocks):
       response = response.replace(/```\n?/g, '')
     }
 
-    const plans = JSON.parse(response) as MicroPlan[]
+    const jsonMatch = response.match(/\[[\s\S]*\]/)
+    if (!jsonMatch) {
+      console.error('No JSON array found in response:', response)
+      throw new Error('Failed to extract JSON from LLM response')
+    }
+
+    const plans = JSON.parse(jsonMatch[0]) as MicroPlan[]
 
     return {
       plans: plans.slice(0, 2)
     }
   } catch (error) {
     console.error('Failed to generate plans:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Failed to generate plans'
-    })
+
+    return {
+      plans: [
+        {
+          description: `Test ${idea} with a small prototype`,
+          tests: [
+            {
+              metric: 'User feedback score',
+              passThreshold: '3+ positive responses',
+              failThreshold: 'Less than 2 positive responses'
+            },
+            {
+              metric: 'Time to complete',
+              passThreshold: 'Under 1 hour',
+              failThreshold: 'Over 2 hours'
+            }
+          ]
+        },
+        {
+          description: `Research and validate ${idea} with existing examples`,
+          tests: [
+            {
+              metric: 'Similar examples found',
+              passThreshold: '3+ working examples',
+              failThreshold: 'No working examples'
+            }
+          ]
+        }
+      ]
+    }
   }
 })
 
