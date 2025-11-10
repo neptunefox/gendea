@@ -1,14 +1,48 @@
 # Gendea
 
-Idea generation and exploration tool.
+Idea generation and exploration tool with structured workflow from capture to execution.
 
-## Branches
+## Setup
 
-- `prototype` - Active development branch with all features
-- `main` - Empty default branch
+1. Install dependencies:
+   ```bash
+   bun install
+   ```
 
-Switch to the prototype branch to see the code:
+2. Configure environment:
+   ```bash
+   cp .env.example .env
+   ```
 
-```bash
-git checkout prototype
+3. Set up database:
+   ```bash
+   bun run db:migrate
+   ```
+
+4. Start development:
+   ```bash
+   bun run dev
+   ```
+
+## LLM Configuration
+
+**Local (Ollama)**:
+```env
+LLM_PROVIDER=ollama
+LLM_MODEL=gemma3:4b
+LLM_BASE_URL=http://localhost:11434
+```
+
+**Cloud (OpenRouter)**:
+```env
+LLM_PROVIDER=openrouter
+LLM_MODEL=anthropic/claude-3-haiku
+LLM_API_KEY=your_key
+```
+
+## Database
+
+PostgreSQL required:
+```env
+DATABASE_URL=postgresql://localhost:5432/gendea
 ```

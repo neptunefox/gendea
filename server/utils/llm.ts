@@ -29,7 +29,7 @@ class LLMService {
       provider: (config?.provider || runtimeConfig.llmProvider || 'ollama') as
         | 'ollama'
         | 'openrouter',
-      model: config?.model || runtimeConfig.llmModel || 'qwen3:4b',
+      model: config?.model || runtimeConfig.llmModel || 'gemma3:4b',
       baseURL: config?.baseURL || runtimeConfig.llmBaseUrl || 'http://localhost:11434',
       apiKey: config?.apiKey || runtimeConfig.llmApiKey
     }

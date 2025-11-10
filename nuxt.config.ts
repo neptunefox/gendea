@@ -4,8 +4,21 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint'],
   runtimeConfig: {
     llmProvider: process.env.LLM_PROVIDER || 'ollama',
-    llmModel: process.env.LLM_MODEL || 'qwen3:4b',
+    llmModel: process.env.LLM_MODEL || 'gemma3:4b',
     llmBaseUrl: process.env.LLM_BASE_URL || 'http://localhost:11434',
     llmApiKey: process.env.LLM_API_KEY || ''
+  },
+  app: {
+    head: {
+      title: 'Gendea - Idea Flow',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'description',
+          content: 'Structured creative thinking from capture to execution'
+        }
+      ]
+    }
   }
 })
