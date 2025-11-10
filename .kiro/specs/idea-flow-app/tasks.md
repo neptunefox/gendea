@@ -158,12 +158,12 @@
     - Use the persisted name in confirmation, tree views, and later stages instead of recomputing client-side
     - _Requirements: 1.4_
 
-- [ ] 13. Create test selection interface
-  - [ ] 13.1 Propose smallest honest tests
+- [x] 13. Create test selection interface
+  - [x] 13.1 Propose smallest honest tests
     - Propose two or three smallest honest tests per plan
     - Allow user to select tests
     - _Requirements: 6.1, 6.2_
-  - [ ] 13.2 Capture test criteria
+  - [x] 13.2 Capture test criteria
     - Prompt for metric
     - Prompt for pass or fail threshold
     - Record test definitions in node

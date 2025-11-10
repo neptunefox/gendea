@@ -44,28 +44,16 @@
           <h4 class="plan-title">Plan {{ index + 1 }}</h4>
           <p class="plan-description">{{ plan.description }}</p>
 
-          <div class="test-section">
-            <h5 class="test-title">Smallest Honest Test</h5>
-            <div class="test-details">
-              <div class="test-item">
-                <span class="test-label">Metric:</span>
-                <span class="test-value">{{ plan.test.metric }}</span>
-              </div>
-              <div class="test-item">
-                <span class="test-label">Pass:</span>
-                <span class="test-value pass">{{ plan.test.passThreshold }}</span>
-              </div>
-              <div class="test-item">
-                <span class="test-label">Fail:</span>
-                <span class="test-value fail">{{ plan.test.failThreshold }}</span>
-              </div>
-            </div>
-          </div>
+          <TestSelection
+            v-if="selectedPlanIndex === index"
+            v-model="selectedTests[index]"
+            :tests="plan.tests"
+          />
         </div>
       </div>
 
       <button
-        v-if="selectedPlanIndex !== null"
+        v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]"
         class="proceed-button"
         @click="proceedToRiskAssessment"
       >
@@ -85,13 +73,15 @@ interface Constraints {
   skillsOnHand: boolean
 }
 
+interface TestOption {
+  metric: string
+  passThreshold: string
+  failThreshold: string
+}
+
 interface MicroPlan {
   description: string
-  test: {
-    metric: string
-    passThreshold: string
-    failThreshold: string
-  }
+  tests: TestOption[]
 }
 
 const props = defineProps<{
@@ -114,6 +104,7 @@ const emit = defineEmits<{
 const plans = ref<MicroPlan[]>([])
 const loading = ref(false)
 const selectedPlanIndex = ref<number | null>(null)
+const selectedTests = ref<Record<number, TestOption | null>>({})
 
 const hasActiveConstraints = computed(() => {
   return constraints.value.timeCap || constraints.value.moneyCap || constraints.value.skillsOnHand
@@ -126,14 +117,21 @@ onMounted(async () => {
     plans.value = [
       {
         description: existingPlan.description,
-        test: {
-          metric: existingPlan.metric,
-          passThreshold: existingPlan.passThreshold,
-          failThreshold: existingPlan.failThreshold
-        }
+        tests: [
+          {
+            metric: existingPlan.metric,
+            passThreshold: existingPlan.passThreshold,
+            failThreshold: existingPlan.failThreshold
+          }
+        ]
       }
     ]
     selectedPlanIndex.value = 0
+    selectedTests.value[0] = {
+      metric: existingPlan.metric,
+      passThreshold: existingPlan.passThreshold,
+      failThreshold: existingPlan.failThreshold
+    }
     if (existingPlan.constraints) {
       constraints.value = {
         timeCap: existingPlan.constraints.timeCap || false,
@@ -170,6 +168,11 @@ async function proceedToRiskAssessment() {
   if (selectedPlanIndex.value === null) return
 
   const plan = plans.value[selectedPlanIndex.value]
+  const selectedTest = selectedTests.value[selectedPlanIndex.value]
+
+  if (!selectedTest) {
+    return
+  }
 
   try {
     await $fetch('/api/plans', {
@@ -178,7 +181,17 @@ async function proceedToRiskAssessment() {
         branchId: props.branchId,
         description: plan.description,
         constraints: constraints.value,
-        test: plan.test
+        test: selectedTest
+      }
+    })
+
+    await $fetch('/api/tests', {
+      method: 'POST',
+      body: {
+        branchId: props.branchId,
+        metric: selectedTest.metric,
+        passThreshold: selectedTest.passThreshold,
+        failThreshold: selectedTest.failThreshold
       }
     })
 
@@ -351,51 +364,7 @@ async function proceedToRiskAssessment() {
   font-size: 0.9375rem;
   color: #374151;
   line-height: 1.6;
-  margin-bottom: 1.25rem;
-}
-
-.test-section {
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.test-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.test-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.test-item {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.test-label {
-  font-weight: 600;
-  color: #6b7280;
-  min-width: 4rem;
-}
-
-.test-value {
-  color: #111827;
-}
-
-.test-value.pass {
-  color: #059669;
-}
-
-.test-value.fail {
-  color: #dc2626;
+  margin-bottom: 0;
 }
 
 .proceed-button {

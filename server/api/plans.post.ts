@@ -9,13 +9,15 @@ interface PlanRequest {
   }
 }
 
+interface TestOption {
+  metric: string
+  passThreshold: string
+  failThreshold: string
+}
+
 interface MicroPlan {
   description: string
-  test: {
-    metric: string
-    passThreshold: string
-    failThreshold: string
-  }
+  tests: TestOption[]
 }
 
 export default defineEventHandler(async event => {
@@ -36,7 +38,7 @@ ${constraintText}
 
 For each plan:
 1. Describe a concrete, actionable approach
-2. Include one smallest honest test with:
+2. Propose 2-3 smallest honest tests, each with:
    - A specific metric to measure
    - A pass threshold (what success looks like)
    - A fail threshold (what failure looks like)
@@ -45,11 +47,13 @@ Respond with ONLY this JSON structure (no markdown, no code blocks):
 [
   {
     "description": "plan description",
-    "test": {
-      "metric": "what to measure",
-      "passThreshold": "success criteria",
-      "failThreshold": "failure criteria"
-    }
+    "tests": [
+      {
+        "metric": "what to measure",
+        "passThreshold": "success criteria",
+        "failThreshold": "failure criteria"
+      }
+    ]
   }
 ]`
 
