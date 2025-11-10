@@ -1,4 +1,7 @@
+import { createError } from 'h3'
 import { useLLMService } from '../utils/llm'
+import { db } from '../db'
+import { archives } from '../../db/schema'
 
 interface StatisticianRequest {
   plan: string
@@ -28,11 +31,24 @@ export default defineEventHandler(async event => {
   const body = await readBody<StatisticianRequest>(event)
   const { plan, referenceClass, userCases } = body
 
+  const allArchives = await db.select().from(archives)
+
   const llm = useLLMService()
 
   const systemPrompt = `You are a statistician agent that provides base rates and realistic expectations based on similar past efforts. Be honest about success rates and timelines.
 
 CRITICAL: You must respond with ONLY valid JSON. No explanations, no markdown, no code blocks. Just the raw JSON object.`
+
+  let archiveContext = ''
+  if (allArchives.length > 0) {
+    const archiveSummaries = allArchives
+      .map(
+        (a, i) =>
+          `${i + 1}. Tests: ${a.tests.map(t => t.description).join(', ')} | Advice: ${a.adviceToSelf}`
+      )
+      .join('\n')
+    archiveContext = `\n\nPast learning archives from similar efforts:\n${archiveSummaries}\n\nUse these archives to inform your base rate estimates.`
+  }
 
   let userPrompt: string
 
@@ -68,7 +84,7 @@ Respond with ONLY this JSON structure (no markdown, no code blocks):
   } else {
     const referenceText = referenceClass ? `\n\nReference class: "${referenceClass}"` : ''
 
-    userPrompt = `For this plan: "${plan}"${referenceText}
+    userPrompt = `For this plan: "${plan}"${referenceText}${archiveContext}
 
 List 3 comparable efforts and estimate base rates for:
 1. Success rate

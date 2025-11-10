@@ -221,11 +221,11 @@
     - If exit, provide fast re-engage path to different route serving same North Star
     - _Requirements: 11.2, 11.3_
 
-- [ ] 19. Implement learning archive
-  - [ ] 19.1 Create archive page on completion
+- [x] 19. Implement learning archive
+  - [x] 19.1 Create archive page on completion
     - When branch finished or exited, write page with tests, evidence, one sentence advice to future self
     - _Requirements: 12.1_
-  - [ ] 19.2 Feed archive into outside view
+  - [x] 19.2 Feed archive into outside view
     - Use archive to feed outside-view step next time
     - _Requirements: 12.2_
 

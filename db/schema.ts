@@ -92,3 +92,20 @@ export const accountabilitySettings = pgTable('accountability_settings', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
+
+export const archives = pgTable('archives', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  branchId: uuid('branch_id').notNull().unique(),
+  tests: jsonb('tests')
+    .$type<
+      Array<{
+        description: string
+        metric: string
+        result?: string
+      }>
+    >()
+    .notNull(),
+  evidence: text('evidence').notNull(),
+  adviceToSelf: text('advice_to_self').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})

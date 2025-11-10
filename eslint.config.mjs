@@ -18,7 +18,7 @@ export default withNuxt(
             {
               name: 'nuxt/app',
               message:
-                "Server runtime forbids Vue app aliases (impound). Fix: replace with server-safe APIs (e.g., `import { createError } from 'h3'`) or rely on server auto-imports."
+                "Server runtime forbids Vue app aliases (impound). Fix: replace with server-safe APIs (e.g., `import { createError } from 'h3'`)."
             },
             {
               name: '#app',
