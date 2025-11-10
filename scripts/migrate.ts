@@ -75,6 +75,18 @@ async function main() {
     );
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS accountability_settings (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id TEXT NOT NULL UNIQUE,
+      enabled INTEGER NOT NULL DEFAULT 0,
+      recipient_email TEXT,
+      frequency TEXT NOT NULL DEFAULT 'weekly',
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()
