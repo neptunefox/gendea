@@ -99,8 +99,6 @@ const initializeSlots = (): IdeaSlot[] => {
     { text: '', isAI: false },
     { text: '', isAI: true, label: '' },
     { text: '', isAI: true, label: '' },
-    { text: '', isAI: true, label: '' },
-    { text: '', isAI: true, label: '' },
     { text: '', isAI: true, label: '' }
   ]
 }

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Fix Diverger slot distribution and AI weighting
+- [x] 1. Fix Diverger slot distribution and AI weighting
   - Modify IdeationSlots.vue to instantiate exactly six slots: three user, three AI
   - Update server/api/diverge.post.ts to return exactly three AI ideas instead of five
   - Add labels to each AI slot showing generation strategy (anti-prototype, constraint-first, weird option)
@@ -94,4 +94,3 @@
   - Enlarge CTAs to 44×44px minimum and maintain consistent placement in bottom-right
   - Add subtle motion animations under 400ms for workflow transitions
   - _Requirements: 13.1, 13.2, 13.3, 13.4, 16.1, 16.2, 16.3, 16.4_
-

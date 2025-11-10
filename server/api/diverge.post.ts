@@ -22,29 +22,15 @@ User has suggested: ${userIdeas.join(', ')}
 
 Generate ONE creative solution that deliberately avoids the obvious or common approaches. Think of what most people would NOT do.`
 
-  const oneHourPrompt = `Given the problem: "${problem}"
+  const constraintPrompt = `Given the problem: "${problem}"
 
-Generate ONE solution that can be completed in under 1 hour. Be specific and actionable.`
-
-  const under100Prompt = `Given the problem: "${problem}"
-
-Generate ONE solution that costs less than $100. Focus on resourcefulness and creativity within budget.`
+Generate ONE solution using only skills and resources you already have. No new purchases or learning required.`
 
   const weirdPrompt = `Given the problem: "${problem}"
 
 Generate ONE weird, unconventional, or playful solution. Don't worry about practicality - be creative and surprising.`
 
-  const constraintPrompt = `Given the problem: "${problem}"
-
-Generate ONE solution using only skills and resources you already have. No new purchases or learning required.`
-
-  const prompts = [
-    antiPrototypePrompt,
-    oneHourPrompt,
-    under100Prompt,
-    weirdPrompt,
-    constraintPrompt
-  ]
+  const prompts = [antiPrototypePrompt, constraintPrompt, weirdPrompt]
 
   for (const prompt of prompts) {
     const idea = await generateSingleIdea(prompt)
@@ -55,7 +41,7 @@ Generate ONE solution using only skills and resources you already have. No new p
 }
 
 function getLabelForSlot(index: number): string {
-  const labels = ['Anti-prototype', 'One hour', 'Under $100', 'Weird option', 'Skills on hand']
+  const labels = ['Anti-prototype', 'Constraint-first', 'Weird option']
   return labels[index] || 'AI suggestion'
 }
 

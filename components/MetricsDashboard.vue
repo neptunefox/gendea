@@ -25,7 +25,9 @@
 
       <div class="metric-card">
         <h2>Learning</h2>
-        <div class="metric-value">{{ Number(metrics.learning.avgLessonsPerBranch || 0).toFixed(1) }}</div>
+        <div class="metric-value">
+          {{ Number(metrics.learning.avgLessonsPerBranch || 0).toFixed(1) }}
+        </div>
         <div class="metric-label">Avg Lessons per Branch</div>
         <div class="metric-detail">
           {{ metrics.learning.archiveViewsBeforePlanning || 0 }} archive views before planning
