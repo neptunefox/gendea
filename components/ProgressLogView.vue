@@ -82,7 +82,7 @@ const props = defineProps<{
   branchId: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   complete: []
 }>()
 
@@ -118,6 +118,7 @@ async function saveLog() {
       }
     })
     showAccountability.value = true
+    emit('complete')
   } catch (error) {
     console.error('Failed to save progress log:', error)
   } finally {
