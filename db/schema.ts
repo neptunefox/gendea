@@ -22,6 +22,7 @@ export const nodes = pgTable('nodes', {
   parentId: uuid('parent_id').references(() => nodes.id),
   childIds: jsonb('child_ids').$type<string[]>().notNull().default([]),
   branchId: uuid('branch_id').notNull(),
+  isAnonymous: integer('is_anonymous').notNull().default(0),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })

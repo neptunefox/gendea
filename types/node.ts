@@ -23,6 +23,7 @@ export interface Node {
   parentId?: string
   childIds: string[]
   branchId: string
+  isAnonymous?: number
   createdAt: Date
   updatedAt: Date
 }

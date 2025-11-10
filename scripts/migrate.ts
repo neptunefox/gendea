@@ -25,6 +25,7 @@ async function main() {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       type TEXT NOT NULL,
       text TEXT NOT NULL,
+      name TEXT,
       rationale TEXT,
       constraints JSONB,
       metric TEXT,
@@ -35,9 +36,20 @@ async function main() {
       parent_id UUID REFERENCES nodes(id),
       child_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
       branch_id UUID NOT NULL,
+      is_anonymous INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE nodes 
+    ADD COLUMN IF NOT EXISTS name TEXT;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE nodes 
+    ADD COLUMN IF NOT EXISTS is_anonymous INTEGER NOT NULL DEFAULT 0;
   `)
 
   await db.execute(sql`

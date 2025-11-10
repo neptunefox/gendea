@@ -154,7 +154,7 @@ const actionCrisisData = ref({
   lowExpectancy: false
 })
 
-async function handleSave(data: { problem: string; assumptions: string[] }) {
+async function handleSave(data: { problem: string; assumptions: string[]; isAnonymous: boolean }) {
   try {
     const result = await saveNode(data)
     savedNode.value = result.node

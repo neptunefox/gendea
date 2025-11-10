@@ -1,8 +1,9 @@
-import type { Node } from '~/types/node'
+import type { Node } from '../types/node'
 
 interface SaveNodeInput {
   problem: string
   assumptions: string[]
+  isAnonymous: boolean
 }
 
 interface SaveNodeResult {
@@ -19,14 +20,16 @@ export const useNodeSave = () => {
       type: 'Idea',
       text: input.problem,
       branchId,
-      childIds: []
+      childIds: [],
+      isAnonymous: input.isAnonymous ? 1 : 0
     }
 
     const assumptionNodes: Partial<Node>[] = input.assumptions.map(assumption => ({
       type: 'Assumption',
       text: assumption,
       branchId,
-      childIds: []
+      childIds: [],
+      isAnonymous: input.isAnonymous ? 1 : 0
     }))
 
     const response = await $fetch<SaveNodeResult>('/api/nodes', {

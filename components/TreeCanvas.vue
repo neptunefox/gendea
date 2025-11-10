@@ -26,6 +26,14 @@
         </div>
       </div>
 
+      <div class="anonymous-option">
+        <label class="checkbox-label">
+          <input v-model="isAnonymous" type="checkbox" class="checkbox" />
+          <span>Submit anonymously (for team use)</span>
+        </label>
+        <p class="anonymous-hint">Anonymous ideas reduce evaluation fear in team settings</p>
+      </div>
+
       <button class="save-button selected" :disabled="!canSave" @click="handleSave">Save</button>
     </div>
   </div>
@@ -34,11 +42,12 @@
 <script setup lang="ts">
 const problemText = ref('')
 const assumptions = ref(['', '', ''])
+const isAnonymous = ref(false)
 
 const canSave = computed(() => problemText.value.trim().length > 0)
 
 const emit = defineEmits<{
-  save: [data: { problem: string; assumptions: string[] }]
+  save: [data: { problem: string; assumptions: string[]; isAnonymous: boolean }]
 }>()
 
 const handleSave = () => {
@@ -46,7 +55,8 @@ const handleSave = () => {
 
   emit('save', {
     problem: problemText.value,
-    assumptions: assumptions.value.filter(a => a.trim().length > 0)
+    assumptions: assumptions.value.filter(a => a.trim().length > 0),
+    isAnonymous: isAnonymous.value
   })
 }
 </script>
@@ -129,5 +139,34 @@ const handleSave = () => {
 .save-button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
+}
+
+.anonymous-option {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+}
+
+.checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+}
+
+.anonymous-hint {
+  margin-top: 0.5rem;
+  margin-left: 1.625rem;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 </style>

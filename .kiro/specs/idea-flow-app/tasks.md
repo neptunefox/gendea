@@ -229,14 +229,14 @@
     - Use archive to feed outside-view step next time
     - _Requirements: 12.2_
 
-- [ ] 20. Add post-capture UX patterns
-  - [ ] 20.1 Show save confirmation
+- [x] 20. Add post-capture UX patterns
+  - [x] 20.1 Show save confirmation
     - Show Save confirmed after capture
     - Display nudge to plan
     - _Requirements: 16.1_
 
-- [ ] 21. Implement team features
-  - [ ] 21.1 Add anonymous idea collection
+- [x] 21. Implement team features
+  - [x] 21.1 Add anonymous idea collection
     - Offer anonymous idea collection in teams to reduce evaluation fear
     - _Requirements: 16.5_
 
