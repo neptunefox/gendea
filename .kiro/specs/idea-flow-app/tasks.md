@@ -191,14 +191,14 @@
     - Show clear progress lines and learning notes
     - _Requirements: 8.3, 16.4_
 
-- [ ] 16. Implement Coach agent critique
-  - [ ] 16.1 Create critique scaffolding
+- [x] 16. Implement Coach agent critique
+  - [x] 16.1 Create critique scaffolding
     - State the bar
     - Affirm ability to reach it
     - Give specific process changes
     - Rewrite critique into high standards with assurance and concrete steps
     - _Requirements: 9.1, 13.1, 14.5_
-  - [ ] 16.2 Avoid harmful feedback patterns
+  - [x] 16.2 Avoid harmful feedback patterns
     - Avoid person labels
     - Keep focus on assumptions and evidence
     - _Requirements: 9.2_

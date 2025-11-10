@@ -38,7 +38,7 @@
         <div class="rating-group">
           <label class="rating-label">Energy Level</label>
           <div class="slider-container">
-            <input v-model.number="log.energyRating" type="range" min="1" max="5" class="slider" >
+            <input v-model.number="log.energyRating" type="range" min="1" max="5" class="slider" />
             <span class="slider-value">{{ log.energyRating }}</span>
           </div>
           <div class="slider-labels">
@@ -56,7 +56,7 @@
               min="1"
               max="5"
               class="slider"
-            >
+            />
             <span class="slider-value">{{ log.expectancyRating }}</span>
           </div>
           <div class="slider-labels">

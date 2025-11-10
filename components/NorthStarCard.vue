@@ -19,7 +19,7 @@
         placeholder="The core purpose or goal..."
         class="input-field"
         @keyup.enter="saveNorthStar"
-      >
+      />
       <div class="button-group">
         <button class="save-button" :disabled="!canSave" @click="saveNorthStar">
           {{ northStar ? 'Update' : 'Pin North Star' }}

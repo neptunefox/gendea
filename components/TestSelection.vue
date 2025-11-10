@@ -41,7 +41,7 @@
             type="text"
             class="form-input"
             placeholder="What will you measure?"
-          >
+          />
         </div>
         <div class="form-group">
           <label class="form-label">Pass Threshold</label>
@@ -50,7 +50,7 @@
             type="text"
             class="form-input"
             placeholder="What indicates success?"
-          >
+          />
         </div>
         <div class="form-group">
           <label class="form-label">Fail Threshold</label>
@@ -59,7 +59,7 @@
             type="text"
             class="form-input"
             placeholder="What indicates failure?"
-          >
+          />
         </div>
         <button class="custom-button" @click="selectCustomTest">Use Custom Test</button>
       </div>

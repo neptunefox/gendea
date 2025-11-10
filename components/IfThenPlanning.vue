@@ -29,12 +29,12 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Date</label>
-          <input v-model="ifThenPlan.date" type="date" class="form-input" :min="minDate" >
+          <input v-model="ifThenPlan.date" type="date" class="form-input" :min="minDate" />
         </div>
 
         <div class="form-group">
           <label class="form-label">Time</label>
-          <input v-model="ifThenPlan.time" type="time" class="form-input" >
+          <input v-model="ifThenPlan.time" type="time" class="form-input" />
         </div>
       </div>
 
@@ -45,7 +45,7 @@
           type="text"
           class="form-input"
           placeholder="Where will you do this?"
-        >
+        />
       </div>
 
       <div class="preview">

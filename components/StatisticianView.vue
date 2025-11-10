@@ -51,7 +51,7 @@
             type="text"
             class="case-description"
             :placeholder="`Case ${i} description...`"
-          >
+          />
           <input
             v-model.number="userCases[i - 1].similarity"
             type="number"
@@ -59,7 +59,7 @@
             max="10"
             class="case-similarity"
             placeholder="1-10"
-          >
+          />
         </div>
       </div>
 

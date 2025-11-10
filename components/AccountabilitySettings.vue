@@ -9,7 +9,7 @@
     <div class="settings-form">
       <div class="toggle-group">
         <label class="toggle-label">
-          <input v-model="settings.enabled" type="checkbox" class="toggle-input" >
+          <input v-model="settings.enabled" type="checkbox" class="toggle-input" />
           <span class="toggle-text">Enable weekly accountability reports</span>
         </label>
       </div>
@@ -21,7 +21,7 @@
           type="email"
           class="form-input"
           placeholder="your@email.com or partner@email.com"
-        >
+        />
         <p class="help-text">Leave blank to send to yourself only</p>
       </div>
 
