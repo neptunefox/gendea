@@ -45,22 +45,40 @@ export default defineEventHandler(async event => {
     createdAt: new Date()
   })
 
-  await $fetch('/api/workflow/transition', {
-    method: 'POST',
-    body: {
-      branchId,
-      event: { type: 'LOG_ENTRY' }
-    }
-  })
+  const { workflowService } = await import('../../lib/workflow-service')
+  const { branches } = await import('../../db/schema')
+  const { eq } = await import('drizzle-orm')
+
+  type WorkflowState =
+    | 'Seeded'
+    | 'Diverging'
+    | 'Clarifying'
+    | 'Planning'
+    | 'Testing'
+    | 'Reviewing'
+    | 'Stalled'
+    | 'Action crisis'
+    | 'Archived'
+
+  const snapshot = workflowService.transition(branchId, { type: 'LOG_ENTRY' })
+
+  await db
+    .update(branches)
+    .set({
+      state: snapshot.value as WorkflowState,
+      updatedAt: new Date()
+    })
+    .where(eq(branches.id, branchId))
 
   if (expectancyRating !== undefined && expectancyRating < 3) {
-    await $fetch('/api/workflow/transition', {
-      method: 'POST',
-      body: {
-        branchId,
-        event: { type: 'LOW_EXPECTANCY' }
-      }
-    })
+    const lowExpSnapshot = workflowService.transition(branchId, { type: 'LOW_EXPECTANCY' })
+    await db
+      .update(branches)
+      .set({
+        state: lowExpSnapshot.value as WorkflowState,
+        updatedAt: new Date()
+      })
+      .where(eq(branches.id, branchId))
   }
 
   return { log: logNode }
