@@ -1,5 +1,6 @@
 import { db } from '../db'
 import { northStars } from '../../db/schema'
+import { createError } from 'h3'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

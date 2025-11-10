@@ -80,6 +80,21 @@
       :branch-id="savedNode?.branchId || ''"
       @complete="handleProgressLogComplete"
     />
+
+    <BreakRecommendation
+      v-else-if="currentView === 'break-recommendation'"
+      :branch-id="savedNode?.branchId || ''"
+      :reason="breakReason"
+      @start-break="handleStartBreak"
+      @skip="handleSkipBreak"
+    />
+
+    <IncubationTimer
+      v-else-if="currentView === 'break-timer'"
+      :branch-id="savedNode?.branchId || ''"
+      :duration="15"
+      @complete="handleBreakComplete"
+    />
   </div>
 </template>
 
@@ -99,6 +114,8 @@ type ViewState =
   | 'risk-assessment'
   | 'if-then-planning'
   | 'progress-log'
+  | 'break-recommendation'
+  | 'break-timer'
 
 const { saveNode } = useNodeSave()
 
@@ -109,6 +126,8 @@ const suggestedTags = ref<string[]>([])
 const problemText = ref('')
 const selectedPlan = ref('')
 const preservedIdeas = ref<Array<{ text: string; isAI: boolean; label?: string }>>([])
+const breakReason = ref<'low-energy' | 'stalled'>('low-energy')
+const returnView = ref<ViewState>('capture')
 
 async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {
@@ -185,8 +204,36 @@ async function handleIfThenPlanSave(plan: {
   }
 }
 
-function handleProgressLogComplete() {
+async function handleProgressLogComplete() {
   console.log('Progress log saved successfully')
+
+  if (!savedNode.value?.branchId) return
+
+  try {
+    const { shouldRecommendBreak, reason } = await $fetch('/api/break-recommendation', {
+      params: { branchId: savedNode.value.branchId }
+    })
+
+    if (shouldRecommendBreak && reason) {
+      breakReason.value = reason as 'low-energy' | 'stalled'
+      returnView.value = 'ideation-second'
+      currentView.value = 'break-recommendation'
+    }
+  } catch (error) {
+    console.error('Failed to check break recommendation:', error)
+  }
+}
+
+function handleStartBreak() {
+  currentView.value = 'break-timer'
+}
+
+function handleSkipBreak() {
+  currentView.value = returnView.value
+}
+
+function handleBreakComplete() {
+  currentView.value = returnView.value
 }
 </script>
 

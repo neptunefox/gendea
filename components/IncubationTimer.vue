@@ -23,15 +23,21 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-const props = defineProps<{
-  branchId: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    branchId: string
+    duration?: number
+  }>(),
+  {
+    duration: 10
+  }
+)
 
 const emit = defineEmits<{
   complete: []
 }>()
 
-const TIMER_DURATION = 10 * 60
+const TIMER_DURATION = props.duration * 60
 const remainingSeconds = ref(TIMER_DURATION)
 let intervalId: NodeJS.Timeout | null = null
 let endTime: number | null = null

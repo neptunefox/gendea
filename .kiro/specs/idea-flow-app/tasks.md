@@ -203,11 +203,11 @@
     - Keep focus on assumptions and evidence
     - _Requirements: 9.2_
 
-- [ ] 17. Build incubation support
-  - [ ] 17.1 Detect stall or low energy
+- [x] 17. Build incubation support
+  - [x] 17.1 Detect stall or low energy
     - Monitor when user stalls or returns low-energy
     - _Requirements: 10.1_
-  - [ ] 17.2 Recommend breaks
+  - [x] 17.2 Recommend breaks
     - Recommend 10 to 15 minute undemanding break or short walk
     - Reopen same node for second pass when user returns
     - _Requirements: 10.1, 10.2_
