@@ -54,14 +54,14 @@ export default defineEventHandler(async event => {
     .where(sql`${nodes.text} ILIKE '%alternative%' OR ${nodes.text} ILIKE '%mars-adjacent%'`)
 
   return {
-    avgEnergy: energyStats[0]?.avgEnergy || 0,
-    avgExpectancy: expectancyStats[0]?.avgExpectancy || 0,
+    avgEnergy: Number(energyStats[0]?.avgEnergy) || 0,
+    avgExpectancy: Number(expectancyStats[0]?.avgExpectancy) || 0,
     sessionCount: energyStats[0]?.count || 0,
     trendData: trendData.map(d => ({
       energy: d.energyRating,
       expectancy: d.expectancyRating,
       date: d.createdAt
     })),
-    noveltyInjectionsChosen: noveltyInjections[0]?.count || 0
+    noveltyInjections: noveltyInjections[0]?.count || 0
   }
 })

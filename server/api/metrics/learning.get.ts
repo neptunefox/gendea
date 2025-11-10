@@ -50,7 +50,7 @@ export default defineEventHandler(async () => {
   const avgArchiveReadsBeforePlanning = planningEvents > 0 ? totalArchiveReads / planningEvents : 0
 
   return {
-    avgLessonsPerBranch,
-    avgArchiveReadsBeforePlanning
+    avgLessonsPerBranch: Number(avgLessonsPerBranch) || 0,
+    archiveViewsBeforePlanning: Math.round(avgArchiveReadsBeforePlanning)
   }
 })
