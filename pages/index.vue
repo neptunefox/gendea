@@ -67,6 +67,13 @@
       :plan="selectedPlan"
       @complete="handleRiskAssessmentComplete"
     />
+
+    <IfThenPlanning
+      v-else-if="currentView === 'if-then-planning'"
+      :branch-id="savedNode?.branchId || ''"
+      :plan-context="selectedPlan"
+      @save="handleIfThenPlanSave"
+    />
   </div>
 </template>
 
@@ -84,6 +91,7 @@ type ViewState =
   | 'clarification'
   | 'planning'
   | 'risk-assessment'
+  | 'if-then-planning'
 
 const { saveNode } = useNodeSave()
 
@@ -147,7 +155,27 @@ function handlePlanningComplete(plan: string) {
 }
 
 function handleRiskAssessmentComplete() {
-  console.log('Risk assessment complete')
+  currentView.value = 'if-then-planning'
+}
+
+async function handleIfThenPlanSave(plan: {
+  action: string
+  date: string
+  time: string
+  place: string
+}) {
+  try {
+    await $fetch('/api/if-then-plan', {
+      method: 'PUT',
+      body: {
+        branchId: savedNode.value?.branchId,
+        ifThenPlan: plan
+      }
+    })
+    console.log('If-then plan saved successfully')
+  } catch (error) {
+    console.error('Failed to save if-then plan:', error)
+  }
 }
 </script>
 

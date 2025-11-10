@@ -169,13 +169,13 @@
     - Record test definitions in node
     - _Requirements: 6.3, 6.4_
 
-- [ ] 14. Build if-then planning interface
-  - [ ] 14.1 Prompt for if-then plan
+- [x] 14. Build if-then planning interface
+  - [x] 14.1 Prompt for if-then plan
     - Prompt after any dump or plan change
     - Include date, time, place fields
     - Store if-then plan with node
     - _Requirements: 7.1, 7.2, 7.3_
-  - [ ] 14.2 Implement Coach agent for planning
+  - [x] 14.2 Implement Coach agent for planning
     - Turn user actions into if-then plans with date, time, place
     - _Requirements: 13.1, 14.5_
 
