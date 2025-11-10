@@ -80,3 +80,15 @@ export const plans = pgTable('plans', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
+
+export const accountabilitySettings = pgTable('accountability_settings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull().unique(),
+  enabled: integer('enabled').notNull().default(0),
+  recipientEmail: text('recipient_email'),
+  frequency: text('frequency', { enum: ['weekly'] })
+    .notNull()
+    .default('weekly'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})

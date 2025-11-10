@@ -74,6 +74,12 @@
       :plan-context="selectedPlan"
       @save="handleIfThenPlanSave"
     />
+
+    <ProgressLogView
+      v-else-if="currentView === 'progress-log'"
+      :branch-id="savedNode?.branchId || ''"
+      @complete="handleProgressLogComplete"
+    />
   </div>
 </template>
 
@@ -92,6 +98,7 @@ type ViewState =
   | 'planning'
   | 'risk-assessment'
   | 'if-then-planning'
+  | 'progress-log'
 
 const { saveNode } = useNodeSave()
 
@@ -172,10 +179,14 @@ async function handleIfThenPlanSave(plan: {
         ifThenPlan: plan
       }
     })
-    console.log('If-then plan saved successfully')
+    currentView.value = 'progress-log'
   } catch (error) {
     console.error('Failed to save if-then plan:', error)
   }
+}
+
+function handleProgressLogComplete() {
+  console.log('Progress log saved successfully')
 }
 </script>
 

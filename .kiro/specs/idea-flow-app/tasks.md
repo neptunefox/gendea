@@ -179,12 +179,12 @@
     - Turn user actions into if-then plans with date, time, place
     - _Requirements: 13.1, 14.5_
 
-- [ ] 15. Create progress logging interface
-  - [ ] 15.1 Display Log progress button
+- [x] 15. Create progress logging interface
+  - [x] 15.1 Display Log progress button
     - Show one-tap button after planned test window
     - Ask what happened, what learned, what next
     - _Requirements: 8.1, 8.2_
-  - [ ] 15.2 Implement accountability reporting
+  - [x] 15.2 Implement accountability reporting
     - Offer optional accountability sending weekly report to user or partner
     - Show only recorded outcomes and learning notes
     - Avoid streaks or likes
