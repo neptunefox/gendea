@@ -132,6 +132,11 @@ async function main() {
     );
   `)
 
+  await db.execute(sql`
+    ALTER TABLE branches 
+    ADD COLUMN IF NOT EXISTS outside_view_analysis JSONB;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

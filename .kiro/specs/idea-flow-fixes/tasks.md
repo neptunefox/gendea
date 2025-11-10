@@ -7,7 +7,7 @@
   - Ensure AI slots remain hidden until user fills three human slots
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2. Surface base rates in OutsideViewCard and wire Statistician
+- [x] 2. Surface base rates in OutsideViewCard and wire Statistician
   - Modify OutsideViewCard.vue to call Statistician API on mount
   - Display list of similar projects with success rates and time-to-milestone estimates
   - Show prompt for user to identify three reference cases if data is insufficient

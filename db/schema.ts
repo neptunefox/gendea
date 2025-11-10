@@ -62,6 +62,18 @@ export const branches = pgTable('branches', {
     .notNull()
     .default('Seeded'),
   missedPlans: integer('missed_plans').notNull().default(0),
+  outsideViewAnalysis: jsonb('outside_view_analysis').$type<{
+    comparableEfforts: Array<{
+      description: string
+      successRate?: string
+      timeToMilestone?: string
+    }>
+    baseRates: {
+      successRate?: string
+      timeToFirstMilestone?: string
+    }
+    referenceClass?: string
+  }>(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
