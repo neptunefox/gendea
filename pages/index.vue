@@ -95,12 +95,30 @@
       :duration="15"
       @complete="handleBreakComplete"
     />
+
+    <ActionCrisisCard
+      v-else-if="currentView === 'action-crisis'"
+      :branch-id="savedNode?.branchId || ''"
+      :north-star="actionCrisisData.northStar"
+      :missed-plans="actionCrisisData.missedPlans"
+      :low-expectancy="actionCrisisData.lowExpectancy"
+      @recommit="handleRecommit"
+      @exit="handleActionCrisisExit"
+    />
+
+    <ActionCrisisExit
+      v-else-if="currentView === 'action-crisis-exit'"
+      :branch-id="savedNode?.branchId || ''"
+      :north-star="actionCrisisData.northStar || ''"
+      :failed-approach="problemText"
+      @select="handleAlternativeSelect"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Node } from '~/types/node'
+import type { Node } from '../types/node'
 import { useNodeSave } from '../composables/useNodeSave'
 
 type ViewState =
@@ -116,6 +134,8 @@ type ViewState =
   | 'progress-log'
   | 'break-recommendation'
   | 'break-timer'
+  | 'action-crisis'
+  | 'action-crisis-exit'
 
 const { saveNode } = useNodeSave()
 
@@ -128,6 +148,11 @@ const selectedPlan = ref('')
 const preservedIdeas = ref<Array<{ text: string; isAI: boolean; label?: string }>>([])
 const breakReason = ref<'low-energy' | 'stalled'>('low-energy')
 const returnView = ref<ViewState>('capture')
+const actionCrisisData = ref({
+  northStar: '',
+  missedPlans: 0,
+  lowExpectancy: false
+})
 
 async function handleSave(data: { problem: string; assumptions: string[] }) {
   try {
@@ -210,9 +235,32 @@ async function handleProgressLogComplete() {
   if (!savedNode.value?.branchId) return
 
   try {
-    const { shouldRecommendBreak, reason } = await $fetch('/api/break-recommendation', {
+    const crisisCheck = (await $fetch('/api/action-crisis/check', {
       params: { branchId: savedNode.value.branchId }
-    })
+    })) as {
+      shouldShowCrisis: boolean
+      missedPlans: number
+      northStar?: string
+    }
+
+    if (crisisCheck.shouldShowCrisis) {
+      actionCrisisData.value = {
+        northStar: crisisCheck.northStar || '',
+        missedPlans: crisisCheck.missedPlans,
+        lowExpectancy: true
+      }
+      currentView.value = 'action-crisis'
+      return
+    }
+
+    const breakCheck = (await $fetch('/api/break-recommendation', {
+      params: { branchId: savedNode.value.branchId }
+    })) as {
+      shouldRecommendBreak: boolean
+      reason?: string
+    }
+
+    const { shouldRecommendBreak, reason } = breakCheck
 
     if (shouldRecommendBreak && reason) {
       breakReason.value = reason as 'low-energy' | 'stalled'
@@ -220,7 +268,7 @@ async function handleProgressLogComplete() {
       currentView.value = 'break-recommendation'
     }
   } catch (error) {
-    console.error('Failed to check break recommendation:', error)
+    console.error('Failed to check progress state:', error)
   }
 }
 
@@ -234,6 +282,22 @@ function handleSkipBreak() {
 
 function handleBreakComplete() {
   currentView.value = returnView.value
+}
+
+async function handleRecommit(data: { metric: string; threshold: string }) {
+  console.log('Recommitted with:', data)
+  currentView.value = 'if-then-planning'
+}
+
+function handleActionCrisisExit() {
+  currentView.value = 'action-crisis-exit'
+}
+
+function handleAlternativeSelect(alternative: { title: string; description: string }) {
+  console.log('Selected alternative:', alternative)
+  problemText.value = `${alternative.title}: ${alternative.description}`
+  savedNode.value = null
+  currentView.value = 'capture'
 }
 </script>
 

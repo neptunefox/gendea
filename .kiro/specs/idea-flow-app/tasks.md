@@ -212,11 +212,11 @@
     - Reopen same node for second pass when user returns
     - _Requirements: 10.1, 10.2_
 
-- [ ] 18. Create action crisis interface
-  - [ ] 18.1 Detect stalled progress
+- [x] 18. Create action crisis interface
+  - [x] 18.1 Detect stalled progress
     - Open Action crisis card if repeated logs show little movement or low expectancy
     - _Requirements: 11.1_
-  - [ ] 18.2 Offer recommit or exit
+  - [x] 18.2 Offer recommit or exit
     - Offer two week recommit or exit test with clear metrics
     - If exit, provide fast re-engage path to different route serving same North Star
     - _Requirements: 11.2, 11.3_
