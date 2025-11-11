@@ -122,7 +122,7 @@
       :branch-id="savedNode?.branchId || ''"
       :north-star="actionCrisisData.northStar || ''"
       :failed-approach="problemText"
-      @select="handleAlternativeSelect"
+      @select="handleAlternativeSelectWithReengagement"
       @exit="handleExitToArchive"
     />
 
@@ -384,11 +384,81 @@ function handleExitToArchive() {
   currentView.value = 'archive-prompt'
 }
 
-function handleAlternativeSelect(alternative: { title: string; description: string }) {
-  console.log('Selected alternative:', alternative)
-  problemText.value = `${alternative.title}: ${alternative.description}`
-  savedNode.value = null
-  currentView.value = 'capture'
+async function handleAlternativeSelectWithReengagement(data: {
+  alternative: { title: string; description: string }
+  branchId: string
+}) {
+  const { alternative, branchId } = data
+
+  try {
+    const branchResponse = await fetch(`/api/branch/${branchId}`)
+    const branchData = (await branchResponse.json()) as {
+      northStar: { text: string } | null
+    }
+
+    const northStarText = branchData.northStar?.text || actionCrisisData.value.northStar
+
+    await fetch('/api/archive', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchId,
+        adviceToSelf: `Tried: ${problemText.value}. Switching to: ${alternative.title}`
+      })
+    })
+
+    const newBranchId = crypto.randomUUID()
+
+    await fetch('/api/nodes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        idea: {
+          type: 'Idea',
+          text: `${alternative.title}: ${alternative.description}`,
+          branchId: newBranchId
+        },
+        assumptions: []
+      })
+    })
+
+    await fetch('/api/north-star', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchId: newBranchId,
+        text: northStarText
+      })
+    })
+
+    await fetch('/api/ladder-steps', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchId: newBranchId,
+        text: alternative.description,
+        order: 0
+      })
+    })
+
+    await fetch('/api/workflow/transition', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchId: newBranchId,
+        event: { type: 'CLARIFY' }
+      })
+    })
+
+    savedNode.value = {
+      id: crypto.randomUUID(),
+      branchId: newBranchId
+    } as Node
+    problemText.value = `${alternative.title}: ${alternative.description}`
+    currentView.value = 'clarification'
+  } catch (error) {
+    console.error('Failed to create new branch from alternative:', error)
+  }
 }
 
 function openProgressLog() {

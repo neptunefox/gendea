@@ -52,7 +52,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  select: [{ title: string; description: string }]
+  select: [{ alternative: { title: string; description: string }; branchId: string }]
   exit: []
 }>()
 
@@ -103,8 +103,7 @@ function handleSelectAlternative() {
 
   processing.value = true
   const selected = alternatives.value[selectedIndex.value]
-  emit('exit')
-  emit('select', selected)
+  emit('select', { alternative: selected, branchId: props.branchId })
 }
 </script>
 

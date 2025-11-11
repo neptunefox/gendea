@@ -58,7 +58,7 @@
     - Modify Statistician to query archived learnings from similar branches and include in outside-view response
     - Fix ArchivePage.vue to accept full archive object prop and eliminate redundant API fetches
     - _Requirements: 7.6, 9.1, 9.2, 9.3, 9.4, 9.5_
-  - [ ] 7.3 Implement action-crisis exit with re-engagement
+  - [x] 7.3 Implement action-crisis exit with re-engagement
     - Update ActionCrisisExit to archive stalled branch and create new branch with same North Star
     - Seed new branch with selected alternative as first Ladder step and navigate to Clarification
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
