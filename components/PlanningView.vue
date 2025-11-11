@@ -26,8 +26,13 @@
       <p class="idea-text">{{ idea }}</p>
     </div>
 
+    <div v-if="loading" class="ai-status">
+      <div class="spinner" />
+      <p>Planner is finding paths within your constraints…</p>
+    </div>
+
     <button class="generate-button" :disabled="loading" @click="generatePlans">
-      {{ loading ? 'Generating...' : 'Generate Plans' }}
+      {{ loading ? 'Generating...' : 'Ask Planner for help' }}
     </button>
 
     <div v-if="plans.length > 0" class="plans-section">
@@ -52,13 +57,18 @@
         </div>
       </div>
 
+      <div v-if="loadingCritique" class="ai-status">
+        <div class="spinner" />
+        <p>Coach is preparing supportive guidance…</p>
+      </div>
+
       <button
         v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]"
         class="review-button"
         :disabled="loadingCritique"
         @click="reviewWithCoach"
       >
-        {{ loadingCritique ? 'Getting feedback...' : 'Review with Coach' }}
+        {{ loadingCritique ? 'Getting feedback...' : 'Ask Coach for help' }}
       </button>
 
       <CritiqueCard
@@ -465,5 +475,38 @@ async function proceedToRiskAssessment() {
 
 .proceed-button:hover {
   background: #059669;
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ai-status p {
+  color: #6b7280;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

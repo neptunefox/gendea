@@ -24,7 +24,7 @@
 
         <div v-if="slot.isAI && isGenerating" class="ai-loading">
           <div class="spinner" />
-          <p>AI is generating ideas...</p>
+          <p>Diverger is warming up a weird option…</p>
         </div>
 
         <textarea
@@ -51,7 +51,7 @@
 
     <div v-if="showAI && !aiGenerated" class="actions">
       <button class="generate-button" :disabled="isGenerating" @click="triggerAIGeneration">
-        {{ isGenerating ? 'Generating...' : 'Generate AI Ideas' }}
+        {{ isGenerating ? 'Generating...' : 'Ask Diverger for help' }}
       </button>
     </div>
 

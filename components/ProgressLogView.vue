@@ -91,6 +91,11 @@
       </div>
     </div>
 
+    <div v-if="loadingCritique" class="ai-status">
+      <div class="spinner" />
+      <p>Coach is preparing supportive guidance…</p>
+    </div>
+
     <CritiqueCard
       v-if="critique"
       :critique="critique"
@@ -128,6 +133,7 @@ const log = ref({
 
 const saving = ref(false)
 const showAccountability = ref(false)
+const loadingCritique = ref(false)
 const critique = ref<{
   bar: string
   affirmation: string
@@ -177,6 +183,7 @@ async function saveLog() {
 }
 
 async function getCritique() {
+  loadingCritique.value = true
   try {
     const response = await $fetch<{
       bar: string
@@ -194,6 +201,8 @@ async function getCritique() {
     critique.value = response
   } catch (error) {
     console.error('Failed to get critique:', error)
+  } finally {
+    loadingCritique.value = false
   }
 }
 
@@ -466,5 +475,38 @@ async function markComplete() {
 .complete-button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fef3c7;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.ai-status p {
+  color: #92400e;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fde68a;
+  border-top-color: #f59e0b;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

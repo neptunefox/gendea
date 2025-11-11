@@ -2,8 +2,13 @@
   <div class="skeptic-view">
     <h3 class="title">Risk Analysis</h3>
 
+    <div v-if="loading" class="ai-status">
+      <div class="spinner" />
+      <p>Skeptic is imagining failure modes…</p>
+    </div>
+
     <button class="analyze-button" :disabled="loading" @click="analyzeRisks">
-      {{ loading ? 'Analyzing...' : 'Analyze Risks' }}
+      {{ loading ? 'Analyzing...' : 'Ask Skeptic for help' }}
     </button>
 
     <div v-if="analysis" class="analysis-section">
@@ -202,5 +207,38 @@ async function analyzeRisks() {
   color: #6b7280;
   margin: 0;
   font-style: italic;
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ai-status p {
+  color: #991b1b;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fecaca;
+  border-top-color: #ef4444;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

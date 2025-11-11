@@ -4,7 +4,8 @@
     <p class="subtitle">Base rates from similar projects</p>
 
     <div v-if="loading" class="loading-state">
-      <p>Statistician is finding similar projects...</p>
+      <div class="spinner" />
+      <p>Statistician is finding similar projects…</p>
     </div>
 
     <div v-else-if="analysis && !analysis.needsUserInput" class="analysis-display">
@@ -259,10 +260,36 @@ function changeReferenceClass() {
 }
 
 .loading-state {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   padding: 2rem;
-  color: #6b7280;
-  font-style: italic;
+  background: #faf5ff;
+  border-radius: 0.5rem;
+}
+
+.loading-state p {
+  color: #6b21a8;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e9d5ff;
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .analysis-display {

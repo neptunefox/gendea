@@ -81,7 +81,7 @@
     - Add Need a spark? button to TreeCanvas with three warm-up options
     - Wire warm-ups to call Diverger with starter prompts and label AI-generated starters
     - _Requirements: 12.1, 12.2, 12.3, 12.4_
-  - [ ] 9.2 Add visible AI agent personas
+  - [x] 9.2 Add visible AI agent personas
     - Add visible AI agent status text for Diverger, Planner, Skeptic, Statistician, Coach
     - Add Ask [Agent] for help buttons in relevant stages
     - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6_
