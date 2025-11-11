@@ -66,9 +66,14 @@
         </div>
       </div>
 
-      <button class="save-button" :disabled="!isValid || saving" @click="saveLog">
-        {{ saving ? 'Saving...' : 'Save Progress' }}
-      </button>
+      <div class="button-group">
+        <button class="save-button" :disabled="!isValid || saving" @click="saveLog">
+          {{ saving ? 'Saving...' : 'Save Progress' }}
+        </button>
+        <button class="complete-button" :disabled="!isValid || saving" @click="markComplete">
+          Mark Complete
+        </button>
+      </div>
     </div>
 
     <CritiqueCard
@@ -92,6 +97,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: []
   showIfThen: []
+  markComplete: []
 }>()
 
 const log = ref({
@@ -171,6 +177,31 @@ async function getCritique() {
 
 function dismissCritique() {
   critique.value = null
+}
+
+async function markComplete() {
+  if (!isValid.value || saving.value) return
+
+  saving.value = true
+  try {
+    await $fetch('/api/progress-log', {
+      method: 'POST',
+      body: {
+        branchId: props.branchId,
+        whatHappened: log.value.whatHappened,
+        whatLearned: log.value.whatLearned,
+        whatNext: log.value.whatNext,
+        energyRating: log.value.energyRating,
+        expectancyRating: log.value.expectancyRating
+      }
+    })
+
+    emit('markComplete')
+  } catch (error) {
+    console.error('Failed to save progress log:', error)
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -326,6 +357,32 @@ function dismissCritique() {
 }
 
 .save-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.complete-button {
+  padding: 0.875rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.complete-button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.complete-button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }

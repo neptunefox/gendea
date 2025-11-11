@@ -65,7 +65,23 @@ export default defineEventHandler(async event => {
     })
     .returning()
 
-  await db.update(branches).set({ state: 'Archived' }).where(eq(branches.id, branchId))
+  const [branch] = await db.select().from(branches).where(eq(branches.id, branchId))
+
+  if (branch) {
+    const { workflowService } = await import('../../lib/workflow-service')
+    workflowService.getOrCreateActor(branchId, {
+      missedPlans: branch.missedPlans
+    })
+    const snapshot = workflowService.transition(branchId, { type: 'COMPLETE' })
+
+    await db
+      .update(branches)
+      .set({
+        state: snapshot.value as typeof branch.state,
+        updatedAt: new Date()
+      })
+      .where(eq(branches.id, branchId))
+  }
 
   return { archive }
 })

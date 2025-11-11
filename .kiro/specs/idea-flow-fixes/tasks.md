@@ -48,7 +48,7 @@
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
 - [ ] 7. Mount ArchivePrompt and implement complete archive workflow
-  - [ ] 7.1 Wire ArchivePrompt to completion and exit flows
+  - [x] 7.1 Wire ArchivePrompt to completion and exit flows
     - Mount ArchivePrompt in pages/index.vue when user selects exit from ActionCrisisExit
     - Mount ArchivePrompt in pages/index.vue when user marks branch complete in ProgressLogView
     - Wire ArchivePrompt to call server/api/archive with branch data on save

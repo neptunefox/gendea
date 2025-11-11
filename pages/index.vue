@@ -89,6 +89,7 @@
       :branch-id="savedNode?.branchId || ''"
       @complete="handleProgressLogComplete"
       @show-if-then="handleShowIfThenFromProgressLog"
+      @mark-complete="handleMarkComplete"
     />
 
     <BreakRecommendation
@@ -122,6 +123,13 @@
       :north-star="actionCrisisData.northStar || ''"
       :failed-approach="problemText"
       @select="handleAlternativeSelect"
+      @exit="handleExitToArchive"
+    />
+
+    <ArchivePrompt
+      v-else-if="currentView === 'archive-prompt'"
+      :branch-id="savedNode?.branchId || ''"
+      @created="handleArchiveCreated"
     />
   </div>
 </template>
@@ -147,6 +155,7 @@ type ViewState =
   | 'break-timer'
   | 'action-crisis'
   | 'action-crisis-exit'
+  | 'archive-prompt'
 
 const { saveNode } = useNodeSave()
 const { pendingLogs, checkTestWindows } = useProgressMonitor()
@@ -165,6 +174,7 @@ const actionCrisisData = ref({
   missedPlans: 0,
   lowExpectancy: false
 })
+const isCompletingBranch = ref(false)
 
 async function handleSave(data: { problem: string; assumptions: string[]; isAnonymous: boolean }) {
   try {
@@ -348,7 +358,30 @@ async function handleRecommit(data: { metric: string; threshold: string }) {
 }
 
 function handleActionCrisisExit() {
+  isCompletingBranch.value = false
   currentView.value = 'action-crisis-exit'
+}
+
+function handleMarkComplete() {
+  isCompletingBranch.value = true
+  currentView.value = 'archive-prompt'
+}
+
+async function handleArchiveCreated() {
+  if (isCompletingBranch.value) {
+    currentView.value = 'capture'
+    savedNode.value = null
+    problemText.value = ''
+  } else {
+    currentView.value = 'capture'
+    savedNode.value = null
+    problemText.value = ''
+  }
+}
+
+function handleExitToArchive() {
+  isCompletingBranch.value = false
+  currentView.value = 'archive-prompt'
 }
 
 function handleAlternativeSelect(alternative: { title: string; description: string }) {
