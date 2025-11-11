@@ -77,7 +77,7 @@
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
 - [ ] 9. Add AI collaboration improvements with visible personas and warm-ups
-  - [ ] 9.1 Add idea-less arrival support
+  - [x] 9.1 Add idea-less arrival support
     - Add Need a spark? button to TreeCanvas with three warm-up options
     - Wire warm-ups to call Diverger with starter prompts and label AI-generated starters
     - _Requirements: 12.1, 12.2, 12.3, 12.4_
