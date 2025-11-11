@@ -84,6 +84,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   complete: []
+  showIfThen: []
 }>()
 
 const log = ref({
@@ -118,6 +119,7 @@ async function saveLog() {
       }
     })
     showAccountability.value = true
+    emit('showIfThen')
     emit('complete')
   } catch (error) {
     console.error('Failed to save progress log:', error)

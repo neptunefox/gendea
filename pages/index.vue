@@ -52,6 +52,7 @@
       v-else-if="currentView === 'clarification'"
       :branch-id="savedNode?.branchId || ''"
       @proceed="handleClarificationComplete"
+      @show-if-then="handleShowIfThenFromClarification"
     />
 
     <PlanningView
@@ -59,6 +60,7 @@
       :branch-id="savedNode?.branchId || ''"
       :idea="problemText"
       @proceed="handlePlanningComplete"
+      @show-if-then="handleShowIfThenFromPlanning"
     />
 
     <RiskAssessmentView
@@ -79,6 +81,7 @@
       v-else-if="currentView === 'progress-log'"
       :branch-id="savedNode?.branchId || ''"
       @complete="handleProgressLogComplete"
+      @show-if-then="handleShowIfThenFromProgressLog"
     />
 
     <BreakRecommendation
@@ -161,7 +164,7 @@ async function handleSave(data: { problem: string; assumptions: string[]; isAnon
     nodeName.value = result.nodeName
     suggestedTags.value = result.suggestedTags
     problemText.value = data.problem
-    currentView.value = 'confirmation'
+    currentView.value = 'if-then-planning'
   } catch (error) {
     console.error('Failed to save node:', error)
   }
@@ -200,9 +203,20 @@ function handleClarificationComplete() {
   currentView.value = 'planning'
 }
 
+function handleShowIfThenFromClarification() {
+  returnView.value = 'clarification'
+  currentView.value = 'if-then-planning'
+}
+
 function handlePlanningComplete(plan: string) {
   selectedPlan.value = plan
   currentView.value = 'risk-assessment'
+}
+
+function handleShowIfThenFromPlanning(plan: string) {
+  selectedPlan.value = plan
+  returnView.value = 'planning'
+  currentView.value = 'if-then-planning'
 }
 
 function handleRiskAssessmentComplete() {
@@ -221,13 +235,31 @@ async function handleIfThenPlanSave(plan: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         branchId: savedNode.value?.branchId,
+        nodeId: savedNode.value?.id,
         ifThenPlan: plan
       })
     })
-    currentView.value = 'progress-log'
+    
+    const previousView = returnView.value
+    if (previousView === 'capture') {
+      currentView.value = 'confirmation'
+    } else if (previousView === 'clarification') {
+      currentView.value = 'clarification'
+    } else if (previousView === 'planning') {
+      currentView.value = 'risk-assessment'
+    } else if (previousView === 'progress-log') {
+      await handleProgressLogComplete()
+    } else {
+      currentView.value = 'confirmation'
+    }
   } catch (error) {
     console.error('Failed to save if-then plan:', error)
   }
+}
+
+function handleShowIfThenFromProgressLog() {
+  returnView.value = 'progress-log'
+  currentView.value = 'if-then-planning'
 }
 
 async function handleProgressLogComplete() {

@@ -1,19 +1,31 @@
 import { db } from '~/server/db'
 import { nodes } from '~/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { branchId, ifThenPlan } = body
+  const { branchId, nodeId, ifThenPlan } = body
 
-  const [planNode] = await db
-    .select()
-    .from(nodes)
-    .where(eq(nodes.branchId, branchId))
-    .orderBy(nodes.createdAt)
-    .limit(1)
+  let targetNode
 
-  if (!planNode) {
+  if (nodeId) {
+    const [node] = await db
+      .select()
+      .from(nodes)
+      .where(and(eq(nodes.id, nodeId), eq(nodes.branchId, branchId)))
+      .limit(1)
+    targetNode = node
+  } else {
+    const [node] = await db
+      .select()
+      .from(nodes)
+      .where(eq(nodes.branchId, branchId))
+      .orderBy(nodes.createdAt)
+      .limit(1)
+    targetNode = node
+  }
+
+  if (!targetNode) {
     throw createError({
       statusCode: 404,
       message: 'Node not found for branch'
@@ -26,7 +38,7 @@ export default defineEventHandler(async event => {
       ifThenPlan,
       updatedAt: new Date()
     })
-    .where(eq(nodes.id, planNode.id))
+    .where(eq(nodes.id, targetNode.id))
     .returning()
 
   return { node: updated }

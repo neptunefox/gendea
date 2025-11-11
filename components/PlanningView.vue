@@ -99,6 +99,7 @@ const constraints = ref<Constraints>({
 
 const emit = defineEmits<{
   proceed: [plan: string]
+  showIfThen: [plan: string]
 }>()
 
 const plans = ref<MicroPlan[]>([])
@@ -203,7 +204,7 @@ async function proceedToRiskAssessment() {
       }
     })
 
-    emit('proceed', plan.description)
+    emit('showIfThen', plan.description)
   } catch (error) {
     console.error('Failed to save plan or transition workflow:', error)
   }

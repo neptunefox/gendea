@@ -64,6 +64,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   proceed: []
+  showIfThen: []
 }>()
 
 const { context, fetchContext } = useBranchContext(props.branchId)
@@ -185,6 +186,7 @@ async function selectAlternative(text: string) {
 
   await handleStepUpdate(swappingStepIndex.value, text)
   closeAlternatives()
+  emit('showIfThen')
 }
 
 function closeAlternatives() {

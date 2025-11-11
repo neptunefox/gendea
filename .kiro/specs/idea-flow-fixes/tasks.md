@@ -15,7 +15,7 @@
   - Store outside-view analysis with branch record
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 3. Trigger if-then planning after every capture and plan change
+- [x] 3. Trigger if-then planning after every capture and plan change
   - Add IfThenPlanning component display after TreeCanvas save
   - Add IfThenPlanning component display after Mars-adjacent swap in ClarificationView
   - Add IfThenPlanning component display after plan selection in PlanningView
