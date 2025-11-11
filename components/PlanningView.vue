@@ -281,6 +281,9 @@ async function proceedToRiskAssessment() {
 }
 
 .context-section {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;

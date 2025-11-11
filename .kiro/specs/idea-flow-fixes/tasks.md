@@ -70,7 +70,7 @@
     - Update server/api/metrics/quality.get.ts to return completionRate
     - Verify MetricsDashboard displays all metrics without undefined values
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8_
-  - [ ] 8.2 Add persistent North Star and Ladder display
+  - [x] 8.2 Add persistent North Star and Ladder display
     - Add North Star and Ladder display to PlanningView, TestSelection, and ProgressLogView components
     - Fetch North Star and Ladder from branch record when mounting these components
     - Display in pinned header or sidebar that remains visible throughout workflow

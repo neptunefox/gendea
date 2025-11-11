@@ -1,5 +1,20 @@
 <template>
   <div class="progress-log-view">
+    <div v-if="context" class="context-section">
+      <div v-if="context.northStar" class="context-card">
+        <h3 class="context-title">North Star</h3>
+        <p class="context-text">{{ context.northStar.text }}</p>
+      </div>
+      <div v-if="context.ladderSteps && context.ladderSteps.length > 0" class="context-card">
+        <h3 class="context-title">Ladder Steps</h3>
+        <ol class="ladder-list">
+          <li v-for="step in context.ladderSteps" :key="step.id" class="ladder-item">
+            {{ step.text }}
+          </li>
+        </ol>
+      </div>
+    </div>
+
     <h3 class="title">Log Your Progress</h3>
     <p class="subtitle">Reflect on what happened and what you learned</p>
 
@@ -88,7 +103,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useBranchContext } from '~/composables/useBranchContext'
 
 const props = defineProps<{
   branchId: string
@@ -99,6 +115,8 @@ const emit = defineEmits<{
   showIfThen: []
   markComplete: []
 }>()
+
+const { context, fetchContext } = useBranchContext(props.branchId)
 
 const log = ref({
   whatHappened: '',
@@ -121,6 +139,10 @@ const LOW_THRESHOLD = 2
 
 const isValid = computed(() => {
   return log.value.whatHappened.trim() !== ''
+})
+
+onMounted(async () => {
+  await fetchContext()
 })
 
 async function saveLog() {
@@ -213,6 +235,65 @@ async function markComplete() {
   background: white;
   border-radius: 0.75rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.context-section {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .context-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.context-card {
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.context-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.context-text {
+  font-size: 0.9375rem;
+  color: #111827;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.ladder-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.ladder-item {
+  font-size: 0.9375rem;
+  color: #111827;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ladder-item:last-child {
+  margin-bottom: 0;
 }
 
 .title {
