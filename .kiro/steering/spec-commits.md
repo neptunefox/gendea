@@ -1,6 +1,6 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: ".kiro/specs/*.md"
+fileMatchPattern: '.kiro/specs/*.md'
 ---
 
 ## Commit Messages

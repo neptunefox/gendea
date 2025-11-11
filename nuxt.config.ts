@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/eslint'],
+  modules: ['@nuxt/eslint'],
   runtimeConfig: {
     llmProvider: process.env.LLM_PROVIDER || 'ollama',
     llmModel: process.env.LLM_MODEL || 'gemma3:4b',
