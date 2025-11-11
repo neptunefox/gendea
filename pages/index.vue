@@ -1,5 +1,12 @@
 <template>
   <div class="page-container">
+    <div v-if="pendingLogs.length > 0" class="log-progress-banner">
+      <div class="banner-content">
+        <span class="banner-text">Test window passed - time to log progress</span>
+        <button class="log-progress-button" @click="openProgressLog">Log Progress</button>
+      </div>
+    </div>
+
     <TreeCanvas v-if="currentView === 'capture'" @save="handleSave" />
 
     <div v-else-if="currentView === 'confirmation'" class="save-confirmation">
@@ -123,6 +130,7 @@
 import { ref } from 'vue'
 import type { Node } from '../types/node'
 import { useNodeSave } from '../composables/useNodeSave'
+import { useProgressMonitor } from '../composables/useProgressMonitor'
 
 type ViewState =
   | 'capture'
@@ -141,6 +149,7 @@ type ViewState =
   | 'action-crisis-exit'
 
 const { saveNode } = useNodeSave()
+const { pendingLogs } = useProgressMonitor()
 
 const currentView = ref<ViewState>('capture')
 const savedNode = ref<Node | null>(null)
@@ -334,6 +343,22 @@ function handleAlternativeSelect(alternative: { title: string; description: stri
   savedNode.value = null
   currentView.value = 'capture'
 }
+
+function openProgressLog() {
+  if (pendingLogs.value.length === 0) return
+
+  const firstPending = pendingLogs.value[0]
+  if (!savedNode.value) {
+    savedNode.value = {
+      id: firstPending.nodeId,
+      branchId: firstPending.branchId
+    } as Node
+  } else {
+    savedNode.value.branchId = firstPending.branchId
+  }
+
+  currentView.value = 'progress-log'
+}
 </script>
 
 <style scoped>
@@ -341,6 +366,62 @@ function handleAlternativeSelect(alternative: { title: string; description: stri
   min-height: 100vh;
   padding: 2rem;
   background-color: #f9fafb;
+}
+
+.log-progress-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.banner-text {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.log-progress-button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.log-progress-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .save-confirmation {
