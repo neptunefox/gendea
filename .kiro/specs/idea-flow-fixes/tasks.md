@@ -64,7 +64,7 @@
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
 
 - [ ] 8. Align metrics schema and add persistent North Star display
-  - [ ] 8.1 Fix metrics API response schema
+  - [x] 8.1 Fix metrics API response schema
     - Update server/api/metrics/acquisition.get.ts to return reachedPlanning and setDatePlace
     - Update server/api/metrics/execution.get.ts to return testsScheduled, plannedTestsRun, passRate, failRate, timeToFirstResult
     - Update server/api/metrics/quality.get.ts to return completionRate

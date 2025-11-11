@@ -48,10 +48,11 @@
 
       <div class="metric-card">
         <h2>Quality</h2>
-        <div class="metric-value">{{ metrics.quality.progressionRate }}%</div>
-        <div class="metric-label">Seed to Test Rate</div>
+        <div class="metric-value">{{ metrics.quality.completionRate.toFixed(1) }}%</div>
+        <div class="metric-label">Completion Rate</div>
         <div class="metric-detail">
-          {{ metrics.quality.totalProgressed }} / {{ metrics.quality.totalSeeds }} ideas
+          {{ metrics.quality.branchesWithTestsAndDecisions }} / {{ metrics.quality.totalBranches }}
+          branches
         </div>
       </div>
     </div>
@@ -71,7 +72,8 @@ interface Metrics {
     testsScheduled: number
     completionRate: number
     passRate: number
-    avgTimeToFirstResult: number
+    failRate: number
+    timeToFirstResult: number
   }
   learning: {
     avgLessonsPerBranch: number
@@ -84,18 +86,24 @@ interface Metrics {
     noveltyInjections: number
   }
   quality: {
-    progressionRate: number
-    totalSeeds: number
-    totalProgressed: number
+    completionRate: number
+    branchesWithTestsAndDecisions: number
+    totalBranches: number
   }
 }
 
 const metrics = ref<Metrics>({
   acquisition: { totalSeeds: 0, reachedPlanning: 0, setDatePlace: 0 },
-  execution: { testsScheduled: 0, completionRate: 0, passRate: 0, avgTimeToFirstResult: 0 },
+  execution: {
+    testsScheduled: 0,
+    completionRate: 0,
+    passRate: 0,
+    failRate: 0,
+    timeToFirstResult: 0
+  },
   learning: { avgLessonsPerBranch: 0, archiveViewsBeforePlanning: 0 },
   motivation: { avgEnergy: 0, avgExpectancy: 0, sessionCount: 0, noveltyInjections: 0 },
-  quality: { progressionRate: 0, totalSeeds: 0, totalProgressed: 0 }
+  quality: { completionRate: 0, branchesWithTestsAndDecisions: 0, totalBranches: 0 }
 })
 
 const loading = ref(true)

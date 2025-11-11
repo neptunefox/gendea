@@ -23,11 +23,11 @@ export default defineEventHandler(async () => {
 
   return {
     totalSeeds: totalSeeds[0]?.count || 0,
-    percentReachingPlanning:
+    reachedPlanning:
       totalBranches[0]?.count > 0
         ? ((branchesInPlanning[0]?.count || 0) / totalBranches[0].count) * 100
         : 0,
-    percentWithDatePlace:
+    setDatePlace:
       totalBranches[0]?.count > 0
         ? ((branchesWithDatePlace[0]?.count || 0) / totalBranches[0].count) * 100
         : 0

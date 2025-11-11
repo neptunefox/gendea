@@ -32,6 +32,6 @@ export default defineEventHandler(async () => {
   return {
     branchesWithTestsAndDecisions: branchesWithDecisions.length,
     totalBranches: totalBranches[0]?.count || 0,
-    qualitySharePercent: qualityShare
+    completionRate: qualityShare
   }
 })

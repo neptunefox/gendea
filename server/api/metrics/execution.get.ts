@@ -76,8 +76,8 @@ export default defineEventHandler(async () => {
       : 0
 
   return {
-    testsScheduledWithinSevenDays: testsScheduledWithinSevenDays[0]?.count || 0,
-    plannedTestsRun:
+    testsScheduled: testsScheduledWithinSevenDays[0]?.count || 0,
+    completionRate:
       totalTests[0]?.count > 0
         ? ((testsWithResults[0]?.count || 0) / totalTests[0].count) * 100
         : 0,
@@ -89,6 +89,6 @@ export default defineEventHandler(async () => {
       testsWithResults[0]?.count > 0
         ? ((failedTests[0]?.count || 0) / testsWithResults[0].count) * 100
         : 0,
-    avgTimeToFirstResultDays: avgTimeToFirstResult
+    timeToFirstResult: avgTimeToFirstResult
   }
 })
