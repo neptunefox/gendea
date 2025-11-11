@@ -89,7 +89,7 @@
     - Generate two if-then suggestions from Coach after progress log submission with pre-populated defaults
     - _Requirements: 15.1, 15.2, 15.3, 15.4_
 
-- [ ] 10. Add workflow continuity improvements with Resume card and consistent CTAs
+- [x] 10. Add workflow continuity improvements with Resume card and consistent CTAs
   - Add Resume card after incubation timer showing North Star, Ladder, last AI batch, pause timestamp, and Goal-Gradient progress bar
   - Enlarge CTAs to 44×44px minimum and maintain consistent placement in bottom-right
   - Add subtle motion animations under 400ms for workflow transitions

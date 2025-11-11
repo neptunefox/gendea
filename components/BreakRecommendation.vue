@@ -94,6 +94,8 @@ function skipBreak() {
 }
 
 .start-break-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem 2rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -105,28 +107,34 @@ function skipBreak() {
   transition:
     transform 0.2s,
     box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .start-break-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
 }
 
 .skip-button {
-  padding: 0.75rem 2rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.875rem 2rem;
   background-color: transparent;
   color: #6b7280;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition:
     background-color 0.2s,
-    border-color 0.2s;
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .skip-button:hover {
   background-color: #f3f4f6;
   border-color: #9ca3af;
+  transform: translateY(-2px);
 }
 </style>

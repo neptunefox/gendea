@@ -300,37 +300,49 @@ async function handleExit() {
 }
 
 .option-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem;
   border: none;
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    all 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   margin-top: auto;
 }
 
 .recommit-button {
   background: #3b82f6;
   color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .recommit-button:hover:not(:disabled) {
   background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 }
 
 .exit-button {
   background: #6b7280;
   color: white;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
 }
 
 .exit-button:hover:not(:disabled) {
   background: #4b5563;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(107, 114, 128, 0.5);
 }
 
 .option-button:disabled {
   background: #d1d5db;
   color: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
 }
 </style>

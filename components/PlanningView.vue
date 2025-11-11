@@ -371,6 +371,7 @@ async function proceedToRiskAssessment() {
 
 .generate-button {
   width: 100%;
+  min-height: 44px;
   padding: 0.875rem;
   background-color: #3b82f6;
   color: white;
@@ -379,17 +380,24 @@ async function proceedToRiskAssessment() {
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   margin: 1.5rem 0;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .generate-button:hover:not(:disabled) {
   background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 }
 
 .generate-button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .plans-section {
@@ -438,6 +446,7 @@ async function proceedToRiskAssessment() {
 
 .review-button {
   width: 100%;
+  min-height: 44px;
   padding: 0.875rem;
   background: #f59e0b;
   color: white;
@@ -446,21 +455,29 @@ async function proceedToRiskAssessment() {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
 
 .review-button:hover:not(:disabled) {
   background: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
 }
 
 .review-button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .proceed-button {
   width: 100%;
+  min-height: 44px;
   padding: 1rem;
   background: #10b981;
   color: white;
@@ -469,12 +486,18 @@ async function proceedToRiskAssessment() {
   font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .proceed-button:hover {
   background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
 }
 
 .ai-status {

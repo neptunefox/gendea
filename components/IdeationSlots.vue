@@ -326,6 +326,8 @@ const generateAIIdeas = async () => {
 }
 
 .generate-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem 2rem;
   background-color: #a855f7;
   color: white;
@@ -334,11 +336,17 @@ const generateAIIdeas = async () => {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
 }
 
 .generate-button:hover:not(:disabled) {
   background-color: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.5);
 }
 
 .generate-button:disabled {
@@ -347,6 +355,8 @@ const generateAIIdeas = async () => {
 }
 
 .incubation-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem 2rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -367,6 +377,8 @@ const generateAIIdeas = async () => {
 }
 
 .continue-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem 2rem;
   background-color: #3b82f6;
   color: white;

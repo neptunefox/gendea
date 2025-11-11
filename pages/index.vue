@@ -44,6 +44,16 @@
       @complete="handleTimerComplete"
     />
 
+    <ResumeCard
+      v-else-if="currentView === 'resume'"
+      :north-star="resumeData.northStar"
+      :ladder-steps="resumeData.ladderSteps"
+      :last-a-i-batch="resumeData.lastAIBatch"
+      :pause-timestamp="resumeData.pauseTimestamp"
+      :progress-stage="resumeData.progressStage"
+      @continue="handleResumeContinue"
+    />
+
     <IdeationSlots
       v-else-if="currentView === 'ideation-second'"
       :branch-id="savedNode?.branchId || ''"
@@ -145,6 +155,7 @@ type ViewState =
   | 'confirmation'
   | 'ideation'
   | 'incubation'
+  | 'resume'
   | 'ideation-second'
   | 'clarification'
   | 'planning'
@@ -175,6 +186,13 @@ const actionCrisisData = ref({
   lowExpectancy: false
 })
 const isCompletingBranch = ref(false)
+const resumeData = ref({
+  northStar: '',
+  ladderSteps: [] as Array<{ id: string; text: string; order: number }>,
+  lastAIBatch: [] as Array<{ text: string; label: string }>,
+  pauseTimestamp: Date.now(),
+  progressStage: 'capture' as 'capture' | 'plan' | 'test'
+})
 
 async function handleSave(data: { problem: string; assumptions: string[]; isAnonymous: boolean }) {
   try {
@@ -201,7 +219,37 @@ function handleIncubation() {
   currentView.value = 'incubation'
 }
 
-function handleTimerComplete() {
+async function handleTimerComplete() {
+  if (!savedNode.value?.branchId) {
+    currentView.value = 'ideation-second'
+    return
+  }
+
+  try {
+    const branchResponse = await fetch(`/api/branch/${savedNode.value.branchId}`)
+    const branchData = (await branchResponse.json()) as {
+      northStar: { text: string } | null
+      ladderSteps: Array<{ id: string; text: string; order: number }>
+    }
+
+    resumeData.value = {
+      northStar: branchData.northStar?.text || '',
+      ladderSteps: branchData.ladderSteps || [],
+      lastAIBatch: preservedIdeas.value
+        .filter(idea => idea.isAI)
+        .map(idea => ({ text: idea.text, label: idea.label || 'AI' })),
+      pauseTimestamp: Date.now(),
+      progressStage: 'capture'
+    }
+
+    currentView.value = 'resume'
+  } catch (error) {
+    console.error('Failed to fetch resume data:', error)
+    currentView.value = 'ideation-second'
+  }
+}
+
+function handleResumeContinue() {
   currentView.value = 'ideation-second'
 }
 
@@ -554,7 +602,7 @@ onMounted(() => {
 .log-progress-button {
   min-width: 44px;
   min-height: 44px;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   background: white;
   color: #667eea;
   border: none;
@@ -562,7 +610,9 @@ onMounted(() => {
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -628,17 +678,26 @@ onMounted(() => {
 }
 
 .continue-button {
-  padding: 0.75rem 1.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.875rem 2rem;
   background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 0.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .continue-button:hover {
   background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 }
 </style>

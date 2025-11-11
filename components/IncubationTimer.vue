@@ -155,17 +155,23 @@ const skipTimer = () => {
 }
 
 .skip-button {
-  padding: 0.75rem 2rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.875rem 2rem;
   background-color: #f3f4f6;
   color: #374151;
   border: none;
   border-radius: 0.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 }
 
 .skip-button:hover {
   background-color: #e5e7eb;
+  transform: translateY(-2px);
 }
 </style>

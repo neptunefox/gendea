@@ -325,18 +325,23 @@ function handleProceed() {
 
 .close-button {
   width: 100%;
-  padding: 0.75rem;
+  min-height: 44px;
+  padding: 0.875rem;
   background: #f3f4f6;
   color: #374151;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 
 .close-button:hover {
   background: #e5e7eb;
+  transform: translateY(-2px);
 }
 
 .proceed-section {
@@ -346,6 +351,8 @@ function handleProceed() {
 }
 
 .proceed-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 1rem 2rem;
   background: #10b981;
   color: white;
@@ -354,10 +361,16 @@ function handleProceed() {
   font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .proceed-button:hover {
   background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
 }
 </style>

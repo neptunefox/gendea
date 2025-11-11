@@ -541,6 +541,8 @@ async function markComplete() {
 }
 
 .save-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem;
   background: #10b981;
   color: white;
@@ -549,16 +551,23 @@ async function markComplete() {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .save-button:hover:not(:disabled) {
   background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
 }
 
 .save-button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .button-group {
@@ -567,6 +576,8 @@ async function markComplete() {
 }
 
 .complete-button {
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.875rem;
   background: #3b82f6;
   color: white;
@@ -575,16 +586,23 @@ async function markComplete() {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .complete-button:hover:not(:disabled) {
   background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
 }
 
 .complete-button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .ai-status {
