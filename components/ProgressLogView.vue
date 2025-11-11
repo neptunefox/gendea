@@ -15,101 +15,133 @@
       </div>
     </div>
 
-    <h3 class="title">Log Your Progress</h3>
-    <p class="subtitle">Reflect on what happened and what you learned</p>
+    <div v-if="!showSuggestions">
+      <h3 class="title">Log Your Progress</h3>
+      <p class="subtitle">Reflect on what happened and what you learned</p>
 
-    <div class="form">
-      <div class="form-group">
-        <label class="form-label">What happened?</label>
-        <textarea
-          v-model="log.whatHappened"
-          class="form-textarea"
-          placeholder="Describe the outcome of your test or action..."
-          rows="4"
-        />
-      </div>
+      <div class="form">
+        <div class="form-group">
+          <label class="form-label">What happened?</label>
+          <textarea
+            v-model="log.whatHappened"
+            class="form-textarea"
+            placeholder="Describe the outcome of your test or action..."
+            rows="4"
+          />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">What did you learn?</label>
-        <textarea
-          v-model="log.whatLearned"
-          class="form-textarea"
-          placeholder="What insights or lessons did you gain?"
-          rows="4"
-        />
-      </div>
+        <div class="form-group">
+          <label class="form-label">What did you learn?</label>
+          <textarea
+            v-model="log.whatLearned"
+            class="form-textarea"
+            placeholder="What insights or lessons did you gain?"
+            rows="4"
+          />
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">What next?</label>
-        <textarea
-          v-model="log.whatNext"
-          class="form-textarea"
-          placeholder="What will you do based on what you learned?"
-          rows="4"
-        />
-      </div>
+        <div class="form-group">
+          <label class="form-label">What next?</label>
+          <textarea
+            v-model="log.whatNext"
+            class="form-textarea"
+            placeholder="What will you do based on what you learned?"
+            rows="4"
+          />
+        </div>
 
-      <div class="ratings">
-        <div class="rating-group">
-          <label class="rating-label">Energy Level</label>
-          <div class="slider-container">
-            <input v-model.number="log.energyRating" type="range" min="1" max="5" class="slider" />
-            <span class="slider-value">{{ log.energyRating }}</span>
+        <div class="ratings">
+          <div class="rating-group">
+            <label class="rating-label">Energy Level</label>
+            <div class="slider-container">
+              <input
+                v-model.number="log.energyRating"
+                type="range"
+                min="1"
+                max="5"
+                class="slider"
+              />
+              <span class="slider-value">{{ log.energyRating }}</span>
+            </div>
+            <div class="slider-labels">
+              <span>Low</span>
+              <span>High</span>
+            </div>
           </div>
-          <div class="slider-labels">
-            <span>Low</span>
-            <span>High</span>
+
+          <div class="rating-group">
+            <label class="rating-label">Expectancy (How likely to succeed?)</label>
+            <div class="slider-container">
+              <input
+                v-model.number="log.expectancyRating"
+                type="range"
+                min="1"
+                max="5"
+                class="slider"
+              />
+              <span class="slider-value">{{ log.expectancyRating }}</span>
+            </div>
+            <div class="slider-labels">
+              <span>Low</span>
+              <span>High</span>
+            </div>
           </div>
         </div>
 
-        <div class="rating-group">
-          <label class="rating-label">Expectancy (How likely to succeed?)</label>
-          <div class="slider-container">
-            <input
-              v-model.number="log.expectancyRating"
-              type="range"
-              min="1"
-              max="5"
-              class="slider"
-            />
-            <span class="slider-value">{{ log.expectancyRating }}</span>
-          </div>
-          <div class="slider-labels">
-            <span>Low</span>
-            <span>High</span>
-          </div>
+        <div class="button-group">
+          <button class="save-button" :disabled="!isValid || saving" @click="saveLog">
+            {{ saving ? 'Saving...' : 'Save Progress' }}
+          </button>
+          <button class="complete-button" :disabled="!isValid || saving" @click="markComplete">
+            Mark Complete
+          </button>
         </div>
       </div>
 
-      <div class="button-group">
-        <button class="save-button" :disabled="!isValid || saving" @click="saveLog">
-          {{ saving ? 'Saving...' : 'Save Progress' }}
-        </button>
-        <button class="complete-button" :disabled="!isValid || saving" @click="markComplete">
-          Mark Complete
-        </button>
+      <div v-if="loadingCritique" class="ai-status">
+        <div class="spinner" />
+        <p>Coach is preparing supportive guidance…</p>
       </div>
+
+      <CritiqueCard
+        v-if="critique"
+        :critique="critique"
+        :dismissable="true"
+        @dismiss="dismissCritique"
+      />
+
+      <AccountabilitySettings v-if="showAccountability" />
     </div>
 
-    <div v-if="loadingCritique" class="ai-status">
-      <div class="spinner" />
-      <p>Coach is preparing supportive guidance…</p>
-    </div>
-
-    <CritiqueCard
-      v-if="critique"
-      :critique="critique"
-      :dismissable="true"
-      @dismiss="dismissCritique"
+    <IfThenSuggestions
+      v-if="showSuggestions"
+      :suggestions="ifThenSuggestions"
+      :loading="loadingSuggestions"
+      @select="handleSuggestionSelect"
+      @custom="handleCustomPlan"
     />
 
-    <AccountabilitySettings v-if="showAccountability" />
+    <IfThenPlanning
+      v-if="showIfThenPlanning"
+      :branch-id="branchId"
+      :initial-plan="selectedSuggestion"
+      :plan-context="log.whatNext"
+      @save="handleIfThenSave"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useBranchContext } from '~/composables/useBranchContext'
+
+interface IfThenSuggestion {
+  action: string
+  suggestedDate: string
+  suggestedTime: string
+  suggestedPlace: string
+  reasoning: string
+}
 
 const props = defineProps<{
   branchId: string
@@ -140,6 +172,20 @@ const critique = ref<{
   processChanges: string[]
   focusAreas?: string[]
 } | null>(null)
+
+const showSuggestions = ref(false)
+const loadingSuggestions = ref(false)
+const ifThenSuggestions = ref<IfThenSuggestion[]>([])
+const showIfThenPlanning = ref(false)
+const selectedSuggestion = ref<
+  | {
+      action: string
+      date: string
+      time: string
+      place: string
+    }
+  | undefined
+>(undefined)
 
 const LOW_THRESHOLD = 2
 
@@ -173,12 +219,76 @@ async function saveLog() {
     }
 
     showAccountability.value = true
-    emit('showIfThen')
-    emit('complete')
+
+    await generateIfThenSuggestions()
   } catch (error) {
     console.error('Failed to save progress log:', error)
   } finally {
     saving.value = false
+  }
+}
+
+async function generateIfThenSuggestions() {
+  if (!log.value.whatNext.trim()) {
+    showIfThenPlanning.value = true
+    return
+  }
+
+  loadingSuggestions.value = true
+  showSuggestions.value = true
+
+  try {
+    const response = await $fetch<{ suggestions: IfThenSuggestion[] }>('/api/if-then-suggestions', {
+      method: 'POST',
+      body: {
+        whatNext: log.value.whatNext,
+        context: `Progress: ${log.value.whatHappened}\nLearned: ${log.value.whatLearned}`
+      }
+    })
+    ifThenSuggestions.value = response.suggestions
+  } catch (error) {
+    console.error('Failed to generate if-then suggestions:', error)
+    ifThenSuggestions.value = []
+  } finally {
+    loadingSuggestions.value = false
+  }
+}
+
+function handleSuggestionSelect(suggestion: IfThenSuggestion) {
+  selectedSuggestion.value = {
+    action: suggestion.action,
+    date: suggestion.suggestedDate,
+    time: suggestion.suggestedTime,
+    place: suggestion.suggestedPlace
+  }
+  showSuggestions.value = false
+  showIfThenPlanning.value = true
+}
+
+function handleCustomPlan() {
+  selectedSuggestion.value = undefined
+  showSuggestions.value = false
+  showIfThenPlanning.value = true
+}
+
+async function handleIfThenSave(plan: {
+  action: string
+  date: string
+  time: string
+  place: string
+}) {
+  try {
+    await $fetch('/api/if-then-plan', {
+      method: 'PUT',
+      body: {
+        branchId: props.branchId,
+        ifThenPlan: plan
+      }
+    })
+    emit('showIfThen')
+    emit('complete')
+  } catch (error) {
+    console.error('Failed to save if-then plan:', error)
   }
 }
 

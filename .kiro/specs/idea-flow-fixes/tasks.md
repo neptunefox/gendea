@@ -85,7 +85,7 @@
     - Add visible AI agent status text for Diverger, Planner, Skeptic, Statistician, Coach
     - Add Ask [Agent] for help buttons in relevant stages
     - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5, 14.6_
-  - [ ] 9.3 Auto-generate if-then suggestions after progress logs
+  - [x] 9.3 Auto-generate if-then suggestions after progress logs
     - Generate two if-then suggestions from Coach after progress log submission with pre-populated defaults
     - _Requirements: 15.1, 15.2, 15.3, 15.4_
 
