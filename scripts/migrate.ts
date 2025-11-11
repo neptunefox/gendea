@@ -137,6 +137,31 @@ async function main() {
     ADD COLUMN IF NOT EXISTS outside_view_analysis JSONB;
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS saved_ideas (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      text TEXT NOT NULL,
+      source TEXT NOT NULL,
+      parent_idea_id UUID,
+      tags JSONB DEFAULT '[]'::jsonb,
+      is_ready_to_build INTEGER NOT NULL DEFAULT 0,
+      branch_id UUID,
+      status TEXT NOT NULL DEFAULT 'exploring',
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS spark_runs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      prompt TEXT NOT NULL,
+      core_ideas JSONB NOT NULL,
+      lenses JSONB NOT NULL,
+      nudges JSONB NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

@@ -1,54 +1,36 @@
 # Gendea
 
-Idea generation and exploration tool with structured workflow from capture to execution.
+Creative workbench that keeps ideation, saved sparks, experiments, and build lessons in one loop.
 
-## Setup
+## What it does
 
-1. Install dependencies:
+- **Spark tab** — parallel AI “lanes” suggest constrained experiments, anti-pattern riffs, and smallest honest tests with pinboard saves.
+- **Pinboard & History** — every saved idea keeps its status, UUID, and full contents so you can resume or branch from past runs instantly.
+- **Build view** — tracks North Star, constraints, plans, and test evidence with XState-powered workflow transitions.
+- **Research nudges** — incubation timers, novelty shuffles, and plan cues based on cognitive psychology.
 
-   ```bash
-   bun install
-   ```
+## Tech
 
-2. Configure environment:
+- Nuxt 4 + Vue 3, Vite, and Lucide
+- PostgreSQL with Drizzle ORM
+- XState for workflow state and Nitro server routes
+- Bun for tooling
 
-   ```bash
-   cp .env.example .env
-   ```
+## Quick start
 
-3. Set up database:
-
-   ```bash
-   bun run db:migrate
-   ```
-
-4. Start development:
-   ```bash
-   bun run dev
-   ```
-
-## LLM Configuration
-
-**Local (Ollama)**:
-
-```env
-LLM_PROVIDER=ollama
-LLM_MODEL=gemma3:4b
-LLM_BASE_URL=http://localhost:11434
+```bash
+bun install
+cp .env.example .env   # add DATABASE_URL + LLM key
+bun run db:migrate
+bun run dev
 ```
 
-**Cloud (OpenRouter)**:
+## Scripts
 
-```env
-LLM_PROVIDER=openrouter
-LLM_MODEL=anthropic/claude-3-haiku
-LLM_API_KEY=your_key
+```bash
+bun run format && bun run lint:fix   # formatting + linting
 ```
 
-## Database
+## License
 
-PostgreSQL required:
-
-```env
-DATABASE_URL=postgresql://localhost:5432/gendea
-```
+MIT

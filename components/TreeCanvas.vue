@@ -58,6 +58,8 @@
 </template>
 
 <script setup lang="ts">
+const props = defineProps<{ initialProblem?: string }>()
+
 const problemText = ref('')
 const assumptions = ref(['', '', ''])
 const isAnonymous = ref(false)
@@ -71,6 +73,16 @@ const showSparkButton = computed(() => problemText.value.trim().length === 0 && 
 const emit = defineEmits<{
   save: [data: { problem: string; assumptions: string[]; isAnonymous: boolean }]
 }>()
+
+watch(
+  () => props.initialProblem,
+  value => {
+    if (typeof value === 'string' && value !== problemText.value) {
+      problemText.value = value
+    }
+  },
+  { immediate: true }
+)
 
 const toggleWarmupOptions = () => {
   showWarmupOptions.value = !showWarmupOptions.value

@@ -9,7 +9,9 @@
     "format": "prettier --write .",
     "db:migrate": "bun run scripts/migrate.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lucide-vue-next": "^0.553.0"
+  },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
     "@vue-flow/core": "^1.47.0",

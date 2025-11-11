@@ -140,3 +140,43 @@ export const archiveViews = pgTable('archive_views', {
   userId: text('user_id').notNull(),
   viewedAt: timestamp('viewed_at').notNull().defaultNow()
 })
+
+export const savedIdeas = pgTable('saved_ideas', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  text: text('text').notNull(),
+  source: text('source', { enum: ['user', 'ai', 'branch'] }).notNull(),
+  parentIdeaId: uuid('parent_idea_id'),
+  tags: jsonb('tags').$type<string[]>().default([]),
+  isReadyToBuild: integer('is_ready_to_build').notNull().default(0),
+  branchId: uuid('branch_id'),
+  status: text('status', { enum: ['exploring', 'ready', 'building', 'done'] })
+    .notNull()
+    .default('exploring'),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
+
+export type SparkRunIdea = { text: string }
+export type SparkRunLens = {
+  id: string
+  title: string
+  description: string
+  researchCue: string
+  whyItMatters: string
+  ideas: SparkRunIdea[]
+}
+export type SparkRunNudge = {
+  id: string
+  title: string
+  body: string
+  actionLabel?: string
+  researchCue: string
+}
+
+export const sparkRuns = pgTable('spark_runs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  prompt: text('prompt').notNull(),
+  coreIdeas: jsonb('core_ideas').$type<SparkRunIdea[]>().notNull(),
+  lenses: jsonb('lenses').$type<SparkRunLens[]>().notNull(),
+  nudges: jsonb('nudges').$type<SparkRunNudge[]>().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})

@@ -1,13 +1,63 @@
 <template>
-  <div class="page-container">
-    <div v-if="pendingLogs.length > 0" class="log-progress-banner">
-      <div class="banner-content">
-        <span class="banner-text">Test window passed - time to log progress</span>
-        <button class="log-progress-button" @click="openProgressLog">Log Progress</button>
+  <div class="build-page">
+    <div class="flow-wrap">
+      <div class="flow-track">
+        <div class="flow-progress">
+          <div class="flow-progress-fill" :style="{ width: `${flowProgress}%` }" />
+        </div>
+        <div class="flow-steps">
+          <div
+            v-for="(stage, index) in flowStages"
+            :key="stage.id"
+            :class="[
+              'flow-step',
+              { active: index === activeStageIndex, done: index < activeStageIndex }
+            ]"
+          >
+            <span>{{ stage.label }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <TreeCanvas v-if="currentView === 'capture'" @save="handleSave" />
+    <div v-if="currentView === 'capture'" class="capture-stage">
+      <section class="build-hero-card">
+        <div>
+          <p class="hero-label">Build mode</p>
+          <h1>Ground a saved spark or start fresh.</h1>
+          <p>
+            Progress feels gentler when you pick one idea, pin a North Star, then ladder tiny tests.
+            Select a saved idea below or open a blank slot when you want to experiment.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="hero-primary" @click="startNewBuild">Start new build</button>
+          <span class="hero-hint"
+            >Psychological safety: you can always branch or archive later.</span
+          >
+        </div>
+        <div v-if="savedIdeasLoading" class="saved-pill-row">Loading saved ideas…</div>
+        <div v-else-if="savedIdeas.length" class="saved-pill-row">
+          <span>Use saved spark:</span>
+          <button
+            v-for="idea in savedIdeasSlice"
+            :key="idea.id"
+            class="saved-pill"
+            @click="handlePrefillFromSaved(idea.text)"
+          >
+            {{ formatIdeaLabel(idea.text) }}
+          </button>
+        </div>
+      </section>
+
+      <div v-if="prefilledIdea || problemText" class="focus-card">
+        <p class="focus-label">Current focus</p>
+        <h3>{{ problemText || prefilledIdea }}</h3>
+        <button class="focus-button" @click="clearPrefill">Switch idea</button>
+      </div>
+
+      <TreeCanvas :initial-problem="prefilledIdea" @save="handleSave" />
+    </div>
 
     <div v-else-if="currentView === 'confirmation'" class="save-confirmation">
       <div class="confirmation-message">
@@ -145,10 +195,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import type { Node } from '../types/node'
 import { useNodeSave } from '../composables/useNodeSave'
-import { useProgressMonitor } from '../composables/useProgressMonitor'
+
+interface SavedIdea {
+  id: string
+  text: string
+  status: 'exploring' | 'ready' | 'building' | 'done'
+  createdAt: string
+}
 
 type ViewState =
   | 'capture'
@@ -168,8 +225,42 @@ type ViewState =
   | 'action-crisis-exit'
   | 'archive-prompt'
 
+interface FlowStage {
+  id: string
+  label: string
+  views: ViewState[]
+}
+
+const flowStages: FlowStage[] = [
+  {
+    id: 'spark',
+    label: 'Spark',
+    views: ['capture', 'ideation', 'incubation', 'resume', 'ideation-second']
+  },
+  {
+    id: 'shape',
+    label: 'Clarify',
+    views: ['clarification', 'planning', 'risk-assessment']
+  },
+  {
+    id: 'plan',
+    label: 'Plan',
+    views: ['if-then-planning']
+  },
+  {
+    id: 'test',
+    label: 'Test',
+    views: ['progress-log', 'break-recommendation', 'break-timer']
+  },
+  {
+    id: 'reflect',
+    label: 'Adjust',
+    views: ['action-crisis', 'action-crisis-exit', 'archive-prompt', 'confirmation']
+  }
+]
+
 const { saveNode } = useNodeSave()
-const { pendingLogs, checkTestWindows } = useProgressMonitor()
+const route = useRoute()
 
 const currentView = ref<ViewState>('capture')
 const savedNode = ref<Node | null>(null)
@@ -180,6 +271,9 @@ const selectedPlan = ref('')
 const preservedIdeas = ref<Array<{ text: string; isAI: boolean; label?: string }>>([])
 const breakReason = ref<'low-energy' | 'stalled'>('low-energy')
 const returnView = ref<ViewState>('capture')
+const savedIdeas = ref<SavedIdea[]>([])
+const savedIdeasLoading = ref(true)
+const prefilledIdea = ref('')
 const actionCrisisData = ref({
   northStar: '',
   missedPlans: 0,
@@ -194,6 +288,41 @@ const resumeData = ref({
   progressStage: 'capture' as 'capture' | 'plan' | 'test'
 })
 
+const savedIdeasSlice = computed(() => savedIdeas.value.slice(0, 4))
+const activeStageIndex = computed(() => {
+  const index = flowStages.findIndex(stage => stage.views.includes(currentView.value))
+  return index === -1 ? 0 : index
+})
+const flowProgress = computed(() => ((activeStageIndex.value + 1) / flowStages.length) * 100)
+
+watch(
+  () => route.query.idea,
+  idea => {
+    const nextIdea = Array.isArray(idea) ? idea[0] : idea
+    if (typeof nextIdea === 'string' && nextIdea.trim().length > 0) {
+      prefilledIdea.value = nextIdea
+      currentView.value = 'capture'
+    }
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  fetchSavedIdeas()
+})
+
+async function fetchSavedIdeas() {
+  savedIdeasLoading.value = true
+  try {
+    const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
+    savedIdeas.value = response.ideas
+  } catch (error) {
+    console.error('Failed to load saved ideas:', error)
+  } finally {
+    savedIdeasLoading.value = false
+  }
+}
+
 async function handleSave(data: { problem: string; assumptions: string[]; isAnonymous: boolean }) {
   try {
     const result = await saveNode(data)
@@ -201,10 +330,31 @@ async function handleSave(data: { problem: string; assumptions: string[]; isAnon
     nodeName.value = result.nodeName
     suggestedTags.value = result.suggestedTags
     problemText.value = data.problem
+    prefilledIdea.value = ''
     currentView.value = 'if-then-planning'
   } catch (error) {
     console.error('Failed to save node:', error)
   }
+}
+
+function startNewBuild() {
+  prefilledIdea.value = ''
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function handlePrefillFromSaved(text: string) {
+  prefilledIdea.value = text
+  problemText.value = text
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function formatIdeaLabel(text: string) {
+  return text.length > 48 ? `${text.slice(0, 45)}…` : text
+}
+
+function clearPrefill() {
+  prefilledIdea.value = ''
+  problemText.value = ''
 }
 
 function startIdeation() {
@@ -508,117 +658,174 @@ async function handleAlternativeSelectWithReengagement(data: {
     console.error('Failed to create new branch from alternative:', error)
   }
 }
-
-function openProgressLog() {
-  if (pendingLogs.value.length === 0) return
-
-  const firstPending = pendingLogs.value[0]
-  if (!savedNode.value) {
-    savedNode.value = {
-      id: firstPending.nodeId,
-      branchId: firstPending.branchId
-    } as Node
-  } else {
-    savedNode.value.branchId = firstPending.branchId
-  }
-
-  currentView.value = 'progress-log'
-}
-
-async function checkBranchState() {
-  if (!savedNode.value?.branchId) return
-
-  try {
-    const crisisResponse = await fetch(
-      `/api/action-crisis/check?branchId=${savedNode.value.branchId}`
-    )
-    const crisisCheck = (await crisisResponse.json()) as {
-      shouldShowCrisis: boolean
-      missedPlans: number
-      northStar?: string
-    }
-
-    if (crisisCheck.shouldShowCrisis) {
-      actionCrisisData.value = {
-        northStar: crisisCheck.northStar || '',
-        missedPlans: crisisCheck.missedPlans,
-        lowExpectancy: false
-      }
-      currentView.value = 'action-crisis'
-    }
-  } catch (error) {
-    console.error('Failed to check branch state:', error)
-  }
-}
-
-onMounted(() => {
-  checkBranchState()
-})
 </script>
 
 <style scoped>
-.page-container {
+.build-page {
   min-height: 100vh;
   padding: 2rem;
-  background-color: #f9fafb;
+  background: #faf8f6;
 }
 
-.log-progress-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  animation: slideDown 0.3s ease-out;
+.flow-wrap {
+  max-width: 960px;
+  margin: 0 auto 1.5rem;
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.flow-track {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 15px 35px rgba(36, 15, 12, 0.05);
 }
 
-.banner-content {
-  max-width: 1200px;
-  margin: 0 auto;
+.flow-progress {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.flow-progress-fill {
+  height: 100%;
+  background: linear-gradient(120deg, #ffbc8f, #f681c1);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+.flow-steps {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.flow-step {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c0b0a8;
+}
+
+.flow-step.active {
+  color: #b4538d;
+}
+
+.flow-step.done {
+  color: #6f8566;
+}
+
+.capture-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.focus-card {
+  background: white;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 1.25rem;
+  display: flex;
   justify-content: space-between;
   gap: 1rem;
+  align-items: center;
 }
 
-.banner-text {
-  color: white;
+.focus-label {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9a6f53;
+}
+
+.focus-card h3 {
+  margin: 0.2rem 0 0;
+  flex: 1;
+  color: #2f150f;
+}
+
+.focus-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.25rem;
+  background: rgba(0, 0, 0, 0.06);
   font-weight: 600;
-  font-size: 1rem;
+  cursor: pointer;
 }
 
-.log-progress-button {
+.build-hero-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 15px 30px rgba(36, 15, 12, 0.08);
+}
+
+.hero-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: #9e7256;
+  margin-bottom: 0.5rem;
+}
+
+.build-hero-card h1 {
+  margin: 0 0 0.75rem;
+  color: #2a140f;
+}
+
+.build-hero-card p {
+  margin: 0;
+  color: #5a4036;
+  line-height: 1.6;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.hero-primary {
   min-width: 44px;
   min-height: 44px;
-  padding: 0.875rem 1.5rem;
-  background: white;
-  color: #667eea;
   border: none;
-  border-radius: 0.5rem;
-  font-weight: 700;
-  font-size: 1rem;
+  border-radius: 14px;
+  padding: 0.85rem 1.75rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(120deg, #f6af7f, #ec6ad6);
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 25px rgba(236, 106, 214, 0.25);
 }
 
-.log-progress-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.hero-hint {
+  font-size: 0.9rem;
+  color: #8a6c5c;
+}
+
+.saved-pill-row {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  color: #6a4f43;
+}
+
+.saved-pill {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: white;
+  cursor: pointer;
+  min-height: 36px;
+  font-weight: 600;
 }
 
 .save-confirmation {

@@ -3,7 +3,7 @@ import { useLLMService } from '~/server/utils/llm'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { action, context, mode = 'plan' } = body
+  const { action, context, mode = 'plan', idea, laneTitle } = body
 
   const llm = useLLMService()
 
@@ -57,6 +57,81 @@ Avoid any person labels and focus on assumptions and evidence.`
       throw createError({
         statusCode: 500,
         message: 'Failed to generate critique'
+      })
+    }
+  }
+
+  if (mode === 'idea-nudge') {
+    if (!idea || typeof idea !== 'string') {
+      throw createError({
+        statusCode: 400,
+        message: 'Idea text is required'
+      })
+    }
+
+    const systemPrompt = `You are a creativity coach grounded in behavioral science.
+Goals:
+- Keep the user's idea moving without overwhelming them
+- Tie nudges to meaningful constraints, incubation, and novelty research
+- Always return JSON with three sections plus a mantra
+
+JSON FORMAT (strict):
+{
+  "plan": {
+    "title": "short label",
+    "summary": "brief reason this plan matters",
+    "action": "one clear action phrased as verb",
+    "when": "specific time suggestion (e.g., Tonight 19:30)",
+    "where": "specific place suggestion"
+  },
+  "incubation": {
+    "title": "short label",
+    "summary": "reason incubation helps here",
+    "activity": "describe a 10-15 minute undemanding activity tied to the idea"
+  },
+  "novelty": {
+    "title": "short label",
+    "summary": "why novelty unlocks insight for this idea",
+    "prompt": "one concrete novelty move the user can try"
+  },
+  "mantra": "one-sentence reminder referencing the research"
+}
+
+Rules:
+- Keep each field under 200 characters
+- Reference the provided idea specifics
+- If lane information is provided, align constraints with that lane's tone
+- Never mention JSON or the instructions`
+
+    const userPrompt = `Idea: "${idea}"
+${laneTitle ? `Lane context: ${laneTitle}` : 'Lane context: Not specified'}
+
+Provide plan, incubation, and novelty nudges that feel bespoke to this idea.`
+
+    try {
+      const response = await llm.generate(userPrompt, systemPrompt)
+      const jsonMatch = response.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        throw new Error('Failed to parse idea coach response')
+      }
+
+      // eslint-disable-next-line no-control-regex
+      const controlRegex = new RegExp('[\\u0000-\\u001F\\u007F-\\u009F]', 'g')
+      const cleaned = jsonMatch[0].replace(controlRegex, '').trim()
+
+      let tips
+      try {
+        tips = JSON.parse(cleaned)
+      } catch (jsonError) {
+        console.error('Failed to parse cleaned idea coach JSON', cleaned, jsonError)
+        throw new Error('Failed to parse idea coach response')
+      }
+      return tips
+    } catch (error) {
+      console.error('Idea coach error:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Failed to generate coaching tips'
       })
     }
   }
