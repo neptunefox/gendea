@@ -54,6 +54,22 @@
 
       <button
         v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]"
+        class="review-button"
+        :disabled="loadingCritique"
+        @click="reviewWithCoach"
+      >
+        {{ loadingCritique ? 'Getting feedback...' : 'Review with Coach' }}
+      </button>
+
+      <CritiqueCard
+        v-if="critique"
+        :critique="critique"
+        :dismissable="true"
+        @dismiss="critique = null"
+      />
+
+      <button
+        v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]"
         class="proceed-button"
         @click="proceedToRiskAssessment"
       >
@@ -106,6 +122,13 @@ const plans = ref<MicroPlan[]>([])
 const loading = ref(false)
 const selectedPlanIndex = ref<number | null>(null)
 const selectedTests = ref<Record<number, TestOption | null>>({})
+const loadingCritique = ref(false)
+const critique = ref<{
+  bar: string
+  affirmation: string
+  processChanges: string[]
+  focusAreas?: string[]
+} | null>(null)
 
 const hasActiveConstraints = computed(() => {
   return constraints.value.timeCap || constraints.value.moneyCap || constraints.value.skillsOnHand
@@ -163,6 +186,38 @@ async function generatePlans() {
 
 function selectPlan(index: number) {
   selectedPlanIndex.value = index
+}
+
+async function reviewWithCoach() {
+  if (selectedPlanIndex.value === null) return
+
+  const plan = plans.value[selectedPlanIndex.value]
+  const selectedTest = selectedTests.value[selectedPlanIndex.value]
+
+  if (!selectedTest) {
+    return
+  }
+
+  loadingCritique.value = true
+  try {
+    const response = await $fetch<{
+      bar: string
+      affirmation: string
+      processChanges: string[]
+      focusAreas?: string[]
+    }>('/api/critique', {
+      method: 'POST',
+      body: {
+        userInput: `Plan: ${plan.description}\nTest: ${selectedTest.metric}\nPass: ${selectedTest.passThreshold}\nFail: ${selectedTest.failThreshold}`,
+        context: `Constraints: ${JSON.stringify(constraints.value)}`
+      }
+    })
+    critique.value = response
+  } catch (error) {
+    console.error('Failed to get critique:', error)
+  } finally {
+    loadingCritique.value = false
+  }
 }
 
 async function proceedToRiskAssessment() {
@@ -368,6 +423,29 @@ async function proceedToRiskAssessment() {
   margin-bottom: 0;
 }
 
+.review-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 2rem;
+}
+
+.review-button:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.review-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
 .proceed-button {
   width: 100%;
   padding: 1rem;
@@ -379,7 +457,7 @@ async function proceedToRiskAssessment() {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .proceed-button:hover {

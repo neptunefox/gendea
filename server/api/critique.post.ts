@@ -42,7 +42,13 @@ Rewrite this into high standards with assurance and concrete steps, avoiding any
       throw new Error('Failed to parse Coach critique response')
     }
 
-    const critique = JSON.parse(jsonMatch[0])
+    let jsonString = jsonMatch[0]
+    jsonString = jsonString
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t')
+
+    const critique = JSON.parse(jsonString)
 
     return {
       bar: critique.bar,

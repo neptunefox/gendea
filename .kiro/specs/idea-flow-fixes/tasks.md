@@ -31,7 +31,7 @@
   - Wire button to open ProgressLogView for the specific branch without sequential navigation
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 5. Wire critique API to PlanningView and ProgressLogView
+- [x] 5. Wire critique API to PlanningView and ProgressLogView
   - Add Review with Coach button to PlanningView after test selection
   - Call server/api/critique.post.ts when button is tapped with plan and test details
   - Display critique response in dedicated UI card

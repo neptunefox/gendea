@@ -71,6 +71,8 @@
       </button>
     </div>
 
+    <CritiqueCard v-if="critique" :critique="critique" :dismissable="true" @dismiss="dismissCritique" />
+
     <AccountabilitySettings v-if="showAccountability" />
   </div>
 </template>
@@ -97,6 +99,14 @@ const log = ref({
 
 const saving = ref(false)
 const showAccountability = ref(false)
+const critique = ref<{
+  bar: string
+  affirmation: string
+  processChanges: string[]
+  focusAreas?: string[]
+} | null>(null)
+
+const LOW_THRESHOLD = 2
 
 const isValid = computed(() => {
   return log.value.whatHappened.trim() !== ''
@@ -118,6 +128,11 @@ async function saveLog() {
         expectancyRating: log.value.expectancyRating
       }
     })
+
+    if (log.value.energyRating <= LOW_THRESHOLD || log.value.expectancyRating <= LOW_THRESHOLD) {
+      await getCritique()
+    }
+
     showAccountability.value = true
     emit('showIfThen')
     emit('complete')
@@ -126,6 +141,30 @@ async function saveLog() {
   } finally {
     saving.value = false
   }
+}
+
+async function getCritique() {
+  try {
+    const response = await $fetch<{
+      bar: string
+      affirmation: string
+      processChanges: string[]
+      focusAreas?: string[]
+    }>('/api/critique', {
+      method: 'POST',
+      body: {
+        userInput: `Progress Log:\nWhat happened: ${log.value.whatHappened}\nWhat learned: ${log.value.whatLearned}\nWhat next: ${log.value.whatNext}\nEnergy: ${log.value.energyRating}/5\nExpectancy: ${log.value.expectancyRating}/5`,
+        context: 'User is experiencing low energy or expectancy. Provide supportive guidance to help them maintain momentum.'
+      }
+    })
+    critique.value = response
+  } catch (error) {
+    console.error('Failed to get critique:', error)
+  }
+}
+
+function dismissCritique() {
+  critique.value = null
 }
 </script>
 
