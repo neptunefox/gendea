@@ -1,14 +1,11 @@
 import { db } from '../db'
 import { nodes, progressLogs } from '~/db/schema'
-import { eq, and, isNotNull } from 'drizzle-orm'
+import { eq, isNotNull } from 'drizzle-orm'
 
 export default defineEventHandler(async () => {
   const now = new Date()
 
-  const nodesWithPlans = await db
-    .select()
-    .from(nodes)
-    .where(isNotNull(nodes.ifThenPlan))
+  const nodesWithPlans = await db.select().from(nodes).where(isNotNull(nodes.ifThenPlan))
 
   const pendingLogs = []
 

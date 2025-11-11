@@ -71,7 +71,12 @@
       </button>
     </div>
 
-    <CritiqueCard v-if="critique" :critique="critique" :dismissable="true" @dismiss="dismissCritique" />
+    <CritiqueCard
+      v-if="critique"
+      :critique="critique"
+      :dismissable="true"
+      @dismiss="dismissCritique"
+    />
 
     <AccountabilitySettings v-if="showAccountability" />
   </div>
@@ -154,7 +159,8 @@ async function getCritique() {
       method: 'POST',
       body: {
         userInput: `Progress Log:\nWhat happened: ${log.value.whatHappened}\nWhat learned: ${log.value.whatLearned}\nWhat next: ${log.value.whatNext}\nEnergy: ${log.value.energyRating}/5\nExpectancy: ${log.value.expectancyRating}/5`,
-        context: 'User is experiencing low energy or expectancy. Provide supportive guidance to help them maintain momentum.'
+        context:
+          'User is experiencing low energy or expectancy. Provide supportive guidance to help them maintain momentum.'
       }
     })
     critique.value = response

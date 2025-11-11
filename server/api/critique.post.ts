@@ -43,10 +43,7 @@ Rewrite this into high standards with assurance and concrete steps, avoiding any
     }
 
     let jsonString = jsonMatch[0]
-    jsonString = jsonString
-      .replace(/\n/g, '\\n')
-      .replace(/\r/g, '\\r')
-      .replace(/\t/g, '\\t')
+    jsonString = jsonString.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')
 
     const critique = JSON.parse(jsonString)
 

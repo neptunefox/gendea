@@ -248,7 +248,7 @@ async function handleIfThenPlanSave(plan: {
         ifThenPlan: plan
       })
     })
-    
+
     const previousView = returnView.value
     if (previousView === 'capture') {
       currentView.value = 'confirmation'
@@ -277,6 +277,15 @@ async function handleProgressLogComplete() {
   if (!savedNode.value?.branchId) return
 
   try {
+    await fetch('/api/workflow/transition', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchId: savedNode.value.branchId,
+        event: { type: 'LOG_ENTRY' }
+      })
+    })
+
     const crisisResponse = await fetch(
       `/api/action-crisis/check?branchId=${savedNode.value.branchId}`
     )
@@ -310,7 +319,10 @@ async function handleProgressLogComplete() {
       breakReason.value = reason as 'low-energy' | 'stalled'
       returnView.value = 'ideation-second'
       currentView.value = 'break-recommendation'
+      return
     }
+
+    currentView.value = 'capture'
   } catch (error) {
     console.error('Failed to check progress state:', error)
   }
