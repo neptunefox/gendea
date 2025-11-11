@@ -44,10 +44,10 @@ CRITICAL: You must respond with ONLY valid JSON. No explanations, no markdown, n
     const archiveSummaries = allArchives
       .map(
         (a, i) =>
-          `${i + 1}. Tests: ${a.tests.map(t => t.description).join(', ')} | Advice: ${a.adviceToSelf}`
+          `${i + 1}. Branch: ${a.branchId} | Tests: ${a.tests.map(t => `${t.description} (${t.metric}${t.result ? ': ' + t.result : ''})`).join('; ')} | Evidence: ${a.evidence} | Advice: ${a.adviceToSelf}`
       )
       .join('\n')
-    archiveContext = `\n\nPast learning archives from similar efforts:\n${archiveSummaries}\n\nUse these archives to inform your base rate estimates.`
+    archiveContext = `\n\nPast learning archives from similar efforts (${allArchives.length} total):\n${archiveSummaries}\n\nAnalyze these archives to identify patterns relevant to the current plan. Use test results, evidence, and advice to inform your base rate estimates and comparable efforts.`
   }
 
   let userPrompt: string
@@ -89,6 +89,8 @@ Respond with ONLY this JSON structure (no markdown, no code blocks):
 List 3 comparable efforts and estimate base rates for:
 1. Success rate
 2. Time to first meaningful milestone
+
+${allArchives.length > 0 ? 'Prioritize insights from the archived learnings above. Extract patterns from test results, evidence, and advice that relate to this plan.' : ''}
 
 If you don't have enough data to provide reliable estimates, set needsUserInput to true.
 

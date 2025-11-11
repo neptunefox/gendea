@@ -54,7 +54,7 @@
     - Wire ArchivePrompt to call server/api/archive with branch data on save
     - Update archive API to transition branch to Archived state
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
-  - [ ] 7.2 Integrate archives with Statistician and fix data efficiency
+  - [x] 7.2 Integrate archives with Statistician and fix data efficiency
     - Modify Statistician to query archived learnings from similar branches and include in outside-view response
     - Fix ArchivePage.vue to accept full archive object prop and eliminate redundant API fetches
     - _Requirements: 7.6, 9.1, 9.2, 9.3, 9.4, 9.5_

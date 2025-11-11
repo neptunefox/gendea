@@ -12,16 +12,7 @@
     </div>
 
     <div v-else class="archives-list">
-      <ArchivePage
-        v-for="archive in archives"
-        :key="archive.id"
-        :archive-id="archive.id"
-        :branch-id="archive.branchId"
-        :tests="archive.tests"
-        :evidence="archive.evidence"
-        :advice-to-self="archive.adviceToSelf"
-        :created-at="archive.createdAt"
-      />
+      <ArchivePage v-for="archive in archives" :key="archive.id" :archive="archive" />
     </div>
   </div>
 </template>

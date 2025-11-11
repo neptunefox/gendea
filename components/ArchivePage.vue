@@ -2,11 +2,11 @@
   <div class="archive-page">
     <h2>Learning Archive</h2>
 
-    <section v-if="archive" class="archive-content">
+    <section v-if="displayArchive" class="archive-content">
       <div class="section">
         <h3>Tests Conducted</h3>
-        <ul v-if="archive.tests.length > 0">
-          <li v-for="(test, index) in archive.tests" :key="index">
+        <ul v-if="displayArchive.tests.length > 0">
+          <li v-for="(test, index) in displayArchive.tests" :key="index">
             <strong>{{ test.description }}</strong>
             <p>Metric: {{ test.metric }}</p>
             <p v-if="test.result">Result: {{ test.result }}</p>
@@ -17,12 +17,12 @@
 
       <div class="section">
         <h3>Evidence</h3>
-        <p class="evidence">{{ archive.evidence || 'No evidence recorded' }}</p>
+        <p class="evidence">{{ displayArchive.evidence || 'No evidence recorded' }}</p>
       </div>
 
       <div class="section">
         <h3>Advice to Future Self</h3>
-        <p class="advice">{{ archive.adviceToSelf }}</p>
+        <p class="advice">{{ displayArchive.adviceToSelf }}</p>
       </div>
     </section>
 
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 interface Archive {
   id: string
@@ -47,18 +47,23 @@ interface Archive {
 }
 
 const props = defineProps<{
-  branchId: string
+  archive?: Archive | null
+  branchId?: string
 }>()
 
-const archive = ref<Archive | null>(null)
+const fetchedArchive = ref<Archive | null>(null)
+
+const displayArchive = computed(() => props.archive || fetchedArchive.value)
 
 onMounted(async () => {
-  try {
-    const response = await fetch(`/api/archive/${props.branchId}`)
-    const data = (await response.json()) as { archive: Archive }
-    archive.value = data.archive
-  } catch (error) {
-    console.error('Failed to load archive:', error)
+  if (!props.archive && props.branchId) {
+    try {
+      const response = await fetch(`/api/archive/${props.branchId}`)
+      const data = (await response.json()) as { archive: Archive }
+      fetchedArchive.value = data.archive
+    } catch (error) {
+      console.error('Failed to load archive:', error)
+    }
   }
 })
 </script>
