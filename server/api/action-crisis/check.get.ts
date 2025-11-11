@@ -22,7 +22,7 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const shouldShowCrisis = branch.state === 'Action crisis'
+  const shouldShowCrisis = branch.state === 'Action crisis' || branch.state === 'Stalled'
 
   let northStarText = undefined
   if (shouldShowCrisis) {

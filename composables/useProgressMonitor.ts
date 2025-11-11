@@ -15,6 +15,8 @@ export const useProgressMonitor = () => {
   const checkTestWindows = async () => {
     loading.value = true
     try {
+      await $fetch('/api/plan-missed-check', { method: 'POST' })
+
       const response = await $fetch<{ pendingLogs: PendingLog[] }>('/api/progress-monitor')
       pendingLogs.value = response.pendingLogs
     } catch (error) {

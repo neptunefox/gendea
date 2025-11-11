@@ -39,7 +39,7 @@
   - Render feedback following scaffolding: state bar, affirm ability, give process changes
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 6. Emit PLAN_MISSED events and trigger Action Crisis
+- [x] 6. Emit PLAN_MISSED events and trigger Action Crisis
   - Create monitoring service to check if test windows pass without progress logs
   - Call server/api/plan-missed.post.ts when test window passes without log
   - Ensure plan-missed API emits PLAN_MISSED event to workflow machine

@@ -1,5 +1,6 @@
 import { db } from '../db'
 import { nodes, progressLogs } from '../../db/schema'
+import { desc } from 'drizzle-orm'
 
 interface ProgressLogRequest {
   branchId: string
@@ -71,14 +72,27 @@ export default defineEventHandler(async event => {
     .where(eq(branches.id, branchId))
 
   if (expectancyRating !== undefined && expectancyRating < 3) {
-    const lowExpSnapshot = workflowService.transition(branchId, { type: 'LOW_EXPECTANCY' })
-    await db
-      .update(branches)
-      .set({
-        state: lowExpSnapshot.value as WorkflowState,
-        updatedAt: new Date()
-      })
-      .where(eq(branches.id, branchId))
+    const recentLogs = await db
+      .select()
+      .from(progressLogs)
+      .where(eq(progressLogs.branchId, branchId))
+      .orderBy(desc(progressLogs.createdAt))
+      .limit(3)
+
+    const lowExpectancyCount = recentLogs.filter(
+      log => log.expectancyRating !== null && log.expectancyRating < 3
+    ).length
+
+    if (lowExpectancyCount >= 2) {
+      const lowExpSnapshot = workflowService.transition(branchId, { type: 'LOW_EXPECTANCY' })
+      await db
+        .update(branches)
+        .set({
+          state: lowExpSnapshot.value as WorkflowState,
+          updatedAt: new Date()
+        })
+        .where(eq(branches.id, branchId))
+    }
   }
 
   return { log: logNode }

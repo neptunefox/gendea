@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import type { Node } from '../types/node'
 import { useNodeSave } from '../composables/useNodeSave'
 import { useProgressMonitor } from '../composables/useProgressMonitor'
@@ -149,7 +149,7 @@ type ViewState =
   | 'action-crisis-exit'
 
 const { saveNode } = useNodeSave()
-const { pendingLogs } = useProgressMonitor()
+const { pendingLogs, checkTestWindows } = useProgressMonitor()
 
 const currentView = ref<ViewState>('capture')
 const savedNode = ref<Node | null>(null)
@@ -286,6 +286,8 @@ async function handleProgressLogComplete() {
       })
     })
 
+    await checkTestWindows()
+
     const crisisResponse = await fetch(
       `/api/action-crisis/check?branchId=${savedNode.value.branchId}`
     )
@@ -371,6 +373,36 @@ function openProgressLog() {
 
   currentView.value = 'progress-log'
 }
+
+async function checkBranchState() {
+  if (!savedNode.value?.branchId) return
+
+  try {
+    const crisisResponse = await fetch(
+      `/api/action-crisis/check?branchId=${savedNode.value.branchId}`
+    )
+    const crisisCheck = (await crisisResponse.json()) as {
+      shouldShowCrisis: boolean
+      missedPlans: number
+      northStar?: string
+    }
+
+    if (crisisCheck.shouldShowCrisis) {
+      actionCrisisData.value = {
+        northStar: crisisCheck.northStar || '',
+        missedPlans: crisisCheck.missedPlans,
+        lowExpectancy: false
+      }
+      currentView.value = 'action-crisis'
+    }
+  } catch (error) {
+    console.error('Failed to check branch state:', error)
+  }
+}
+
+onMounted(() => {
+  checkBranchState()
+})
 </script>
 
 <style scoped>
