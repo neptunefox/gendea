@@ -215,4 +215,3 @@ Critical fixes to align the idea flow application implementation with its specif
 2. THE Continue, Recommit, and Start buttons SHALL maintain consistent placement in the bottom-right corner across all views
 3. WHEN transitioning between divergent and convergent workflow states, THE System SHALL use subtle motion animations under 400ms
 4. THE Break Recommendation and Action Crisis cards SHALL feature enlarged CTAs that are visually prominent
-
