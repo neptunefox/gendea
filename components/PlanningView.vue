@@ -1,22 +1,5 @@
 <template>
   <div class="planning-view">
-    <h2 class="title">Create Your Plan</h2>
-
-    <div v-if="context" class="context-section">
-      <div v-if="context.northStar" class="context-card">
-        <h3 class="context-title">North Star</h3>
-        <p class="context-text">{{ context.northStar.text }}</p>
-      </div>
-      <div v-if="context.ladderSteps && context.ladderSteps.length > 0" class="context-card">
-        <h3 class="context-title">Ladder Steps</h3>
-        <ol class="ladder-list">
-          <li v-for="step in context.ladderSteps" :key="step.id" class="ladder-item">
-            {{ step.text }}
-          </li>
-        </ol>
-      </div>
-    </div>
-
     <ConstraintBanner :has-constraints="hasActiveConstraints" />
 
     <ConstraintToggles v-model="constraints" />
@@ -78,13 +61,14 @@
         @dismiss="critique = null"
       />
 
-      <button
-        v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]"
-        class="proceed-button"
-        @click="proceedToRiskAssessment"
-      >
-        Continue to Risk Assessment →
-      </button>
+      <div v-if="selectedPlanIndex !== null && selectedTests[selectedPlanIndex]" class="risk-hint">
+        <h4>💡 Pre-mortem tip</h4>
+        <p>
+          Imagine this plan failed. What went wrong? Thinking through failure modes now helps you
+          spot risks early.
+        </p>
+        <button class="proceed-button" @click="proceedToIfThen">Lock in plan →</button>
+      </div>
     </div>
   </div>
 </template>
@@ -230,7 +214,7 @@ async function reviewWithCoach() {
   }
 }
 
-async function proceedToRiskAssessment() {
+async function proceedToIfThen() {
   if (selectedPlanIndex.value === null) return
 
   const plan = plans.value[selectedPlanIndex.value]
@@ -288,65 +272,6 @@ async function proceedToRiskAssessment() {
   font-weight: 700;
   color: #111827;
   margin-bottom: 1.5rem;
-}
-
-.context-section {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .context-section {
-    grid-template-columns: 1fr;
-  }
-}
-
-.context-card {
-  padding: 1rem;
-  background: white;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-}
-
-.context-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  margin: 0 0 0.5rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.context-text {
-  font-size: 0.9375rem;
-  color: #111827;
-  margin: 0;
-  line-height: 1.6;
-}
-
-.ladder-list {
-  margin: 0;
-  padding-left: 1.25rem;
-  list-style: decimal;
-}
-
-.ladder-item {
-  font-size: 0.9375rem;
-  color: #111827;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-}
-
-.ladder-item:last-child {
-  margin-bottom: 0;
 }
 
 .idea-section {
@@ -475,6 +400,27 @@ async function proceedToRiskAssessment() {
   box-shadow: none;
 }
 
+.risk-hint {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: 0.5rem;
+}
+
+.risk-hint h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #92400e;
+}
+
+.risk-hint p {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: #78350f;
+  line-height: 1.5;
+}
+
 .proceed-button {
   width: 100%;
   min-height: 44px;
@@ -490,7 +436,6 @@ async function proceedToRiskAssessment() {
     background 0.2s,
     transform 0.2s,
     box-shadow 0.2s;
-  margin-top: 1rem;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 

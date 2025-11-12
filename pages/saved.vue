@@ -61,7 +61,7 @@
         </div>
         <div class="pin-actions">
           <button class="link-button" type="button" @click.stop="handleCardClick(idea)">
-            {{ idea.status === 'exploring' ? 'Ideate' : 'Build' }}
+            {{ idea.status === 'exploring' ? 'Ideate' : 'Coach' }}
           </button>
           <button class="card-delete" type="button" @click.stop="handleDelete(idea.id)">
             <Trash2 :size="14" />
@@ -130,11 +130,7 @@ async function fetchIdeas() {
 }
 
 function handleCardClick(idea: SavedIdea) {
-  if (idea.status === 'exploring') {
-    navigateTo(`/spark?explore=${encodeURIComponent(idea.text)}`)
-  } else if (idea.status === 'ready' || idea.status === 'building') {
-    navigateTo(`/?idea=${encodeURIComponent(idea.text)}`)
-  }
+  navigateTo(`/spark?explore=${encodeURIComponent(idea.text)}`)
 }
 
 async function handleDelete(ideaId: string) {

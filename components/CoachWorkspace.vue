@@ -39,9 +39,40 @@
           </header>
           <ClarificationView
             :branch-id="branchId"
-            @proceed="activateSection('plan')"
+            @proceed="activateSection('ideate')"
             @show-if-then="handleShowIfThenFromClarify"
           />
+        </section>
+
+        <section ref="ideateSection" class="coach-section">
+          <header>
+            <h4>Ideate</h4>
+            <p>Generate diverse approaches with AI help (optional).</p>
+          </header>
+          <div class="ideate-content">
+            <p class="ideate-hint">
+              Fill 3+ ideas yourself, then ask AI for wild alternatives. Or skip to planning.
+            </p>
+            <div class="ideate-slots">
+              <div v-for="n in 6" :key="n" class="idea-slot-mini">
+                <span class="slot-num">{{ n }}</span>
+                <textarea
+                  v-model="ideaSlots[n - 1]"
+                  :placeholder="n <= 3 ? 'Your idea...' : 'AI suggestion...'"
+                  :disabled="n > 3 && !isGeneratingIdeas"
+                  :readonly="n > 3"
+                  class="slot-input-mini"
+                  rows="2"
+                />
+              </div>
+            </div>
+            <div class="ideate-actions">
+              <button class="ghost small" :disabled="isGeneratingIdeas" @click="generateAIIdeas">
+                {{ isGeneratingIdeas ? 'Generating...' : 'Ask AI for alternatives' }}
+              </button>
+              <button class="primary small" @click="activateSection('plan')">Skip to Plan →</button>
+            </div>
+          </div>
         </section>
 
         <section ref="planSection" class="coach-section">
@@ -91,7 +122,7 @@ import { useNodeSave } from '~/composables/useNodeSave'
 import { Loader } from 'lucide-vue-next'
 
 interface SectionDefinition {
-  id: 'clarify' | 'plan' | 'progress'
+  id: 'clarify' | 'ideate' | 'plan' | 'progress'
   label: string
 }
 
@@ -106,6 +137,7 @@ const MAP_KEY = 'coach-branch-map'
 
 const sections: SectionDefinition[] = [
   { id: 'clarify', label: 'Clarify' },
+  { id: 'ideate', label: 'Ideate' },
   { id: 'plan', label: 'Plan' },
   { id: 'progress', label: 'Progress' }
 ]
@@ -117,8 +149,11 @@ const creationError = ref('')
 const activeSection = ref<SectionDefinition['id']>('clarify')
 const showIfThenPlanning = ref(false)
 const selectedPlan = ref('')
+const ideaSlots = ref<string[]>(['', '', '', '', '', ''])
+const isGeneratingIdeas = ref(false)
 
 const clarifySection = ref<HTMLElement | null>(null)
+const ideateSection = ref<HTMLElement | null>(null)
 const planSection = ref<HTMLElement | null>(null)
 const progressSection = ref<HTMLElement | null>(null)
 
@@ -201,17 +236,17 @@ function activateSection(sectionId: SectionDefinition['id']) {
     const target =
       sectionId === 'clarify'
         ? clarifySection.value
-        : sectionId === 'plan'
-          ? planSection.value
-          : progressSection.value
+        : sectionId === 'ideate'
+          ? ideateSection.value
+          : sectionId === 'plan'
+            ? planSection.value
+            : progressSection.value
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   })
 }
 
 function handleShowIfThenFromClarify() {
-  activateSection('plan')
-  showIfThenPlanning.value = true
-  selectedPlan.value = `Translate ladder step "${props.idea}" into action`
+  activateSection('ideate')
 }
 
 function handleShowIfThenFromPlanning(plan: string) {
@@ -257,85 +292,133 @@ function handleProgressComplete() {
 function handleMarkComplete() {
   props.showToast?.('Marked complete — archive when ready')
 }
+
+async function generateAIIdeas() {
+  const userIdeas = ideaSlots.value.slice(0, 3).filter(idea => idea.trim().length > 0)
+
+  if (userIdeas.length < 3) {
+    props.showToast?.('Fill at least 3 ideas first')
+    return
+  }
+
+  isGeneratingIdeas.value = true
+
+  try {
+    const response = await $fetch<{ ideas: Array<{ text: string; label: string }> }>(
+      '/api/diverge',
+      {
+        method: 'POST',
+        body: {
+          problem: props.idea,
+          userIdeas: userIdeas
+        }
+      }
+    )
+
+    ideaSlots.value[3] = response.ideas[0]?.text || ''
+    ideaSlots.value[4] = response.ideas[1]?.text || ''
+    ideaSlots.value[5] = response.ideas[2]?.text || ''
+
+    props.showToast?.('AI alternatives generated')
+  } catch (error) {
+    console.error('Failed to generate AI ideas:', error)
+    props.showToast?.('Failed to generate ideas')
+  } finally {
+    isGeneratingIdeas.value = false
+  }
+}
 </script>
 
 <style scoped>
 .coach-workspace {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0;
 }
 
 .coach-loader,
 .coach-error,
 .coach-empty {
-  height: 200px;
-  border: 1px dashed rgba(98, 76, 138, 0.3);
+  min-height: 180px;
+  border: 1px dashed rgba(212, 117, 111, 0.25);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #5f4a82;
-  gap: 0.5rem;
+  color: #835872;
+  gap: 0.75rem;
+  padding: 2rem;
+  background: rgba(255, 246, 239, 0.3);
 }
 
 .coach-sections {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0;
 }
 
 .coach-tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
+  padding: 0 0 1rem;
+  border-bottom: 1px solid rgba(212, 117, 111, 0.1);
+  margin-bottom: 1rem;
 }
 
 .coach-tab {
-  border: 1px solid rgba(98, 76, 138, 0.2);
-  background: white;
-  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  background: transparent;
+  padding: 0.4rem 0.9rem;
   border-radius: 999px;
   font-weight: 600;
-  font-size: 0.85rem;
-  color: #4f3a76;
+  font-size: 0.8rem;
+  color: #835872;
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.coach-tab:hover {
+  background: rgba(255, 215, 189, 0.2);
+  border-color: rgba(212, 117, 111, 0.3);
 }
 
 .coach-tab.active {
-  background: rgba(98, 76, 138, 0.15);
-  border-color: rgba(98, 76, 138, 0.45);
-  color: #2f1c4f;
+  background: linear-gradient(135deg, #ffd7bd, #f8c0ff);
+  border-color: #d4756f;
+  color: #2f1810;
+  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.2);
 }
 
 .coach-section {
-  padding: 1rem;
-  border: 1px solid rgba(94, 80, 135, 0.18);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 12px 30px rgba(21, 0, 36, 0.08);
+  padding: 0 0 1.5rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.coach-section:last-child {
+  padding-bottom: 0;
 }
 
 .coach-section header {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .coach-section h4 {
   margin: 0;
-  font-size: 1rem;
-  color: #2c1f3f;
+  font-size: 1.1rem;
+  color: #2f1810;
+  font-weight: 700;
 }
 
 .coach-section p {
-  margin: 0.2rem 0 0;
-  color: #6c5b88;
+  margin: 0.3rem 0 0;
+  color: #835872;
   font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 :deep(.clarification-view),
@@ -360,6 +443,132 @@ function handleMarkComplete() {
 
 :deep(.progress-log-view) {
   padding-top: 0.5rem;
+}
+
+.ideate-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ideate-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #835872;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
+  border-left: 3px solid #d4756f;
+}
+
+.ideate-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.idea-slot-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(212, 117, 111, 0.15);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.idea-slot-mini:hover {
+  border-color: rgba(212, 117, 111, 0.3);
+  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.08);
+}
+
+.slot-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #d4756f;
+  min-width: 1.5rem;
+  text-align: center;
+  background: rgba(212, 117, 111, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+}
+
+.slot-input-mini {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #2f1810;
+  outline: none;
+  resize: vertical;
+  min-height: 2.5rem;
+  line-height: 1.5;
+  font-family: inherit;
+  padding: 0;
+}
+
+.slot-input-mini:disabled,
+.slot-input-mini:read-only {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.slot-input-mini::placeholder {
+  color: #9b7455;
+  font-style: italic;
+}
+
+.ideate-actions {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.primary {
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
+}
+
+.primary.small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.ghost {
+  border: 1px solid rgba(212, 117, 111, 0.25);
+  border-radius: 12px;
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  color: #835872;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.ghost:hover {
+  background: rgba(255, 215, 189, 0.2);
+  border-color: rgba(212, 117, 111, 0.4);
+  color: #2f1810;
+}
+
+.ghost.small {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
 }
 
 .spin {

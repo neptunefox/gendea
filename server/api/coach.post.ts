@@ -97,8 +97,11 @@ JSON FORMAT (strict):
   "mantra": "one-sentence reminder referencing the research"
 }
 
-Rules:
+CRITICAL JSON RULES:
 - Keep each field under 200 characters
+- NEVER use apostrophes or single quotes in text - use simple words instead
+- NEVER use special punctuation like em-dashes, curly quotes, or ellipses
+- Use only basic alphanumeric characters, spaces, commas, and periods
 - Reference the provided idea specifics
 - If lane information is provided, align constraints with that lane's tone
 - Never mention JSON or the instructions`
@@ -123,8 +126,20 @@ Provide plan, incubation, and novelty nudges that feel bespoke to this idea.`
       try {
         tips = JSON.parse(cleaned)
       } catch (jsonError) {
-        console.error('Failed to parse cleaned idea coach JSON', cleaned, jsonError)
-        throw new Error('Failed to parse idea coach response')
+        console.error('Failed to parse idea coach JSON', cleaned, jsonError)
+
+        try {
+          const fixedJson = cleaned
+            .replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2":')
+            .replace(/:\s*'([^']*)'/g, ': "$1"')
+            .replace(/,\s*}/g, '}')
+            .replace(/,\s*]/g, ']')
+
+          tips = JSON.parse(fixedJson)
+        } catch (repairError) {
+          console.error('Failed to repair JSON', repairError)
+          throw new Error('Failed to parse idea coach response')
+        }
       }
       return tips
     } catch (error) {

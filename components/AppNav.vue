@@ -15,10 +15,6 @@
           <LayoutGrid :size="18" />
           <span>Board</span>
         </NuxtLink>
-        <NuxtLink to="/" class="nav-link">
-          <Hammer :size="18" />
-          <span>Build</span>
-        </NuxtLink>
         <NuxtLink to="/history" class="nav-link">
           <Archive :size="18" />
           <span>History</span>
@@ -29,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { Lightbulb, Sparkles, LayoutGrid, Archive, Hammer } from 'lucide-vue-next'
+import { Lightbulb, Sparkles, LayoutGrid, Archive } from 'lucide-vue-next'
 </script>
 
 <style scoped>

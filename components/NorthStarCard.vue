@@ -94,13 +94,11 @@ async function saveNorthStar() {
 
 <style scoped>
 .north-star-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 1rem;
+  background: linear-gradient(135deg, #fff6ef, #fdefff);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(40, 18, 13, 0.08);
 }
 
 .card-header {
@@ -111,15 +109,17 @@ async function saveNorthStar() {
 }
 
 .card-header h3 {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
+  color: #2f1810;
 }
 
 .pinned-badge {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(212, 117, 111, 0.15);
+  color: #d4756f;
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -127,29 +127,32 @@ async function saveNorthStar() {
 .north-star-display {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .north-star-text {
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.6;
   margin: 0;
+  color: #40312b;
 }
 
 .edit-button {
   align-self: flex-start;
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0.5rem;
+  background: transparent;
+  color: #c0667f;
+  border: 1px solid rgba(212, 117, 111, 0.3);
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  font-size: 0.85rem;
 }
 
 .edit-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 215, 189, 0.2);
+  border-color: rgba(212, 117, 111, 0.5);
 }
 
 .north-star-input {
@@ -159,50 +162,53 @@ async function saveNorthStar() {
 }
 
 .north-star-input label {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  opacity: 0.9;
+  color: #835872;
 }
 
 .input-field {
   width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  transition: border-color 0.2s;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+  border: 1px solid rgba(212, 117, 111, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2f1810;
+  transition: all 0.2s;
 }
 
 .input-field::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #9b7455;
 }
 
 .input-field:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(212, 117, 111, 0.5);
+  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
 }
 
 .button-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
 .save-button {
-  padding: 0.75rem 1.5rem;
-  background: white;
-  color: #667eea;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+  font-size: 0.9rem;
 }
 
 .save-button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .save-button:disabled {
@@ -211,17 +217,19 @@ async function saveNorthStar() {
 }
 
 .cancel-button {
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  color: #835872;
+  border: 1px solid rgba(212, 117, 111, 0.3);
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  font-size: 0.9rem;
 }
 
 .cancel-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 215, 189, 0.2);
+  border-color: rgba(212, 117, 111, 0.5);
 }
 </style>

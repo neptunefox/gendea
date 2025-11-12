@@ -94,7 +94,6 @@
                     Save
                   </button>
                   <button class="link-button" @click="handleBranch(idea.text)">Branch</button>
-                  <button class="link-button" @click="handleSendToBuild(idea.text)">Build</button>
                   <button class="link-button" @click="openCoachPanel(idea.text)">
                     <Sparkles :size="14" />
                     Coach
@@ -178,7 +177,7 @@
                 </div>
                 <p class="pin-card-text">{{ idea.text }}</p>
                 <div class="card-actions">
-                  <button class="link-button" @click="handleSendToBuild(idea.text)">Build</button>
+                  <button class="link-button" @click="openCoachPanel(idea.text)">Coach</button>
                   <button class="link-button" @click="copyIdea(idea.text)">Copy</button>
                 </div>
               </div>
@@ -217,59 +216,45 @@
         </div>
 
         <div v-else class="coach-body">
-          <div v-if="coachState.tips" class="coach-grid">
-            <article class="coach-card">
-              <p class="coach-tag">Plan cue</p>
-              <h4>{{ coachState.tips.plan.title }}</h4>
-              <p class="coach-copy">{{ coachState.tips.plan.summary }}</p>
-              <div class="coach-meta">
-                <span>{{ coachState.tips.plan.action }}</span>
-                <small>{{ coachState.tips.plan.when }} · {{ coachState.tips.plan.where }}</small>
-              </div>
-              <button class="ghost small" @click="applyCoachPlanSuggestion">
-                Apply suggestion
-              </button>
-              <div class="plan-form">
-                <label>Action</label>
-                <input v-model="planCue.action" placeholder="Sketch 3 covers" />
-                <label>When</label>
-                <input v-model="planCue.when" placeholder="Tonight 7:30" />
-                <label>Where</label>
-                <input v-model="planCue.where" placeholder="Kitchen table" />
-                <button class="primary small" @click="handlePlanCueSave">Save cue</button>
-                <p v-if="planCueSaved" class="plan-hint">Saved—check History anytime.</p>
-              </div>
-            </article>
-
-            <article class="coach-card">
-              <p class="coach-tag">Incubation</p>
-              <h4>{{ coachState.tips.incubation.title }}</h4>
-              <p class="coach-copy">{{ coachState.tips.incubation.summary }}</p>
-              <p class="coach-meta">{{ coachState.tips.incubation.activity }}</p>
-              <div class="coach-card-actions">
-                <button class="link-button" @click="startIncubationTimer()">
-                  Start 10-min timer
-                </button>
-              </div>
-            </article>
-
-            <article class="coach-card">
-              <p class="coach-tag">Novelty</p>
-              <h4>{{ coachState.tips.novelty.title }}</h4>
-              <p class="coach-copy">{{ coachState.tips.novelty.summary }}</p>
-              <p class="coach-meta">{{ coachState.tips.novelty.prompt }}</p>
-              <div class="coach-card-actions">
-                <button
-                  class="link-button"
-                  @click="copyCoachPrompt(coachState.tips.novelty.prompt)"
-                >
-                  Copy prompt
-                </button>
-              </div>
-            </article>
+          <div class="workspace-container">
+            <CoachWorkspace :idea="coachState.idea" :show-toast="showToastMessage" />
           </div>
-          <p v-if="coachState.tips" class="coach-mantra">{{ coachState.tips.mantra }}</p>
-          <CoachWorkspace :idea="coachState.idea" :show-toast="showToastMessage" />
+          <details v-if="coachState.tips" class="coach-tips-toggle">
+            <summary>
+              <span>💡 Quick tips</span>
+              <span class="toggle-hint">Optional nudges</span>
+            </summary>
+            <div class="tips-container">
+              <p v-if="coachState.tips" class="coach-mantra">{{ coachState.tips.mantra }}</p>
+              <div class="coach-grid">
+                <article class="coach-card">
+                  <p class="coach-tag">Plan cue</p>
+                  <h4>{{ coachState.tips.plan.title }}</h4>
+                  <p class="coach-copy">{{ coachState.tips.plan.summary }}</p>
+                  <div class="coach-meta">
+                    <span>{{ coachState.tips.plan.action }}</span>
+                    <small
+                      >{{ coachState.tips.plan.when }} · {{ coachState.tips.plan.where }}</small
+                    >
+                  </div>
+                </article>
+
+                <article class="coach-card">
+                  <p class="coach-tag">Incubation</p>
+                  <h4>{{ coachState.tips.incubation.title }}</h4>
+                  <p class="coach-copy">{{ coachState.tips.incubation.summary }}</p>
+                  <p class="coach-meta">{{ coachState.tips.incubation.activity }}</p>
+                </article>
+
+                <article class="coach-card">
+                  <p class="coach-tag">Novelty</p>
+                  <h4>{{ coachState.tips.novelty.title }}</h4>
+                  <p class="coach-copy">{{ coachState.tips.novelty.summary }}</p>
+                  <p class="coach-meta">{{ coachState.tips.novelty.prompt }}</p>
+                </article>
+              </div>
+            </div>
+          </details>
         </div>
       </aside>
     </transition>
@@ -280,29 +265,14 @@
         {{ toastMessage }}
       </div>
     </transition>
-
-    <div v-if="timerActive" class="timer-banner">
-      <Clock :size="16" />
-      <span>Incubating · {{ formattedTimer }}</span>
-      <button class="link-button" @click="stopIncubationTimer(true)">Dismiss</button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch, reactive } from 'vue'
+import { ref, computed, onMounted, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import {
-  Lightbulb,
-  Loader,
-  Check,
-  Sparkles,
-  BookmarkPlus,
-  Clock,
-  LayoutGrid,
-  X
-} from 'lucide-vue-next'
-import CoachWorkspace from '~/components/CoachWorkspace.vue'
+import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, LayoutGrid, X } from 'lucide-vue-next'
+import CoachWorkspace from '../components/CoachWorkspace.vue'
 
 interface SparkIdea {
   text: string
@@ -381,7 +351,6 @@ interface SparkRunRecord {
 }
 
 const STORAGE_KEY = 'spark-thread-journal'
-const PLAN_CUE_KEY = 'spark-plan-cue'
 
 const input = ref('')
 const entries = ref<JournalEntry[]>([])
@@ -389,8 +358,6 @@ const isGenerating = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const lastPrompt = ref('')
-const timerActive = ref(false)
-const timerSeconds = ref(600)
 const savedIdeas = ref<SavedIdea[]>([])
 const boardFilter = ref<BoardFilter>('all')
 const statusOrder: SavedIdeaStatus[] = ['exploring', 'ready', 'building', 'done']
@@ -432,12 +399,6 @@ const boardIdeas = computed(() =>
 )
 const boardLoading = ref(true)
 const showBoardDrawer = ref(false)
-const planCue = reactive({
-  action: '',
-  when: '',
-  where: ''
-})
-const planCueSaved = ref(false)
 const resumingRunId = ref<string | null>(null)
 const coachState = reactive<{
   open: boolean
@@ -454,7 +415,6 @@ const coachState = reactive<{
   tips: null,
   error: ''
 })
-let timerInterval: NodeJS.Timeout | null = null
 
 const router = useRouter()
 const route = useRoute()
@@ -537,10 +497,6 @@ function handleBranch(text: string) {
   handleGenerate(text)
 }
 
-async function handleSendToBuild(text: string) {
-  await router.push(`/?idea=${encodeURIComponent(text)}`)
-}
-
 function handleResetThread() {
   entries.value = []
   input.value = ''
@@ -564,8 +520,9 @@ function clearQueryParam(key: string) {
   Object.entries(route.query).forEach(([paramKey, value]) => {
     if (paramKey === key || value == null) return
     if (Array.isArray(value)) {
-      if (value.length > 0) {
-        nextQuery[paramKey] = value
+      const filtered = value.filter((v): v is string => typeof v === 'string' && v.length > 0)
+      if (filtered.length > 0) {
+        nextQuery[paramKey] = filtered
       }
     } else if (typeof value === 'string' && value.length > 0) {
       nextQuery[paramKey] = value
@@ -573,32 +530,6 @@ function clearQueryParam(key: string) {
   })
 
   router.replace({ query: nextQuery })
-}
-
-function startIncubationTimer() {
-  timerActive.value = true
-  timerSeconds.value = 600
-  if (timerInterval) {
-    clearInterval(timerInterval)
-  }
-  timerInterval = setInterval(() => {
-    timerSeconds.value = Math.max(0, timerSeconds.value - 1)
-    if (timerSeconds.value === 0) {
-      stopIncubationTimer()
-      showToastMessage('Break finished—same prompt is ready when you are')
-    }
-  }, 1000)
-}
-
-function stopIncubationTimer(manual = false) {
-  if (timerInterval) {
-    clearInterval(timerInterval)
-    timerInterval = null
-  }
-  timerActive.value = false
-  if (manual) {
-    showToastMessage('Incubation logged')
-  }
 }
 
 async function fetchSavedIdeas() {
@@ -632,10 +563,6 @@ async function copyIdea(text: string) {
   await copyText(text, 'Copied idea')
 }
 
-async function copyCoachPrompt(text?: string) {
-  await copyText(text, 'Tip copied')
-}
-
 function formatRelative(timestamp: number) {
   const diff = Date.now() - timestamp
   const minutes = Math.floor(diff / 60000)
@@ -656,12 +583,6 @@ function formatFull(timestamp: number) {
   })
   return formatter.format(timestamp)
 }
-
-const formattedTimer = computed(() => {
-  const minutes = Math.floor(timerSeconds.value / 60)
-  const seconds = timerSeconds.value % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
-})
 
 function showToastMessage(message: string) {
   toastMessage.value = message
@@ -686,44 +607,8 @@ function restoreThread() {
   }
 }
 
-function loadPlanCue() {
-  if (typeof window === 'undefined') return
-  const stored = window.localStorage.getItem(PLAN_CUE_KEY)
-  if (!stored) return
-  try {
-    const parsed = JSON.parse(stored) as Partial<typeof planCue>
-    planCue.action = parsed.action ?? ''
-    planCue.when = parsed.when ?? ''
-    planCue.where = parsed.where ?? ''
-  } catch (error) {
-    console.warn('Failed to load saved cue', error)
-  }
-}
-
-function handlePlanCueSave() {
-  if (
-    !planCue.action.trim().length ||
-    !planCue.when.trim().length ||
-    !planCue.where.trim().length
-  ) {
-    showToastMessage('Add the action, when, and where first')
-    return
-  }
-
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(PLAN_CUE_KEY, JSON.stringify(planCue))
-  }
-
-  planCueSaved.value = true
-  showToastMessage('Cue saved')
-  setTimeout(() => {
-    planCueSaved.value = false
-  }, 2400)
-}
-
 onMounted(async () => {
   restoreThread()
-  loadPlanCue()
   await fetchSavedIdeas()
 })
 
@@ -798,21 +683,6 @@ async function refreshCoachTips() {
   await fetchCoachTips()
 }
 
-function applyCoachPlanSuggestion() {
-  if (!coachState.tips?.plan) return
-  const suggestion = coachState.tips.plan
-  if (suggestion.action) {
-    planCue.action = suggestion.action
-  }
-  if (suggestion.when) {
-    planCue.when = suggestion.when
-  }
-  if (suggestion.where) {
-    planCue.where = suggestion.where
-  }
-  showToastMessage('Plan suggestion applied')
-}
-
 watch(
   () => [route.query.prefill, route.query.explore],
   ([prefill, explore]) => {
@@ -849,12 +719,6 @@ watch(
   },
   { deep: true }
 )
-
-onBeforeUnmount(() => {
-  if (timerInterval) {
-    clearInterval(timerInterval)
-  }
-})
 </script>
 
 <style scoped>
@@ -1210,26 +1074,46 @@ onBeforeUnmount(() => {
 
 .plan-form {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(98, 76, 138, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(98, 76, 138, 0.08);
 }
 
 .plan-form input {
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(98, 76, 138, 0.15);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.85rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.plan-form input:focus {
+  outline: none;
+  border-color: rgba(98, 76, 138, 0.4);
 }
 
 .plan-form label {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #a36854;
+  letter-spacing: 0.05em;
+  color: #7c5aa6;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.plan-form label:first-child {
+  margin-top: 0;
 }
 
 .plan-hint {
   margin: 0;
-  font-size: 0.8rem;
-  color: #6f4c58;
+  font-size: 0.75rem;
+  color: #6b5a8b;
+  font-style: italic;
 }
 
 .placeholder-card {
@@ -1248,12 +1132,12 @@ onBeforeUnmount(() => {
   right: 1.5rem;
   top: 4.5rem;
   bottom: 1.5rem;
-  width: min(360px, calc(100% - 3rem));
+  width: min(320px, calc(100% - 3rem));
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: 0.75rem;
+  padding: 1rem;
   z-index: 4;
 }
 
@@ -1261,7 +1145,12 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 0.75rem;
+}
+
+.board-header h2 {
+  font-size: 1rem;
+  margin: 0;
 }
 
 .board-label {
@@ -1370,21 +1259,21 @@ onBeforeUnmount(() => {
 
 .pin-card {
   background: #ffffff;
-  border-radius: 18px;
-  padding: 1rem;
-  border: 1px solid rgba(91, 76, 161, 0.12);
-  box-shadow: 0 12px 30px rgba(23, 0, 37, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem;
+  border: 1px solid rgba(91, 76, 161, 0.1);
+  box-shadow: 0 2px 8px rgba(23, 0, 37, 0.04);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   transition:
     box-shadow 0.2s ease,
     transform 0.2s ease;
 }
 
 .pin-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 32px rgba(23, 0, 37, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 0, 37, 0.08);
 }
 
 .pin-card-head {
@@ -1401,7 +1290,8 @@ onBeforeUnmount(() => {
 .pin-card-text {
   margin: 0;
   color: #3a2035;
-  line-height: 1.45;
+  line-height: 1.4;
+  font-size: 0.9rem;
 }
 
 .status-chip {
@@ -1464,15 +1354,19 @@ onBeforeUnmount(() => {
 .coach-panel {
   position: fixed;
   left: 1.5rem;
-  top: 4.5rem;
+  top: 5.5rem;
   bottom: 1.5rem;
   width: min(420px, calc(100% - 3rem));
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: 0;
+  padding: 0;
   z-index: 4;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  border: 1px solid rgba(212, 117, 111, 0.15);
+  box-shadow: 0 20px 40px rgba(64, 37, 24, 0.12);
 }
 
 .coach-header {
@@ -1480,32 +1374,41 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 1rem;
   align-items: flex-start;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(255, 215, 189, 0.2), rgba(243, 217, 255, 0.2));
+  border-bottom: 1px solid rgba(212, 117, 111, 0.12);
 }
 
 .coach-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.75rem;
-  color: #6b5a8b;
-  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  color: #9b7455;
+  margin: 0 0 0.3rem;
+  font-weight: 600;
 }
 
 .coach-header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #2a1a32;
+  font-size: 1rem;
+  color: #2c150e;
+  line-height: 1.3;
+  font-weight: 700;
 }
 
 .coach-lane {
-  margin: 0.2rem 0 0;
-  color: #6b5a8b;
-  font-size: 0.9rem;
+  margin: 0.3rem 0 0;
+  color: #9b7455;
+  font-size: 0.85rem;
+  font-style: italic;
+  opacity: 0.8;
 }
 
 .coach-actions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .coach-body {
@@ -1514,85 +1417,188 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-right: 0.25rem;
+  gap: 1rem;
+  padding: 1.5rem;
 }
 
 .coach-body::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
-.coach-body::-webkit-scrollbar-thumb {
-  background: rgba(98, 76, 138, 0.3);
+.coach-body::-webkit-scrollbar-track {
+  background: rgba(243, 217, 255, 0.2);
   border-radius: 999px;
 }
 
-.coach-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.85rem;
+.coach-body::-webkit-scrollbar-thumb {
+  background: rgba(108, 48, 130, 0.25);
+  border-radius: 999px;
 }
 
-.coach-card {
-  border: 1px solid rgba(86, 72, 143, 0.12);
-  border-radius: 18px;
-  padding: 1rem;
+.coach-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(108, 48, 130, 0.4);
+}
+
+.coach-grid {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  background: rgba(255, 255, 255, 0.92);
+}
+
+.coach-card {
+  border: 1px solid rgba(86, 72, 143, 0.1);
+  border-radius: 10px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.coach-card:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(86, 72, 143, 0.2);
+}
+
+.coach-card h4 {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #2f1c4f;
 }
 
 .coach-tag {
   margin: 0;
   text-transform: uppercase;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   color: #7c5aa6;
+  font-weight: 600;
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: rgba(124, 90, 166, 0.08);
+  border-radius: 4px;
+  align-self: flex-start;
 }
 
 .coach-copy {
   margin: 0;
   color: #3d2a44;
   line-height: 1.45;
+  font-size: 0.85rem;
 }
 
 .coach-meta {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #6b5a8b;
-  line-height: 1.3;
+  line-height: 1.4;
+  padding: 0.5rem;
+  background: rgba(98, 76, 138, 0.04);
+  border-radius: 6px;
+  border-left: 2px solid rgba(98, 76, 138, 0.2);
+}
+
+.coach-meta span {
+  display: block;
+  font-weight: 600;
+  color: #4f3a76;
+  margin-bottom: 0.25rem;
 }
 
 .coach-card small {
   color: #a08fb8;
+  display: block;
+  margin-top: 0.15rem;
 }
 
 .coach-card-actions {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-top: 0.25rem;
 }
 
 .coach-loading,
 .coach-error {
   flex: 1;
-  min-height: 180px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.5rem;
-  color: #6b5a8b;
+  gap: 0.75rem;
+  color: #835872;
+  padding: 2rem;
 }
 
 .coach-mantra {
-  margin: 0.5rem 0 0;
-  font-size: 0.9rem;
-  color: #594c74;
-  font-weight: 600;
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+  color: #593e33;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
+  border-left: 3px solid #d4756f;
 }
+
+.workspace-container {
+  margin-top: 0;
+}
+
+.coach-tips-toggle {
+  margin-top: 1rem;
+  border: 1px solid rgba(212, 117, 111, 0.15);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.coach-tips-toggle:hover {
+  border-color: rgba(212, 117, 111, 0.25);
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.08);
+}
+
+.coach-tips-toggle summary {
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #593e33;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.coach-tips-toggle summary:hover {
+  background: rgba(255, 215, 189, 0.15);
+}
+
+.coach-tips-toggle summary span:first-child {
+  flex: 1;
+}
+
+.toggle-hint {
+  font-size: 0.8rem;
+  color: #9b7455;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.tips-container {
+  padding: 1rem;
+  border-top: 1px solid rgba(212, 117, 111, 0.1);
+  background: rgba(255, 246, 239, 0.4);
+}
+
 .card-actions {
   display: flex;
   justify-content: flex-end;
@@ -1613,21 +1619,6 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   z-index: 10;
-}
-
-.timer-banner {
-  position: fixed;
-  top: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1f2937;
-  color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 9;
 }
 
 .spin {

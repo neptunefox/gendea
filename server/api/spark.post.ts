@@ -222,11 +222,10 @@ Ideas should be punchy (max 2 sentences) and tailored to the instructions.`
 
     const freshIdeas = ideaTexts.filter(text => !seenIdeas.has(normalizeIdea(text)))
 
-    if (freshIdeas.length === 0) {
-      throw new Error('No ideas returned')
-    }
+    const finalIdeas =
+      freshIdeas.length > 0 ? freshIdeas : blueprint.fallbackIdeas(topic).slice(0, 2)
 
-    freshIdeas.forEach(text => seenIdeas.add(normalizeIdea(text)))
+    finalIdeas.forEach(text => seenIdeas.add(normalizeIdea(text)))
 
     return {
       id: blueprint.id,
@@ -234,7 +233,7 @@ Ideas should be punchy (max 2 sentences) and tailored to the instructions.`
       description: blueprint.description,
       researchCue: blueprint.researchCue,
       whyItMatters: parsed.anchor?.trim() || blueprint.researchCue,
-      ideas: freshIdeas.map(text => ({ text: text.trim() }))
+      ideas: finalIdeas.map(text => ({ text: text.trim() }))
     }
   } catch (error) {
     console.error(`Failed to generate lens ${blueprint.id}:`, error)
