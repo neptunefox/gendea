@@ -83,7 +83,7 @@ function formatThreadDate(value: string) {
 
 function resumeThread(id: string) {
   navigateTo({
-    path: '/spark',
+    path: '/',
     query: {
       resume: id
     }

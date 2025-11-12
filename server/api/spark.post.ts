@@ -93,9 +93,10 @@ Return EXACT JSON:
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { input, history } = body as {
+  const { input, history, isBranch } = body as {
     input?: string
     history?: SparkHistoryEntry[]
+    isBranch?: boolean
   }
 
   if (!input || typeof input !== 'string') {
@@ -105,9 +106,10 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const normalizedHistory = Array.isArray(history)
-    ? history.filter(entry => entry?.prompt && typeof entry.prompt === 'string')
-    : []
+  const normalizedHistory =
+    Array.isArray(history) && isBranch
+      ? history.filter(entry => entry?.prompt && typeof entry.prompt === 'string')
+      : []
 
   const seenIdeas = buildHistorySet(normalizedHistory)
   const coreIdeas = await generateSparkIdeas(input, normalizedHistory, seenIdeas)
@@ -177,13 +179,10 @@ Return only new, distinct angles.`
     throw new Error('Invalid response format')
   } catch (error) {
     console.error('Failed to generate spark ideas:', error)
-    return [
-      { text: 'Set a daily 15-minute practice session at the same time each day' },
-      { text: 'Join an online community or forum focused on this topic' },
-      { text: 'Create a simple project that forces you to learn the basics' },
-      { text: 'Find 3 YouTube tutorials and follow along with them this week' },
-      { text: 'Set up a dedicated space or folder to track your progress' }
-    ]
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to generate ideas. Please try again.'
+    })
   }
 }
 
@@ -237,14 +236,10 @@ Ideas should be punchy (max 2 sentences) and tailored to the instructions.`
     }
   } catch (error) {
     console.error(`Failed to generate lens ${blueprint.id}:`, error)
-    return {
-      id: blueprint.id,
-      title: blueprint.title,
-      description: blueprint.description,
-      researchCue: blueprint.researchCue,
-      whyItMatters: blueprint.researchCue,
-      ideas: blueprint.fallbackIdeas(topic).map(text => ({ text }))
-    }
+    throw createError({
+      statusCode: 500,
+      statusMessage: `Failed to generate ${blueprint.title}. Please try again.`
+    })
   }
 }
 
