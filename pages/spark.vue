@@ -14,46 +14,34 @@
               alive. No prep, no force—just a gentle place to wander.
             </p>
           </div>
-          <div class="hero-actions">
-            <div v-if="entries.length > 0" class="thread-stats">
-              <p>Thread depth · {{ entries.length }} run{{ entries.length === 1 ? '' : 's' }}</p>
-              <div class="progress-track">
-                <div class="progress-fill" :style="{ width: `${threadProgress}%` }" />
-              </div>
-              <span>Last spark · {{ formatRelative(entries[0].timestamp) }}</span>
-            </div>
-            <button class="pinboard-button" @click="toggleBoardDrawer(true)">
-              <LayoutGrid :size="16" />
-              Pinboard ({{ savedIdeas.length }})
-            </button>
-          </div>
         </header>
 
-        <div class="input-card glass">
+        <div class="spark-input-wrapper">
           <textarea
             v-model="input"
-            class="spark-input"
+            class="spark-input glass"
             rows="3"
             placeholder="I want to build... learn... remix..."
             @keydown.enter.exact.prevent="handleGenerate()"
           />
-          <div class="input-actions">
+          <div class="input-controls">
             <button
-              class="primary"
+              v-if="entries.length"
+              class="reset-button"
+              title="Reset thread"
+              @click="handleResetThread"
+            >
+              <RotateCcw :size="16" />
+            </button>
+            <button
+              class="generate-button"
               :disabled="!canGenerate || isGenerating"
               @click="handleGenerate()"
             >
               <Lightbulb v-if="!isGenerating" :size="18" />
               <Loader v-else :size="18" class="spin" />
-              {{ isGenerating ? 'Weaving ideas' : 'Generate' }}
+              {{ isGenerating ? 'Weaving' : 'Generate' }}
             </button>
-            <button v-if="entries.length" class="ghost" @click="handleResetThread">
-              Reset thread
-            </button>
-          </div>
-          <div v-if="entries.length" class="thread-memory">
-            <span>Memory on · avoids repeats</span>
-            <span>Anchor: {{ lastPrompt }}</span>
           </div>
         </div>
 
@@ -110,82 +98,6 @@
         </div>
       </section>
     </div>
-
-    <transition name="drawer">
-      <aside v-if="showBoardDrawer" class="board-drawer glass">
-        <header class="board-header">
-          <div>
-            <p class="board-label">Pinboard</p>
-            <h2>Saved sparks</h2>
-          </div>
-          <div class="board-actions">
-            <NuxtLink to="/saved" class="ghost small">Open board</NuxtLink>
-            <button class="ghost icon" @click="toggleBoardDrawer(false)">
-              <X :size="16" />
-            </button>
-          </div>
-        </header>
-
-        <div v-if="boardLoading" class="board-loading">
-          <Loader :size="24" class="spin" />
-        </div>
-
-        <div v-else-if="savedIdeas.length === 0" class="board-empty">
-          <p>No pins yet.</p>
-          <p class="board-empty-sub">Tap “Save” on any idea to keep it close.</p>
-        </div>
-
-        <div v-else class="board-content">
-          <div class="board-scroll">
-            <div class="board-meta">
-              <div>
-                <p class="board-total">{{ boardSummary.total }} saved</p>
-                <p class="board-ready">{{ boardSummary.counts.ready || 0 }} ready to build</p>
-              </div>
-              <div class="board-filters">
-                <button
-                  v-for="option in boardFilterOptions"
-                  :key="option.value"
-                  class="filter-chip"
-                  :class="{ active: boardFilter === option.value }"
-                  @click="boardFilter = option.value"
-                >
-                  <span>{{ option.label }}</span>
-                  <span class="chip-count">
-                    {{
-                      option.value === 'all'
-                        ? boardSummary.total
-                        : (boardSummary.counts[option.value] ?? 0)
-                    }}
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            <div v-if="boardIdeas.length === 0" class="board-filter-empty">
-              <p>No pins in this lane yet.</p>
-              <button class="link-button" @click="boardFilter = 'all'">Show all pins</button>
-            </div>
-
-            <div v-else class="board-grid">
-              <div v-for="idea in boardIdeas" :key="idea.id" class="pin-card">
-                <div class="pin-card-head">
-                  <span class="status-chip" :data-status="idea.status">
-                    {{ ideaStatusLabels[idea.status] }}
-                  </span>
-                  <small>{{ formatRelative(new Date(idea.createdAt).getTime()) }}</small>
-                </div>
-                <p class="pin-card-text">{{ idea.text }}</p>
-                <div class="card-actions">
-                  <button class="link-button" @click="openCoachPanel(idea.text)">Coach</button>
-                  <button class="link-button" @click="copyIdea(idea.text)">Copy</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </transition>
 
     <transition name="drawer">
       <aside v-if="coachState.open" class="coach-panel glass">
@@ -271,7 +183,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, LayoutGrid, X } from 'lucide-vue-next'
+import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, X, RotateCcw } from 'lucide-vue-next'
 import CoachWorkspace from '../components/CoachWorkspace.vue'
 
 interface SparkIdea {
@@ -303,16 +215,6 @@ interface JournalEntry {
   lenses: SparkLens[]
   nudges: SparkNudge[]
 }
-
-interface SavedIdea {
-  id: string
-  text: string
-  status: 'exploring' | 'ready' | 'building' | 'done'
-  createdAt: string
-}
-
-type SavedIdeaStatus = SavedIdea['status']
-type BoardFilter = SavedIdeaStatus | 'all'
 
 interface CoachPlanSuggestion {
   title: string
@@ -358,47 +260,6 @@ const isGenerating = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const lastPrompt = ref('')
-const savedIdeas = ref<SavedIdea[]>([])
-const boardFilter = ref<BoardFilter>('all')
-const statusOrder: SavedIdeaStatus[] = ['exploring', 'ready', 'building', 'done']
-const ideaStatusLabels: Record<SavedIdeaStatus, string> = {
-  exploring: 'Exploring',
-  ready: 'Ready to build',
-  building: 'In build',
-  done: 'Shipped'
-}
-const boardFilterOptions: Array<{ value: BoardFilter; label: string }> = [
-  { value: 'all', label: 'All' },
-  { value: 'exploring', label: 'Exploring' },
-  { value: 'ready', label: 'Ready' },
-  { value: 'building', label: 'Building' },
-  { value: 'done', label: 'Done' }
-]
-const boardSummary = computed(() => {
-  const counts = statusOrder.reduce(
-    (acc, status) => {
-      acc[status] = 0
-      return acc
-    },
-    {} as Record<SavedIdeaStatus, number>
-  )
-
-  savedIdeas.value.forEach(idea => {
-    counts[idea.status] += 1
-  })
-
-  return {
-    total: savedIdeas.value.length,
-    counts
-  }
-})
-const boardIdeas = computed(() =>
-  boardFilter.value === 'all'
-    ? savedIdeas.value
-    : savedIdeas.value.filter(idea => idea.status === boardFilter.value)
-)
-const boardLoading = ref(true)
-const showBoardDrawer = ref(false)
 const resumingRunId = ref<string | null>(null)
 const coachState = reactive<{
   open: boolean
@@ -420,7 +281,6 @@ const router = useRouter()
 const route = useRoute()
 
 const canGenerate = computed(() => input.value.trim().length > 0)
-const threadProgress = computed(() => Math.min(entries.value.length * 25, 100))
 const historyPayload = computed(() =>
   entries.value.map(entry => ({
     prompt: entry.prompt,
@@ -485,7 +345,6 @@ async function handleSaveIdea(text: string) {
     })
 
     showToastMessage('Saved to pinboard')
-    await fetchSavedIdeas()
   } catch (error) {
     console.error('Failed to save idea:', error)
     showToastMessage('Failed to save')
@@ -508,10 +367,6 @@ function prefillInput(prompt: string) {
   input.value = prompt
 }
 
-function toggleBoardDrawer(force?: boolean) {
-  showBoardDrawer.value = typeof force === 'boolean' ? force : !showBoardDrawer.value
-}
-
 function clearQueryParam(key: string) {
   if (!import.meta.client) return
   if (!(key in route.query)) return
@@ -530,48 +385,6 @@ function clearQueryParam(key: string) {
   })
 
   router.replace({ query: nextQuery })
-}
-
-async function fetchSavedIdeas() {
-  boardLoading.value = true
-  try {
-    const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
-    savedIdeas.value = response.ideas
-  } catch (error) {
-    console.error('Failed to load saved ideas:', error)
-  } finally {
-    boardLoading.value = false
-  }
-}
-
-async function copyText(text?: string, successMessage = 'Copied') {
-  if (!text || !text.trim()) return
-  if (typeof navigator === 'undefined' || !navigator.clipboard) {
-    showToastMessage('Clipboard unavailable')
-    return
-  }
-  try {
-    await navigator.clipboard.writeText(text)
-    showToastMessage(successMessage)
-  } catch (error) {
-    console.error('Failed to copy text:', error)
-    showToastMessage('Failed to copy')
-  }
-}
-
-async function copyIdea(text: string) {
-  await copyText(text, 'Copied idea')
-}
-
-function formatRelative(timestamp: number) {
-  const diff = Date.now() - timestamp
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
 }
 
 function formatFull(timestamp: number) {
@@ -607,9 +420,8 @@ function restoreThread() {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   restoreThread()
-  await fetchSavedIdeas()
 })
 
 async function resumeFromHistory(runId: string) {
@@ -649,7 +461,6 @@ function closeCoachPanel() {
 async function openCoachPanel(idea: string, lane?: string) {
   const trimmed = idea.trim()
   if (!trimmed) return
-  showBoardDrawer.value = false
   coachState.open = true
   coachState.idea = trimmed
   coachState.lane = lane ?? ''
@@ -692,7 +503,6 @@ watch(
 
     if (candidates.length > 0) {
       input.value = candidates[0]
-      toggleBoardDrawer(false)
     }
   },
   { immediate: true }
@@ -823,11 +633,8 @@ watch(
   box-shadow: 0 10px 25px rgba(108, 48, 130, 0.18);
 }
 
-.input-card {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.spark-input-wrapper {
+  position: relative;
 }
 
 .spark-input {
@@ -835,15 +642,93 @@ watch(
   border-radius: 18px;
   border: 1px solid rgba(108, 48, 130, 0.2);
   padding: 1rem 1.25rem;
+  padding-right: 10rem;
+  padding-bottom: 3.5rem;
   font-size: 1.15rem;
   resize: none;
   background: rgba(255, 255, 255, 0.9);
+  transition: border-color 0.2s ease;
 }
 
-.input-actions {
+.spark-input:focus {
+  outline: none;
+  border-color: rgba(246, 113, 118, 0.4);
+}
+
+.input-controls {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.generate-button {
+  border: none;
+  border-radius: 14px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.generate-button:hover:not(:disabled) {
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
+  transform: translateY(-1px);
+}
+
+.generate-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.reset-button {
+  border: 1px solid rgba(89, 62, 51, 0.2);
+  border-radius: 50%;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #593e33;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.reset-button:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(89, 62, 51, 0.35);
+  transform: scale(1.05);
+}
+
+.reset-button::after {
+  content: 'Reset thread';
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+  background: #2c150e;
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  font-weight: 500;
+}
+
+.reset-button:hover::after {
+  opacity: 1;
 }
 
 .primary {
@@ -892,13 +777,6 @@ watch(
 .primary.small {
   padding: 0.55rem 1rem;
   font-size: 0.85rem;
-}
-
-.thread-memory {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.9rem;
-  color: #755555;
 }
 
 .loading-card {
@@ -1686,13 +1564,20 @@ watch(
 }
 
 @media (max-width: 640px) {
-  .input-actions {
-    flex-direction: column;
+  .spark-input {
+    padding-right: 1.25rem;
+    padding-bottom: 4.5rem;
   }
 
-  .thread-memory {
-    flex-direction: column;
-    gap: 0.35rem;
+  .input-controls {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    justify-content: space-between;
+  }
+
+  .generate-button {
+    flex: 1;
   }
 }
 </style>
