@@ -18,7 +18,8 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'Structured creative thinking from capture to execution'
         }
-      ]
+      ],
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
     }
   }
 })

@@ -1,7 +1,7 @@
 <template>
   <nav class="app-nav">
     <NuxtLink to="/" class="logo">
-      <Lightbulb :size="20" />
+      <img src="/favicon.svg" alt="Gendea" class="logo-icon" />
       <span>Gendea</span>
     </NuxtLink>
 
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { Lightbulb, Sparkles, Archive } from 'lucide-vue-next'
+import { Sparkles, Archive } from 'lucide-vue-next'
 </script>
 
 <style scoped>
@@ -57,6 +57,11 @@ import { Lightbulb, Sparkles, Archive } from 'lucide-vue-next'
 
 .logo:hover {
   color: #c26660;
+}
+
+.logo-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .logo span {
