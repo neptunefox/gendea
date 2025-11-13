@@ -31,7 +31,7 @@
             @keydown.enter.exact.prevent="handleGenerate()"
           />
           <button
-            class="generate-button"
+            class="generate-button-inline"
             :disabled="!canGenerate || isGenerating"
             @click="handleGenerate()"
           >
@@ -998,16 +998,14 @@ watch(
 }
 
 .spark-input-wrapper {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-end;
+  position: relative;
 }
 
 .spark-input {
-  flex: 1;
+  width: 100%;
   border-radius: 12px;
   border: 1px solid #f0e5e0;
-  padding: 1rem 1.25rem;
+  padding: 1rem 140px 1rem 1.25rem;
   font-size: 1rem;
   resize: none;
   background: #fef8f5;
@@ -1023,10 +1021,14 @@ watch(
   background: white;
 }
 
-.generate-button {
+.generate-button-inline {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   border: none;
-  border-radius: 12px;
-  padding: 1rem 2rem;
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -1035,21 +1037,19 @@ watch(
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   white-space: nowrap;
-  height: 60px;
 }
 
-.generate-button:hover:not(:disabled) {
+.generate-button-inline:hover:not(:disabled) {
   background: #c26660;
-  transform: translateY(-2px);
+  transform: translateY(-50%) translateY(-1px);
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
 }
 
-.generate-button:disabled {
+.generate-button-inline:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .reset-button {
