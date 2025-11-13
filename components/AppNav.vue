@@ -10,14 +10,14 @@
         <Sparkles :size="20" />
       </NuxtLink>
       <NuxtLink to="/history" class="nav-link" title="History">
-        <Archive :size="20" />
+        <Clock :size="20" />
       </NuxtLink>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-import { Sparkles, Archive } from 'lucide-vue-next'
+import { Sparkles, Clock } from 'lucide-vue-next'
 </script>
 
 <style scoped>
