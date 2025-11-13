@@ -120,16 +120,26 @@
               >
                 <p>{{ idea.text }}</p>
                 <div class="pill-actions">
-                  <button class="link-button" @click="handleSaveIdea(idea.text)">
-                    <BookmarkPlus :size="14" />
-                    Save
+                  <button
+                    class="icon-action-btn"
+                    title="Save to collection"
+                    @click="handleSaveIdea(idea.text)"
+                  >
+                    <BookmarkPlus :size="18" />
                   </button>
-                  <button class="link-button" @click="handleBranch(idea.text, entry)">
-                    Branch
+                  <button
+                    class="icon-action-btn"
+                    title="Branch and explore"
+                    @click="handleBranch(idea.text, entry)"
+                  >
+                    <Split :size="18" />
                   </button>
-                  <button class="link-button" @click="openCoachPanel(idea.text)">
-                    <Sparkles :size="14" />
-                    Coach
+                  <button
+                    class="icon-action-btn"
+                    title="Open coach"
+                    @click="openCoachPanel(idea.text)"
+                  >
+                    <Sparkles :size="18" />
                   </button>
                 </div>
               </div>
@@ -234,7 +244,8 @@ import {
   Sparkles,
   BookmarkPlus,
   X,
-  CornerDownRight
+  CornerDownRight,
+  Split
 } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -1332,24 +1343,69 @@ watch(
   gap: 0.5rem;
 }
 
-.link-button {
-  background: none;
-  border: none;
-  padding: 0;
-  font-weight: 600;
+.icon-action-btn {
+  background: rgba(212, 117, 111, 0.08);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
   color: #d4756f;
   cursor: pointer;
-  min-width: 44px;
-  min-height: 28px;
+  min-width: 40px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  transition: color 0.2s ease;
-  font-size: 0.875rem;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.link-button:hover {
+.icon-action-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(40, 31, 27, 0.95);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.icon-action-btn::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(40, 31, 27, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.icon-action-btn:hover::after,
+.icon-action-btn:hover::before {
+  opacity: 1;
+}
+
+.icon-action-btn:hover {
+  background: rgba(212, 117, 111, 0.15);
+  border-color: rgba(212, 117, 111, 0.35);
   color: #c26660;
+  transform: translateY(-1px);
+}
+
+.icon-action-btn:active {
+  transform: translateY(0);
 }
 
 .lens-note {
