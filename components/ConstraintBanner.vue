@@ -27,9 +27,9 @@ const message = computed(() => {
 <style scoped>
 .constraint-banner {
   padding: 0.75rem 1rem;
-  background-color: #fef3c7;
-  border-left: 4px solid #f59e0b;
-  border-radius: 0.25rem;
+  background: rgba(255, 215, 189, 0.15);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 10px;
   margin-bottom: 1rem;
 }
 
@@ -46,7 +46,7 @@ const message = computed(() => {
 
 .message {
   font-size: 0.875rem;
-  color: #92400e;
+  color: #835872;
   margin: 0;
 }
 </style>

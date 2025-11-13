@@ -147,7 +147,7 @@ function selectCustomTest() {
 .test-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #835872;
   margin-bottom: 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -155,7 +155,7 @@ function selectCustomTest() {
 
 .test-subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #835872;
   margin-bottom: 0.75rem;
 }
 
@@ -168,22 +168,22 @@ function selectCustomTest() {
 
 .test-option {
   padding: 1rem;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .test-option:hover {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: rgba(212, 117, 111, 0.4);
+  background: rgba(255, 215, 189, 0.1);
 }
 
 .test-option.selected {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+  border-color: #d4756f;
+  background: linear-gradient(135deg, #fff6ef, #fdefff);
+  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.2);
 }
 
 .test-header {
@@ -193,7 +193,7 @@ function selectCustomTest() {
 .test-number {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #3b82f6;
+  color: #d4756f;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -212,12 +212,12 @@ function selectCustomTest() {
 
 .test-label {
   font-weight: 600;
-  color: #6b7280;
+  color: #835872;
   min-width: 4rem;
 }
 
 .test-value {
-  color: #111827;
+  color: #40312b;
   flex: 1;
 }
 
@@ -233,9 +233,9 @@ function selectCustomTest() {
   width: 100%;
   padding: 0.75rem;
   background: white;
-  color: #3b82f6;
-  border: 2px dashed #3b82f6;
-  border-radius: 0.375rem;
+  color: #d4756f;
+  border: 2px dashed rgba(212, 117, 111, 0.4);
+  border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -243,7 +243,7 @@ function selectCustomTest() {
 }
 
 .toggle-custom:hover {
-  background: #eff6ff;
+  background: rgba(255, 215, 189, 0.1);
 }
 
 .custom-test {
@@ -253,7 +253,7 @@ function selectCustomTest() {
 .custom-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #835872;
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -274,36 +274,39 @@ function selectCustomTest() {
 .form-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #835872;
 }
 
 .form-input {
   padding: 0.625rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  border: 1px solid rgba(212, 117, 111, 0.25);
+  border-radius: 10px;
   font-size: 0.875rem;
   transition: border-color 0.2s;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: rgba(212, 117, 111, 0.5);
+  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
 }
 
 .custom-button {
   padding: 0.75rem;
-  background: #3b82f6;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(246, 113, 118, 0.25);
 }
 
 .custom-button:hover {
-  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.35);
 }
 </style>

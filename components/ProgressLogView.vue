@@ -351,23 +351,17 @@ async function markComplete() {
 .progress-log-view {
   max-width: 700px;
   margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0;
 }
 
 .context-section {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.1);
+  border-radius: 12px;
 }
 
 @media (max-width: 768px) {
@@ -378,15 +372,15 @@ async function markComplete() {
 
 .context-card {
   padding: 1rem;
-  background: white;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 117, 111, 0.2);
 }
 
 .context-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: #835872;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -394,7 +388,7 @@ async function markComplete() {
 
 .context-text {
   font-size: 0.9375rem;
-  color: #111827;
+  color: #40312b;
   margin: 0;
   line-height: 1.6;
 }
@@ -407,7 +401,7 @@ async function markComplete() {
 
 .ladder-item {
   font-size: 0.9375rem;
-  color: #111827;
+  color: #40312b;
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
@@ -419,13 +413,13 @@ async function markComplete() {
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: #2f1810;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 0.9375rem;
-  color: #6b7280;
+  color: #835872;
   margin-bottom: 1.5rem;
 }
 
@@ -444,23 +438,24 @@ async function markComplete() {
 .form-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #835872;
 }
 
 .form-textarea {
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  border: 1px solid rgba(212, 117, 111, 0.25);
+  border-radius: 10px;
   font-size: 0.9375rem;
   font-family: inherit;
   resize: vertical;
   transition: border-color 0.2s;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .form-textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: rgba(212, 117, 111, 0.5);
+  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
 }
 
 .ratings {
@@ -468,8 +463,8 @@ async function markComplete() {
   flex-direction: column;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.1);
+  border-radius: 12px;
 }
 
 .rating-group {
@@ -481,7 +476,7 @@ async function markComplete() {
 .rating-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: #835872;
 }
 
 .slider-container {
@@ -494,7 +489,7 @@ async function markComplete() {
   flex: 1;
   height: 6px;
   border-radius: 3px;
-  background: #e5e7eb;
+  background: rgba(212, 117, 111, 0.2);
   outline: none;
   appearance: none;
 }
@@ -504,69 +499,65 @@ async function markComplete() {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #d4756f;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .slider::-webkit-slider-thumb:hover {
-  background: #2563eb;
+  background: #c26660;
 }
 
 .slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #d4756f;
   cursor: pointer;
   border: none;
   transition: background 0.2s;
 }
 
 .slider::-moz-range-thumb:hover {
-  background: #2563eb;
+  background: #c26660;
 }
 
 .slider-value {
   min-width: 1.5rem;
   text-align: center;
   font-weight: 600;
-  color: #3b82f6;
+  color: #d4756f;
 }
 
 .slider-labels {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #835872;
 }
 
 .save-button {
   min-width: 44px;
   min-height: 44px;
   padding: 0.875rem;
-  background: #10b981;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
 }
 
 .save-button:hover:not(:disabled) {
-  background: #059669;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .save-button:disabled {
-  background: #9ca3af;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -580,28 +571,24 @@ async function markComplete() {
   min-width: 44px;
   min-height: 44px;
   padding: 0.875rem;
-  background: #3b82f6;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
 }
 
 .complete-button:hover:not(:disabled) {
-  background: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .complete-button:disabled {
-  background: #9ca3af;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -612,13 +599,13 @@ async function markComplete() {
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: #fef3c7;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
   margin: 1rem 0;
 }
 
 .ai-status p {
-  color: #92400e;
+  color: #835872;
   font-size: 0.9375rem;
   font-weight: 500;
   margin: 0;
@@ -627,8 +614,8 @@ async function markComplete() {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #fde68a;
-  border-top-color: #f59e0b;
+  border: 2px solid rgba(212, 117, 111, 0.2);
+  border-top-color: #d4756f;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

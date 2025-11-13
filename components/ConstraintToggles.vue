@@ -57,21 +57,21 @@ function emitChange() {
 <style scoped>
 .constraint-toggles {
   padding: 1.5rem;
-  background: white;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  border: 1px solid rgba(212, 117, 111, 0.2);
 }
 
 .title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: #2f1810;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #835872;
   margin-bottom: 1rem;
 }
 
@@ -96,6 +96,6 @@ function emitChange() {
 
 .toggle-label {
   font-size: 0.9375rem;
-  color: #374151;
+  color: #40312b;
 }
 </style>

@@ -55,16 +55,16 @@ defineEmits<{
 <style scoped>
 .critique-card {
   padding: 1.5rem;
-  background: #fef3c7;
-  border: 2px solid #fbbf24;
-  border-radius: 0.75rem;
+  background: rgba(255, 215, 189, 0.2);
+  border: 1px solid rgba(212, 117, 111, 0.3);
+  border-radius: 12px;
   margin: 1.5rem 0;
 }
 
 .critique-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #92400e;
+  color: #2f1810;
   margin: 0 0 1.25rem 0;
 }
 
@@ -79,7 +79,7 @@ defineEmits<{
 .section-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #78350f;
+  color: #835872;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -87,7 +87,7 @@ defineEmits<{
 
 .section-content {
   font-size: 0.9375rem;
-  color: #451a03;
+  color: #40312b;
   line-height: 1.6;
   margin: 0;
 }
@@ -102,7 +102,7 @@ defineEmits<{
 .process-item,
 .focus-item {
   font-size: 0.9375rem;
-  color: #451a03;
+  color: #40312b;
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
@@ -115,18 +115,20 @@ defineEmits<{
 .dismiss-button {
   width: 100%;
   padding: 0.75rem;
-  background: #92400e;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   margin-top: 1.25rem;
+  box-shadow: 0 2px 8px rgba(246, 113, 118, 0.25);
 }
 
 .dismiss-button:hover {
-  background: #78350f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.35);
 }
 </style>

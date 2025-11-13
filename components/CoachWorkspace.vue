@@ -460,7 +460,7 @@ async function generateAIIdeas() {
   padding: 0.75rem 1rem;
   background: rgba(255, 215, 189, 0.15);
   border-radius: 10px;
-  border-left: 3px solid #d4756f;
+  border: 1px solid rgba(212, 117, 111, 0.2);
 }
 
 .ideate-slots {

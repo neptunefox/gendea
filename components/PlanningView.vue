@@ -265,63 +265,61 @@ async function proceedToIfThen() {
 .planning-view {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
 }
 
 .title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #111827;
+  color: #2f1810;
   margin-bottom: 1.5rem;
 }
 
 .idea-section {
   margin: 1.5rem 0;
   padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 117, 111, 0.2);
 }
 
 .section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: #835872;
   margin-bottom: 0.75rem;
 }
 
 .idea-text {
   font-size: 0.9375rem;
-  color: #111827;
+  color: #40312b;
   margin: 0;
+  line-height: 1.6;
 }
 
 .generate-button {
   width: 100%;
   min-height: 44px;
   padding: 0.875rem;
-  background-color: #3b82f6;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 0.2s;
   margin: 1.5rem 0;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
 }
 
 .generate-button:hover:not(:disabled) {
-  background-color: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .generate-button:disabled {
-  background-color: #9ca3af;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -338,34 +336,35 @@ async function proceedToIfThen() {
 
 .plan-card {
   padding: 1.5rem;
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(40, 18, 13, 0.06);
 }
 
 .plan-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  border-color: rgba(212, 117, 111, 0.4);
+  box-shadow: 0 4px 12px rgba(40, 18, 13, 0.1);
 }
 
 .plan-card.selected {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  border-color: #d4756f;
+  background: linear-gradient(135deg, #fff6ef, #fdefff);
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
 }
 
 .plan-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #111827;
+  color: #2f1810;
   margin-bottom: 0.75rem;
 }
 
 .plan-description {
   font-size: 0.9375rem;
-  color: #374151;
+  color: #40312b;
   line-height: 1.6;
   margin-bottom: 0;
 }
@@ -374,29 +373,25 @@ async function proceedToIfThen() {
   width: 100%;
   min-height: 44px;
   padding: 0.875rem;
-  background: #f59e0b;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 0.2s;
   margin-top: 2rem;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
 }
 
 .review-button:hover:not(:disabled) {
-  background: #d97706;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .review-button:disabled {
-  background: #9ca3af;
+  opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -404,21 +399,22 @@ async function proceedToIfThen() {
 .risk-hint {
   margin-top: 2rem;
   padding: 1rem;
-  background: rgba(245, 158, 11, 0.08);
-  border-left: 3px solid #f59e0b;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
+  border: 1px solid rgba(212, 117, 111, 0.2);
 }
 
 .risk-hint h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: #92400e;
+  color: #835872;
+  font-weight: 600;
 }
 
 .risk-hint p {
   margin: 0 0 1rem;
   font-size: 0.9rem;
-  color: #78350f;
+  color: #40312b;
   line-height: 1.5;
 }
 
@@ -426,24 +422,20 @@ async function proceedToIfThen() {
   width: 100%;
   min-height: 44px;
   padding: 1rem;
-  background: #10b981;
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
   color: white;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
 }
 
 .proceed-button:hover {
-  background: #059669;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
 }
 
 .ai-status {
@@ -452,13 +444,13 @@ async function proceedToIfThen() {
   justify-content: center;
   gap: 0.75rem;
   padding: 1rem;
-  background: #f3f4f6;
-  border-radius: 0.5rem;
+  background: rgba(255, 215, 189, 0.15);
+  border-radius: 10px;
   margin: 1rem 0;
 }
 
 .ai-status p {
-  color: #6b7280;
+  color: #835872;
   font-size: 0.9375rem;
   font-weight: 500;
   margin: 0;
@@ -467,8 +459,8 @@ async function proceedToIfThen() {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 2px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  border: 2px solid rgba(212, 117, 111, 0.2);
+  border-top-color: #d4756f;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
