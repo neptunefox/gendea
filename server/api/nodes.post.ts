@@ -1,9 +1,11 @@
-import { db } from '~/server/db'
-import { nodes, branches } from '~/db/schema'
 import { eq } from 'drizzle-orm'
-import { validateRequired } from '../utils/validation'
-import { handleDatabaseError } from '../utils/db-error-handler'
+
 import { workflowService } from '../../lib/workflow-service'
+import { handleDatabaseError } from '../utils/db-error-handler'
+import { validateRequired } from '../utils/validation'
+
+import { nodes, branches } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async event => {
   try {

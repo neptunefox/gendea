@@ -113,13 +113,14 @@
 </template>
 
 <script setup lang="ts">
+import { Loader } from 'lucide-vue-next'
 import { ref, watch, nextTick } from 'vue'
+
 import ClarificationView from '~/components/ClarificationView.vue'
-import PlanningView from '~/components/PlanningView.vue'
 import IfThenPlanning from '~/components/IfThenPlanning.vue'
+import PlanningView from '~/components/PlanningView.vue'
 import ProgressLogView from '~/components/ProgressLogView.vue'
 import { useNodeSave } from '~/composables/useNodeSave'
-import { Loader } from 'lucide-vue-next'
 
 interface SectionDefinition {
   id: 'clarify' | 'ideate' | 'plan' | 'progress'

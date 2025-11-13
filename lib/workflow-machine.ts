@@ -1,4 +1,5 @@
 import { setup, assign } from 'xstate'
+
 import type { WorkflowContext, WorkflowEvent } from '../types/workflow'
 
 export const workflowMachine = setup({

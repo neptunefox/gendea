@@ -1,7 +1,8 @@
 import { createError } from 'h3'
-import { useLLMService } from '../utils/llm'
-import { db } from '../db'
+
 import { sparkRuns } from '../../db/schema'
+import { db } from '../db'
+import { useLLMService } from '../utils/llm'
 
 interface SparkIdea {
   text: string

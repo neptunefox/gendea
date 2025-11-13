@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { nodes, archives, archiveViews, branches } from '~/db/schema'
 import { sql, count, eq } from 'drizzle-orm'
+
+import { nodes, archives, archiveViews, branches } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async () => {
   const lessonsPerBranch = await db

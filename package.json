@@ -14,10 +14,10 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
-    "@vue-flow/core": "^1.47.0",
     "drizzle-orm": "^0.44.7",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-vue": "^10.5.1",
     "nuxt": "^4.2.0",
     "postgres": "^3.4.7",

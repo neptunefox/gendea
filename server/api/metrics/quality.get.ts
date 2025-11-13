@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { nodes, branches } from '~/db/schema'
 import { count, eq, and, inArray } from 'drizzle-orm'
+
+import { nodes, branches } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async () => {
   const branchesWithTests = await db

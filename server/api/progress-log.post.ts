@@ -1,6 +1,7 @@
-import { db } from '../db'
-import { nodes, progressLogs } from '../../db/schema'
 import { desc } from 'drizzle-orm'
+
+import { nodes, progressLogs } from '../../db/schema'
+import { db } from '../db'
 
 interface ProgressLogRequest {
   branchId: string

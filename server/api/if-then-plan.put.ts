@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { nodes } from '~/db/schema'
 import { eq, and } from 'drizzle-orm'
+
+import { nodes } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

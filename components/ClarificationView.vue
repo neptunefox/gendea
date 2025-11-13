@@ -53,8 +53,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { NorthStar, LadderStep } from '~/types/node'
+
 import { useBranchContext } from '~/composables/useBranchContext'
+import type { NorthStar, LadderStep } from '~/types/node'
 
 interface Props {
   branchId: string

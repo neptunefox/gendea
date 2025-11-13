@@ -229,9 +229,10 @@
 </template>
 
 <script setup lang="ts">
+import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, X } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, X } from 'lucide-vue-next'
+
 import CoachWorkspace from '../components/CoachWorkspace.vue'
 
 interface SparkIdea {

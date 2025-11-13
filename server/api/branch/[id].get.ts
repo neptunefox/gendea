@@ -1,6 +1,7 @@
-import { db } from '../../db'
-import { branches, northStars, ladderSteps, plans } from '../../../db/schema'
 import { eq } from 'drizzle-orm'
+
+import { branches, northStars, ladderSteps, plans } from '../../../db/schema'
+import { db } from '../../db'
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')

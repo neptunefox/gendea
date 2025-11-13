@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { nodes, branches } from '~/db/schema'
 import { sql, count, eq } from 'drizzle-orm'
+
+import { nodes, branches } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async () => {
   const totalSeeds = await db.select({ count: count() }).from(nodes).where(eq(nodes.type, 'Idea'))

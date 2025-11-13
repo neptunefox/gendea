@@ -1,6 +1,7 @@
-import { db } from '../db'
-import { plans } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+
+import { plans } from '../../db/schema'
+import { db } from '../db'
 
 interface SavePlanRequest {
   branchId: string

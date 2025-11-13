@@ -1,6 +1,8 @@
 import { createActor } from 'xstate'
-import { workflowMachine } from './workflow-machine'
+
 import type { WorkflowContext, WorkflowEvent } from '../types/workflow'
+
+import { workflowMachine } from './workflow-machine'
 
 export class WorkflowService {
   private actors: Map<string, ReturnType<typeof createActor<typeof workflowMachine>>> = new Map()

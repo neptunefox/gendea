@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { nodes } from '~/db/schema'
 import { sql, count, eq, and } from 'drizzle-orm'
+
+import { nodes } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async () => {
   const sevenDaysAgo = new Date()

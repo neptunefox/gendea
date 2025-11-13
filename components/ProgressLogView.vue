@@ -133,6 +133,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+
 import { useBranchContext } from '~/composables/useBranchContext'
 
 interface IfThenSuggestion {

@@ -1,6 +1,7 @@
-import { db } from '~/server/db'
-import { progressLogs, nodes } from '~/db/schema'
 import { sql, avg, count, eq } from 'drizzle-orm'
+
+import { progressLogs, nodes } from '~/db/schema'
+import { db } from '~/server/db'
 
 export default defineEventHandler(async event => {
   const query = getQuery(event)
