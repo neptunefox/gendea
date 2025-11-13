@@ -24,20 +24,22 @@
         </h2>
         <div class="spark-input-wrapper">
           <textarea
+            ref="inputField"
             v-model="input"
             class="spark-input"
-            rows="2"
+            rows="1"
             placeholder="What do you want to explore?"
             @keydown.enter.exact.prevent="handleGenerate()"
           />
           <button
-            class="generate-button-inline"
+            class="icon-button"
+            type="button"
             :disabled="!canGenerate || isGenerating"
+            :title="isGenerating ? 'Generating' : 'Generate'"
             @click="handleGenerate()"
           >
-            <Lightbulb v-if="!isGenerating" :size="18" />
-            <Loader v-else :size="18" class="spin" />
-            {{ isGenerating ? 'Generating' : 'Generate' }}
+            <Lightbulb v-if="!isGenerating" :size="20" />
+            <Loader v-else :size="20" class="spin" />
           </button>
         </div>
       </section>
@@ -99,19 +101,15 @@
             :class="{ latest: index === 0, branched: !!entry.parentPrompt }"
           >
             <div v-if="entry.parentPrompt" class="branch-indicator">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M5 3v10M11 8H5M11 8l-2-2M11 8l-2 2"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                />
-              </svg>
-              <span>Branched from: {{ entry.parentPrompt }}</span>
+              <CornerDownRight :size="16" />
+              <span>{{ entry.parentPrompt }}</span>
             </div>
             <div class="entry-header">
               <p class="entry-prompt">{{ entry.prompt }}</p>
-              <span class="entry-time">{{ formatFull(entry.timestamp) }}</span>
+              <div class="entry-meta">
+                <span v-if="index === 0" class="new-badge">New</span>
+                <span class="entry-time">{{ formatFull(entry.timestamp) }}</span>
+              </div>
             </div>
 
             <div class="idea-deck">
@@ -229,8 +227,16 @@
 </template>
 
 <script setup lang="ts">
-import { Lightbulb, Loader, Check, Sparkles, BookmarkPlus, X } from 'lucide-vue-next'
-import { ref, computed, onMounted, watch, reactive } from 'vue'
+import {
+  Lightbulb,
+  Loader,
+  Check,
+  Sparkles,
+  BookmarkPlus,
+  X,
+  CornerDownRight
+} from 'lucide-vue-next'
+import { ref, computed, onMounted, watch, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import CoachWorkspace from '../components/CoachWorkspace.vue'
@@ -321,6 +327,7 @@ const lastPrompt = ref('')
 const resumingRunId = ref<string | null>(null)
 const showAllIdeas = ref(false)
 const inputSection = ref<HTMLElement | null>(null)
+const inputField = ref<HTMLTextAreaElement | null>(null)
 const coachState = reactive<{
   open: boolean
   loading: boolean
@@ -336,6 +343,8 @@ const coachState = reactive<{
   tips: null,
   error: ''
 })
+
+const INPUT_HEIGHT_LIMIT = 280
 
 const router = useRouter()
 const route = useRoute()
@@ -440,6 +449,26 @@ function handleBranch(text: string, parentEntry?: JournalEntry) {
   handleGenerate(text, parentEntry)
 }
 
+watch(
+  input,
+  () => {
+    void nextTick(() => {
+      adjustInputHeight()
+    })
+  },
+  { immediate: true }
+)
+
+function adjustInputHeight() {
+  const field = inputField.value
+  if (!field) return
+  field.style.height = 'auto'
+  const scrollHeight = field.scrollHeight
+  const newHeight = Math.min(scrollHeight, INPUT_HEIGHT_LIMIT)
+  field.style.height = `${newHeight}px`
+  field.style.overflowY = scrollHeight > INPUT_HEIGHT_LIMIT ? 'auto' : 'hidden'
+}
+
 function clearQueryParam(key: string) {
   if (!import.meta.client) return
   if (!(key in route.query)) return
@@ -493,9 +522,11 @@ function restoreThread() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   restoreThread()
   fetchSavedIdeas()
+  await nextTick()
+  adjustInputHeight()
 })
 
 async function fetchSavedIdeas() {
@@ -531,7 +562,6 @@ async function resumeFromHistory(runId: string) {
     const remainingEntries = entries.value.filter(existing => existing.id !== entry.id)
     entries.value = [entry, ...remainingEntries].slice(0, 6)
     lastPrompt.value = entry.prompt
-    input.value = entry.prompt
     showToastMessage('Thread restored from History')
   } catch (error) {
     console.error('Failed to resume thread', error)
@@ -999,57 +1029,84 @@ watch(
 
 .spark-input-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  padding: 1rem 4rem 1rem 1.25rem;
+  background: white;
+  border: 1px solid #f0e5e0;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  min-height: 56px;
+}
+
+.spark-input-wrapper:focus-within {
+  border-color: #d4756f;
+  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
 }
 
 .spark-input {
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid #f0e5e0;
-  padding: 1rem 140px 1rem 1.25rem;
+  flex: 1;
+  border: none;
+  padding: 0;
   font-size: 1rem;
   resize: none;
-  background: #fef8f5;
-  transition: all 0.2s ease;
+  background: transparent;
   font-family: inherit;
-  min-height: 60px;
+  max-height: 280px;
+  min-height: 24px;
+  line-height: 1.5;
+  overflow-y: hidden;
+  overflow-wrap: break-word;
+}
+
+.spark-input::-webkit-scrollbar {
+  width: 6px;
+}
+
+.spark-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.spark-input::-webkit-scrollbar-thumb {
+  background: rgba(212, 117, 111, 0.25);
+  border-radius: 3px;
+}
+
+.spark-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 117, 111, 0.4);
 }
 
 .spark-input:focus {
   outline: none;
-  border-color: #d4756f;
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
-  background: white;
 }
 
-.generate-button-inline {
+.icon-button {
   position: absolute;
-  right: 8px;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
   border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.25rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  border-radius: 50%;
   background: #d4756f;
   color: white;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
-  font-size: 0.9375rem;
-  white-space: nowrap;
 }
 
-.generate-button-inline:hover:not(:disabled) {
+.icon-button:hover:not(:disabled) {
   background: #c26660;
-  transform: translateY(-50%) translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+  transform: translateY(-50%) scale(1.05);
 }
 
-.generate-button-inline:disabled {
-  opacity: 0.6;
+.icon-button:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: translateY(-50%);
 }
 
 .reset-button {
@@ -1144,12 +1201,12 @@ watch(
 }
 
 .journal-entry.latest {
-  border-color: #d4756f;
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
+  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
 }
 
 .journal-entry.branched {
-  border-left: 3px solid #d4756f;
+  background: linear-gradient(135deg, #fff9f5 0%, #fef5f0 100%);
+  border: 1px solid rgba(212, 117, 111, 0.3);
 }
 
 .branch-indicator {
@@ -1189,6 +1246,25 @@ watch(
   font-weight: 600;
   color: #40312b;
   flex: 1;
+}
+
+.entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.new-badge {
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(246, 113, 118, 0.3);
 }
 
 .entry-time {

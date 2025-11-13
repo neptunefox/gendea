@@ -275,15 +275,57 @@ function extractJson(raw: string): string {
 
   const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/)
   if (arrayMatch) {
-    return arrayMatch[0]
+    return sanitizeJsonString(arrayMatch[0])
   }
 
   const objectMatch = cleanedResponse.match(/\{[\s\S]*\}/)
   if (objectMatch) {
-    return objectMatch[0]
+    return sanitizeJsonString(objectMatch[0])
   }
 
-  return cleanedResponse
+  return sanitizeJsonString(cleanedResponse)
+}
+
+function sanitizeJsonString(jsonStr: string): string {
+  let inString = false
+  let escaped = false
+  let result = ''
+
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i]
+
+    if (char === '"' && !escaped) {
+      inString = !inString
+      result += char
+      continue
+    }
+
+    if (char === '\\' && !escaped) {
+      escaped = true
+      result += char
+      continue
+    }
+
+    if (inString && !escaped) {
+      const code = char.charCodeAt(0)
+      if (code < 32 || (code >= 127 && code <= 159)) {
+        const escapeMap: Record<string, string> = {
+          '\b': '\\b',
+          '\f': '\\f',
+          '\n': '\\n',
+          '\r': '\\r',
+          '\t': '\\t'
+        }
+        result += escapeMap[char] || ''
+        continue
+      }
+    }
+
+    escaped = false
+    result += char
+  }
+
+  return result
 }
 
 function buildHistorySet(history: SparkHistoryEntry[]): Set<string> {
