@@ -7,12 +7,25 @@
       </div>
 
       <template v-else>
-        <div class="floating-ideas-container">
-          <p class="floating-label">Drag ideas into the cauldron</p>
-        </div>
+        <transition-group name="fade" tag="div" class="floating-ideas-container">
+          <FloatingIdea
+            v-for="(idea, index) in displayedIdeas"
+            :key="idea.id"
+            :idea="idea"
+            :index="index"
+            @drag-start="handleIdeaDragStart"
+            @drag-end="handleIdeaDragEnd"
+          />
+        </transition-group>
 
         <div class="cauldron-center">
-          <div class="cauldron-pot">
+          <div
+            class="cauldron-pot"
+            :class="{ 'drag-over': isDragOver }"
+            @drop="handleDrop"
+            @dragover.prevent="handleDragOver"
+            @dragleave="handleDragLeave"
+          >
             <div class="pot-body">
               <div v-if="ingredients.length < 3" class="ingredient-counter">
                 {{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }}
@@ -83,7 +96,9 @@
 
 <script setup lang="ts">
 import { Loader, Check } from 'lucide-vue-next'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
+
+import FloatingIdea from '~/components/FloatingIdea.vue'
 
 interface FloatingIdea {
   id: string
@@ -113,6 +128,8 @@ interface CauldronSession {
 const USER_ID = 'default-user'
 
 const floatingIdeas = ref<FloatingIdea[]>([])
+const displayedIdeas = ref<FloatingIdea[]>([])
+const recentlyDisplayedIds = ref<Set<string>>(new Set())
 const ingredients = ref<CauldronIngredient[]>([])
 const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
@@ -122,6 +139,9 @@ const manualInputVisible = ref(true)
 const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
+const isDragOver = ref(false)
+const draggedIdea = ref<FloatingIdea | null>(null)
+let rotationInterval: NodeJS.Timeout | null = null
 
 async function loadSession() {
   try {
@@ -164,8 +184,116 @@ async function loadFloatingIdeas() {
   try {
     const { ideas } = await $fetch<{ ideas: FloatingIdea[] }>('/api/cauldron/floating-ideas')
     floatingIdeas.value = ideas
+    initializeDisplayedIdeas()
   } catch (error) {
     console.error('Failed to load floating ideas:', error)
+  }
+}
+
+function initializeDisplayedIdeas() {
+  const count = Math.min(10, floatingIdeas.value.length)
+  displayedIdeas.value = floatingIdeas.value.slice(0, count)
+  displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))
+}
+
+function getNextIdea(): FloatingIdea | null {
+  const available = floatingIdeas.value.filter(idea => !recentlyDisplayedIds.value.has(idea.id))
+
+  if (available.length === 0) {
+    recentlyDisplayedIds.value.clear()
+    displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))
+    return floatingIdeas.value.find(idea => !recentlyDisplayedIds.value.has(idea.id)) || null
+  }
+
+  const randomIndex = Math.floor(Math.random() * available.length)
+  return available[randomIndex]
+}
+
+function rotateIdea() {
+  if (displayedIdeas.value.length === 0) return
+
+  const randomIndex = Math.floor(Math.random() * displayedIdeas.value.length)
+  const oldIdea = displayedIdeas.value[randomIndex]
+  const newIdea = getNextIdea()
+
+  if (newIdea) {
+    recentlyDisplayedIds.value.delete(oldIdea.id)
+    recentlyDisplayedIds.value.add(newIdea.id)
+    displayedIdeas.value[randomIndex] = newIdea
+  }
+}
+
+function startAutoRotation() {
+  if (rotationInterval) return
+
+  rotationInterval = setInterval(
+    () => {
+      rotateIdea()
+    },
+    15000 + Math.random() * 5000
+  )
+}
+
+function stopAutoRotation() {
+  if (rotationInterval) {
+    clearInterval(rotationInterval)
+    rotationInterval = null
+  }
+}
+
+function handleIdeaDragStart(idea: FloatingIdea) {
+  draggedIdea.value = idea
+}
+
+function handleIdeaDragEnd() {
+  draggedIdea.value = null
+}
+
+function handleDragOver(event: DragEvent) {
+  event.preventDefault()
+  isDragOver.value = true
+}
+
+function handleDragLeave() {
+  isDragOver.value = false
+}
+
+async function handleDrop(event: DragEvent) {
+  event.preventDefault()
+  isDragOver.value = false
+
+  if (!draggedIdea.value || !currentSession.value) return
+
+  try {
+    await $fetch('/api/cauldron/add-ingredient', {
+      method: 'POST',
+      body: {
+        sessionId: currentSession.value.id,
+        sourceType: draggedIdea.value.source,
+        sourceId: draggedIdea.value.id,
+        content: draggedIdea.value.text
+      }
+    })
+
+    const droppedIdeaId = draggedIdea.value.id
+    const index = displayedIdeas.value.findIndex(idea => idea.id === droppedIdeaId)
+
+    if (index !== -1) {
+      const newIdea = getNextIdea()
+      if (newIdea) {
+        recentlyDisplayedIds.value.delete(displayedIdeas.value[index].id)
+        recentlyDisplayedIds.value.add(newIdea.id)
+        displayedIdeas.value[index] = newIdea
+      }
+    }
+
+    await loadSession()
+    showToastMessage('Idea added to cauldron')
+  } catch (error) {
+    console.error('Failed to add ingredient:', error)
+    showToastMessage('Failed to add idea')
+  } finally {
+    draggedIdea.value = null
   }
 }
 
@@ -281,6 +409,11 @@ watch(
 onMounted(async () => {
   await loadSession()
   await loadFloatingIdeas()
+  startAutoRotation()
+})
+
+onUnmounted(() => {
+  stopAutoRotation()
 })
 </script>
 
@@ -325,14 +458,30 @@ onMounted(async () => {
 }
 
 .floating-ideas-container {
-  text-align: center;
-  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.floating-label {
-  font-size: 1.125rem;
-  color: #8a7566;
-  font-weight: 600;
+.floating-ideas-container > * {
+  pointer-events: auto;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.8s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-leave-to {
+  opacity: 0;
 }
 
 .cauldron-center {
@@ -341,6 +490,8 @@ onMounted(async () => {
   align-items: center;
   gap: 2rem;
   padding: 2rem;
+  position: relative;
+  z-index: 2;
 }
 
 .cauldron-pot {
@@ -354,6 +505,12 @@ onMounted(async () => {
   justify-content: center;
   box-shadow: 0 8px 32px rgba(212, 117, 111, 0.3);
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.cauldron-pot.drag-over {
+  transform: scale(1.05);
+  box-shadow: 0 12px 48px rgba(212, 117, 111, 0.5);
 }
 
 .pot-body {

@@ -30,6 +30,7 @@ Automatically perform comprehensive cascade cleanup:
 ### What to Report
 
 After cleanup, briefly list:
+
 - Files deleted
 - Functions/components removed
 - Import statements cleaned up

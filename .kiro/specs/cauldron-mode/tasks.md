@@ -42,7 +42,7 @@
   - Implement auto-save of session state on ingredient changes
   - _Requirements: 9.4, 10.3, 10.4_
 
-- [ ] 6. Implement floating ideas display
+- [x] 6. Implement floating ideas display
   - Create FloatingIdea.vue component with drift and rotation animations
   - Position 8-10 ideas randomly around the screen edges
   - Implement drag start handler that captures idea data
