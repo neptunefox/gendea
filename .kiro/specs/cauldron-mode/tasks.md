@@ -54,7 +54,7 @@
   - When floating idea is added to cauldron, rotate in new idea to maintain 8-10 count
   - _Requirements: 1.1, 1.5, 1.6, 1.7, 1.8, 2.2_
 
-- [ ] 7. Build cauldron visual component
+- [x] 7. Build cauldron visual component
   - Create CauldronPot.vue component with witch's cauldron aesthetic
   - Style with warm coral/terracotta colors matching app palette
   - Implement drop zone that accepts dragged ideas

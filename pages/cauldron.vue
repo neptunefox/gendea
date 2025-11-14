@@ -19,34 +19,7 @@
         </transition-group>
 
         <div class="cauldron-center">
-          <div
-            class="cauldron-pot"
-            :class="{ 'drag-over': isDragOver }"
-            @drop="handleDrop"
-            @dragover.prevent="handleDragOver"
-            @dragleave="handleDragLeave"
-          >
-            <div class="pot-body">
-              <div v-if="ingredients.length < 3" class="ingredient-counter">
-                {{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }}
-                needed
-              </div>
-              <div v-else-if="isMixing" class="mixing-indicator">
-                <Loader :size="24" class="spin" />
-                <span>Mixing...</span>
-              </div>
-              <div v-else class="ingredients-list">
-                <div
-                  v-for="(ingredient, index) in ingredients"
-                  :key="ingredient.id"
-                  class="ingredient-item"
-                >
-                  {{ index + 1 }}. {{ ingredient.content.slice(0, 40)
-                  }}{{ ingredient.content.length > 40 ? '...' : '' }}
-                </div>
-              </div>
-            </div>
-          </div>
+          <CauldronPot :ingredients="ingredients" :is-mixing="isMixing" @drop="handleDrop" />
 
           <div v-if="manualInputVisible" class="manual-input-wrapper">
             <input
@@ -95,9 +68,10 @@
 </template>
 
 <script setup lang="ts">
-import { Loader, Check } from 'lucide-vue-next'
+import { Check } from 'lucide-vue-next'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 
+import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 
 interface FloatingIdea {
@@ -139,7 +113,6 @@ const manualInputVisible = ref(true)
 const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
-const isDragOver = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 let rotationInterval: NodeJS.Timeout | null = null
 
@@ -249,19 +222,7 @@ function handleIdeaDragEnd() {
   draggedIdea.value = null
 }
 
-function handleDragOver(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = true
-}
-
-function handleDragLeave() {
-  isDragOver.value = false
-}
-
-async function handleDrop(event: DragEvent) {
-  event.preventDefault()
-  isDragOver.value = false
-
+async function handleDrop(_event: DragEvent) {
   if (!draggedIdea.value || !currentSession.value) return
 
   try {
@@ -494,69 +455,6 @@ onUnmounted(() => {
   z-index: 2;
 }
 
-.cauldron-pot {
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 32px rgba(212, 117, 111, 0.3);
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.cauldron-pot.drag-over {
-  transform: scale(1.05);
-  box-shadow: 0 12px 48px rgba(212, 117, 111, 0.5);
-}
-
-.pot-body {
-  width: 85%;
-  height: 85%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: white;
-  text-align: center;
-}
-
-.ingredient-counter {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.mixing-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.ingredients-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-}
-
-.ingredient-item {
-  font-size: 0.9375rem;
-  text-align: left;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-}
-
 .manual-input-wrapper {
   display: flex;
   gap: 0.75rem;
@@ -724,10 +622,6 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .cauldron-page {
     padding: 1rem;
-  }
-
-  .cauldron-pot {
-    max-width: 350px;
   }
 
   .reset-btn {
