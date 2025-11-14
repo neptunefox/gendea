@@ -5,6 +5,7 @@ Always generate commit messages following conventional commit format.
 Format: `type(scope): description`
 
 Types:
+
 - feat: new feature
 - fix: bug fix
 - refactor: code change that neither fixes a bug nor adds a feature

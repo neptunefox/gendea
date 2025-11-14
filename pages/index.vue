@@ -18,19 +18,24 @@
         </div>
       </header>
 
-      <section ref="inputSection" class="input-section">
-        <h2 class="section-title">
-          {{ savedIdeas.length > 0 ? 'Explore more' : 'Start exploring' }}
-        </h2>
-        <div class="spark-input-wrapper">
+      <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
+        <div class="spark-input-area">
+          <div v-if="input.length === 0" class="placeholder-container">
+            <transition-group name="slide-up" tag="div" class="placeholder-wrapper">
+              <span :key="currentPlaceholder" class="rotating-placeholder">
+                {{ currentPlaceholder }}
+              </span>
+            </transition-group>
+          </div>
           <textarea
             ref="inputField"
             v-model="input"
             class="spark-input"
             rows="1"
-            placeholder="What do you want to explore?"
             @keydown.enter.exact.prevent="handleGenerate()"
           />
+        </div>
+        <div class="spark-input-actions" @click.stop>
           <button
             class="icon-button"
             type="button"
@@ -42,7 +47,7 @@
             <Loader v-else :size="20" class="spin" />
           </button>
         </div>
-      </section>
+      </div>
 
       <section v-if="savedIdeas.length > 0" class="ideas-collection">
         <div class="collection-header">
@@ -247,7 +252,7 @@ import {
   CornerDownRight,
   Split
 } from 'lucide-vue-next'
-import { ref, computed, onMounted, watch, reactive, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import CoachWorkspace from '../components/CoachWorkspace.vue'
@@ -355,10 +360,23 @@ const coachState = reactive<{
   error: ''
 })
 
-const INPUT_HEIGHT_LIMIT = 280
+const INPUT_HEIGHT_LIMIT = 100
 
 const router = useRouter()
 const route = useRoute()
+
+const placeholders = [
+  'What do you want to explore?',
+  'An idea you want to develop...',
+  'A problem you want to solve...',
+  'Something you are curious about...',
+  'A project you are thinking about...',
+  'A skill you want to learn...',
+  'A challenge you are facing...'
+]
+const currentPlaceholder = ref(placeholders[0])
+let placeholderIndex = 0
+let rotationInterval: ReturnType<typeof setInterval> | null = null
 
 const canGenerate = computed(() => input.value.trim().length > 0)
 const buildingCount = computed(() => savedIdeas.value.filter(i => i.status === 'building').length)
@@ -455,6 +473,12 @@ function scrollToInput() {
   inputSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
+function focusInput() {
+  nextTick(() => {
+    inputField.value?.focus()
+  })
+}
+
 function handleBranch(text: string, parentEntry?: JournalEntry) {
   input.value = text
   handleGenerate(text, parentEntry)
@@ -475,9 +499,13 @@ function adjustInputHeight() {
   if (!field) return
   field.style.height = 'auto'
   const scrollHeight = field.scrollHeight
-  const newHeight = Math.min(scrollHeight, INPUT_HEIGHT_LIMIT)
-  field.style.height = `${newHeight}px`
-  field.style.overflowY = scrollHeight > INPUT_HEIGHT_LIMIT ? 'auto' : 'hidden'
+  if (scrollHeight > INPUT_HEIGHT_LIMIT) {
+    field.style.height = `${INPUT_HEIGHT_LIMIT}px`
+    field.style.overflowY = 'auto'
+  } else {
+    field.style.height = `${scrollHeight}px`
+    field.style.overflowY = 'hidden'
+  }
 }
 
 function clearQueryParam(key: string) {
@@ -533,11 +561,32 @@ function restoreThread() {
   }
 }
 
+function startPlaceholderRotation() {
+  rotationInterval = setInterval(() => {
+    if (input.value.trim().length > 0) return
+
+    placeholderIndex = (placeholderIndex + 1) % placeholders.length
+    currentPlaceholder.value = placeholders[placeholderIndex]
+  }, 3500)
+}
+
+function stopPlaceholderRotation() {
+  if (rotationInterval) {
+    clearInterval(rotationInterval)
+    rotationInterval = null
+  }
+}
+
 onMounted(async () => {
   restoreThread()
   fetchSavedIdeas()
   await nextTick()
   adjustInputHeight()
+  startPlaceholderRotation()
+})
+
+onUnmounted(() => {
+  stopPlaceholderRotation()
 })
 
 async function fetchSavedIdeas() {
@@ -1022,14 +1071,6 @@ watch(
   text-decoration: underline;
 }
 
-.input-section {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid #f0e5e0;
-}
-
 .recent-runs {
   background: white;
   border-radius: 16px;
@@ -1039,15 +1080,73 @@ watch(
 }
 
 .spark-input-wrapper {
-  position: relative;
   display: flex;
-  align-items: center;
-  padding: 1rem 4rem 1rem 1.25rem;
+  flex-direction: column;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
   background: white;
   border: 1px solid #f0e5e0;
   border-radius: 20px;
-  transition: all 0.2s ease;
-  min-height: 56px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 1rem 1.25rem 0.75rem;
+  cursor: text;
+  min-height: 80px;
+}
+
+.spark-input-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.placeholder-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+  color: #a0a0a0;
+  font-size: 1.0625rem;
+  height: 26px;
+  overflow: hidden;
+}
+
+.placeholder-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.rotating-placeholder {
+  position: absolute;
+  white-space: nowrap;
+  left: 0;
+  top: 0;
+}
+
+.slide-up-enter-active {
+  transition: all 0.5s ease-out;
+}
+
+.slide-up-leave-active {
+  transition: all 0.5s ease-in;
+  position: absolute;
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(26px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-26px);
+}
+
+.slide-up-move {
+  transition: transform 0.5s ease;
 }
 
 .spark-input-wrapper:focus-within {
@@ -1056,18 +1155,19 @@ watch(
 }
 
 .spark-input {
-  flex: 1;
+  width: 100%;
   border: none;
   padding: 0;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   resize: none;
   background: transparent;
   font-family: inherit;
-  max-height: 280px;
-  min-height: 24px;
+  min-height: 26px;
+  max-height: 100px;
   line-height: 1.5;
   overflow-y: hidden;
   overflow-wrap: break-word;
+  outline: none;
 }
 
 .spark-input::-webkit-scrollbar {
@@ -1087,15 +1187,15 @@ watch(
   background: rgba(212, 117, 111, 0.4);
 }
 
-.spark-input:focus {
-  outline: none;
+.spark-input-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  margin-top: -0.25rem;
+  align-self: flex-end;
 }
 
 .icon-button {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
   width: 36px;
   height: 36px;
   border: none;
@@ -1107,17 +1207,20 @@ watch(
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.3);
 }
 
 .icon-button:hover:not(:disabled) {
   background: #c26660;
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.4);
 }
 
 .icon-button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  transform: translateY(-50%);
+  box-shadow: none;
 }
 
 .reset-button {
