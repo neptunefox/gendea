@@ -7,7 +7,7 @@
   - Update db/schema.ts with new table definitions and types
   - _Requirements: 2.4, 5.1, 10.1_
 
-- [ ] 2. Create API endpoint for fetching floating ideas
+- [x] 2. Create API endpoint for fetching floating ideas
   - Implement GET /api/cauldron/floating-ideas endpoint
   - Query 60% of ideas from savedIdeas table ordered by most recent
   - Query 40% of ideas from sparkRuns table including AI-generated ideas, lens ideas, and user prompts
@@ -15,7 +15,7 @@
   - Return array of 8-10 ideas with id, text, source fields
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 3. Create API endpoint for session management
+- [x] 3. Create API endpoint for session management
   - Implement POST /api/cauldron/session endpoint to create new session
   - Implement GET /api/cauldron/session endpoint to retrieve current active session
   - Implement POST /api/cauldron/add-ingredient endpoint to add idea to session
