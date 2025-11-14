@@ -1,7 +1,7 @@
 <template>
   <div
     class="floating-idea"
-    :class="{ dragging: isDragging }"
+    :class="{ dragging: isDragging, dissolving: isDissolving }"
     :style="positionStyle"
     draggable="true"
     @dragstart="handleDragStart"
@@ -31,9 +31,11 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
   dragEnd: []
+  dissolved: [idea: FloatingIdea]
 }>()
 
 const isDragging = ref(false)
+const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
 
 const positionStyle = computed(() => ({
@@ -75,6 +77,17 @@ function handleDragEnd() {
   emit('dragEnd')
 }
 
+function dissolve() {
+  isDissolving.value = true
+  setTimeout(() => {
+    emit('dissolved', props.idea)
+  }, 600)
+}
+
+defineExpose({
+  dissolve
+})
+
 onMounted(() => {
   position.value = getRandomEdgePosition()
 })
@@ -108,6 +121,26 @@ onMounted(() => {
   opacity: 0.5;
   cursor: grabbing;
   animation: none;
+}
+
+.floating-idea.dissolving {
+  animation: dissolve 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes dissolve {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8) translateY(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-40px);
+  }
 }
 
 .idea-content {

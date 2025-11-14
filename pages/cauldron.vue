@@ -11,10 +11,12 @@
           <FloatingIdea
             v-for="(idea, index) in displayedIdeas"
             :key="idea.id"
+            :ref="el => setIdeaRef(idea.id, el)"
             :idea="idea"
             :index="index"
             @drag-start="handleIdeaDragStart"
             @drag-end="handleIdeaDragEnd"
+            @dissolved="handleIdeaDissolved"
           />
         </transition-group>
 
@@ -114,7 +116,16 @@ const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
 const draggedIdea = ref<FloatingIdea | null>(null)
+const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
 let rotationInterval: NodeJS.Timeout | null = null
+
+function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
+  if (el) {
+    ideaRefs.value.set(ideaId, el)
+  } else {
+    ideaRefs.value.delete(ideaId)
+  }
+}
 
 async function loadSession() {
   try {
@@ -225,28 +236,23 @@ function handleIdeaDragEnd() {
 async function handleDrop(_event: DragEvent) {
   if (!draggedIdea.value || !currentSession.value) return
 
+  const droppedIdea = draggedIdea.value
+  const ideaRef = ideaRefs.value.get(droppedIdea.id)
+
+  if (ideaRef && typeof ideaRef.dissolve === 'function') {
+    ideaRef.dissolve()
+  }
+
   try {
     await $fetch('/api/cauldron/add-ingredient', {
       method: 'POST',
       body: {
         sessionId: currentSession.value.id,
-        sourceType: draggedIdea.value.source,
-        sourceId: draggedIdea.value.id,
-        content: draggedIdea.value.text
+        sourceType: droppedIdea.source,
+        sourceId: droppedIdea.id,
+        content: droppedIdea.text
       }
     })
-
-    const droppedIdeaId = draggedIdea.value.id
-    const index = displayedIdeas.value.findIndex(idea => idea.id === droppedIdeaId)
-
-    if (index !== -1) {
-      const newIdea = getNextIdea()
-      if (newIdea) {
-        recentlyDisplayedIds.value.delete(displayedIdeas.value[index].id)
-        recentlyDisplayedIds.value.add(newIdea.id)
-        displayedIdeas.value[index] = newIdea
-      }
-    }
 
     await loadSession()
     showToastMessage('Idea added to cauldron')
@@ -255,6 +261,19 @@ async function handleDrop(_event: DragEvent) {
     showToastMessage('Failed to add idea')
   } finally {
     draggedIdea.value = null
+  }
+}
+
+function handleIdeaDissolved(idea: FloatingIdea) {
+  const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
+
+  if (index !== -1) {
+    const newIdea = getNextIdea()
+    if (newIdea) {
+      recentlyDisplayedIds.value.delete(displayedIdeas.value[index].id)
+      recentlyDisplayedIds.value.add(newIdea.id)
+      displayedIdeas.value[index] = newIdea
+    }
   }
 }
 

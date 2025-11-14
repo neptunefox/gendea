@@ -62,7 +62,7 @@
   - Display ingredient counter when fewer than 3 ingredients
   - _Requirements: 2.1, 4.2, 8.4_
 
-- [ ] 8. Implement drag and drop interaction
+- [x] 8. Implement drag and drop interaction
   - Add drag event listeners to FloatingIdea components
   - Implement drop handler on CauldronPot that validates drop target
   - Call add-ingredient API when idea is dropped
