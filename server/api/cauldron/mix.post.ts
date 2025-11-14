@@ -1,7 +1,7 @@
-import { eq, desc } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { cauldronIngredients, cauldronSessions, savedIdeas } from '../../../db/schema'
+import { cauldronIngredients, cauldronSessions } from '../../../db/schema'
 import { db } from '../../db'
 import { useLLMService } from '../../utils/llm'
 import { validateRequired, validateUUID } from '../../utils/validation'
@@ -38,24 +38,7 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const userSavedIdeas = await db
-    .select()
-    .from(savedIdeas)
-    .orderBy(desc(savedIdeas.createdAt))
-    .limit(20)
-
-  const previousCauldronOutputs = await db
-    .select()
-    .from(savedIdeas)
-    .where(eq(savedIdeas.isCauldronOutput, 1))
-    .orderBy(desc(savedIdeas.createdAt))
-    .limit(10)
-
-  const synthesizedText = await synthesizeIdeas(
-    ingredients,
-    userSavedIdeas,
-    previousCauldronOutputs
-  )
+  const synthesizedText = await synthesizeIdeas(ingredients)
 
   await db
     .update(cauldronSessions)
@@ -66,41 +49,33 @@ export default defineEventHandler(async event => {
 })
 
 async function synthesizeIdeas(
-  ingredients: Array<{ content: string; order: number }>,
-  userSavedIdeas: Array<{ text: string }>,
-  previousOutputs: Array<{ text: string }>
+  ingredients: Array<{ content: string; order: number }>
 ): Promise<string> {
   const llm = useLLMService()
 
-  const systemPrompt = `You are a convergent synthesis assistant. Your role is to analyze multiple ideas and synthesize them into ONE compelling, actionable idea that captures the essence of all ingredients.
+  const systemPrompt = `You are a convergent synthesis assistant. Your role is to analyze patterns across multiple ideas and synthesize them into ONE compelling, actionable idea.
 
 CRITICAL: Respond with ONLY the synthesized idea text. No explanations, no markdown, no extra formatting.
 
+Process:
+1. Identify common themes, patterns, and connections across ALL ingredients
+2. Find the deeper underlying interest or direction these ingredients point toward
+3. Synthesize into ONE cohesive, actionable idea that captures the essence
+
 Rules:
-- Synthesize all ingredients into ONE cohesive idea
-- The output should feel personalized based on observed patterns
+- Analyze patterns within the provided ingredients only
+- Don't just combine ideas - find what they reveal about the user's interests
 - Keep it specific and actionable (2-3 sentences max)
-- Don't just combine ideas - find the deeper connection
 - Make it compelling and ready to act on
-- Focus on what makes this unique to the user's interests`
+- The output should feel like a natural evolution of the ingredients`
 
   const ingredientsList = ingredients.map((ing, idx) => `${idx + 1}. ${ing.content}`).join('\n')
 
-  const savedIdeasContext =
-    userSavedIdeas.length > 0
-      ? `\n\nUser's recent saved ideas (for pattern analysis):\n${userSavedIdeas.map(idea => `- ${idea.text}`).join('\n')}`
-      : ''
+  const userPrompt = `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling idea:
 
-  const previousOutputsContext =
-    previousOutputs.length > 0
-      ? `\n\nPrevious cauldron outputs that resonated:\n${previousOutputs.map(output => `- ${output.text}`).join('\n')}`
-      : ''
+${ingredientsList}
 
-  const userPrompt = `Synthesize these ${ingredients.length} ingredients into ONE compelling idea:
-
-${ingredientsList}${savedIdeasContext}${previousOutputsContext}
-
-Analyze the patterns in what the user saved and what they're mixing now. Create a synthesis that feels personalized to their interests and style.`
+What themes, interests, or directions do these ingredients reveal? Create a synthesis that captures the deeper pattern.`
 
   try {
     const response = await llm.generate(userPrompt, systemPrompt)

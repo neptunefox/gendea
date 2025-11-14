@@ -26,9 +26,7 @@
 - [x] 4. Create API endpoint for AI mixing
   - Implement POST /api/cauldron/mix endpoint
   - Fetch all ingredients for the current session with their order
-  - Fetch user's saved ideas history for pattern analysis
-  - Fetch previous cauldron outputs for learning
-  - Build convergent prompt that synthesizes ingredients into one idea
+  - Build convergent prompt that analyzes patterns within ingredients and synthesizes into one idea
   - Use existing LLM service to generate synthesis
   - Save output to savedIdeas with isCauldronOutput flag
   - Return synthesized idea text

@@ -75,8 +75,8 @@ The Cauldron Mode is a convergent idea synthesis feature that allows users to mi
 #### Acceptance Criteria
 
 1. THE System SHALL track all ingredients added to the cauldron in each session
-2. THE System SHALL analyze the user's saved ideas history to identify preference patterns
-3. THE System SHALL analyze previous cauldron outputs to learn what resonated with the user
+2. THE System SHALL analyze patterns, themes, and connections within the provided ingredients
+3. THE System SHALL identify what the ingredients reveal about the user's underlying interests
 4. THE System SHALL use the convergent agent pattern to synthesize ingredients into one compelling idea
 5. THE System SHALL NOT display detected patterns to the user
 
