@@ -1,20 +1,32 @@
 <template>
   <div class="spark-page">
     <div class="spark-layout">
-      <header class="momentum-header">
-        <div class="momentum-stats">
-          <div class="stat-card">
-            <div class="stat-number">{{ savedIdeas.length }}</div>
-            <div class="stat-label">Ideas saved</div>
+      <header v-if="savedIdeas.length > 0" class="momentum-header">
+        <div class="header-label">
+          <h2>
+            Your collection
+            <span class="collection-count">{{ savedIdeas.length }}</span>
+          </h2>
+        </div>
+        <div class="mini-corkboard">
+          <div
+            v-for="(idea, index) in savedIdeas.slice(0, 8)"
+            :key="idea.id"
+            class="mini-pin"
+            :class="`mini-pin-${index % 8}`"
+            :title="idea.text"
+            @click="scrollToFullCollection"
+          >
+            <div class="mini-tack" />
+            <div class="mini-pin-status" :data-status="idea.status" />
           </div>
-          <div class="stat-card">
-            <div class="stat-number">{{ entries.length }}</div>
-            <div class="stat-label">Runs today</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">{{ buildingCount }}</div>
-            <div class="stat-label">In progress</div>
-          </div>
+          <button
+            v-if="savedIdeas.length > 8"
+            class="view-more-pins"
+            @click="scrollToFullCollection"
+          >
+            +{{ savedIdeas.length - 8 }}
+          </button>
         </div>
       </header>
 
@@ -49,7 +61,7 @@
         </div>
       </div>
 
-      <section v-if="savedIdeas.length > 0" class="ideas-collection">
+      <section v-if="savedIdeas.length > 0" ref="ideasCollectionSection" class="ideas-collection">
         <div class="collection-header">
           <h2 class="collection-title">Your ideas</h2>
           <button
@@ -363,6 +375,7 @@ const resumingRunId = ref<string | null>(null)
 const showAllIdeas = ref(false)
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
+const ideasCollectionSection = ref<HTMLElement | null>(null)
 const coachState = reactive<{
   open: boolean
   loading: boolean
@@ -398,7 +411,6 @@ let placeholderIndex = 0
 let rotationInterval: ReturnType<typeof setInterval> | null = null
 
 const canGenerate = computed(() => input.value.trim().length > 0)
-const buildingCount = computed(() => savedIdeas.value.filter(i => i.status === 'building').length)
 const historyPayload = computed(() =>
   entries.value.map(entry => ({
     prompt: entry.prompt,
@@ -490,6 +502,10 @@ async function handleDeleteIdea(ideaId: string) {
 
 function scrollToInput() {
   inputSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
+function scrollToFullCollection() {
+  ideasCollectionSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 function focusInput() {
@@ -751,36 +767,198 @@ watch(
 }
 
 .momentum-header {
-  background: white;
+  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid #f0e5e0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.momentum-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
+.header-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
-.stat-card {
-  text-align: center;
-}
-
-.stat-number {
-  font-size: 2.5rem;
+.header-label h2 {
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #d4756f;
-  line-height: 1;
+  color: #40312b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.stat-label {
-  font-size: 0.875rem;
-  color: #8a7566;
-  margin-top: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.collection-count {
+  font-size: 1rem;
+  color: #d4756f;
+  font-weight: 700;
+  background: rgba(212, 117, 111, 0.1);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+.mini-corkboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+  position: relative;
+}
+
+.mini-pin {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
+  border: 1px solid #f0e5e0;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mini-tack {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #d4756f;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(212, 117, 111, 0.4);
+  z-index: 2;
+}
+
+.mini-pin-status {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fde7ff;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mini-pin-status[data-status='ready'] {
+  background: #fff0da;
+}
+
+.mini-pin-status[data-status='building'] {
+  background: #e9f8ec;
+}
+
+.mini-pin-status[data-status='done'] {
+  background: #e9edff;
+}
+
+.mini-pin-0 {
+  transform: rotate(-2deg);
+}
+
+.mini-pin-1 {
+  transform: rotate(1.5deg);
+}
+
+.mini-pin-2 {
+  transform: rotate(-1deg);
+}
+
+.mini-pin-3 {
+  transform: rotate(2deg);
+}
+
+.mini-pin-4 {
+  transform: rotate(-1.5deg);
+}
+
+.mini-pin-5 {
+  transform: rotate(1deg);
+}
+
+.mini-pin-6 {
+  transform: rotate(-2.5deg);
+}
+
+.mini-pin-7 {
+  transform: rotate(1.8deg);
+}
+
+.mini-pin-0:hover {
+  transform: translateY(-4px) rotate(-4deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-1:hover {
+  transform: translateY(-4px) rotate(3deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-2:hover {
+  transform: translateY(-4px) rotate(-2.5deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-3:hover {
+  transform: translateY(-4px) rotate(4deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-4:hover {
+  transform: translateY(-4px) rotate(-3deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-5:hover {
+  transform: translateY(-4px) rotate(2.5deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-6:hover {
+  transform: translateY(-4px) rotate(-4.5deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.mini-pin-7:hover {
+  transform: translateY(-4px) rotate(3.5deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.view-more-pins {
+  aspect-ratio: 1;
+  background: rgba(212, 117, 111, 0.1);
+  border: 2px dashed rgba(212, 117, 111, 0.3);
+  border-radius: 8px;
+  color: #d4756f;
+  font-weight: 700;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-more-pins:hover {
+  background: rgba(212, 117, 111, 0.15);
+  border-color: rgba(212, 117, 111, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
 }
 
 .ideas-collection {
