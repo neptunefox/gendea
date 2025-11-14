@@ -46,18 +46,7 @@
           </div>
         </div>
 
-        <div v-if="output" class="output-container">
-          <div class="output-card">
-            <h3>Your synthesized idea</h3>
-            <p class="output-text">{{ output }}</p>
-            <div class="output-actions">
-              <button class="action-btn primary" @click="handleSaveOutput">
-                Save to collection
-              </button>
-              <button class="action-btn secondary" @click="handleReset">Start fresh</button>
-            </div>
-          </div>
-        </div>
+        <CauldronOutput :output="output" @save="handleSaveOutput" @reset="handleReset" />
 
         <button v-if="ingredients.length > 0 && !output" class="reset-btn" @click="handleReset">
           Reset cauldron
@@ -78,6 +67,7 @@
 import { Check, Plus } from 'lucide-vue-next'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 
+import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 
@@ -542,70 +532,6 @@ onUnmounted(() => {
 .submit-manual-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-}
-
-.output-container {
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.output-card {
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
-  border: 2px solid #d4756f;
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  box-shadow: 0 8px 32px rgba(212, 117, 111, 0.2);
-}
-
-.output-card h3 {
-  margin: 0 0 1rem 0;
-  color: #40312b;
-  font-size: 1.25rem;
-}
-
-.output-text {
-  color: #40312b;
-  font-size: 1.125rem;
-  line-height: 1.6;
-  margin: 0 0 1.5rem 0;
-}
-
-.output-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
-}
-
-.action-btn.primary {
-  background: #d4756f;
-  color: white;
-}
-
-.action-btn.primary:hover {
-  background: #c26660;
-  transform: translateY(-1px);
-}
-
-.action-btn.secondary {
-  background: rgba(212, 117, 111, 0.1);
-  color: #d4756f;
-}
-
-.action-btn.secondary:hover {
-  background: rgba(212, 117, 111, 0.2);
 }
 
 .reset-btn {
