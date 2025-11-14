@@ -92,7 +92,7 @@ function checkOverlap(
 function getRandomEdgePosition() {
   const viewportWidth = window.innerWidth
   const viewportHeight = window.innerHeight
-  const cardWidth = 250
+  const cardWidth = 280
   const cardHeight = 150
 
   const centerX = viewportWidth / 2
@@ -102,7 +102,7 @@ function getRandomEdgePosition() {
 
   const navHeight = 120
   const bottomInputHeight = 200
-  const sideMargin = 30
+  const sideMargin = 80
 
   let x = 0
   let y = 0
@@ -194,7 +194,7 @@ defineExpose({
 
 onMounted(() => {
   position.value = getRandomEdgePosition()
-  emit('positionSet', { x: position.value.x, y: position.value.y, width: 250, height: 150 })
+  emit('positionSet', { x: position.value.x, y: position.value.y, width: 280, height: 150 })
 })
 </script>
 
