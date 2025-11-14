@@ -2,10 +2,11 @@
   <div
     class="floating-idea"
     :class="{ dragging: isDragging, dissolving: isDissolving }"
-    :style="positionStyle"
+    :style="{ ...positionStyle, zIndex: zIndex }"
     draggable="true"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd"
+    @mouseenter="bringToFront"
   >
     <div class="idea-content">
       {{ idea.text }}
@@ -25,6 +26,7 @@ interface FloatingIdea {
 interface Props {
   idea: FloatingIdea
   index: number
+  existingPositions: Array<{ x: number; y: number; width: number; height: number }>
 }
 
 const props = defineProps<Props>()
@@ -32,35 +34,117 @@ const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
   dragEnd: []
   dissolved: [idea: FloatingIdea]
+  positionSet: [position: { x: number; y: number; width: number; height: number }]
 }>()
 
 const isDragging = ref(false)
 const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
+const zIndex = ref(10 + props.index)
 
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
   top: `${position.value.y}px`
 }))
 
+function bringToFront() {
+  zIndex.value = 100
+}
+
+function checkOverlap(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  existing: Array<{ x: number; y: number; width: number; height: number }>
+): boolean {
+  const padding = 40
+
+  for (const pos of existing) {
+    if (
+      x < pos.x + pos.width + padding &&
+      x + width + padding > pos.x &&
+      y < pos.y + pos.height + padding &&
+      y + height + padding > pos.y
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 function getRandomEdgePosition() {
-  const edge = Math.floor(Math.random() * 4)
   const viewportWidth = window.innerWidth
   const viewportHeight = window.innerHeight
-  const margin = 100
+  const cardWidth = 250
+  const cardHeight = 150
 
-  switch (edge) {
-    case 0:
-      return { x: Math.random() * (viewportWidth - 300), y: margin }
-    case 1:
-      return { x: viewportWidth - 250 - margin, y: Math.random() * (viewportHeight - 200) }
-    case 2:
-      return { x: Math.random() * (viewportWidth - 300), y: viewportHeight - 150 - margin }
-    case 3:
-      return { x: margin, y: Math.random() * (viewportHeight - 200) }
-    default:
-      return { x: margin, y: margin }
+  const centerX = viewportWidth / 2
+  const centerY = viewportHeight / 2
+  const cauldronRadius = 350
+  const minDistanceFromCauldron = cauldronRadius + 100
+
+  const navHeight = 120
+  const bottomInputHeight = 200
+  const sideMargin = 30
+
+  let x = 0
+  let y = 0
+  let attempts = 0
+  const maxAttempts = 100
+
+  while (attempts < maxAttempts) {
+    const baseAngle = props.index * (360 / 10)
+    const randomOffset = (Math.random() - 0.5) * 30
+    const angle = (baseAngle + randomOffset) * (Math.PI / 180)
+    const distance = minDistanceFromCauldron + props.index * 20 + Math.random() * 80
+
+    x = centerX + Math.cos(angle) * distance - cardWidth / 2
+    y = centerY + Math.sin(angle) * distance - cardHeight / 2
+
+    x = Math.max(sideMargin, Math.min(x, viewportWidth - cardWidth - sideMargin))
+    y = Math.max(navHeight, Math.min(y, viewportHeight - cardHeight - bottomInputHeight))
+
+    const inputAreaTop = viewportHeight - bottomInputHeight
+    const inputAreaBottom = viewportHeight
+    const inputAreaLeft = centerX - 300
+    const inputAreaRight = centerX + 300
+
+    if (
+      x + cardWidth > inputAreaLeft &&
+      x < inputAreaRight &&
+      y + cardHeight > inputAreaTop &&
+      y < inputAreaBottom
+    ) {
+      attempts++
+      continue
+    }
+
+    const finalDistanceFromCenter = Math.sqrt(
+      Math.pow(x + cardWidth / 2 - centerX, 2) + Math.pow(y + cardHeight / 2 - centerY, 2)
+    )
+
+    if (finalDistanceFromCenter < minDistanceFromCauldron) {
+      attempts++
+      continue
+    }
+
+    if (!checkOverlap(x, y, cardWidth, cardHeight, props.existingPositions)) {
+      return { x, y }
+    }
+
+    attempts++
   }
+
+  const fallbackAngle = (props.index * (360 / 10) + 180) * (Math.PI / 180)
+  const fallbackDistance = minDistanceFromCauldron + props.index * 30 + 100
+  x = centerX + Math.cos(fallbackAngle) * fallbackDistance - cardWidth / 2
+  y = centerY + Math.sin(fallbackAngle) * fallbackDistance - cardHeight / 2
+
+  x = Math.max(sideMargin, Math.min(x, viewportWidth - cardWidth - sideMargin))
+  y = Math.max(navHeight, Math.min(y, viewportHeight - cardHeight - bottomInputHeight))
+
+  return { x, y }
 }
 
 function handleDragStart(event: DragEvent) {
@@ -90,6 +174,7 @@ defineExpose({
 
 onMounted(() => {
   position.value = getRandomEdgePosition()
+  emit('positionSet', { x: position.value.x, y: position.value.y, width: 250, height: 150 })
 })
 </script>
 
@@ -104,17 +189,18 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   cursor: grab;
   user-select: none;
-  z-index: 10;
+  pointer-events: auto;
   transition: all 0.3s ease;
   animation:
     drift 8s ease-in-out infinite,
     gentle-rotate 12s ease-in-out infinite;
+  will-change: transform;
 }
 
 .floating-idea:hover {
-  transform: translateY(-2px) scale(1.02);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   border-color: #d4756f;
+  animation-play-state: paused;
 }
 
 .floating-idea.dragging {

@@ -14,6 +14,8 @@
             :ref="el => setIdeaRef(idea.id, el)"
             :idea="idea"
             :index="index"
+            :existing-positions="Array.from(cardPositions.values())"
+            @position-set="pos => cardPositions.set(idea.id, pos)"
             @drag-start="handleIdeaDragStart"
             @drag-end="handleIdeaDragEnd"
             @dissolved="handleIdeaDissolved"
@@ -112,6 +114,9 @@ const toastMessage = ref('')
 const draggedIdea = ref<FloatingIdea | null>(null)
 const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
+const cardPositions = ref<Map<string, { x: number; y: number; width: number; height: number }>>(
+  new Map()
+)
 let rotationInterval: NodeJS.Timeout | null = null
 
 function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
@@ -196,6 +201,7 @@ function rotateIdea() {
   const newIdea = getNextIdea()
 
   if (newIdea) {
+    cardPositions.value.delete(oldIdea.id)
     recentlyDisplayedIds.value.delete(oldIdea.id)
     recentlyDisplayedIds.value.add(newIdea.id)
     displayedIdeas.value[randomIndex] = newIdea
@@ -263,6 +269,7 @@ function handleIdeaDissolved(idea: FloatingIdea) {
   const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
 
   if (index !== -1) {
+    cardPositions.value.delete(idea.id)
     const newIdea = getNextIdea()
     if (newIdea) {
       recentlyDisplayedIds.value.delete(displayedIdeas.value[index].id)
@@ -448,11 +455,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
-}
-
-.floating-ideas-container > * {
-  pointer-events: auto;
+  z-index: 50;
 }
 
 .fade-enter-active,
