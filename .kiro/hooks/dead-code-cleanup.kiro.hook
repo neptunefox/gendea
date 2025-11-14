@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Dead Code Cleanup",
+  "description": "Monitors file changes for deletions and automatically identifies and removes unused imports and dead code to prevent codebase bloat",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.vue"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Code has been removed from files. Perform a comprehensive dead code and dead file analysis:\n\n1. **Unused imports** - remove imports that are no longer referenced\n2. **Dead functions/methods** - remove functions that are no longer called anywhere in the codebase\n3. **Unused variables/constants** - remove declarations that are never used\n4. **Dead types/interfaces** - remove type definitions with no references\n5. **Dead files** - identify and DELETE entire files that are no longer imported or used anywhere\n6. **Orphaned components** - remove Vue components not referenced in any templates or imports\n7. **Dead API endpoints** - remove server routes that are no longer called from the frontend\n8. **Unreachable code** - remove code paths that can never execute\n9. **Unused exports** - remove exports that nothing imports\n10. **Abandoned features** - remove entire feature modules that are no longer used\n\nScan the ENTIRE codebase, not just modified files. Immediately remove all dead code AND dead files. Be thorough - this includes code and files that linters can't detect as unused."
+  }
+}

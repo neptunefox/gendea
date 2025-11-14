@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "name": "Dead Code Cleanup on File Deletion",
+  "description": "Monitors file deletions and automatically scans the codebase to identify and remove imports and references to the deleted file, preventing dead code accumulation",
+  "version": "1",
+  "when": {
+    "type": "fileDeleted",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.vue"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file has been deleted. Perform a comprehensive cascade cleanup of dead code and dead files:\n\n1. **Direct references** - search entire codebase for imports and references to the deleted file\n2. **Remove broken imports** - delete all import statements pointing to the deleted file\n3. **Cascade dead files** - identify OTHER files that are now unused (only imported by deleted file) and DELETE them\n4. **Dead functions** - remove functions that only existed to support the deleted file\n5. **Dead types** - remove type definitions that only the deleted file used\n6. **Dead components** - remove components that only the deleted file rendered\n7. **Dead API calls** - remove frontend code calling deleted API endpoints\n8. **Dead routes** - remove route definitions pointing to deleted components\n9. **Orphaned folders** - DELETE entire folders if all files inside are now unused\n10. **Dead dependencies** - identify npm packages only used by deleted code\n\nBe AGGRESSIVE - this is cascade cleanup. If something only existed to support the deleted file, DELETE it immediately. Check the entire codebase for ripple effects. Remove code and files that linters can't detect as dead."
+  }
+}
