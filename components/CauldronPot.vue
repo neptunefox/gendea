@@ -14,10 +14,7 @@
       <div v-if="ingredients.length < 3" class="ingredient-counter">
         {{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }} needed
       </div>
-      <div v-else-if="isMixing" class="mixing-indicator">
-        <Loader :size="24" class="spin" />
-        <span>Mixing...</span>
-      </div>
+      <div v-else-if="isMixing" class="mixing-indicator"></div>
       <div v-else class="ingredients-list">
         <div
           v-for="(ingredient, index) in ingredients"
@@ -37,11 +34,14 @@
       :style="bubble.style"
     ></div>
 
-    <div v-if="isMixing" class="mixing-particles">
-      <div v-for="i in 12" :key="i" class="particle" :style="getParticleStyle(i)"></div>
-    </div>
-
     <div v-if="isMixing" class="glow-effect"></div>
+
+    <div
+      v-for="bubble in mixingBubbles"
+      :key="`mixing-${bubble.id}`"
+      class="mixing-bubble"
+      :style="bubble.style"
+    ></div>
 
     <transition name="dissolve">
       <div v-if="showManualAddEffect" class="manual-add-particle"></div>
@@ -50,8 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 interface CauldronIngredient {
   id: string
@@ -68,7 +67,7 @@ interface Props {
   isMixing: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   drop: [event: DragEvent]
@@ -77,7 +76,9 @@ const emit = defineEmits<{
 const isDragOver = ref(false)
 const showManualAddEffect = ref(false)
 const activeBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
+const mixingBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 let bubbleIdCounter = 0
+let mixingBubbleInterval: NodeJS.Timeout | null = null
 
 function handleDragOver(event: DragEvent) {
   event.preventDefault()
@@ -132,16 +133,41 @@ function triggerDropBubbles() {
   }, 2000)
 }
 
-function getParticleStyle(index: number) {
-  const angle = (index / 12) * 360
-  const radius = 40 + Math.random() * 20
-  return {
-    '--angle': `${angle}deg`,
-    '--radius': `${radius}%`,
-    '--delay': `${index * 0.1}s`,
-    '--duration': `${2 + Math.random()}s`
-  }
+function createMixingBubble() {
+  const size = Math.floor(Math.random() * 8) + 10
+  const bottom = Math.floor(Math.random() * 15) + 25
+  const left = Math.floor(Math.random() * 50) + 25
+
+  mixingBubbles.value.push({
+    id: bubbleIdCounter++,
+    style: {
+      width: `${size}px`,
+      height: `${size}px`,
+      bottom: `${bottom}%`,
+      left: `${left}%`
+    }
+  })
+
+  setTimeout(() => {
+    mixingBubbles.value.shift()
+  }, 2000)
 }
+
+watch(
+  () => props.isMixing,
+  mixing => {
+    if (mixing) {
+      mixingBubbles.value = []
+      mixingBubbleInterval = setInterval(createMixingBubble, 600)
+    } else {
+      if (mixingBubbleInterval) {
+        clearInterval(mixingBubbleInterval)
+        mixingBubbleInterval = null
+      }
+      mixingBubbles.value = []
+    }
+  }
+)
 
 defineExpose({
   triggerManualAddAnimation
@@ -175,23 +201,22 @@ defineExpose({
 }
 
 .cauldron-pot.mixing {
-  animation: color-shift 2.5s ease-in-out infinite;
-  box-shadow:
-    0 0 40px rgba(212, 117, 111, 0.5),
-    0 0 80px rgba(212, 117, 111, 0.3),
-    0 0 120px rgba(212, 117, 111, 0.2);
+  animation: simmer 2.5s ease-in-out infinite;
 }
 
-@keyframes color-shift {
+@keyframes simmer {
   0%,
   100% {
-    background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+    transform: scale(1);
+    box-shadow:
+      0 8px 32px rgba(212, 117, 111, 0.32),
+      0 0 18px rgba(212, 117, 111, 0.2);
   }
-  33% {
-    background: linear-gradient(135deg, #e08a7f 0%, #d4756f 100%);
-  }
-  66% {
-    background: linear-gradient(135deg, #c26660 0%, #b85850 100%);
+  50% {
+    transform: scale(1.005);
+    box-shadow:
+      0 8px 32px rgba(212, 117, 111, 0.36),
+      0 0 24px rgba(212, 117, 111, 0.25);
   }
 }
 
@@ -210,31 +235,34 @@ defineExpose({
   z-index: 2;
 }
 
+.cauldron-pot.mixing .pot-body {
+  animation: liquid-swirl 4s ease-in-out infinite;
+}
+
+@keyframes liquid-swirl {
+  0%,
+  100% {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  25% {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  50% {
+    background: rgba(255, 255, 255, 0.11);
+  }
+  75% {
+    background: rgba(255, 255, 255, 0.13);
+  }
+}
+
 .ingredient-counter {
   font-size: 1.5rem;
   font-weight: 700;
 }
 
 .mixing-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  width: 100%;
+  height: 100%;
 }
 
 .ingredients-list {
@@ -277,6 +305,33 @@ defineExpose({
   }
   100% {
     transform: translateY(-120px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+.mixing-bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: mixing-bubble-rise 2s ease-out forwards;
+}
+
+@keyframes mixing-bubble-rise {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.5;
+  }
+  70% {
+    opacity: 0.4;
+    transform: translateY(-60px) scale(0.9);
+  }
+  100% {
+    transform: translateY(-90px) scale(0.5);
     opacity: 0;
   }
 }
@@ -328,49 +383,6 @@ defineExpose({
   }
 }
 
-.mixing-particles {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.particle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.3) 100%);
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  animation: swirl var(--duration, 2s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-@keyframes swirl {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg) translateX(calc(var(--radius, 40%) * 1px))
-      rotate(0deg);
-    opacity: 0;
-    filter: blur(0px);
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg) translateX(calc(var(--radius, 40%) * 1px))
-      rotate(-360deg);
-    opacity: 0;
-    filter: blur(2px);
-  }
-}
-
 .glow-effect {
   position: absolute;
   width: 100%;
@@ -380,24 +392,22 @@ defineExpose({
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(212, 117, 111, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(212, 117, 111, 0.05) 50%,
     transparent 70%
   );
-  animation: pulse-glow 1.8s ease-in-out infinite;
+  animation: gentle-glow 2s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
 
-@keyframes pulse-glow {
+@keyframes gentle-glow {
   0%,
   100% {
-    opacity: 0.4;
-    transform: scale(1);
+    opacity: 0.5;
   }
   50% {
-    opacity: 0.7;
-    transform: scale(1.03);
+    opacity: 0.8;
   }
 }
 
