@@ -6,7 +6,6 @@
       </div>
 
       <div class="output-card">
-        <div class="glow-ring"></div>
         <div class="card-content">
           <h3 class="output-title">Your synthesized idea</h3>
           <p class="output-text">{{ output }}</p>
@@ -128,7 +127,7 @@ function getSteamStyle(index: number) {
 
 .output-card {
   position: relative;
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
+  background: linear-gradient(135deg, #fef3f0 0%, #fce8e3 100%);
   border: 3px solid #d4756f;
   border-radius: 20px;
   padding: 2.5rem;
@@ -138,32 +137,6 @@ function getSteamStyle(index: number) {
     0 12px 40px rgba(212, 117, 111, 0.25),
     0 0 60px rgba(212, 117, 111, 0.15);
   z-index: 2;
-}
-
-.glow-ring {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #d4756f, #e08a7f, #d4756f);
-  opacity: 0.3;
-  filter: blur(8px);
-  z-index: -1;
-  animation: glow-pulse 2s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%,
-  100% {
-    opacity: 0.25;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.45;
-    transform: scale(1.02);
-  }
 }
 
 .card-content {
