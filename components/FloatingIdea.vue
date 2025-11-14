@@ -7,6 +7,7 @@
     @dragstart="handleDragStart"
     @dragend="handleDragEnd"
     @mouseenter="bringToFront"
+    @click="handleClick"
   >
     <div class="idea-content">
       {{ idea.text }}
@@ -35,12 +36,14 @@ const emit = defineEmits<{
   dragEnd: []
   dissolved: [idea: FloatingIdea]
   positionSet: [position: { x: number; y: number; width: number; height: number }]
+  bringToTop: [ideaId: string]
 }>()
 
 const isDragging = ref(false)
 const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
+const dragStartTime = ref(0)
 
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
@@ -49,6 +52,19 @@ const positionStyle = computed(() => ({
 
 function bringToFront() {
   zIndex.value = 100
+}
+
+function handleClick(event: MouseEvent) {
+  const timeSinceDragStart = Date.now() - dragStartTime.value
+  if (timeSinceDragStart < 200 && isDragging.value) {
+    event.preventDefault()
+    return
+  }
+  emit('bringToTop', props.idea.id)
+}
+
+function setZIndex(newZIndex: number) {
+  zIndex.value = newZIndex
 }
 
 function checkOverlap(
@@ -149,6 +165,7 @@ function getRandomEdgePosition() {
 
 function handleDragStart(event: DragEvent) {
   isDragging.value = true
+  dragStartTime.value = Date.now()
   if (event.dataTransfer) {
     event.dataTransfer.effectAllowed = 'move'
     event.dataTransfer.setData('application/json', JSON.stringify(props.idea))
@@ -157,7 +174,9 @@ function handleDragStart(event: DragEvent) {
 }
 
 function handleDragEnd() {
-  isDragging.value = false
+  setTimeout(() => {
+    isDragging.value = false
+  }, 100)
   emit('dragEnd')
 }
 
@@ -169,7 +188,8 @@ function dissolve() {
 }
 
 defineExpose({
-  dissolve
+  dissolve,
+  setZIndex
 })
 
 onMounted(() => {
@@ -186,20 +206,24 @@ onMounted(() => {
   background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
   border: 2px solid #f0e5e0;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  cursor: grab;
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.1);
+  cursor: pointer;
   user-select: none;
   pointer-events: auto;
-  transition: all 0.3s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
   animation:
-    drift 8s ease-in-out infinite,
-    gentle-rotate 12s ease-in-out infinite;
+    drift 10s ease-in-out infinite,
+    gentle-rotate 15s ease-in-out infinite;
   will-change: transform;
 }
 
 .floating-idea:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 16px rgba(212, 117, 111, 0.2);
   border-color: #d4756f;
+  transform: translateY(-2px);
   animation-play-state: paused;
 }
 
@@ -207,6 +231,10 @@ onMounted(() => {
   opacity: 0.5;
   cursor: grabbing;
   animation: none;
+}
+
+.floating-idea:active:not(.dragging):not(.dissolving) {
+  transform: scale(0.98);
 }
 
 .floating-idea.dissolving {
@@ -246,13 +274,13 @@ onMounted(() => {
     transform: translate(0, 0);
   }
   25% {
-    transform: translate(15px, -10px);
+    transform: translate(10px, -8px);
   }
   50% {
-    transform: translate(-10px, 15px);
+    transform: translate(-8px, 12px);
   }
   75% {
-    transform: translate(10px, 10px);
+    transform: translate(8px, 8px);
   }
 }
 
@@ -262,32 +290,32 @@ onMounted(() => {
     transform: rotate(0deg);
   }
   50% {
-    transform: rotate(2deg);
+    transform: rotate(1.5deg);
   }
 }
 
 .floating-idea:nth-child(2n) {
   animation:
-    drift-alt 10s ease-in-out infinite,
-    gentle-rotate-alt 14s ease-in-out infinite;
+    drift-alt 12s ease-in-out infinite,
+    gentle-rotate-alt 16s ease-in-out infinite;
 }
 
 .floating-idea:nth-child(3n) {
   animation:
-    drift-slow 12s ease-in-out infinite,
-    gentle-rotate 16s ease-in-out infinite;
+    drift-slow 14s ease-in-out infinite,
+    gentle-rotate 18s ease-in-out infinite;
 }
 
 .floating-idea:nth-child(4n) {
   animation:
-    drift 9s ease-in-out infinite reverse,
-    gentle-rotate-alt 13s ease-in-out infinite;
+    drift 11s ease-in-out infinite reverse,
+    gentle-rotate-alt 15s ease-in-out infinite;
 }
 
 .floating-idea:nth-child(5n) {
   animation:
-    drift-alt 11s ease-in-out infinite reverse,
-    gentle-rotate 15s ease-in-out infinite;
+    drift-alt 13s ease-in-out infinite reverse,
+    gentle-rotate 17s ease-in-out infinite;
 }
 
 @keyframes drift-alt {
@@ -296,13 +324,13 @@ onMounted(() => {
     transform: translate(0, 0);
   }
   25% {
-    transform: translate(-12px, 15px);
+    transform: translate(-10px, 12px);
   }
   50% {
-    transform: translate(18px, -8px);
+    transform: translate(14px, -6px);
   }
   75% {
-    transform: translate(-8px, -12px);
+    transform: translate(-6px, -10px);
   }
 }
 
@@ -312,10 +340,10 @@ onMounted(() => {
     transform: translate(0, 0);
   }
   33% {
-    transform: translate(10px, 12px);
+    transform: translate(8px, 10px);
   }
   66% {
-    transform: translate(-15px, -10px);
+    transform: translate(-12px, -8px);
   }
 }
 
@@ -325,7 +353,7 @@ onMounted(() => {
     transform: rotate(0deg);
   }
   50% {
-    transform: rotate(-2deg);
+    transform: rotate(-1.5deg);
   }
 }
 </style>

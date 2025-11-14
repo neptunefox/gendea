@@ -123,21 +123,28 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px rgba(212, 117, 111, 0.3);
+  box-shadow:
+    0 8px 32px rgba(212, 117, 111, 0.3),
+    0 0 0 0 rgba(212, 117, 111, 0);
   position: relative;
-  transition: all 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .cauldron-pot.drag-over {
-  transform: scale(1.05);
-  box-shadow: 0 12px 48px rgba(212, 117, 111, 0.5);
+  transform: scale(1.03);
+  box-shadow:
+    0 12px 48px rgba(212, 117, 111, 0.4),
+    0 0 20px rgba(212, 117, 111, 0.3);
 }
 
 .cauldron-pot.mixing {
-  animation: color-shift 3s ease-in-out infinite;
+  animation: color-shift 2.5s ease-in-out infinite;
   box-shadow:
-    0 0 40px rgba(212, 117, 111, 0.6),
-    0 0 80px rgba(212, 117, 111, 0.4);
+    0 0 40px rgba(212, 117, 111, 0.5),
+    0 0 80px rgba(212, 117, 111, 0.3),
+    0 0 120px rgba(212, 117, 111, 0.2);
 }
 
 @keyframes color-shift {
@@ -145,14 +152,11 @@ defineExpose({
   100% {
     background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
   }
-  25% {
+  33% {
     background: linear-gradient(135deg, #e08a7f 0%, #d4756f 100%);
   }
-  50% {
+  66% {
     background: linear-gradient(135deg, #c26660 0%, #b85850 100%);
-  }
-  75% {
-    background: linear-gradient(135deg, #d4756f 0%, #e08a7f 100%);
   }
 }
 
@@ -339,17 +343,19 @@ defineExpose({
     transform: translate(-50%, -50%) rotate(0deg) translateX(calc(var(--radius, 40%) * 1px))
       rotate(0deg);
     opacity: 0;
+    filter: blur(0px);
   }
-  10% {
+  15% {
     opacity: 1;
   }
-  90% {
+  85% {
     opacity: 1;
   }
   100% {
     transform: translate(-50%, -50%) rotate(360deg) translateX(calc(var(--radius, 40%) * 1px))
       rotate(-360deg);
     opacity: 0;
+    filter: blur(2px);
   }
 }
 
@@ -362,11 +368,11 @@ defineExpose({
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.2) 0%,
-    rgba(212, 117, 111, 0.1) 50%,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(212, 117, 111, 0.15) 50%,
     transparent 70%
   );
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 1.8s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
@@ -374,12 +380,12 @@ defineExpose({
 @keyframes pulse-glow {
   0%,
   100% {
-    opacity: 0.3;
+    opacity: 0.4;
     transform: scale(1);
   }
   50% {
-    opacity: 0.6;
-    transform: scale(1.05);
+    opacity: 0.7;
+    transform: scale(1.03);
   }
 }
 

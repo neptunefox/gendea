@@ -111,15 +111,18 @@ function getSteamStyle(index: number) {
 
 @keyframes steam-rise {
   0% {
-    transform: translateX(var(--offset, 0)) translateY(0) scale(0.8);
+    transform: translateX(var(--offset, 0)) translateY(0) scale(0.7);
     opacity: 0;
+    filter: blur(2px);
   }
-  20% {
-    opacity: 0.6;
+  25% {
+    opacity: 0.7;
+    filter: blur(3px);
   }
   100% {
-    transform: translateX(var(--offset, 0)) translateY(-80px) scale(1.5);
+    transform: translateX(var(--offset, 0)) translateY(-90px) scale(1.8);
     opacity: 0;
+    filter: blur(5px);
   }
 }
 
@@ -154,10 +157,12 @@ function getSteamStyle(index: number) {
 @keyframes glow-pulse {
   0%,
   100% {
-    opacity: 0.3;
+    opacity: 0.25;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.45;
+    transform: scale(1.02);
   }
 }
 
@@ -199,7 +204,11 @@ function getSteamStyle(index: number) {
   border-radius: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   font-size: 1rem;
   display: flex;
   align-items: center;
@@ -207,31 +216,31 @@ function getSteamStyle(index: number) {
 }
 
 .action-btn.primary {
-  background: #d4756f;
+  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
 }
 
 .action-btn.primary:hover {
-  background: #c26660;
+  background: linear-gradient(135deg, #c26660 0%, #b85850 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(212, 117, 111, 0.4);
 }
 
 .action-btn.secondary {
-  background: rgba(212, 117, 111, 0.1);
+  background: rgba(212, 117, 111, 0.08);
   color: #d4756f;
-  border: 2px solid rgba(212, 117, 111, 0.3);
+  border: 2px solid rgba(212, 117, 111, 0.25);
 }
 
 .action-btn.secondary:hover {
-  background: rgba(212, 117, 111, 0.2);
+  background: rgba(212, 117, 111, 0.15);
   border-color: #d4756f;
   transform: translateY(-2px);
 }
 
 .emerge-enter-active {
-  animation: emerge 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: emerge 1.2s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 .emerge-leave-active {
@@ -241,14 +250,17 @@ function getSteamStyle(index: number) {
 @keyframes emerge {
   0% {
     opacity: 0;
-    transform: translateY(60px) scale(0.8);
+    transform: translateY(50px) scale(0.85);
+    filter: blur(4px);
   }
-  40% {
-    opacity: 0.5;
+  50% {
+    opacity: 0.7;
+    filter: blur(1px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 }
 

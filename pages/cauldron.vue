@@ -7,20 +7,24 @@
       </div>
 
       <template v-else>
-        <transition-group name="fade" tag="div" class="floating-ideas-container">
+        <div class="floating-ideas-container">
           <FloatingIdea
             v-for="(idea, index) in displayedIdeas"
             :key="idea.id"
-            :ref="el => setIdeaRef(idea.id, el)"
+            :ref="(el: any) => setIdeaRef(idea.id, el)"
             :idea="idea"
             :index="index"
             :existing-positions="Array.from(cardPositions.values())"
-            @position-set="pos => cardPositions.set(idea.id, pos)"
+            @position-set="
+              (pos: { x: number; y: number; width: number; height: number }) =>
+                cardPositions.set(idea.id, pos)
+            "
             @drag-start="handleIdeaDragStart"
             @drag-end="handleIdeaDragEnd"
             @dissolved="handleIdeaDissolved"
+            @bring-to-top="handleBringToTop"
           />
-        </transition-group>
+        </div>
 
         <div class="cauldron-center">
           <CauldronPot
@@ -66,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { Check, Plus } from 'lucide-vue-next'
+import { Check, Loader, Plus } from 'lucide-vue-next'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
@@ -112,18 +116,32 @@ const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
 const draggedIdea = ref<FloatingIdea | null>(null)
-const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
+const ideaRefs = ref<Map<string, { dissolve: () => void; setZIndex: (z: number) => void }>>(
+  new Map()
+)
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
 const cardPositions = ref<Map<string, { x: number; y: number; width: number; height: number }>>(
   new Map()
 )
+const topZIndex = ref(100)
 let rotationInterval: NodeJS.Timeout | null = null
 
-function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
+function setIdeaRef(
+  ideaId: string,
+  el: { dissolve: () => void; setZIndex: (z: number) => void } | null
+) {
   if (el) {
     ideaRefs.value.set(ideaId, el)
   } else {
     ideaRefs.value.delete(ideaId)
+  }
+}
+
+function handleBringToTop(ideaId: string) {
+  const ideaRef = ideaRefs.value.get(ideaId)
+  if (ideaRef && typeof ideaRef.setZIndex === 'function') {
+    topZIndex.value += 1
+    ideaRef.setZIndex(topZIndex.value)
   }
 }
 
@@ -167,7 +185,12 @@ async function createNewSession() {
 async function loadFloatingIdeas() {
   try {
     const { ideas } = await $fetch<{ ideas: FloatingIdea[] }>('/api/cauldron/floating-ideas')
-    floatingIdeas.value = ideas
+
+    const uniqueIdeas = ideas.filter(
+      (idea, index, self) => index === self.findIndex(i => i.id === idea.id || i.text === idea.text)
+    )
+
+    floatingIdeas.value = uniqueIdeas
     initializeDisplayedIdeas()
   } catch (error) {
     console.error('Failed to load floating ideas:', error)
@@ -295,7 +318,7 @@ async function handleManualSubmit() {
       method: 'POST',
       body: {
         sessionId: currentSession.value.id,
-        sourceType: 'manual',
+        sourceType: 'user',
         sourceId: null,
         content: text
       }
@@ -458,19 +481,6 @@ onUnmounted(() => {
   z-index: 50;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.8s ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-}
-
-.fade-leave-to {
-  opacity: 0;
-}
-
 .cauldron-center {
   display: flex;
   flex-direction: column;
@@ -523,15 +533,17 @@ onUnmounted(() => {
   border: none;
   border-radius: 0 14px 14px 0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .submit-manual-btn:hover:not(:disabled) {
-  background: rgba(212, 117, 111, 0.1);
-  transform: scale(1.05);
+  background: rgba(212, 117, 111, 0.12);
+  transform: translateY(-1px);
 }
 
 .submit-manual-btn:disabled {
@@ -544,14 +556,19 @@ onUnmounted(() => {
   bottom: 2rem;
   right: 2rem;
   padding: 0.875rem 1.5rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border: 2px solid #f0e5e0;
   border-radius: 12px;
   color: #8a7566;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.1);
 }
 
 .reset-btn:hover {
@@ -559,7 +576,7 @@ onUnmounted(() => {
   border-color: #d4756f;
   color: #d4756f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(212, 117, 111, 0.2);
 }
 
 .toast {

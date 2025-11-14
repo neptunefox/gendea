@@ -110,7 +110,7 @@
   - Test navigation flow between modes
   - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 14. Polish animations and visual effects
+- [x] 14. Polish animations and visual effects
   - Fine-tune floating idea drift speeds and rotation angles
   - Adjust mixing animation timing and particle effects
   - Ensure output emergence animation feels magical but not slow
