@@ -188,6 +188,7 @@ export const cauldronSessions = pgTable('cauldron_sessions', {
   userId: text('user_id').notNull(),
   ingredientIds: jsonb('ingredient_ids').$type<string[]>().notNull().default([]),
   outputIdeaId: uuid('output_idea_id'),
+  outputText: text('output_text'),
   patterns: jsonb('patterns').$type<Record<string, unknown>>(),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })

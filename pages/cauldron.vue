@@ -99,6 +99,7 @@ interface CauldronSession {
   createdAt: string
   ingredientIds: string[]
   outputIdeaId: string | null
+  outputText: string | null
   patterns: string | null
 }
 
@@ -157,6 +158,7 @@ async function loadSession() {
     if (session) {
       currentSession.value = session
       ingredients.value = sessionIngredients
+      output.value = session.outputText || null
     } else {
       await createNewSession()
     }

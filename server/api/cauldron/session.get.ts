@@ -1,4 +1,4 @@
-import { desc, eq, isNull } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 
 import { cauldronSessions, cauldronIngredients } from '../../../db/schema'
 import { db } from '../../db'
@@ -18,7 +18,6 @@ export default defineEventHandler(async event => {
     .select()
     .from(cauldronSessions)
     .where(eq(cauldronSessions.userId, userId))
-    .where(isNull(cauldronSessions.outputIdeaId))
     .orderBy(desc(cauldronSessions.createdAt))
     .limit(1)
 

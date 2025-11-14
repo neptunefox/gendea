@@ -57,20 +57,9 @@ export default defineEventHandler(async event => {
     previousCauldronOutputs
   )
 
-  const [outputIdea] = await db
-    .insert(savedIdeas)
-    .values({
-      text: synthesizedText,
-      source: 'ai',
-      isCauldronOutput: 1,
-      cauldronSessionId: sessionId,
-      status: 'exploring'
-    })
-    .returning()
-
   await db
     .update(cauldronSessions)
-    .set({ outputIdeaId: outputIdea.id })
+    .set({ outputText: synthesizedText })
     .where(eq(cauldronSessions.id, sessionId))
 
   return { output: synthesizedText }

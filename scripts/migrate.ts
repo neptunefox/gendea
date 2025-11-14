@@ -195,6 +195,11 @@ async function main() {
     ADD COLUMN IF NOT EXISTS cauldron_session_id UUID;
   `)
 
+  await db.execute(sql`
+    ALTER TABLE cauldron_sessions 
+    ADD COLUMN IF NOT EXISTS output_text TEXT;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()
