@@ -33,4 +33,4 @@ bun run format && bun run lint:fix   # formatting + linting
 
 ## License
 
-MIT
+AGPL-3.0 - see [LICENSE](LICENSE) file for details
