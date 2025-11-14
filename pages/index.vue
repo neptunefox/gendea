@@ -110,7 +110,25 @@
               <span>{{ entry.parentPrompt }}</span>
             </div>
             <div class="entry-header">
-              <p class="entry-prompt">{{ entry.prompt }}</p>
+              <div class="entry-prompt-wrapper">
+                <p
+                  class="entry-prompt"
+                  :class="{ truncated: !entry.expanded && entry.prompt.length > 150 }"
+                >
+                  {{
+                    entry.expanded || entry.prompt.length <= 150
+                      ? entry.prompt
+                      : entry.prompt.slice(0, 150) + '...'
+                  }}
+                </p>
+                <button
+                  v-if="entry.prompt.length > 150"
+                  class="expand-prompt-btn"
+                  @click.stop="togglePromptExpansion(entry.id)"
+                >
+                  {{ entry.expanded ? 'Show less' : 'Show more' }}
+                </button>
+              </div>
               <div class="entry-meta">
                 <span v-if="index === 0" class="new-badge">New</span>
                 <span class="entry-time">{{ formatFull(entry.timestamp) }}</span>
@@ -286,6 +304,7 @@ interface JournalEntry {
   lenses: SparkLens[]
   nudges: SparkNudge[]
   parentPrompt?: string
+  expanded?: boolean
 }
 
 interface CoachPlanSuggestion {
@@ -544,6 +563,13 @@ function showToastMessage(message: string) {
   setTimeout(() => {
     showToast.value = false
   }, 2200)
+}
+
+function togglePromptExpansion(entryId: string) {
+  const entry = entries.value.find(e => e.id === entryId)
+  if (entry) {
+    entry.expanded = !entry.expanded
+  }
 }
 
 function restoreThread() {
@@ -1354,12 +1380,37 @@ watch(
   margin-bottom: 0.5rem;
 }
 
+.entry-prompt-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .entry-prompt {
   margin: 0;
   font-size: 1.0625rem;
   font-weight: 600;
   color: #40312b;
-  flex: 1;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.expand-prompt-btn {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  color: #d4756f;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  transition: all 0.2s ease;
+}
+
+.expand-prompt-btn:hover {
+  color: #c26660;
+  text-decoration: underline;
 }
 
 .entry-meta {
