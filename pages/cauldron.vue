@@ -8,22 +8,24 @@
 
       <template v-else>
         <div class="floating-ideas-container">
-          <FloatingIdea
-            v-for="(idea, index) in displayedIdeas"
-            :key="idea.id"
-            :ref="(el: any) => setIdeaRef(idea.id, el)"
-            :idea="idea"
-            :index="index"
-            :existing-positions="Array.from(cardPositions.values())"
-            @position-set="
-              (pos: { x: number; y: number; width: number; height: number }) =>
-                cardPositions.set(idea.id, pos)
-            "
-            @drag-start="handleIdeaDragStart"
-            @drag-end="handleIdeaDragEnd"
-            @dissolved="handleIdeaDissolved"
-            @bring-to-top="handleBringToTop"
-          />
+          <TransitionGroup name="idea-fade">
+            <FloatingIdea
+              v-for="(idea, index) in displayedIdeas"
+              :key="idea.id"
+              :ref="(el: any) => setIdeaRef(idea.id, el)"
+              :idea="idea"
+              :index="index"
+              :existing-positions="Array.from(cardPositions.values())"
+              @position-set="
+                (pos: { x: number; y: number; width: number; height: number }) =>
+                  cardPositions.set(idea.id, pos)
+              "
+              @drag-start="handleIdeaDragStart"
+              @drag-end="handleIdeaDragEnd"
+              @dissolved="handleIdeaDissolved"
+              @bring-to-top="handleBringToTop"
+            />
+          </TransitionGroup>
         </div>
 
         <div class="cauldron-center">
@@ -200,18 +202,28 @@ async function loadFloatingIdeas() {
 }
 
 function initializeDisplayedIdeas() {
-  const count = Math.min(10, floatingIdeas.value.length)
-  displayedIdeas.value = floatingIdeas.value.slice(0, count)
+  const displayCount = Math.min(8, floatingIdeas.value.length)
+  const shuffled = [...floatingIdeas.value].sort(() => Math.random() - 0.5)
+  displayedIdeas.value = shuffled.slice(0, displayCount)
   displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))
 }
 
 function getNextIdea(): FloatingIdea | null {
-  const available = floatingIdeas.value.filter(idea => !recentlyDisplayedIds.value.has(idea.id))
+  const currentlyDisplayedIds = new Set(displayedIdeas.value.map(i => i.id))
+
+  let available = floatingIdeas.value.filter(
+    idea => !recentlyDisplayedIds.value.has(idea.id) && !currentlyDisplayedIds.has(idea.id)
+  )
 
   if (available.length === 0) {
     recentlyDisplayedIds.value.clear()
     displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))
-    return floatingIdeas.value.find(idea => !recentlyDisplayedIds.value.has(idea.id)) || null
+
+    available = floatingIdeas.value.filter(idea => !currentlyDisplayedIds.has(idea.id))
+
+    if (available.length === 0) {
+      return null
+    }
   }
 
   const randomIndex = Math.floor(Math.random() * available.length)
@@ -481,6 +493,22 @@ onUnmounted(() => {
   height: 100%;
   pointer-events: none;
   z-index: 50;
+}
+
+.idea-fade-enter-active {
+  transition: opacity 0.8s ease;
+}
+
+.idea-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.idea-fade-enter-from {
+  opacity: 0;
+}
+
+.idea-fade-leave-to {
+  opacity: 0;
 }
 
 .cauldron-center {
