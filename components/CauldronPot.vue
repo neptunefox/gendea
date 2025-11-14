@@ -1,7 +1,11 @@
 <template>
   <div
     class="cauldron-pot"
-    :class="{ 'drag-over': isDragOver, bubbling: ingredients.length === 0 }"
+    :class="{
+      'drag-over': isDragOver,
+      bubbling: ingredients.length === 0,
+      'manual-add': showManualAddEffect
+    }"
     @drop="handleDrop"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
@@ -29,6 +33,10 @@
     <div v-if="ingredients.length === 0" class="bubble bubble-1"></div>
     <div v-if="ingredients.length === 0" class="bubble bubble-2"></div>
     <div v-if="ingredients.length === 0" class="bubble bubble-3"></div>
+
+    <transition name="dissolve">
+      <div v-if="showManualAddEffect" class="manual-add-particle"></div>
+    </transition>
   </div>
 </template>
 
@@ -58,6 +66,7 @@ const emit = defineEmits<{
 }>()
 
 const isDragOver = ref(false)
+const showManualAddEffect = ref(false)
 
 function handleDragOver(event: DragEvent) {
   event.preventDefault()
@@ -73,6 +82,17 @@ function handleDrop(event: DragEvent) {
   isDragOver.value = false
   emit('drop', event)
 }
+
+function triggerManualAddAnimation() {
+  showManualAddEffect.value = true
+  setTimeout(() => {
+    showManualAddEffect.value = false
+  }, 800)
+}
+
+defineExpose({
+  triggerManualAddAnimation
+})
 </script>
 
 <style scoped>
@@ -200,6 +220,53 @@ function handleDrop(event: DragEvent) {
   }
   100% {
     transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.cauldron-pot.manual-add {
+  animation: pulse 0.4s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.manual-add-particle {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(212, 117, 111, 0.4) 100%);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.dissolve-enter-active {
+  animation: dissolve-in 0.8s ease-out;
+}
+
+@keyframes dissolve-in {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
     opacity: 0;
   }
 }

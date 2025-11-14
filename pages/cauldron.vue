@@ -21,13 +21,18 @@
         </transition-group>
 
         <div class="cauldron-center">
-          <CauldronPot :ingredients="ingredients" :is-mixing="isMixing" @drop="handleDrop" />
+          <CauldronPot
+            ref="cauldronPotRef"
+            :ingredients="ingredients"
+            :is-mixing="isMixing"
+            @drop="handleDrop"
+          />
 
-          <div v-if="manualInputVisible" class="manual-input-wrapper">
+          <div v-if="!output" class="manual-input-wrapper">
             <input
               v-model="manualInput"
               type="text"
-              placeholder="Type your own idea..."
+              placeholder="Add your own idea..."
               class="manual-input"
               @keydown.enter="handleManualSubmit"
             />
@@ -36,7 +41,7 @@
               :disabled="!manualInput.trim()"
               @click="handleManualSubmit"
             >
-              Add
+              <Plus :size="20" />
             </button>
           </div>
         </div>
@@ -70,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next'
+import { Check, Plus } from 'lucide-vue-next'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 
 import CauldronPot from '~/components/CauldronPot.vue'
@@ -111,12 +116,12 @@ const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
 const output = ref<string | null>(null)
 const manualInput = ref('')
-const manualInputVisible = ref(true)
 const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
 const draggedIdea = ref<FloatingIdea | null>(null)
 const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
+const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
 let rotationInterval: NodeJS.Timeout | null = null
 
 function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
@@ -280,6 +285,13 @@ function handleIdeaDissolved(idea: FloatingIdea) {
 async function handleManualSubmit() {
   const text = manualInput.value.trim()
   if (!text || !currentSession.value) return
+
+  if (
+    cauldronPotRef.value &&
+    typeof cauldronPotRef.value.triggerManualAddAnimation === 'function'
+  ) {
+    cauldronPotRef.value.triggerManualAddAnimation()
+  }
 
   try {
     await $fetch('/api/cauldron/add-ingredient', {
@@ -476,46 +488,59 @@ onUnmounted(() => {
 
 .manual-input-wrapper {
   display: flex;
-  gap: 0.75rem;
+  gap: 0;
+  background: white;
+  border: 2px solid #f0e5e0;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
   width: 100%;
   max-width: 500px;
 }
 
+.manual-input-wrapper:focus-within {
+  border-color: #d4756f;
+  box-shadow: 0 4px 20px rgba(212, 117, 111, 0.15);
+}
+
 .manual-input {
   flex: 1;
-  padding: 0.875rem 1.25rem;
-  border: 2px solid #f0e5e0;
-  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border: none;
+  border-radius: 16px;
   font-size: 1rem;
-  background: white;
+  background: transparent;
   color: #40312b;
-  transition: all 0.2s ease;
+}
+
+.manual-input::placeholder {
+  color: #b8a89d;
 }
 
 .manual-input:focus {
   outline: none;
-  border-color: #d4756f;
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
 }
 
 .submit-manual-btn {
-  padding: 0.875rem 1.5rem;
-  background: #d4756f;
-  color: white;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: #d4756f;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
+  border-radius: 0 14px 14px 0;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit-manual-btn:hover:not(:disabled) {
-  background: #c26660;
-  transform: translateY(-1px);
+  background: rgba(212, 117, 111, 0.1);
+  transform: scale(1.05);
 }
 
 .submit-manual-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 

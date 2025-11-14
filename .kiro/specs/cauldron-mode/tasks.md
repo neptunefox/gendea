@@ -70,7 +70,7 @@
   - Remove floating idea and rotate in new one from API
   - _Requirements: 2.2, 2.3, 1.5_
 
-- [ ] 9. Create input field for manual idea entry
+- [x] 9. Create input field for manual idea entry
   - Add fixed-position input field with natural placement
   - Style input to match app aesthetic without distracting from cauldron
   - Implement submit handler that calls add-ingredient API
