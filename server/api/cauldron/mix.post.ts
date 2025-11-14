@@ -73,7 +73,7 @@ export default defineEventHandler(async event => {
     .set({ outputIdeaId: outputIdea.id })
     .where(eq(cauldronSessions.id, sessionId))
 
-  return { idea: synthesizedText }
+  return { output: synthesizedText }
 })
 
 async function synthesizeIdeas(

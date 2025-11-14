@@ -78,7 +78,7 @@
   - Add ingredient to cauldron with dissolving animation
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 10. Implement mixing animations and state
+- [x] 10. Implement mixing animations and state
   - Detect when ingredient count reaches 3 and trigger mixing
   - Call /api/cauldron/mix endpoint when mixing starts
   - Display swirling particles, color shifts, and glow effects during mixing
