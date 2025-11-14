@@ -3,7 +3,6 @@
     class="cauldron-pot"
     :class="{
       'drag-over': isDragOver,
-      bubbling: ingredients.length === 0,
       'manual-add': showManualAddEffect,
       mixing: isMixing
     }"
@@ -31,9 +30,12 @@
       </div>
     </div>
 
-    <div v-if="ingredients.length === 0" class="bubble bubble-1"></div>
-    <div v-if="ingredients.length === 0" class="bubble bubble-2"></div>
-    <div v-if="ingredients.length === 0" class="bubble bubble-3"></div>
+    <div
+      v-for="bubble in activeBubbles"
+      :key="bubble.id"
+      class="bubble"
+      :style="bubble.style"
+    ></div>
 
     <div v-if="isMixing" class="mixing-particles">
       <div v-for="i in 12" :key="i" class="particle" :style="getParticleStyle(i)"></div>
@@ -74,6 +76,8 @@ const emit = defineEmits<{
 
 const isDragOver = ref(false)
 const showManualAddEffect = ref(false)
+const activeBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
+let bubbleIdCounter = 0
 
 function handleDragOver(event: DragEvent) {
   event.preventDefault()
@@ -87,14 +91,45 @@ function handleDragLeave() {
 function handleDrop(event: DragEvent) {
   event.preventDefault()
   isDragOver.value = false
+  triggerDropBubbles()
   emit('drop', event)
 }
 
 function triggerManualAddAnimation() {
   showManualAddEffect.value = true
+  triggerDropBubbles()
   setTimeout(() => {
     showManualAddEffect.value = false
   }, 800)
+}
+
+function triggerDropBubbles() {
+  const bubbleCount = Math.floor(Math.random() * 4) + 2
+  const newBubbles = []
+
+  for (let i = 0; i < bubbleCount; i++) {
+    const size = Math.floor(Math.random() * 10) + 14
+    const bottom = Math.floor(Math.random() * 10) + 28
+    const left = Math.floor(Math.random() * 60) + 20
+    const delay = Math.random() * 0.2
+
+    newBubbles.push({
+      id: bubbleIdCounter++,
+      style: {
+        width: `${size}px`,
+        height: `${size}px`,
+        bottom: `${bottom}%`,
+        left: `${left}%`,
+        animationDelay: `${delay}s`
+      }
+    })
+  }
+
+  activeBubbles.value = newBubbles
+
+  setTimeout(() => {
+    activeBubbles.value = []
+  }, 2000)
 }
 
 function getParticleStyle(index: number) {
@@ -221,50 +256,27 @@ defineExpose({
 
 .bubble {
   position: absolute;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
-}
-
-.cauldron-pot.bubbling .bubble {
-  animation: bubble-rise 3s ease-in-out infinite;
-}
-
-.bubble-1 {
-  width: 20px;
-  height: 20px;
-  bottom: 20%;
-  left: 30%;
-  animation-delay: 0s;
-}
-
-.bubble-2 {
-  width: 15px;
-  height: 15px;
-  bottom: 25%;
-  left: 55%;
-  animation-delay: 1s;
-}
-
-.bubble-3 {
-  width: 18px;
-  height: 18px;
-  bottom: 22%;
-  left: 70%;
-  animation-delay: 2s;
+  animation: bubble-rise 1.5s ease-out forwards;
 }
 
 @keyframes bubble-rise {
   0% {
-    transform: translateY(0) scale(1);
-    opacity: 0.3;
+    transform: translateY(0) scale(0.5);
+    opacity: 0;
   }
-  50% {
+  20% {
+    opacity: 0.6;
+  }
+  60% {
     opacity: 0.5;
+    transform: translateY(-80px) scale(0.9);
   }
   100% {
-    transform: translateY(-100px) scale(0.5);
+    transform: translateY(-120px) scale(0.4);
     opacity: 0;
   }
 }
