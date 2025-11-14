@@ -459,7 +459,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 2rem;
   position: relative;
-  min-height: 80vh;
+  min-height: 200vh;
 }
 
 .loading-state {
@@ -486,7 +486,7 @@ onUnmounted(() => {
 }
 
 .floating-ideas-container {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;

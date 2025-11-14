@@ -200,7 +200,7 @@ onMounted(() => {
 
 <style scoped>
 .floating-idea {
-  position: fixed;
+  position: absolute;
   width: 220px;
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
