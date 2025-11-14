@@ -1,6 +1,6 @@
 ## Commit Messages
 
-Always generate commit messages following conventional commit format.
+When user asks to commit, suggest a commit message following conventional commit format instead of running git commands.
 
 Format: `type(scope): description`
 

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Set up database schema for cauldron sessions
+- [x] 1. Set up database schema for cauldron sessions
   - Create migration file for cauldron_sessions table with id, userId, createdAt, ingredientIds, outputIdeaId, patterns fields
   - Create migration file for cauldron_ingredients table with id, sessionId, sourceType, sourceId, content, addedAt, order fields
   - Add isCauldronOutput and cauldronSessionId fields to savedIdeas table

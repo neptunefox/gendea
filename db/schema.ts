@@ -152,6 +152,8 @@ export const savedIdeas = pgTable('saved_ideas', {
   status: text('status', { enum: ['exploring', 'ready', 'building', 'done'] })
     .notNull()
     .default('exploring'),
+  isCauldronOutput: integer('is_cauldron_output').notNull().default(0),
+  cauldronSessionId: uuid('cauldron_session_id'),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })
 
@@ -179,4 +181,25 @@ export const sparkRuns = pgTable('spark_runs', {
   lenses: jsonb('lenses').$type<SparkRunLens[]>().notNull(),
   nudges: jsonb('nudges').$type<SparkRunNudge[]>().notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow()
+})
+
+export const cauldronSessions = pgTable('cauldron_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id').notNull(),
+  ingredientIds: jsonb('ingredient_ids').$type<string[]>().notNull().default([]),
+  outputIdeaId: uuid('output_idea_id'),
+  patterns: jsonb('patterns').$type<Record<string, unknown>>(),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
+
+export const cauldronIngredients = pgTable('cauldron_ingredients', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sessionId: uuid('session_id')
+    .notNull()
+    .references(() => cauldronSessions.id),
+  sourceType: text('source_type', { enum: ['saved', 'spark', 'user'] }).notNull(),
+  sourceId: uuid('source_id'),
+  content: text('content').notNull(),
+  order: integer('order').notNull(),
+  addedAt: timestamp('added_at').notNull().defaultNow()
 })

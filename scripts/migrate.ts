@@ -162,6 +162,39 @@ async function main() {
     );
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS cauldron_sessions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id TEXT NOT NULL,
+      ingredient_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+      output_idea_id UUID,
+      patterns JSONB,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS cauldron_ingredients (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      session_id UUID NOT NULL REFERENCES cauldron_sessions(id),
+      source_type TEXT NOT NULL,
+      source_id UUID,
+      content TEXT NOT NULL,
+      "order" INTEGER NOT NULL,
+      added_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS is_cauldron_output INTEGER NOT NULL DEFAULT 0;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS cauldron_session_id UUID;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()
