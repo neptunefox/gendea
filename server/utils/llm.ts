@@ -1,3 +1,5 @@
+import { useRuntimeConfig } from '#imports'
+
 interface LLMConfig {
   provider: 'ollama' | 'openrouter'
   model: string
@@ -67,12 +69,12 @@ class LLMService {
 
   private async ollamaChat(messages: LLMMessage[]): Promise<LLMResponse> {
     interface OllamaResponse {
-      message: { content: string }
+      message?: { content: string }
       prompt_eval_count?: number
       eval_count?: number
     }
 
-    const response = await $fetch<OllamaResponse>(`${this.config.baseURL}/api/chat`, {
+    const rawResponse = await $fetch<string>(`${this.config.baseURL}/api/chat`, {
       method: 'POST',
       body: {
         model: this.config.model,
@@ -84,8 +86,26 @@ class LLMService {
       }
     })
 
+    const response: OllamaResponse =
+      typeof rawResponse === 'string' ? JSON.parse(rawResponse) : rawResponse
+
+    if (!response.message?.content) {
+      throw new Error(`Invalid response from Ollama: missing message.content`)
+    }
+
+    let content = response.message.content
+
+    try {
+      const parsed = JSON.parse(content)
+      if (Array.isArray(parsed) && parsed.every(item => item.text)) {
+        content = JSON.stringify(parsed.map(item => ({ text: item.text })))
+      }
+    } catch {
+      // Content is not JSON, use as-is
+    }
+
     return {
-      content: response.message.content,
+      content,
       usage:
         response.prompt_eval_count || response.eval_count
           ? {

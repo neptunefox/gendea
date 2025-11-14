@@ -271,6 +271,16 @@ function buildNudges(topic: string): SparkNudge[] {
 
 function extractJson(raw: string): string {
   let cleanedResponse = raw.trim()
+
+  try {
+    const parsed = JSON.parse(cleanedResponse)
+    if (Array.isArray(parsed) && parsed.every(item => item.text)) {
+      return JSON.stringify(parsed.map(item => ({ text: item.text })))
+    }
+  } catch {
+    // Not valid JSON, continue with extraction
+  }
+
   cleanedResponse = cleanedResponse.replace(/```json\n?/gi, '').replace(/```\n?/g, '')
 
   const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/)
