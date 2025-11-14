@@ -10,7 +10,7 @@
         <Sparkles :size="20" />
       </NuxtLink>
       <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
-        <Wand :size="20" />
+        <FlaskConical :size="20" />
       </NuxtLink>
       <NuxtLink to="/history" class="nav-link" title="History">
         <Clock :size="20" />
@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { Sparkles, Wand, Clock } from 'lucide-vue-next'
+import { Sparkles, FlaskConical, Clock } from 'lucide-vue-next'
 </script>
 
 <style scoped>

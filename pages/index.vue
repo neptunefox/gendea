@@ -13,11 +13,11 @@
             v-for="(idea, index) in savedIdeas.slice(0, 8)"
             :key="idea.id"
             class="mini-pin"
-            :class="`mini-pin-${index % 8}`"
+            :class="[`mini-pin-${index % 8}`, { 'mini-pin-cauldron': idea.isCauldronOutput }]"
             :title="idea.text"
             @click="scrollToFullCollection"
           >
-            <div class="mini-tack" />
+            <div class="mini-tack" :class="{ 'mini-tack-cauldron': idea.isCauldronOutput }" />
             <div class="mini-pin-status" :data-status="idea.status" />
           </div>
           <button
@@ -77,6 +77,7 @@
             v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
             :key="idea.id"
             class="idea-card"
+            :class="{ 'cauldron-output': idea.isCauldronOutput }"
           >
             <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -88,6 +89,18 @@
                 />
               </svg>
             </button>
+            <div v-if="idea.isCauldronOutput" class="cauldron-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <path
+                  d="M8 12h8M12 8v8"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+              Cauldron mix
+            </div>
             <div class="idea-status" :data-status="idea.status">{{ idea.status }}</div>
             <p class="idea-text">{{ idea.text }}</p>
             <div class="idea-actions">
@@ -360,6 +373,8 @@ interface SavedIdea {
   text: string
   status: 'exploring' | 'ready' | 'building' | 'done'
   createdAt: string
+  isCauldronOutput?: number
+  cauldronSessionId?: string
 }
 
 const STORAGE_KEY = 'spark-thread-journal'
@@ -634,7 +649,11 @@ onUnmounted(() => {
 async function fetchSavedIdeas() {
   try {
     const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
-    savedIdeas.value = response.ideas
+    savedIdeas.value = response.ideas.sort((a, b) => {
+      if (a.isCauldronOutput && !b.isCauldronOutput) return -1
+      if (!a.isCauldronOutput && b.isCauldronOutput) return 1
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
   } catch (error) {
     console.error('Failed to fetch saved ideas:', error)
   }
@@ -822,6 +841,14 @@ watch(
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
+.mini-pin.mini-pin-cauldron {
+  background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
+  border: 2px solid #d4756f;
+  box-shadow:
+    0 4px 12px rgba(212, 117, 111, 0.2),
+    0 0 20px rgba(212, 117, 111, 0.1);
+}
+
 .mini-tack {
   position: absolute;
   top: -6px;
@@ -833,6 +860,31 @@ watch(
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(212, 117, 111, 0.4);
   z-index: 2;
+}
+
+.mini-tack.mini-tack-cauldron {
+  width: 14px;
+  height: 14px;
+  top: -7px;
+  background: linear-gradient(135deg, #d4756f 0%, #e08a7f 100%);
+  box-shadow:
+    0 2px 8px rgba(212, 117, 111, 0.6),
+    0 0 12px rgba(212, 117, 111, 0.3);
+  animation: mini-cauldron-glow 2s ease-in-out infinite;
+}
+
+@keyframes mini-cauldron-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 2px 8px rgba(212, 117, 111, 0.6),
+      0 0 12px rgba(212, 117, 111, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 2px 10px rgba(212, 117, 111, 0.8),
+      0 0 16px rgba(212, 117, 111, 0.5);
+  }
 }
 
 .mini-pin-status {
@@ -1097,6 +1149,14 @@ watch(
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
+.idea-card.cauldron-output {
+  background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
+  border: 2px solid #d4756f;
+  box-shadow:
+    0 8px 20px rgba(212, 117, 111, 0.2),
+    0 0 40px rgba(212, 117, 111, 0.1);
+}
+
 .idea-card::before {
   content: '';
   position: absolute;
@@ -1108,6 +1168,51 @@ watch(
   background: #d4756f;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(212, 117, 111, 0.5);
+}
+
+.idea-card.cauldron-output::before {
+  width: 18px;
+  height: 18px;
+  top: -10px;
+  background: linear-gradient(135deg, #d4756f 0%, #e08a7f 100%);
+  box-shadow:
+    0 3px 12px rgba(212, 117, 111, 0.6),
+    0 0 20px rgba(212, 117, 111, 0.3);
+  animation: cauldron-glow 2s ease-in-out infinite;
+}
+
+@keyframes cauldron-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 3px 12px rgba(212, 117, 111, 0.6),
+      0 0 20px rgba(212, 117, 111, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 3px 16px rgba(212, 117, 111, 0.8),
+      0 0 30px rgba(212, 117, 111, 0.5);
+  }
+}
+
+.cauldron-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: linear-gradient(135deg, rgba(212, 117, 111, 0.15), rgba(224, 138, 127, 0.15));
+  border: 1px solid rgba(212, 117, 111, 0.3);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #c26660;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cauldron-badge svg {
+  color: #d4756f;
 }
 
 .unpin-btn {
@@ -1191,6 +1296,42 @@ watch(
 .idea-card:nth-child(6n + 6):hover {
   transform: translateY(-2px) rotate(1.5deg);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 1):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 2):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 3):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 4):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 5):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
+}
+
+.idea-card.cauldron-output:nth-child(6n + 6):hover {
+  box-shadow:
+    0 12px 32px rgba(212, 117, 111, 0.3),
+    0 0 50px rgba(212, 117, 111, 0.15);
 }
 
 .idea-status {

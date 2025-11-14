@@ -3,7 +3,7 @@ import { db } from '../db'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { text, source, parentIdeaId, tags, status } = body
+  const { text, source, parentIdeaId, tags, status, isCauldronOutput, cauldronSessionId } = body
 
   if (!text || !source) {
     throw createError({
@@ -19,7 +19,9 @@ export default defineEventHandler(async event => {
       source,
       parentIdeaId: parentIdeaId || null,
       tags: tags || [],
-      status: status || 'exploring'
+      status: status || 'exploring',
+      isCauldronOutput: isCauldronOutput ? 1 : 0,
+      cauldronSessionId: cauldronSessionId || null
     })
     .returning()
 

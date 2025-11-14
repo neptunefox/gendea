@@ -323,7 +323,7 @@ async function handleReset() {
 }
 
 async function handleSaveOutput() {
-  if (!output.value) return
+  if (!output.value || !currentSession.value) return
 
   try {
     await $fetch('/api/saved-ideas', {
@@ -331,7 +331,9 @@ async function handleSaveOutput() {
       body: {
         text: output.value,
         source: 'cauldron',
-        status: 'exploring'
+        status: 'exploring',
+        isCauldronOutput: true,
+        cauldronSessionId: currentSession.value.id
       }
     })
 

@@ -94,7 +94,7 @@
   - Show output when mixing completes
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 12. Implement save and reset actions
+- [x] 12. Implement save and reset actions
   - Add save button to CauldronOutput component
   - Call API to save output to savedIdeas with special flags
   - Show success feedback when saved
@@ -103,7 +103,7 @@
   - Prevent individual ingredient removal
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 8.2, 8.3, 8.5_
 
-- [ ] 13. Add Cauldron Mode to navigation
+- [x] 13. Add Cauldron Mode to navigation
   - Add cauldron icon and link to main navigation component
   - Use appropriate icon that represents mixing/cauldron concept
   - Ensure navigation link is visible and accessible
