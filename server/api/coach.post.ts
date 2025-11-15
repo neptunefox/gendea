@@ -8,6 +8,78 @@ export default defineEventHandler(async event => {
 
   const llm = useLLMService()
 
+  if (mode === 'test-suggestions') {
+    const systemPrompt = `You are a research-backed coach helping users design tiny, honest tests.
+
+Return EXACT JSON format:
+{"tests":[
+  {"description":"test 1 description","successSignal":"measurable signal"},
+  {"description":"test 2 description","successSignal":"measurable signal"},
+  {"description":"test 3 description","successSignal":"measurable signal"}
+]}
+
+Rules:
+- Each test should take less than 1 hour and cost under $50
+- Tests must have clear, measurable success signals
+- Focus on gathering evidence, not building the full thing
+- Keep descriptions to 1-2 sentences max`
+
+    const userPrompt = `Idea: "${idea}"
+
+Generate 3 smallest honest tests to validate this idea.`
+
+    try {
+      const response = await llm.generate(userPrompt, systemPrompt)
+      const jsonMatch = response.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        throw new Error('Failed to parse test suggestions')
+      }
+
+      const parsed = JSON.parse(jsonMatch[0])
+      return { tests: parsed.tests || [] }
+    } catch (error) {
+      console.error('Test suggestions error:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Failed to generate test suggestions'
+      })
+    }
+  }
+
+  if (mode === 'reference-class') {
+    const systemPrompt = `You are providing outside-view base rates for similar projects.
+
+Return EXACT JSON format:
+{"baseRates":{
+  "timeToMilestone":"X-Y months",
+  "pivots":"X-Y pivots",
+  "successRate":"X%"
+}}
+
+Base estimates on typical indie/small team projects.`
+
+    const userPrompt = `Idea: "${idea}"
+
+What are typical base rates for similar projects?`
+
+    try {
+      const response = await llm.generate(userPrompt, systemPrompt)
+      const jsonMatch = response.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        throw new Error('Failed to parse base rates')
+      }
+
+      const parsed = JSON.parse(jsonMatch[0])
+      return { baseRates: parsed.baseRates || {} }
+    } catch (error) {
+      console.error('Reference class error:', error)
+      throw createError({
+        statusCode: 500,
+        message: 'Failed to generate base rates'
+      })
+    }
+  }
+
   if (mode === 'critique') {
     const systemPrompt = `You are a Coach agent providing constructive critique. Follow this scaffolding:
 

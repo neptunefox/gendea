@@ -107,7 +107,20 @@
               <button class="action-btn" @click="handleExploreIdea(idea.text)">
                 Generate more
               </button>
-              <button class="action-btn secondary" @click="openCoachPanel(idea.text)">Coach</button>
+              <button
+                v-if="idea.status === 'exploring' || idea.status === 'ready'"
+                class="action-btn primary"
+                @click="startBuilding(idea)"
+              >
+                Start building →
+              </button>
+              <button
+                v-else-if="idea.status === 'building'"
+                class="action-btn building"
+                @click="$router.push(`/coach/${idea.id}`)"
+              >
+                Continue building
+              </button>
             </div>
           </div>
         </transition-group>
@@ -182,13 +195,6 @@
                   >
                     <Split :size="18" />
                   </button>
-                  <button
-                    class="icon-action-btn"
-                    title="Open coach"
-                    @click="openCoachPanel(idea.text)"
-                  >
-                    <Sparkles :size="18" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -196,78 +202,6 @@
         </div>
       </section>
     </div>
-
-    <transition name="drawer">
-      <aside v-if="coachState.open" class="coach-panel glass">
-        <header class="coach-header">
-          <div>
-            <p class="coach-label">Idea coach</p>
-            <h3>{{ coachState.idea }}</h3>
-            <p v-if="coachState.lane" class="coach-lane">{{ coachState.lane }}</p>
-          </div>
-          <div class="coach-actions">
-            <button class="ghost small" :disabled="coachState.loading" @click="refreshCoachTips">
-              {{ coachState.loading ? 'Refreshing' : 'Refresh tips' }}
-            </button>
-            <button class="ghost icon" @click="closeCoachPanel">
-              <X :size="16" />
-            </button>
-          </div>
-        </header>
-
-        <div v-if="coachState.loading" class="coach-loading">
-          <Loader :size="20" class="spin" />
-          <p>Personalizing cues…</p>
-        </div>
-
-        <div v-else-if="coachState.error" class="coach-error">
-          <p>{{ coachState.error }}</p>
-          <button class="primary small" @click="refreshCoachTips">Try again</button>
-        </div>
-
-        <div v-else class="coach-body">
-          <div class="workspace-container">
-            <CoachWorkspace :idea="coachState.idea" :show-toast="showToastMessage" />
-          </div>
-          <details v-if="coachState.tips" class="coach-tips-toggle">
-            <summary>
-              <span>💡 Quick tips</span>
-              <span class="toggle-hint">Optional nudges</span>
-            </summary>
-            <div class="tips-container">
-              <p v-if="coachState.tips" class="coach-mantra">{{ coachState.tips.mantra }}</p>
-              <div class="coach-grid">
-                <article class="coach-card">
-                  <p class="coach-tag">Plan cue</p>
-                  <h4>{{ coachState.tips.plan.title }}</h4>
-                  <p class="coach-copy">{{ coachState.tips.plan.summary }}</p>
-                  <div class="coach-meta">
-                    <span>{{ coachState.tips.plan.action }}</span>
-                    <small
-                      >{{ coachState.tips.plan.when }} · {{ coachState.tips.plan.where }}</small
-                    >
-                  </div>
-                </article>
-
-                <article class="coach-card">
-                  <p class="coach-tag">Incubation</p>
-                  <h4>{{ coachState.tips.incubation.title }}</h4>
-                  <p class="coach-copy">{{ coachState.tips.incubation.summary }}</p>
-                  <p class="coach-meta">{{ coachState.tips.incubation.activity }}</p>
-                </article>
-
-                <article class="coach-card">
-                  <p class="coach-tag">Novelty</p>
-                  <h4>{{ coachState.tips.novelty.title }}</h4>
-                  <p class="coach-copy">{{ coachState.tips.novelty.summary }}</p>
-                  <p class="coach-meta">{{ coachState.tips.novelty.prompt }}</p>
-                </article>
-              </div>
-            </div>
-          </details>
-        </div>
-      </aside>
-    </transition>
 
     <transition name="toast">
       <div v-if="showToast" class="toast">
@@ -289,16 +223,12 @@ import {
   Lightbulb,
   Loader,
   Check,
-  Sparkles,
   BookmarkPlus,
-  X,
   CornerDownRight,
   Split
 } from 'lucide-vue-next'
-import { ref, computed, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-
-import CoachWorkspace from '../components/CoachWorkspace.vue'
 
 interface SparkIdea {
   text: string
@@ -332,32 +262,9 @@ interface JournalEntry {
   expanded?: boolean
 }
 
-interface CoachPlanSuggestion {
-  title: string
-  summary: string
-  action: string
-  when: string
-  where: string
-}
 
-interface CoachIncubationSuggestion {
-  title: string
-  summary: string
-  activity: string
-}
 
-interface CoachNoveltySuggestion {
-  title: string
-  summary: string
-  prompt: string
-}
 
-interface IdeaCoachTips {
-  plan: CoachPlanSuggestion
-  incubation: CoachIncubationSuggestion
-  novelty: CoachNoveltySuggestion
-  mantra: string
-}
 
 interface SparkRunRecord {
   id: string
@@ -391,21 +298,6 @@ const showAllIdeas = ref(false)
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
 const ideasCollectionSection = ref<HTMLElement | null>(null)
-const coachState = reactive<{
-  open: boolean
-  loading: boolean
-  idea: string
-  lane: string
-  tips: IdeaCoachTips | null
-  error: string
-}>({
-  open: false,
-  loading: false,
-  idea: '',
-  lane: '',
-  tips: null,
-  error: ''
-})
 
 const INPUT_HEIGHT_LIMIT = 100
 
@@ -693,44 +585,23 @@ async function resumeFromHistory(runId: string) {
   }
 }
 
-function closeCoachPanel() {
-  coachState.open = false
-}
-
-async function openCoachPanel(idea: string, lane?: string) {
-  const trimmed = idea.trim()
-  if (!trimmed) return
-  coachState.open = true
-  coachState.idea = trimmed
-  coachState.lane = lane ?? ''
-  coachState.tips = null
-  coachState.error = ''
-  await fetchCoachTips()
-}
-
-async function fetchCoachTips() {
-  if (!coachState.idea) return
-  coachState.loading = true
+async function startBuilding(idea: SavedIdea) {
   try {
-    const tips = await $fetch<IdeaCoachTips>('/api/coach', {
-      method: 'POST',
-      body: {
-        mode: 'idea-nudge',
-        idea: coachState.idea,
-        laneTitle: coachState.lane
-      }
+    await $fetch(`/api/saved-ideas/${idea.id}`, {
+      method: 'PATCH',
+      body: { status: 'building' }
     })
-    coachState.tips = tips
-  } catch (error) {
-    console.error('Failed to load coach tips', error)
-    coachState.error = 'Could not load nudges'
-  } finally {
-    coachState.loading = false
-  }
-}
 
-async function refreshCoachTips() {
-  await fetchCoachTips()
+    const index = savedIdeas.value.findIndex(i => i.id === idea.id)
+    if (index !== -1) {
+      savedIdeas.value[index].status = 'building'
+    }
+
+    await router.push(`/coach/${idea.id}`)
+  } catch (error) {
+    console.error('Failed to start building:', error)
+    showToastMessage('Failed to start building')
+  }
 }
 
 watch(
@@ -1395,13 +1266,28 @@ watch(
   transform: translateY(-1px);
 }
 
-.action-btn.secondary {
-  background: #f0e5e0;
-  color: #8a7566;
+.action-btn.primary {
+  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(246, 113, 118, 0.25);
 }
 
-.action-btn.secondary:hover {
-  background: #e8d5cf;
+.action-btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.35);
+}
+
+.action-btn.building {
+  background: linear-gradient(135deg, #ffd89b, #19547b);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(25, 84, 123, 0.25);
+}
+
+.action-btn.building:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 84, 123, 0.35);
 }
 
 .view-all-link {

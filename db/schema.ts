@@ -154,6 +154,20 @@ export const savedIdeas = pgTable('saved_ideas', {
     .default('exploring'),
   isCauldronOutput: integer('is_cauldron_output').notNull().default(0),
   cauldronSessionId: uuid('cauldron_session_id'),
+  northStar: text('north_star'),
+  testCommitment: jsonb('test_commitment').$type<{
+    description: string
+    when: string
+    where: string
+    successSignal: string
+    committedAt: string
+  }>(),
+  testResult: jsonb('test_result').$type<{
+    outcome: 'worked' | 'didnt-work' | 'didnt-try'
+    learnings?: string
+    completedAt: string
+  }>(),
+  dismissedNudges: jsonb('dismissed_nudges').$type<string[]>().default([]),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })
 

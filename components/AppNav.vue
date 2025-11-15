@@ -12,6 +12,9 @@
       <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
         <FlaskConical :size="20" />
       </NuxtLink>
+      <NuxtLink to="/coach" class="nav-link" title="Coach">
+        <Hammer :size="20" />
+      </NuxtLink>
       <NuxtLink to="/history" class="nav-link" title="History">
         <Clock :size="20" />
       </NuxtLink>
@@ -20,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { Sparkles, FlaskConical, Clock } from 'lucide-vue-next'
+import { Sparkles, FlaskConical, Hammer, Clock } from 'lucide-vue-next'
 </script>
 
 <style scoped>

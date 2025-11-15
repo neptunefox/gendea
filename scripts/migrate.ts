@@ -200,6 +200,26 @@ async function main() {
     ADD COLUMN IF NOT EXISTS output_text TEXT;
   `)
 
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS north_star TEXT;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS test_commitment JSONB;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS test_result JSONB;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS dismissed_nudges JSONB DEFAULT '[]'::jsonb;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

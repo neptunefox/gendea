@@ -54,7 +54,12 @@
           </div>
         </div>
 
-        <CauldronOutput :output="output" @save="handleSaveOutput" @reset="handleReset" />
+        <CauldronOutput
+          :output="output"
+          @save="handleSaveOutput"
+          @save-and-build="handleSaveAndBuild"
+          @reset="handleReset"
+        />
 
         <button v-if="ingredients.length > 0 && !output" class="reset-btn" @click="handleReset">
           Reset cauldron
@@ -385,6 +390,29 @@ async function handleSaveOutput() {
     await handleReset()
   } catch (error) {
     console.error('Failed to save output:', error)
+    showToastMessage('Failed to save')
+  }
+}
+
+async function handleSaveAndBuild() {
+  if (!output.value || !currentSession.value) return
+
+  try {
+    const response = await $fetch<{ idea: { id: string } }>('/api/saved-ideas', {
+      method: 'POST',
+      body: {
+        text: output.value,
+        source: 'cauldron',
+        status: 'building',
+        isCauldronOutput: true,
+        cauldronSessionId: currentSession.value.id
+      }
+    })
+
+    showToastMessage('Saved - starting to build')
+    await navigateTo(`/coach/${response.idea.id}`)
+  } catch (error) {
+    console.error('Failed to save and build:', error)
     showToastMessage('Failed to save')
   }
 }

@@ -10,9 +10,13 @@
           <h3 class="output-title">Your synthesized idea</h3>
           <p class="output-text">{{ output }}</p>
           <div class="output-actions">
-            <button class="action-btn primary" @click="$emit('save')">
+            <button class="action-btn secondary" @click="$emit('save')">
               <Save :size="18" />
-              Save to collection
+              Save
+            </button>
+            <button class="action-btn primary" @click="$emit('saveAndBuild')">
+              <Hammer :size="18" />
+              Save + Build
             </button>
             <button class="action-btn secondary" @click="$emit('reset')">
               <RotateCcw :size="18" />
@@ -26,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Save, RotateCcw } from 'lucide-vue-next'
+import { Save, RotateCcw, Hammer } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
 interface Props {
@@ -37,6 +41,7 @@ const props = defineProps<Props>()
 
 defineEmits<{
   save: []
+  saveAndBuild: []
   reset: []
 }>()
 
