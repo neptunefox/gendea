@@ -219,14 +219,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Lightbulb,
-  Loader,
-  Check,
-  BookmarkPlus,
-  CornerDownRight,
-  Split
-} from 'lucide-vue-next'
+import { Lightbulb, Loader, Check, BookmarkPlus, CornerDownRight, Split } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -261,10 +254,6 @@ interface JournalEntry {
   parentPrompt?: string
   expanded?: boolean
 }
-
-
-
-
 
 interface SparkRunRecord {
   id: string

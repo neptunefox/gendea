@@ -270,30 +270,32 @@ function buildNudges(topic: string): SparkNudge[] {
 }
 
 function extractJson(raw: string): string {
-  let cleanedResponse = raw.trim()
+  const cleanedResponse = raw
+    .trim()
+    .replace(/```json\n?/gi, '')
+    .replace(/```\n?/g, '')
 
   try {
-    const parsed = JSON.parse(cleanedResponse)
-    if (Array.isArray(parsed) && parsed.every(item => item.text)) {
-      return JSON.stringify(parsed.map(item => ({ text: item.text })))
+    // If the whole thing is valid JSON, just return it.
+    JSON.parse(cleanedResponse)
+    return cleanedResponse
+  } catch (e) {
+    // If parsing fails, it's likely because of extra text. Try to extract.
+    const objectMatch = cleanedResponse.match(/\{[\s\S]*\}/)
+    if (objectMatch) {
+      const sanitized = sanitizeJsonString(objectMatch[0])
+      return sanitized.replace(/,\s*(?=[}\]])/g, '')
     }
-  } catch {
-    // Not valid JSON, continue with extraction
+
+    const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/)
+    if (arrayMatch) {
+      const sanitized = sanitizeJsonString(arrayMatch[0])
+      return sanitized.replace(/,\s*(?=[}\]])/g, '')
+    }
+
+    // If we can't extract, return the original cleaned string for a more accurate error.
+    return cleanedResponse
   }
-
-  cleanedResponse = cleanedResponse.replace(/```json\n?/gi, '').replace(/```\n?/g, '')
-
-  const arrayMatch = cleanedResponse.match(/\[[\s\S]*\]/)
-  if (arrayMatch) {
-    return sanitizeJsonString(arrayMatch[0])
-  }
-
-  const objectMatch = cleanedResponse.match(/\{[\s\S]*\}/)
-  if (objectMatch) {
-    return sanitizeJsonString(objectMatch[0])
-  }
-
-  return sanitizeJsonString(cleanedResponse)
 }
 
 function sanitizeJsonString(jsonStr: string): string {
