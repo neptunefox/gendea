@@ -276,10 +276,9 @@ function extractJson(raw: string): string {
     .replace(/```\n?/g, '')
 
   try {
-    // If the whole thing is valid JSON, just return it.
     JSON.parse(cleanedResponse)
     return cleanedResponse
-  } catch (e) {
+  } catch {
     // If parsing fails, it's likely because of extra text. Try to extract.
     const objectMatch = cleanedResponse.match(/\{[\s\S]*\}/)
     if (objectMatch) {
