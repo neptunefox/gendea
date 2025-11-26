@@ -1,79 +1,145 @@
 import {
+  SPARK_CORE_IDEAS_SYSTEM_PROMPT,
+  SPARK_LENS_SYSTEM_PROMPT,
+  CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
+  CANVAS_EXPAND_SYSTEM_PROMPT,
+  CANVAS_TIDY_UP_SYSTEM_PROMPT,
+  CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
+  PROACTIVE_QUESTION_SYSTEM_PROMPT,
+  PROACTIVE_TOOL_SYSTEM_PROMPT,
+  buildSparkCoreIdeasPrompt,
+  buildSparkLensPrompt,
+  buildCauldronSynthesisPrompt,
+  buildCanvasExpandPrompt,
+  buildCanvasTidyUpPrompt,
+  buildCanvasConnectionLabelPrompt,
+  buildProactiveQuestionPrompt,
+  buildProactiveToolPrompt,
+  formatSparkHistory
+} from './langchain-prompts'
+import {
   SparkCoreIdeasSchema,
   SparkLensSchema,
   CauldronOutputSchema,
   CanvasExpandSchema,
-  ProactiveQuestionSchema
+  CanvasTidyUpSchema,
+  CanvasConnectionLabelSchema,
+  ProactiveQuestionSchema,
+  ProactiveToolSchema
 } from './langchain-schemas'
 import { useLangChainService } from './langchain-service'
+import type { SparkHistoryEntry } from './langchain-types'
 
-export async function exampleSparkGeneration(topic: string) {
+export async function generateSparkCoreIdeas(topic: string, history: SparkHistoryEntry[] = []) {
   const langchain = useLangChainService()
+  const historyText = formatSparkHistory(history)
 
   const result = await langchain.generateStructured({
-    prompt: `Generate 5-6 diverse, specific, actionable ideas for: "${topic}"`,
-    systemPrompt: `You are a creative ideation assistant. Generate diverse, specific, actionable ideas.
-Each idea must be specific and actionable (1-2 sentences max).
-Vary the approach (practical, creative, unconventional).`,
+    prompt: buildSparkCoreIdeasPrompt(topic, historyText),
+    systemPrompt: SPARK_CORE_IDEAS_SYSTEM_PROMPT,
     schema: SparkCoreIdeasSchema
   })
 
   return result
 }
 
-export async function exampleLensGeneration(topic: string, lensPrompt: string) {
+export async function generateSparkLens(
+  topic: string,
+  lensId: string,
+  history: SparkHistoryEntry[] = []
+) {
   const langchain = useLangChainService()
+  const historyText = formatSparkHistory(history)
+  const prompt = buildSparkLensPrompt(topic, lensId, historyText)
+
+  if (!prompt) {
+    throw new Error(`Unknown lens: ${lensId}`)
+  }
 
   const result = await langchain.generateStructured({
-    prompt: lensPrompt,
-    systemPrompt: `You are a creative partner who outputs strict JSON.
-Ideas should be punchy (max 2 sentences) and tailored to the instructions.`,
+    prompt,
+    systemPrompt: SPARK_LENS_SYSTEM_PROMPT,
     schema: SparkLensSchema
   })
 
   return result
 }
 
-export async function exampleCauldronSynthesis(ingredients: string[]) {
+export async function generateCauldronSynthesis(ingredients: Array<{ content: string }>) {
   const langchain = useLangChainService()
 
-  const ingredientsList = ingredients.map((ing, idx) => `${idx + 1}. ${ing}`).join('\n')
-
   const result = await langchain.generateStructured({
-    prompt: `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling idea:\n\n${ingredientsList}`,
-    systemPrompt: `You are a convergent synthesis assistant. Analyze patterns across multiple ideas and synthesize them into ONE compelling, actionable idea.
-The synthesis should be 2-3 sentences that capture the deeper pattern.`,
+    prompt: buildCauldronSynthesisPrompt(ingredients),
+    systemPrompt: CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
     schema: CauldronOutputSchema
   })
 
   return result
 }
 
-export async function exampleCanvasExpand(nodeContent: string) {
+export async function generateCanvasExpand(nodeContent: string, nodeType: string = 'idea') {
   const langchain = useLangChainService()
 
   const result = await langchain.generateStructured({
-    prompt: `Expand this idea into 3-5 related subtasks or concepts: "${nodeContent}"`,
-    systemPrompt: `You are a planning assistant. Generate related nodes that break down or expand the given idea.`,
+    prompt: buildCanvasExpandPrompt(nodeContent, nodeType),
+    systemPrompt: CANVAS_EXPAND_SYSTEM_PROMPT,
     schema: CanvasExpandSchema
   })
 
   return result
 }
 
-export async function exampleProactiveQuestion(nodeContent: string) {
+export async function generateCanvasTidyUp(
+  nodes: Array<{ id: string; type: string; content: string }>
+) {
   const langchain = useLangChainService()
 
   const result = await langchain.generateStructured({
-    prompt: `Analyze this idea and determine if it needs clarification: "${nodeContent}"`,
-    systemPrompt: `You are a proactive assistant. Determine if the idea is vague and needs clarifying questions.`,
+    prompt: buildCanvasTidyUpPrompt(nodes),
+    systemPrompt: CANVAS_TIDY_UP_SYSTEM_PROMPT,
+    schema: CanvasTidyUpSchema
+  })
+
+  return result
+}
+
+export async function generateCanvasConnectionLabel(sourceContent: string, targetContent: string) {
+  const langchain = useLangChainService()
+
+  const result = await langchain.generateStructured({
+    prompt: buildCanvasConnectionLabelPrompt(sourceContent, targetContent),
+    systemPrompt: CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
+    schema: CanvasConnectionLabelSchema
+  })
+
+  return result
+}
+
+export async function generateProactiveQuestion(nodeContent: string, nodeType: string = 'idea') {
+  const langchain = useLangChainService()
+
+  const result = await langchain.generateStructured({
+    prompt: buildProactiveQuestionPrompt(nodeContent, nodeType),
+    systemPrompt: PROACTIVE_QUESTION_SYSTEM_PROMPT,
     schema: ProactiveQuestionSchema
   })
 
   return result
 }
 
-export async function exampleWithContext(topic: string, previousIdeas: string[]) {
+export async function generateProactiveTool(nodeContent: string) {
+  const langchain = useLangChainService()
+
+  const result = await langchain.generateStructured({
+    prompt: buildProactiveToolPrompt(nodeContent),
+    systemPrompt: PROACTIVE_TOOL_SYSTEM_PROMPT,
+    schema: ProactiveToolSchema
+  })
+
+  return result
+}
+
+export async function generateWithContext(topic: string, previousIdeas: string[]) {
   const langchain = useLangChainService()
 
   const context = previousIdeas.map((idea, idx) => ({
@@ -82,8 +148,8 @@ export async function exampleWithContext(topic: string, previousIdeas: string[])
   }))
 
   const result = await langchain.generateStructured({
-    prompt: `Generate new ideas for "${topic}" that are different from the previous ones.`,
-    systemPrompt: 'You are a creative ideation assistant.',
+    prompt: buildSparkCoreIdeasPrompt(topic, previousIdeas.join('\n')),
+    systemPrompt: SPARK_CORE_IDEAS_SYSTEM_PROMPT,
     schema: SparkCoreIdeasSchema,
     context
   })
@@ -91,7 +157,7 @@ export async function exampleWithContext(topic: string, previousIdeas: string[])
   return result
 }
 
-export async function exampleWithFallback(topic: string) {
+export async function generateWithFallback(topic: string) {
   const langchain = useLangChainService()
 
   const fallback = {
@@ -100,7 +166,8 @@ export async function exampleWithFallback(topic: string) {
 
   const result = await langchain.generateWithFallback(
     {
-      prompt: `Synthesize: ${topic}`,
+      prompt: buildCauldronSynthesisPrompt([{ content: topic }]),
+      systemPrompt: CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
       schema: CauldronOutputSchema
     },
     fallback

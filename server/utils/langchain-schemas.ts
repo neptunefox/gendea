@@ -1,39 +1,72 @@
 import { z } from 'zod'
 
 export const SparkIdeaSchema = z.object({
-  text: z.string().min(10).describe('A specific, actionable idea (1-2 sentences)')
+  text: z
+    .string()
+    .min(10)
+    .describe('A specific, actionable idea (1-2 sentences, minimum 10 characters)')
 })
 
-export const SparkCoreIdeasSchema = z.array(SparkIdeaSchema).min(5).max(6)
+export const SparkCoreIdeasSchema = z
+  .array(SparkIdeaSchema)
+  .min(5)
+  .max(6)
+  .describe('Array of 5-6 diverse, specific, actionable ideas')
 
 export const SparkLensSchema = z.object({
   ideas: z
     .array(z.string().min(10))
     .length(2)
-    .describe('Two specific ideas following the lens constraints'),
-  anchor: z.string().min(10).describe('One sentence explaining the reframing or insight')
+    .describe('Exactly two specific ideas following the lens constraints (each min 10 chars)'),
+  anchor: z
+    .string()
+    .min(10)
+    .describe('One sentence explaining the reframing or insight (min 10 chars)')
 })
 
 export const CauldronOutputSchema = z.object({
   synthesis: z
     .string()
     .min(50)
-    .describe('A compelling, actionable synthesized idea (2-3 sentences)')
+    .describe(
+      'A compelling, actionable synthesized idea capturing the deeper pattern (2-3 sentences, min 50 chars)'
+    )
 })
 
 export const CanvasNodeSchema = z.object({
   type: z
     .enum(['sticky', 'shape', 'text', 'input', 'tool', 'task', 'idea', 'goal'])
-    .describe('The type of canvas node'),
-  content: z.string().describe('The main content or text of the node'),
+    .describe(
+      'Node type: sticky (note), shape (visual), text (block), input (question), tool (resource), task (action), idea (concept), goal (target)'
+    ),
+  content: z.string().min(1).describe('The main content or text of the node'),
   metadata: z
     .object({
-      color: z.string().optional(),
-      icon: z.string().optional(),
-      link: z.string().optional(),
-      completed: z.boolean().optional()
+      color: z.string().optional().describe('Node color (hex or named)'),
+      icon: z.string().optional().describe('Icon identifier'),
+      link: z.string().optional().describe('URL for tool nodes'),
+      completed: z.boolean().optional().describe('Completion status for task nodes')
     })
     .optional()
+    .describe('Optional styling and state metadata')
+})
+
+export const CanvasConnectionSchema = z.object({
+  sourceIndex: z
+    .number()
+    .int()
+    .min(0)
+    .describe('Index of source node (0 = original node being expanded)'),
+  targetIndex: z
+    .number()
+    .int()
+    .min(1)
+    .describe('Index of target node in the generated nodes array (1-based)'),
+  relationship: z
+    .enum(['leads_to', 'requires', 'blocks', 'relates_to'])
+    .describe(
+      'Relationship type: leads_to (sequential), requires (prerequisite), blocks (dependency), relates_to (conceptual)'
+    )
 })
 
 export const CanvasExpandSchema = z.object({
@@ -41,50 +74,70 @@ export const CanvasExpandSchema = z.object({
     .array(CanvasNodeSchema)
     .min(3)
     .max(5)
-    .describe('3-5 related nodes connected to the original'),
+    .describe('3-5 related nodes that expand on the original idea'),
   connections: z
-    .array(
-      z.object({
-        sourceIndex: z.number().describe('Index of source node (0 = original node)'),
-        targetIndex: z.number().describe('Index of target node in the nodes array'),
-        relationship: z
-          .enum(['leads_to', 'requires', 'blocks', 'relates_to'])
-          .describe('Type of relationship')
-      })
+    .array(CanvasConnectionSchema)
+    .min(1)
+    .describe('Connections linking the original node (index 0) to generated nodes')
+})
+
+export const CanvasClusterSchema = z.object({
+  name: z.string().min(1).describe('Descriptive name for the cluster or flow'),
+  nodeIds: z.array(z.string()).min(1).describe('IDs of nodes belonging to this cluster'),
+  layout: z
+    .enum(['grid', 'linear', 'radial'])
+    .describe(
+      'Layout pattern: grid (related but independent), linear (sequential), radial (central with satellites)'
     )
-    .describe('Connections between nodes')
 })
 
 export const CanvasTidyUpSchema = z.object({
   clusters: z
-    .array(
-      z.object({
-        name: z.string().describe('Name of the cluster or flow'),
-        nodeIds: z.array(z.string()).describe('IDs of nodes in this cluster'),
-        layout: z.enum(['grid', 'linear', 'radial']).describe('Suggested layout pattern')
-      })
-    )
-    .describe('Organized clusters of nodes')
+    .array(CanvasClusterSchema)
+    .min(1)
+    .describe('Organized clusters grouping related nodes by theme, sequence, or dependency')
 })
 
 export const CanvasConnectionLabelSchema = z.object({
-  label: z.string().min(3).max(50).describe('Suggested label for the connection'),
+  label: z.string().min(3).max(50).describe('Concise label describing the connection (3-50 chars)'),
   relationship: z
     .enum(['leads_to', 'requires', 'blocks', 'relates_to'])
-    .describe('Suggested relationship type')
+    .describe(
+      'Relationship type: leads_to (progression), requires (prerequisite), blocks (blocker), relates_to (association)'
+    )
 })
 
 export const ProactiveQuestionSchema = z.object({
-  shouldAsk: z.boolean().describe('Whether a clarifying question should be asked'),
-  question: z.string().optional().describe('The clarifying question to ask'),
-  reason: z.string().optional().describe('Why this question would be helpful')
+  shouldAsk: z
+    .boolean()
+    .describe('True if the idea is too vague and needs clarification, false otherwise'),
+  question: z
+    .string()
+    .optional()
+    .describe('The clarifying question to ask (required if shouldAsk is true)'),
+  reason: z
+    .string()
+    .optional()
+    .describe('Brief explanation of why this question helps (required if shouldAsk is true)')
 })
 
 export const ProactiveToolSchema = z.object({
-  shouldSuggest: z.boolean().describe('Whether a tool should be suggested'),
-  toolName: z.string().optional().describe('Name of the suggested tool'),
-  toolLink: z.string().optional().describe('Link to the tool'),
-  reason: z.string().optional().describe('Why this tool would be helpful')
+  shouldSuggest: z
+    .boolean()
+    .describe('True if a specific tool would significantly help, false otherwise'),
+  toolName: z
+    .string()
+    .optional()
+    .describe('Name of the suggested tool (required if shouldSuggest is true)'),
+  toolLink: z
+    .string()
+    .url()
+    .optional()
+    .describe('URL to the tool (required if shouldSuggest is true)'),
+  reason: z
+    .string()
+    .optional()
+    .describe('Brief explanation of why this tool helps (required if shouldSuggest is true)')
 })
 
 export type SparkIdea = z.infer<typeof SparkIdeaSchema>
@@ -92,7 +145,9 @@ export type SparkCoreIdeas = z.infer<typeof SparkCoreIdeasSchema>
 export type SparkLens = z.infer<typeof SparkLensSchema>
 export type CauldronOutput = z.infer<typeof CauldronOutputSchema>
 export type CanvasNode = z.infer<typeof CanvasNodeSchema>
+export type CanvasConnection = z.infer<typeof CanvasConnectionSchema>
 export type CanvasExpand = z.infer<typeof CanvasExpandSchema>
+export type CanvasCluster = z.infer<typeof CanvasClusterSchema>
 export type CanvasTidyUp = z.infer<typeof CanvasTidyUpSchema>
 export type CanvasConnectionLabel = z.infer<typeof CanvasConnectionLabelSchema>
 export type ProactiveQuestion = z.infer<typeof ProactiveQuestionSchema>

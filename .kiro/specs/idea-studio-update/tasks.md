@@ -8,7 +8,7 @@
   - Ensure compatibility with existing LLM provider configuration (OpenRouter/Ollama)
   - _Requirements: 1.1, 1.5, 1.6, 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 2. Rewrite AI prompts for LangChain structured outputs
+- [x] 2. Rewrite AI prompts for LangChain structured outputs
   - Rewrite Spark generation prompt with explicit JSON schema definitions
   - Rewrite Cauldron mixing prompt with synthesis pattern instructions
   - Create Canvas AI action prompts (Expand, Tidy Up, Suggest)
