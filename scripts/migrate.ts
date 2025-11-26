@@ -225,6 +225,42 @@ async function main() {
     ALTER COLUMN source_id TYPE TEXT USING source_id::TEXT;
   `)
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS canvas_nodes (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id UUID NOT NULL,
+      type TEXT NOT NULL,
+      position JSONB NOT NULL,
+      data JSONB NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS canvas_edges (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id UUID NOT NULL,
+      source_id UUID NOT NULL,
+      target_id UUID NOT NULL,
+      type TEXT,
+      label TEXT,
+      style JSONB,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS canvas_state (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id UUID NOT NULL UNIQUE,
+      viewport_x INTEGER NOT NULL DEFAULT 0,
+      viewport_y INTEGER NOT NULL DEFAULT 0,
+      zoom INTEGER NOT NULL DEFAULT 1,
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

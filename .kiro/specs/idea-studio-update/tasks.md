@@ -47,7 +47,7 @@
   - Configure infinite canvas with zoom and pan
   - _Requirements: 5.1, 5.2_
 
-- [ ] 7. Create Canvas database schema
+- [x] 7. Create Canvas database schema
   - Add canvas_nodes table (id, project_id, type, position, data, created_at, updated_at)
   - Add canvas_edges table (id, project_id, source_id, target_id, type, label, style, created_at)
   - Add canvas_state table (id, project_id, viewport_x, viewport_y, zoom, updated_at)

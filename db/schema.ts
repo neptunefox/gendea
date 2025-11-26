@@ -218,3 +218,33 @@ export const cauldronIngredients = pgTable('cauldron_ingredients', {
   order: integer('order').notNull(),
   addedAt: timestamp('added_at').notNull().defaultNow()
 })
+
+export const canvasNodes = pgTable('canvas_nodes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull(),
+  type: text('type').notNull(),
+  position: jsonb('position').$type<{ x: number; y: number }>().notNull(),
+  data: jsonb('data').$type<Record<string, unknown>>().notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
+
+export const canvasEdges = pgTable('canvas_edges', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull(),
+  sourceId: uuid('source_id').notNull(),
+  targetId: uuid('target_id').notNull(),
+  type: text('type'),
+  label: text('label'),
+  style: jsonb('style').$type<Record<string, unknown>>(),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
+
+export const canvasState = pgTable('canvas_state', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  projectId: uuid('project_id').notNull().unique(),
+  viewportX: integer('viewport_x').notNull().default(0),
+  viewportY: integer('viewport_y').notNull().default(0),
+  zoom: integer('zoom').notNull().default(1),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
