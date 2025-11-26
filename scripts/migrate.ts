@@ -178,7 +178,7 @@ async function main() {
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       session_id UUID NOT NULL REFERENCES cauldron_sessions(id),
       source_type TEXT NOT NULL,
-      source_id UUID,
+      source_id TEXT,
       content TEXT NOT NULL,
       "order" INTEGER NOT NULL,
       added_at TIMESTAMP NOT NULL DEFAULT NOW()
@@ -218,6 +218,11 @@ async function main() {
   await db.execute(sql`
     ALTER TABLE saved_ideas 
     ADD COLUMN IF NOT EXISTS dismissed_nudges JSONB DEFAULT '[]'::jsonb;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE cauldron_ingredients 
+    ALTER COLUMN source_id TYPE TEXT USING source_id::TEXT;
   `)
 
   console.log('[SUCCESS] Tables created successfully!')
