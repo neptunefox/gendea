@@ -33,7 +33,7 @@
   - Mark Cauldron outputs in collection with special indicator
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 5. Migrate Cauldron page to use LangChain service
+- [x] 5. Migrate Cauldron page to use LangChain service
   - Replace existing mixing logic with LangChain service
   - Update API endpoint to use structured output parser
   - Ensure output conforms to defined schema

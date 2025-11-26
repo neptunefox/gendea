@@ -3,7 +3,9 @@ import { createError } from 'h3'
 
 import { cauldronIngredients, cauldronSessions } from '../../../db/schema'
 import { db } from '../../db'
-import { useLLMService } from '../../utils/llm'
+import { useLangChainService } from '../../utils/langchain-service'
+import { CauldronOutputSchema } from '../../utils/langchain-schemas'
+import { CAULDRON_SYNTHESIS_SYSTEM_PROMPT, buildCauldronSynthesisPrompt } from '../../utils/langchain-prompts'
 import { validateRequired, validateUUID } from '../../utils/validation'
 
 export default defineEventHandler(async event => {
@@ -51,35 +53,18 @@ export default defineEventHandler(async event => {
 async function synthesizeIdeas(
   ingredients: Array<{ content: string; order: number }>
 ): Promise<string> {
-  const llm = useLLMService()
+  const langchain = useLangChainService()
 
-  const systemPrompt = `You are a convergent synthesis assistant. Your role is to analyze patterns across multiple ideas and synthesize them into ONE compelling, actionable idea.
-
-CRITICAL: Respond with ONLY the synthesized idea text. No explanations, no markdown, no extra formatting.
-
-Process:
-1. Identify common themes, patterns, and connections across ALL ingredients
-2. Find the deeper underlying interest or direction these ingredients point toward
-3. Synthesize into ONE cohesive, actionable idea that captures the essence
-
-Rules:
-- Analyze patterns within the provided ingredients only
-- Don't just combine ideas - find what they reveal about the user's interests
-- Keep it specific and actionable (2-3 sentences max)
-- Make it compelling and ready to act on
-- The output should feel like a natural evolution of the ingredients`
-
-  const ingredientsList = ingredients.map((ing, idx) => `${idx + 1}. ${ing.content}`).join('\n')
-
-  const userPrompt = `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling idea:
-
-${ingredientsList}
-
-What themes, interests, or directions do these ingredients reveal? Create a synthesis that captures the deeper pattern.`
+  const prompt = buildCauldronSynthesisPrompt(ingredients)
 
   try {
-    const response = await llm.generate(userPrompt, systemPrompt)
-    return response.trim()
+    const result = await langchain.generateStructured({
+      prompt,
+      systemPrompt: CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
+      schema: CauldronOutputSchema
+    })
+
+    return result.synthesis
   } catch (error) {
     console.error('Failed to synthesize ideas:', error)
     throw createError({
