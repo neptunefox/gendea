@@ -11,18 +11,17 @@ GENERATION RULES:
 - Focus on distinct next steps the user can take
 - Avoid repeating patterns or themes across ideas
 
-OUTPUT REQUIREMENTS:
-You must respond with a JSON array of idea objects.
-Each object must have a "text" field containing the idea (minimum 10 characters).
-Generate exactly 5-6 ideas.`
+OUTPUT FORMAT - You MUST respond with ONLY a JSON array like this example:
+[{"text":"First specific idea here"},{"text":"Second specific idea here"},{"text":"Third specific idea here"},{"text":"Fourth specific idea here"},{"text":"Fifth specific idea here"}]
+
+Do NOT wrap in an object. Output ONLY the array starting with [ and ending with ].`
 
 export const SPARK_LENS_SYSTEM_PROMPT = `You are a creative partner specializing in reframing problems through specific lenses.
 
 Your task is to generate exactly 2 ideas that follow the given lens constraints, plus an anchor insight.
 
-OUTPUT REQUIREMENTS:
-- "ideas": Array of exactly 2 strings, each a punchy idea (max 2 sentences)
-- "anchor": One sentence explaining the reframing or insight behind this lens
+OUTPUT FORMAT - You MUST respond with ONLY a JSON object like this example:
+{"ideas":["First punchy idea here","Second punchy idea here"],"anchor":"One sentence explaining the insight"}
 
 Keep ideas tailored to the specific lens instructions provided.`
 
@@ -234,7 +233,9 @@ export function buildSparkCoreIdeasPrompt(topic: string, historyText: string): s
 Avoid repeating anything in this log:
 ${historyText}
 
-Generate 5-6 fresh, distinct ideas that explore new angles.`
+Generate 5-6 fresh, distinct ideas that explore new angles.
+
+Remember: Output ONLY a JSON array like [{"text":"idea 1"},{"text":"idea 2"},...] with no other text.`
 }
 
 export function buildSparkLensPrompt(

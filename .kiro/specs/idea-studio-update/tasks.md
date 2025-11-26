@@ -16,7 +16,7 @@
   - Add context history formatting utilities
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 19.1, 19.2, 19.3, 19.4_
 
-- [ ] 3. Migrate Spark page to use LangChain service
+- [x] 3. Migrate Spark page to use LangChain service
   - Replace existing LLM calls with LangChain service
   - Update API endpoint to use structured output parsers
   - Implement multi-select for ideas with Branch/Reply actions

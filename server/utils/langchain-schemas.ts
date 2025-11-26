@@ -140,9 +140,8 @@ export const ProactiveToolSchema = z.object({
     .describe('Brief explanation of why this tool helps (required if shouldSuggest is true)')
 })
 
-export type SparkIdea = z.infer<typeof SparkIdeaSchema>
 export type SparkCoreIdeas = z.infer<typeof SparkCoreIdeasSchema>
-export type SparkLens = z.infer<typeof SparkLensSchema>
+export type SparkLensOutput = z.infer<typeof SparkLensSchema>
 export type CauldronOutput = z.infer<typeof CauldronOutputSchema>
 export type CanvasNode = z.infer<typeof CanvasNodeSchema>
 export type CanvasConnection = z.infer<typeof CanvasConnectionSchema>
