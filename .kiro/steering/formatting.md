@@ -1,3 +1,7 @@
+---
+inclusion: manual
+---
+
 ## Formatting and Linting
 
 - After making code changes, run: `bun run format && bun run lint:fix`
