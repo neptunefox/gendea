@@ -12,7 +12,11 @@
       </div>
     </header>
 
-    <div class="canvas-container">
+    <div v-if="isLoading" class="loading-state">
+      <p>Loading canvas...</p>
+    </div>
+
+    <div v-else class="canvas-container">
       <VueFlow
         v-model="elements"
         :default-viewport="viewport"
@@ -28,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { VueFlow, type Viewport } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -40,6 +44,7 @@ const router = useRouter()
 const projectId = computed(() => route.params.id as string)
 
 const elements = ref([])
+const isLoading = ref(true)
 
 const viewport = ref<Viewport>({
   x: 0,
@@ -47,8 +52,74 @@ const viewport = ref<Viewport>({
   zoom: 1
 })
 
+let viewportSaveTimeout: NodeJS.Timeout | null = null
+
+async function loadCanvas() {
+  if (!projectId.value) return
+
+  try {
+    const data = await $fetch(`/api/canvas/${projectId.value}`)
+    
+    const nodes = data.nodes.map((node: any) => ({
+      id: node.id,
+      type: node.type,
+      position: node.position,
+      data: node.data
+    }))
+
+    const edges = data.edges.map((edge: any) => ({
+      id: edge.id,
+      source: edge.sourceId,
+      target: edge.targetId,
+      type: edge.type,
+      label: edge.label,
+      style: edge.style
+    }))
+
+    elements.value = [...nodes, ...edges]
+
+    if (data.state) {
+      viewport.value = {
+        x: data.state.viewportX,
+        y: data.state.viewportY,
+        zoom: data.state.zoom
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load canvas:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 function handleViewportChange(newViewport: Viewport) {
   viewport.value = newViewport
+
+  if (viewportSaveTimeout) {
+    clearTimeout(viewportSaveTimeout)
+  }
+
+  viewportSaveTimeout = setTimeout(() => {
+    saveViewport(newViewport)
+  }, 500)
+}
+
+async function saveViewport(vp: Viewport) {
+  if (!projectId.value) return
+
+  try {
+    await $fetch('/api/canvas/state', {
+      method: 'PUT',
+      body: {
+        projectId: projectId.value,
+        viewportX: Math.round(vp.x),
+        viewportY: Math.round(vp.y),
+        zoom: vp.zoom
+      }
+    })
+  } catch (error) {
+    console.error('Failed to save viewport:', error)
+  }
 }
 
 function navigateToCoach() {
@@ -56,6 +127,10 @@ function navigateToCoach() {
     router.push(`/coach/${projectId.value}`)
   }
 }
+
+onMounted(() => {
+  loadCanvas()
+})
 </script>
 
 <style scoped>
@@ -118,6 +193,15 @@ function navigateToCoach() {
   background: #c26660;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(212, 117, 111, 0.3);
+}
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b7a75;
+  font-size: 0.9375rem;
 }
 
 .canvas-container {

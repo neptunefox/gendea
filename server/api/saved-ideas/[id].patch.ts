@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { savedIdeas } from '../../../db/schema'
+import { savedIdeas, canvasState } from '../../../db/schema'
 import { db } from '../../db'
 
 export default defineEventHandler(async event => {
@@ -39,9 +39,27 @@ export default defineEventHandler(async event => {
   }
 
   try {
+    const [current] = await db.select().from(savedIdeas).where(eq(savedIdeas.id, id))
+
     await db.update(savedIdeas).set(updateData).where(eq(savedIdeas.id, id))
 
     const [updated] = await db.select().from(savedIdeas).where(eq(savedIdeas.id, id))
+
+    if (body.status === 'building' && current?.status !== 'building') {
+      const [existingCanvas] = await db
+        .select()
+        .from(canvasState)
+        .where(eq(canvasState.projectId, id))
+
+      if (!existingCanvas) {
+        await db.insert(canvasState).values({
+          projectId: id,
+          viewportX: 0,
+          viewportY: 0,
+          zoom: 1
+        })
+      }
+    }
 
     return { idea: updated }
   } catch (error) {

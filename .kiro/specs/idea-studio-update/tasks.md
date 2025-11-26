@@ -54,7 +54,7 @@
   - Add migration script
   - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-- [ ] 8. Implement Canvas-Project relationship
+- [x] 8. Implement Canvas-Project relationship
   - Create Canvas instance when idea status changes to "building"
   - Add Canvas route with project ID parameter
   - Create API endpoints for Canvas CRUD operations

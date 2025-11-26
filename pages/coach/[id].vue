@@ -31,6 +31,7 @@
         </div>
 
         <div class="context-actions">
+          <button class="ghost-btn" @click="navigateToCanvas">Switch to Canvas</button>
           <button class="ghost-btn" @click="backToExploring">← Back to exploring</button>
         </div>
       </aside>
@@ -182,6 +183,11 @@ async function saveNorthStar() {
     console.error('Failed to save north star:', error)
     showToastMessage('Failed to save')
   }
+}
+
+function navigateToCanvas() {
+  const ideaId = route.params.id as string
+  router.push(`/canvas/${ideaId}`)
 }
 
 async function backToExploring() {
