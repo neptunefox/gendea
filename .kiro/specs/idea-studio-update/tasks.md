@@ -39,7 +39,7 @@
   - Ensure output conforms to defined schema
   - _Requirements: 1.3, 2.1_
 
-- [ ] 6. Install and configure Vue Flow
+- [x] 6. Install and configure Vue Flow
   - Add @vue-flow/core dependency
   - Add @vue-flow/background dependency
   - Add @vue-flow/controls dependency
