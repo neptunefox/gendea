@@ -1,5 +1,12 @@
 <template>
   <div class="coach-workspace">
+    <FlowGuidanceBanner
+      :suggestion="flowGuidance.currentSuggestion.value"
+      :is-visible="flowGuidance.isVisible.value"
+      @dismiss="flowGuidance.dismissSuggestion()"
+      @action="handleFlowGuidanceAction"
+    />
+
     <div v-if="isLoading" class="loading-state">
       <Loader :size="32" class="spin" />
       <p>Loading workspace...</p>
@@ -115,7 +122,9 @@ import { ArrowLeft, Loader, Check, LayoutGrid } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import CanvasPlanProgress from '~/components/coach/CanvasPlanProgress.vue'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
 import CommitPhase from '~/components/coach/CommitPhase.vue'
 import LearnPhase from '~/components/coach/LearnPhase.vue'
 import PreMortemTool from '~/components/coach/PreMortemTool.vue'
@@ -162,6 +171,7 @@ interface PlanSummary {
 
 const route = useRoute()
 const router = useRouter()
+const flowGuidance = useFlowGuidance()
 
 const idea = ref<SavedIdea | null>(null)
 const planSummary = ref<PlanSummary | null>(null)
@@ -197,6 +207,9 @@ async function loadPlanSummary() {
   const ideaId = route.params.id as string
   try {
     planSummary.value = await $fetch<PlanSummary>(`/api/canvas/plan-summary/${ideaId}`)
+    if (planSummary.value && !planSummary.value.hasStructure) {
+      flowGuidance.showSuggestion(flowGuidance.suggestions.coachToCanvas)
+    }
   } catch (error) {
     console.error('Failed to load plan summary:', error)
   }
@@ -278,6 +291,14 @@ function showToastMessage(message: string) {
   }, 2200)
 }
 
+function handleFlowGuidanceAction() {
+  const suggestion = flowGuidance.currentSuggestion.value
+  if (suggestion?.icon === 'canvas') {
+    flowGuidance.hideSuggestion()
+    navigateToCanvas()
+  }
+}
+
 async function saveLastActiveView() {
   const ideaId = route.params.id as string
   try {
@@ -323,6 +344,7 @@ onMounted(() => {
   loadPlanSummary()
   saveLastActiveView()
   startSync()
+  flowGuidance.initialize()
 })
 
 onUnmounted(() => {

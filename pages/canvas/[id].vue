@@ -1,5 +1,13 @@
 <template>
   <div class="canvas-page">
+    <FlowGuidanceBanner
+      :suggestion="flowGuidance.currentSuggestion.value"
+      :is-visible="flowGuidance.isVisible.value"
+      class="canvas-flow-banner"
+      @dismiss="flowGuidance.dismissSuggestion()"
+      @action="handleFlowGuidanceAction"
+    />
+
     <div v-if="isLoading" class="loading-state">
       <p>Loading canvas...</p>
     </div>
@@ -191,6 +199,8 @@ import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Conn
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2, FlaskConical, AlertTriangle, CheckCircle2 } from 'lucide-vue-next'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -212,6 +222,7 @@ import type { WorkflowState } from '~/types/workflow'
 
 const route = useRoute()
 const router = useRouter()
+const flowGuidance = useFlowGuidance()
 
 const projectId = computed(() => route.params.id as string)
 
@@ -599,6 +610,14 @@ async function navigateToCoach() {
   }
 }
 
+function handleFlowGuidanceAction() {
+  const suggestion = flowGuidance.currentSuggestion.value
+  if (suggestion?.icon === 'coach') {
+    flowGuidance.hideSuggestion()
+    navigateToCoach()
+  }
+}
+
 function handleSelectionEnd() {
   // Selection box completed - nodes are automatically selected by Vue Flow
 }
@@ -767,6 +786,11 @@ let clusterCheckTimeout: NodeJS.Timeout | null = null
 watch(() => elements.value.length, () => {
   if (clusterCheckTimeout) clearTimeout(clusterCheckTimeout)
   clusterCheckTimeout = setTimeout(checkForDisconnectedClusters, 5000)
+
+  const taskNodes = elements.value.filter((e: any) => !e.source && e.type === 'task')
+  if (taskNodes.length >= 3) {
+    flowGuidance.showSuggestion(flowGuidance.suggestions.canvasToCoach)
+  }
 })
 
 async function groupSelectedNodes() {
@@ -956,6 +980,7 @@ onMounted(() => {
   saveLastActiveView()
   startSync()
   window.addEventListener('keydown', handleKeyDown)
+  flowGuidance.initialize()
 })
 
 onUnmounted(() => {
@@ -977,6 +1002,15 @@ onUnmounted(() => {
   position: fixed;
   top: 0;
   left: 0;
+}
+
+.canvas-flow-banner {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: 500px;
 }
 
 .loading-state {

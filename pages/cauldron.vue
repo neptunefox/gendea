@@ -1,5 +1,12 @@
 <template>
   <div class="cauldron-page">
+    <FlowGuidanceBanner
+      :suggestion="flowGuidance.currentSuggestion.value"
+      :is-visible="flowGuidance.isVisible.value"
+      @dismiss="flowGuidance.dismissSuggestion()"
+      @action="handleFlowGuidanceAction"
+    />
+
     <div class="cauldron-layout">
       <div v-if="isLoading" class="loading-state">
         <Loader :size="32" class="spin" />
@@ -83,6 +90,8 @@ import { ref, onMounted, watch, onUnmounted } from 'vue'
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
 
 interface FloatingIdea {
   id: string
@@ -111,6 +120,8 @@ interface CauldronSession {
 }
 
 const USER_ID = 'default-user'
+
+const flowGuidance = useFlowGuidance()
 
 const floatingIdeas = ref<FloatingIdea[]>([])
 const displayedIdeas = ref<FloatingIdea[]>([])
@@ -425,6 +436,14 @@ function showToastMessage(message: string) {
   }, 2200)
 }
 
+function handleFlowGuidanceAction() {
+  const suggestion = flowGuidance.currentSuggestion.value
+  if (suggestion?.id === 'cauldron-to-build' && output.value) {
+    flowGuidance.hideSuggestion()
+    handleSaveAndBuild()
+  }
+}
+
 watch(
   () => ingredients.value.length,
   async (newCount, oldCount) => {
@@ -436,6 +455,7 @@ watch(
           body: { sessionId: currentSession.value.id }
         })
         output.value = mixedOutput
+        flowGuidance.showSuggestion(flowGuidance.suggestions.cauldronToBuild)
       } catch (error) {
         console.error('Failed to mix:', error)
         showToastMessage('Failed to mix ideas')
@@ -466,6 +486,7 @@ onMounted(async () => {
   await loadSession()
   await loadFloatingIdeas()
   startAutoRotation()
+  flowGuidance.initialize()
 })
 
 onUnmounted(() => {
@@ -478,6 +499,16 @@ onUnmounted(() => {
   min-height: 100vh;
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
   padding: 2rem 1.5rem 4rem;
+  position: relative;
+}
+
+.cauldron-page > .flow-guidance-banner {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: 500px;
 }
 
 .cauldron-layout {

@@ -167,7 +167,7 @@
   - Add 2-second visual indicator updates on state changes
   - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
 
-- [ ] 22. Implement application flow guidance
+- [x] 22. Implement application flow guidance
   - Add suggestion to move to Cauldron after Spark session
   - Add suggestion to start building after Cauldron mix
   - Add guidance to set up Canvas and Coach when building starts

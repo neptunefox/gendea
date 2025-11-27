@@ -1,6 +1,13 @@
 <template>
   <div class="spark-page">
     <div class="spark-layout" :class="{ 'with-tray': showCollectionTray }">
+      <FlowGuidanceBanner
+        :suggestion="flowGuidance.currentSuggestion.value"
+        :is-visible="flowGuidance.isVisible.value"
+        @dismiss="flowGuidance.dismissSuggestion()"
+        @action="handleFlowGuidanceAction"
+      />
+
       <header v-if="savedIdeas.length > 0" class="momentum-header">
         <div class="header-label">
           <h2>
@@ -312,6 +319,8 @@ import { Lightbulb, Loader, Check, BookmarkPlus, CornerDownRight, Split, X, Arro
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 
 interface SparkIdea {
   text: string
@@ -385,8 +394,10 @@ const INPUT_HEIGHT_LIMIT = 100
 const router = useRouter()
 const route = useRoute()
 const { onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
+const flowGuidance = useFlowGuidance()
 
 const isDraggingIdea = ref<string | null>(null)
+const generationCount = ref(0)
 
 const placeholders = [
   'What do you want to explore?',
@@ -486,6 +497,11 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
 
     if (!customPrompt) {
       input.value = ''
+    }
+
+    generationCount.value++
+    if (generationCount.value >= 2 && savedIdeas.value.length >= 2) {
+      flowGuidance.showSuggestion(flowGuidance.suggestions.sparkToCauldron)
     }
   } catch (error: unknown) {
     console.error('Failed to generate ideas:', error)
@@ -654,6 +670,7 @@ onMounted(async () => {
   await nextTick()
   adjustInputHeight()
   startPlaceholderRotation()
+  flowGuidance.initialize()
 })
 
 onUnmounted(() => {
@@ -723,6 +740,14 @@ async function startBuilding(idea: SavedIdea) {
   } catch (error) {
     console.error('Failed to start building:', error)
     showToastMessage('Failed to start building')
+  }
+}
+
+function handleFlowGuidanceAction() {
+  const suggestion = flowGuidance.currentSuggestion.value
+  if (suggestion?.route) {
+    flowGuidance.hideSuggestion()
+    router.push(suggestion.route)
   }
 }
 
