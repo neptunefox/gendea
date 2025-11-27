@@ -129,6 +129,7 @@
         v-if="currentSuggestion"
         :suggestion="currentSuggestion"
         :project-id="projectId"
+        :is-applying="isTidying"
         @dismiss="dismissSuggestion"
         @apply="applySuggestion"
       />

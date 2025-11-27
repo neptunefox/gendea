@@ -32,7 +32,7 @@
         :disabled="isApplying"
         @click="handleApply"
       >
-        <Loader2 v-if="isApplying" :size="14" class="spin" />
+        <Loader2 v-if="props.isApplying" :size="14" class="spin" />
         <span>{{ suggestion.actionLabel }}</span>
       </button>
     </div>
@@ -40,7 +40,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Lightbulb, X, Loader2 } from 'lucide-vue-next'
 
 interface Suggestion {
@@ -56,6 +55,7 @@ interface Suggestion {
 const props = defineProps<{
   suggestion: Suggestion | null
   projectId: string
+  isApplying?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -63,21 +63,13 @@ const emit = defineEmits<{
   (e: 'apply', action: string): void
 }>()
 
-const isApplying = ref(false)
-
 function handleDismiss() {
   emit('dismiss')
 }
 
-async function handleApply() {
-  if (!props.suggestion?.action || isApplying.value) return
-  isApplying.value = true
-
-  try {
-    emit('apply', props.suggestion.action)
-  } finally {
-    isApplying.value = false
-  }
+function handleApply() {
+  if (!props.suggestion?.action || props.isApplying) return
+  emit('apply', props.suggestion.action)
 }
 </script>
 
