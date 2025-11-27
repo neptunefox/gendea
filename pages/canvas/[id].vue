@@ -214,8 +214,6 @@ onMounted(() => {
 <style>
 @import '@vue-flow/core/dist/style.css';
 @import '@vue-flow/core/dist/theme-default.css';
-@import '@vue-flow/controls/dist/style.css';
-@import '@vue-flow/background/dist/style.css';
 
 .vue-flow {
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
