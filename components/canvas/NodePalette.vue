@@ -10,8 +10,6 @@
     </button>
 
     <div v-if="!isCollapsed" class="palette-content">
-      <div class="palette-header">Add Nodes</div>
-
       <div class="palette-items">
         <div
           v-for="item in paletteItems"
@@ -140,16 +138,6 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
 
 .palette-content {
   padding: 0.75rem;
-}
-
-.palette-header {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #8b7a75;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-  padding: 0 0.25rem;
 }
 
 .palette-items {
