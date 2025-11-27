@@ -181,7 +181,7 @@
   - Handle idea deletion (remove or mark Canvas nodes)
   - _Requirements: 9.5_
 
-- [ ] 24. Implement Canvas multi-user conflict prevention
+- [x] 24. Implement Canvas multi-user conflict prevention
   - Add optimistic locking for Canvas state updates
   - Detect concurrent edits
   - Show conflict resolution UI when needed

@@ -63,7 +63,8 @@ async function findOrCreateGoalNode(projectId: string, northStar: string) {
         text: northStar,
         coachOrigin: true,
         savedIdeaId: projectId
-      }
+      },
+      version: 1
     })
     .returning()
 
@@ -118,7 +119,8 @@ async function findOrCreateTestNode(
         coachOrigin: true,
         savedIdeaId: projectId,
         testCommitmentId: testCommitment.committedAt
-      }
+      },
+      version: 1
     })
     .returning()
 
@@ -185,7 +187,8 @@ export default defineEventHandler(async event => {
           projectId: id,
           viewportX: 0,
           viewportY: 0,
-          zoom: 1
+          zoom: 1,
+          version: 1
         })
       }
     }

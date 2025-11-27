@@ -228,6 +228,7 @@ export const canvasNodes = pgTable('canvas_nodes', {
   data: jsonb('data').$type<Record<string, unknown>>().notNull(),
   parentNodeId: uuid('parent_node_id'),
   dismissedSuggestions: jsonb('dismissed_suggestions').$type<string[]>().default([]),
+  version: integer('version').notNull().default(1),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
@@ -240,6 +241,7 @@ export const canvasEdges = pgTable('canvas_edges', {
   type: text('type'),
   label: text('label'),
   style: jsonb('style').$type<Record<string, unknown>>(),
+  version: integer('version').notNull().default(1),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })
 
@@ -249,5 +251,6 @@ export const canvasState = pgTable('canvas_state', {
   viewportX: integer('viewport_x').notNull().default(0),
   viewportY: integer('viewport_y').notNull().default(0),
   zoom: real('zoom').notNull().default(1),
+  version: integer('version').notNull().default(1),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })

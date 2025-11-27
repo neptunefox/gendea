@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 import { canvasEdges } from '../../../../db/schema'
 import { db } from '../../../db'
@@ -14,8 +14,31 @@ export default defineEventHandler(async event => {
   }
 
   const body = await readBody(event)
+  const expectedVersion = body.version as number | undefined
 
-  const updateData: Record<string, unknown> = {}
+  const [existingEdge] = await db.select().from(canvasEdges).where(eq(canvasEdges.id, id))
+
+  if (!existingEdge) {
+    throw createError({
+      statusCode: 404,
+      message: 'Edge not found'
+    })
+  }
+
+  if (expectedVersion !== undefined && existingEdge.version !== expectedVersion) {
+    throw createError({
+      statusCode: 409,
+      message: 'Conflict: Edge was modified by another user',
+      data: {
+        currentVersion: existingEdge.version,
+        currentData: existingEdge
+      }
+    })
+  }
+
+  const updateData: Record<string, unknown> = {
+    version: existingEdge.version + 1
+  }
 
   if (body.type !== undefined) {
     updateData.type = body.type
@@ -29,9 +52,23 @@ export default defineEventHandler(async event => {
     updateData.style = body.style
   }
 
-  await db.update(canvasEdges).set(updateData).where(eq(canvasEdges.id, id))
+  const result = await db
+    .update(canvasEdges)
+    .set(updateData)
+    .where(and(eq(canvasEdges.id, id), eq(canvasEdges.version, existingEdge.version)))
+    .returning()
 
-  const [updated] = await db.select().from(canvasEdges).where(eq(canvasEdges.id, id))
+  if (result.length === 0) {
+    const [currentEdge] = await db.select().from(canvasEdges).where(eq(canvasEdges.id, id))
+    throw createError({
+      statusCode: 409,
+      message: 'Conflict: Edge was modified by another user',
+      data: {
+        currentVersion: currentEdge?.version ?? 0,
+        currentData: currentEdge
+      }
+    })
+  }
 
-  return { edge: updated }
+  return { edge: result[0] }
 })

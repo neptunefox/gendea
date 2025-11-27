@@ -5,6 +5,7 @@ interface CanvasNode {
   type: string
   position: { x: number; y: number }
   data: Record<string, unknown>
+  version?: number
 }
 
 interface CanvasEdge {
@@ -14,12 +15,22 @@ interface CanvasEdge {
   type?: string
   label?: string
   style?: Record<string, unknown>
+  version?: number
 }
 
 interface CanvasState {
   viewportX: number
   viewportY: number
   zoom: number
+  version?: number
+}
+
+export interface ConflictInfo {
+  type: 'node' | 'edge' | 'state'
+  id: string
+  localData: CanvasNode | CanvasEdge | CanvasState
+  serverData: CanvasNode | CanvasEdge | CanvasState
+  currentVersion: number
 }
 
 export function useCanvas(projectId: Ref<string>) {
@@ -27,6 +38,8 @@ export function useCanvas(projectId: Ref<string>) {
   const edges = ref<CanvasEdge[]>([])
   const state = ref<CanvasState | null>(null)
   const isLoading = ref(true)
+  const conflict = ref<ConflictInfo | null>(null)
+  const hasConflict = computed(() => conflict.value !== null)
 
   async function loadCanvas() {
     if (!projectId.value) return
@@ -38,7 +51,8 @@ export function useCanvas(projectId: Ref<string>) {
         id: node.id,
         type: node.type,
         position: node.position,
-        data: node.data
+        data: node.data,
+        version: node.version
       }))
 
       edges.value = data.edges.map((edge: any) => ({
@@ -47,10 +61,16 @@ export function useCanvas(projectId: Ref<string>) {
         target: edge.targetId,
         type: edge.type,
         label: edge.label,
-        style: edge.style
+        style: edge.style,
+        version: edge.version
       }))
 
-      state.value = data.state
+      state.value = data.state ? {
+        viewportX: data.state.viewportX,
+        viewportY: data.state.viewportY,
+        zoom: data.state.zoom,
+        version: data.state.version
+      } : null
     } catch (error) {
       console.error('Failed to load canvas:', error)
     } finally {
@@ -72,7 +92,8 @@ export function useCanvas(projectId: Ref<string>) {
         id: created.id,
         type: created.type,
         position: created.position,
-        data: created.data
+        data: created.data,
+        version: created.version
       })
 
       return created
@@ -83,10 +104,15 @@ export function useCanvas(projectId: Ref<string>) {
   }
 
   async function updateNode(id: string, updates: Partial<Omit<CanvasNode, 'id'>>) {
+    const existingNode = nodes.value.find(n => n.id === id)
+    
     try {
       const { node: updated } = await $fetch(`/api/canvas/nodes/${id}`, {
         method: 'PATCH',
-        body: updates
+        body: {
+          ...updates,
+          version: existingNode?.version
+        }
       })
 
       const index = nodes.value.findIndex(n => n.id === id)
@@ -95,12 +121,29 @@ export function useCanvas(projectId: Ref<string>) {
           id: updated.id,
           type: updated.type,
           position: updated.position,
-          data: updated.data
+          data: updated.data,
+          version: updated.version
         }
       }
 
       return updated
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.statusCode === 409 && error?.data) {
+        const serverData = error.data.currentData
+        conflict.value = {
+          type: 'node',
+          id,
+          localData: existingNode || { id, ...updates } as CanvasNode,
+          serverData: {
+            id: serverData.id,
+            type: serverData.type,
+            position: serverData.position,
+            data: serverData.data,
+            version: serverData.version
+          },
+          currentVersion: error.data.currentVersion
+        }
+      }
       console.error('Failed to update node:', error)
       throw error
     }
@@ -146,7 +189,8 @@ export function useCanvas(projectId: Ref<string>) {
         target: created.targetId,
         type: created.type,
         label: created.label,
-        style: created.style
+        style: created.style,
+        version: created.version
       })
 
       return created
@@ -157,10 +201,15 @@ export function useCanvas(projectId: Ref<string>) {
   }
 
   async function updateEdge(id: string, updates: Partial<Omit<CanvasEdge, 'id' | 'source' | 'target'>>) {
+    const existingEdge = edges.value.find(e => e.id === id)
+    
     try {
       const { edge: updated } = await $fetch(`/api/canvas/edges/${id}`, {
         method: 'PATCH',
-        body: updates
+        body: {
+          ...updates,
+          version: existingEdge?.version
+        }
       })
 
       const index = edges.value.findIndex(e => e.id === id)
@@ -171,12 +220,31 @@ export function useCanvas(projectId: Ref<string>) {
           target: updated.targetId,
           type: updated.type,
           label: updated.label,
-          style: updated.style
+          style: updated.style,
+          version: updated.version
         }
       }
 
       return updated
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.statusCode === 409 && error?.data) {
+        const serverData = error.data.currentData
+        conflict.value = {
+          type: 'edge',
+          id,
+          localData: existingEdge || { id, ...updates } as CanvasEdge,
+          serverData: {
+            id: serverData.id,
+            source: serverData.sourceId,
+            target: serverData.targetId,
+            type: serverData.type,
+            label: serverData.label,
+            style: serverData.style,
+            version: serverData.version
+          },
+          currentVersion: error.data.currentVersion
+        }
+      }
       console.error('Failed to update edge:', error)
       throw error
     }
@@ -197,19 +265,107 @@ export function useCanvas(projectId: Ref<string>) {
 
   async function saveViewport(viewport: CanvasState) {
     try {
-      await $fetch('/api/canvas/state', {
+      const { state: updated } = await $fetch('/api/canvas/state', {
         method: 'PUT',
         body: {
           projectId: projectId.value,
-          ...viewport
+          ...viewport,
+          version: state.value?.version
         }
       })
 
-      state.value = viewport
-    } catch (error) {
+      state.value = {
+        viewportX: updated.viewportX,
+        viewportY: updated.viewportY,
+        zoom: updated.zoom,
+        version: updated.version
+      }
+    } catch (error: any) {
+      if (error?.statusCode === 409 && error?.data) {
+        const serverData = error.data.currentData
+        conflict.value = {
+          type: 'state',
+          id: projectId.value,
+          localData: viewport,
+          serverData: {
+            viewportX: serverData.viewportX,
+            viewportY: serverData.viewportY,
+            zoom: serverData.zoom,
+            version: serverData.version
+          },
+          currentVersion: error.data.currentVersion
+        }
+      }
       console.error('Failed to save viewport:', error)
       throw error
     }
+  }
+
+  async function resolveConflict(resolution: 'keep-local' | 'use-server' | 'reload') {
+    if (!conflict.value) return
+
+    const currentConflict = conflict.value
+
+    if (resolution === 'reload') {
+      conflict.value = null
+      await loadCanvas()
+      return
+    }
+
+    if (resolution === 'use-server') {
+      if (currentConflict.type === 'node') {
+        const serverNode = currentConflict.serverData as CanvasNode
+        const index = nodes.value.findIndex(n => n.id === currentConflict.id)
+        if (index !== -1) {
+          nodes.value[index] = serverNode
+        }
+      } else if (currentConflict.type === 'edge') {
+        const serverEdge = currentConflict.serverData as CanvasEdge
+        const index = edges.value.findIndex(e => e.id === currentConflict.id)
+        if (index !== -1) {
+          edges.value[index] = serverEdge
+        }
+      } else if (currentConflict.type === 'state') {
+        state.value = currentConflict.serverData as CanvasState
+      }
+      conflict.value = null
+      return
+    }
+
+    if (resolution === 'keep-local') {
+      if (currentConflict.type === 'node') {
+        const localNode = currentConflict.localData as CanvasNode
+        const index = nodes.value.findIndex(n => n.id === currentConflict.id)
+        if (index !== -1) {
+          nodes.value[index].version = currentConflict.currentVersion
+        }
+        await updateNode(currentConflict.id, {
+          position: localNode.position,
+          data: localNode.data,
+          type: localNode.type
+        })
+      } else if (currentConflict.type === 'edge') {
+        const localEdge = currentConflict.localData as CanvasEdge
+        const index = edges.value.findIndex(e => e.id === currentConflict.id)
+        if (index !== -1) {
+          edges.value[index].version = currentConflict.currentVersion
+        }
+        await updateEdge(currentConflict.id, {
+          type: localEdge.type,
+          label: localEdge.label,
+          style: localEdge.style
+        })
+      } else if (currentConflict.type === 'state') {
+        const localState = currentConflict.localData as CanvasState
+        state.value = { ...localState, version: currentConflict.currentVersion }
+        await saveViewport(localState)
+      }
+      conflict.value = null
+    }
+  }
+
+  function dismissConflict() {
+    conflict.value = null
   }
 
   return {
@@ -217,6 +373,8 @@ export function useCanvas(projectId: Ref<string>) {
     edges,
     state,
     isLoading,
+    conflict,
+    hasConflict,
     loadCanvas,
     createNode,
     updateNode,
@@ -224,6 +382,8 @@ export function useCanvas(projectId: Ref<string>) {
     createEdge,
     updateEdge,
     deleteEdge,
-    saveViewport
+    saveViewport,
+    resolveConflict,
+    dismissConflict
   }
 }

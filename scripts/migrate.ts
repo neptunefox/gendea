@@ -282,6 +282,21 @@ async function main() {
     ADD COLUMN IF NOT EXISTS dismissed_suggestions JSONB DEFAULT '[]'::jsonb;
   `)
 
+  await db.execute(sql`
+    ALTER TABLE canvas_nodes 
+    ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_edges 
+    ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_state 
+    ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

@@ -160,6 +160,13 @@
         <span>Coach</span>
       </button>
 
+      <ConflictResolutionModal
+        v-if="hasConflict && conflict"
+        :conflict="conflict"
+        @resolve="resolveConflict"
+        @dismiss="dismissConflict"
+      />
+
       <div class="ideas-panel" :class="{ collapsed: isIdeasPanelCollapsed }">
         <button class="panel-toggle" @click="isIdeasPanelCollapsed = !isIdeasPanelCollapsed">
           <ChevronRight v-if="isIdeasPanelCollapsed" :size="16" />
@@ -216,7 +223,9 @@ import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 import NodePalette from '~/components/canvas/NodePalette.vue'
 import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
 import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
+import ConflictResolutionModal from '~/components/canvas/ConflictResolutionModal.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import { useCanvas, type ConflictInfo } from '~/composables/useCanvas'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
 import type { WorkflowState } from '~/types/workflow'
 
@@ -228,6 +237,7 @@ const projectId = computed(() => route.params.id as string)
 
 const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
 const canvasAnimations = useCanvasAnimations()
+const { conflict, hasConflict, resolveConflict, dismissConflict } = useCanvas(projectId)
 
 provide('canvasAnimations', canvasAnimations)
 
@@ -404,16 +414,24 @@ onPaneReady(() => {
 onNodeDragStop(async ({ node }) => {
   if (!projectId.value) return
   try {
-    await $fetch(`/api/canvas/nodes/${node.id}`, {
+    const nodeData = node.data as Record<string, unknown>
+    const response = await $fetch(`/api/canvas/nodes/${node.id}`, {
       method: 'PATCH',
       body: {
         position: {
           x: Math.round(node.position.x),
           y: Math.round(node.position.y)
-        }
+        },
+        version: nodeData?.version
       }
     })
-  } catch (error) {
+    if (response.node?.version) {
+      updateNode(node.id, { data: { ...nodeData, version: response.node.version } })
+    }
+  } catch (error: any) {
+    if (error?.statusCode === 409) {
+      await loadCanvas()
+    }
     console.error('Failed to save node position:', error)
   }
 })
@@ -439,7 +457,8 @@ async function handleConnect(connection: Connection) {
       target: connection.target,
       type: 'relationship',
       data: {
-        relationshipType: 'relates-to'
+        relationshipType: 'relates-to',
+        version: edge.version
       }
     })
 
@@ -499,7 +518,7 @@ async function loadCanvas() {
         id: node.id,
         type: node.type,
         position: node.position,
-        data: node.data,
+        data: { ...node.data, version: node.version },
         zIndex: -1
       }))
 
@@ -510,7 +529,7 @@ async function loadCanvas() {
           id: node.id,
           type: node.type,
           position: node.position,
-          data: node.data
+          data: { ...node.data, version: node.version }
         }
         if (node.parentNodeId) {
           nodeData.parentNode = node.parentNodeId
@@ -530,7 +549,8 @@ async function loadCanvas() {
         type: 'relationship',
         label: edge.label,
         data: {
-          relationshipType
+          relationshipType,
+          version: edge.version
         }
       }
     })
@@ -628,7 +648,7 @@ function handleAINodesCreated(nodes: any[], edges: any[]) {
       id: node.id,
       type: node.type,
       position: node.position,
-      data: node.data
+      data: { ...node.data, version: node.version }
     })
     canvasAnimations.markNodeStaggered(node.id, nodes.indexOf(node))
   }
@@ -640,7 +660,8 @@ function handleAINodesCreated(nodes: any[], edges: any[]) {
       target: edge.targetId,
       type: 'relationship',
       data: {
-        relationshipType: edge.type || 'relates-to'
+        relationshipType: edge.type || 'relates-to',
+        version: edge.version
       }
     })
   }
@@ -839,19 +860,30 @@ async function groupSelectedNodes() {
         y: node.position.y - sectionNode.position.y
       }
 
-      await $fetch(`/api/canvas/nodes/${node.id}`, {
-        method: 'PATCH',
-        body: {
-          position: relativePosition,
-          parentNode: created.id
-        }
-      })
+      const nodeData = node.data as Record<string, unknown>
+      try {
+        const response = await $fetch(`/api/canvas/nodes/${node.id}`, {
+          method: 'PATCH',
+          body: {
+            position: relativePosition,
+            parentNode: created.id,
+            version: nodeData?.version
+          }
+        })
 
-      updateNode(node.id, {
-        position: relativePosition,
-        parentNode: created.id,
-        extent: 'parent'
-      })
+        updateNode(node.id, {
+          position: relativePosition,
+          parentNode: created.id,
+          extent: 'parent',
+          data: { ...nodeData, version: response.node?.version }
+        })
+      } catch (error: any) {
+        if (error?.statusCode === 409) {
+          await loadCanvas()
+          return
+        }
+        throw error
+      }
     }
   } catch (error) {
     console.error('Failed to group nodes:', error)
@@ -920,7 +952,7 @@ async function syncCanvasData() {
           id: node.id,
           type: node.type,
           position: node.position,
-          data: node.data,
+          data: { ...node.data, version: node.version },
           zIndex: -1
         }))
 
@@ -931,7 +963,7 @@ async function syncCanvasData() {
             id: node.id,
             type: node.type,
             position: node.position,
-            data: node.data
+            data: { ...node.data, version: node.version }
           }
           if (node.parentNodeId) {
             nodeData.parentNode = node.parentNodeId
@@ -951,7 +983,8 @@ async function syncCanvasData() {
           type: 'relationship',
           label: edge.label,
           data: {
-            relationshipType
+            relationshipType,
+            version: edge.version
           }
         }
       })

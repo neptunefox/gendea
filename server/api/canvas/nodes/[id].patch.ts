@@ -1,8 +1,21 @@
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 import { canvasNodes, savedIdeas, branches } from '../../../../db/schema'
 import { workflowService } from '../../../../lib/workflow-service'
 import { db } from '../../../db'
+
+export class ConflictError extends Error {
+  statusCode = 409
+  currentVersion: number
+  currentData: typeof canvasNodes.$inferSelect | null
+
+  constructor(message: string, currentVersion: number, currentData: typeof canvasNodes.$inferSelect | null) {
+    super(message)
+    this.name = 'ConflictError'
+    this.currentVersion = currentVersion
+    this.currentData = currentData
+  }
+}
 
 type WorkflowState = 'Seeded' | 'Diverging' | 'Clarifying' | 'Planning' | 'Testing' | 'Reviewing' | 'Stalled' | 'Action crisis' | 'Archived'
 
@@ -82,13 +95,34 @@ export default defineEventHandler(async event => {
   }
 
   const body = await readBody(event)
+  const expectedVersion = body.version as number | undefined
 
   const [existingNode] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, id))
+  
+  if (!existingNode) {
+    throw createError({
+      statusCode: 404,
+      message: 'Node not found'
+    })
+  }
+
+  if (expectedVersion !== undefined && existingNode.version !== expectedVersion) {
+    throw createError({
+      statusCode: 409,
+      message: 'Conflict: Node was modified by another user',
+      data: {
+        currentVersion: existingNode.version,
+        currentData: existingNode
+      }
+    })
+  }
+
   const existingData = existingNode?.data as Record<string, unknown> | undefined
   const wasCompleted = existingData?.completed
 
   const updateData: Record<string, unknown> = {
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    version: existingNode.version + 1
   }
 
   if (body.position !== undefined) {
@@ -107,9 +141,25 @@ export default defineEventHandler(async event => {
     updateData.parentNodeId = body.parentNode
   }
 
-  await db.update(canvasNodes).set(updateData).where(eq(canvasNodes.id, id))
+  const result = await db
+    .update(canvasNodes)
+    .set(updateData)
+    .where(and(eq(canvasNodes.id, id), eq(canvasNodes.version, existingNode.version)))
+    .returning()
 
-  const [updated] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, id))
+  if (result.length === 0) {
+    const [currentNode] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, id))
+    throw createError({
+      statusCode: 409,
+      message: 'Conflict: Node was modified by another user',
+      data: {
+        currentVersion: currentNode?.version ?? 0,
+        currentData: currentNode
+      }
+    })
+  }
+
+  const [updated] = result
 
   const newData = updated?.data as Record<string, unknown> | undefined
   const isNowCompleted = newData?.completed
