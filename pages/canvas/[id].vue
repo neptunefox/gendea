@@ -167,6 +167,17 @@
         @dismiss="dismissConflict"
       />
 
+      <EdgeSuggestionPopup
+        v-if="edgeSuggestion"
+        :is-visible="!!edgeSuggestion"
+        :position="edgeSuggestion.position"
+        :suggested-type="edgeSuggestion.suggestedType"
+        :suggested-label="edgeSuggestion.suggestedLabel"
+        :edge-id="edgeSuggestion.edgeId"
+        @accept="handleEdgeSuggestionAccept"
+        @dismiss="handleEdgeSuggestionDismiss"
+      />
+
       <div class="ideas-panel" :class="{ collapsed: isIdeasPanelCollapsed }">
         <button class="panel-toggle" @click="isIdeasPanelCollapsed = !isIdeasPanelCollapsed">
           <ChevronRight v-if="isIdeasPanelCollapsed" :size="16" />
@@ -224,10 +235,12 @@ import NodePalette from '~/components/canvas/NodePalette.vue'
 import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
 import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
 import ConflictResolutionModal from '~/components/canvas/ConflictResolutionModal.vue'
+import EdgeSuggestionPopup from '~/components/canvas/EdgeSuggestionPopup.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
 import { useCanvas, type ConflictInfo } from '~/composables/useCanvas'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
 import type { WorkflowState } from '~/types/workflow'
+import type { EdgeRelationshipType } from '~/types/canvas'
 
 const route = useRoute()
 const router = useRouter()
@@ -400,6 +413,15 @@ const currentSuggestion = ref<Suggestion | null>(null)
 const isTidying = ref(false)
 const dismissedSuggestions = ref<Set<string>>(new Set())
 
+interface EdgeSuggestion {
+  edgeId: string
+  suggestedType: EdgeRelationshipType
+  suggestedLabel: string
+  position: { x: number; y: number }
+}
+const edgeSuggestion = ref<EdgeSuggestion | null>(null)
+const isLoadingEdgeSuggestion = ref(false)
+
 let pendingViewport: Viewport | null = null
 let paneReady = false
 
@@ -439,6 +461,12 @@ onNodeDragStop(async ({ node }) => {
 async function handleConnect(connection: Connection) {
   if (!connection.source || !connection.target) return
 
+  const sourceNode = elements.value.find((e: any) => e.id === connection.source && !e.source)
+  const targetNode = elements.value.find((e: any) => e.id === connection.target && !e.source)
+  
+  const sourceContent = sourceNode ? getNodeContent(sourceNode) : ''
+  const targetContent = targetNode ? getNodeContent(targetNode) : ''
+
   try {
     const { edge } = await $fetch('/api/canvas/edges', {
       method: 'POST',
@@ -462,10 +490,82 @@ async function handleConnect(connection: Connection) {
       }
     })
 
+    if (sourceContent && targetContent) {
+      fetchEdgeSuggestion(edge.id, sourceContent, targetContent, sourceNode, targetNode)
+    }
+
     checkConnectionRelatedness(connection.source, connection.target)
   } catch (error) {
     console.error('Failed to create edge:', error)
   }
+}
+
+async function fetchEdgeSuggestion(
+  edgeId: string,
+  sourceContent: string,
+  targetContent: string,
+  sourceNode: any,
+  targetNode: any
+) {
+  isLoadingEdgeSuggestion.value = true
+  try {
+    const result = await $fetch('/api/canvas/ai/suggest-label', {
+      method: 'POST',
+      body: { sourceContent, targetContent }
+    })
+
+    const midX = (sourceNode.position.x + targetNode.position.x) / 2
+    const midY = (sourceNode.position.y + targetNode.position.y) / 2
+    
+    const canvasRect = document.querySelector('.vue-flow')?.getBoundingClientRect()
+    const screenX = canvasRect ? canvasRect.left + (midX * viewport.value.zoom + viewport.value.x) : midX
+    const screenY = canvasRect ? canvasRect.top + (midY * viewport.value.zoom + viewport.value.y) : midY
+
+    edgeSuggestion.value = {
+      edgeId,
+      suggestedType: result.relationship as EdgeRelationshipType,
+      suggestedLabel: result.label,
+      position: { x: screenX, y: screenY }
+    }
+  } catch (error) {
+    console.error('Failed to get edge suggestion:', error)
+  } finally {
+    isLoadingEdgeSuggestion.value = false
+  }
+}
+
+async function handleEdgeSuggestionAccept(edgeId: string, type: EdgeRelationshipType, label: string | null) {
+  try {
+    await $fetch(`/api/canvas/edges/${edgeId}`, {
+      method: 'PATCH',
+      body: {
+        type: 'relationship',
+        label: label,
+        style: { relationshipType: type }
+      }
+    })
+
+    const edgeIndex = elements.value.findIndex((e: any) => e.id === edgeId)
+    if (edgeIndex !== -1) {
+      const edge = elements.value[edgeIndex]
+      elements.value[edgeIndex] = {
+        ...edge,
+        label: label || undefined,
+        data: {
+          ...edge.data,
+          relationshipType: type
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to update edge:', error)
+  } finally {
+    edgeSuggestion.value = null
+  }
+}
+
+function handleEdgeSuggestionDismiss() {
+  edgeSuggestion.value = null
 }
 
 async function checkConnectionRelatedness(sourceId: string, targetId: string) {

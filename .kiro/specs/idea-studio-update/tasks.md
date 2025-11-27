@@ -187,7 +187,7 @@
   - Show conflict resolution UI when needed
   - _Requirements: 14.5_
 
-- [ ] 25. Add Canvas AI edge suggestions
+- [x] 25. Add Canvas AI edge suggestions
   - Implement AI suggestion for edge relationship types
   - Display suggested relationship when connecting nodes
   - Allow user to accept or modify suggestion
