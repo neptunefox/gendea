@@ -53,6 +53,7 @@
       <div class="edge-editor-actions">
         <button class="save-btn" @click="saveEdit">Save</button>
         <button class="cancel-btn" @click="cancelEdit">Cancel</button>
+        <button class="delete-btn" @click="deleteEdge">Delete</button>
       </div>
     </div>
   </EdgeLabelRenderer>
@@ -71,6 +72,10 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { EDGE_STYLES, EDGE_RELATIONSHIP_LABELS, type EdgeRelationshipType } from '~/types/canvas'
 
 const props = defineProps<EdgeProps>()
+
+const emit = defineEmits<{
+  delete: [edgeId: string]
+}>()
 
 const { updateEdge, findEdge } = useVueFlow()
 
@@ -196,6 +201,19 @@ function cancelEdit() {
   editType.value = edgeType.value
   editLabel.value = (props.label as string) || ''
 }
+
+async function deleteEdge() {
+  try {
+    await $fetch(`/api/canvas/edges/${props.id}`, {
+      method: 'DELETE'
+    })
+    const { removeEdges } = useVueFlow()
+    removeEdges([props.id])
+    isEditing.value = false
+  } catch (error) {
+    console.error('Failed to delete edge:', error)
+  }
+}
 </script>
 
 <script lang="ts">
@@ -276,7 +294,8 @@ export default {
 }
 
 .save-btn,
-.cancel-btn {
+.cancel-btn,
+.delete-btn {
   flex: 1;
   padding: 0.375rem;
   border: none;
@@ -303,6 +322,17 @@ export default {
 
 .cancel-btn:hover {
   background: #e5d5d0;
+}
+
+.delete-btn {
+  background: transparent;
+  color: #c26660;
+  border: 1px solid #f0e5e0;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+  border-color: #c26660;
 }
 
 @keyframes edgeDraw {
