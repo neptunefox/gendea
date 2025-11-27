@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, jsonb, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, integer, jsonb, uuid, real } from 'drizzle-orm/pg-core'
 
 export const nodes = pgTable('nodes', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -246,6 +246,6 @@ export const canvasState = pgTable('canvas_state', {
   projectId: uuid('project_id').notNull().unique(),
   viewportX: integer('viewport_x').notNull().default(0),
   viewportY: integer('viewport_y').notNull().default(0),
-  zoom: integer('zoom').notNull().default(1),
+  zoom: real('zoom').notNull().default(1),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })

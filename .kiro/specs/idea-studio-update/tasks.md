@@ -96,7 +96,7 @@
   - Handle drop outside Canvas to cancel
   - _Requirements: 16.1, 16.2, 16.3, 16.4_
 
-- [ ] 13. Implement Saved Ideas import to Canvas
+- [x] 13. Implement Saved Ideas import to Canvas
   - Add drag handler for Saved Ideas
   - Create Canvas node from Saved Idea on drop
   - Apply special styling for Bottled Potion nodes

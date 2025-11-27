@@ -232,9 +232,15 @@ async function main() {
       type TEXT NOT NULL,
       position JSONB NOT NULL,
       data JSONB NOT NULL,
+      parent_node_id UUID,
       created_at TIMESTAMP NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_nodes 
+    ADD COLUMN IF NOT EXISTS parent_node_id UUID;
   `)
 
   await db.execute(sql`
@@ -256,9 +262,14 @@ async function main() {
       project_id UUID NOT NULL UNIQUE,
       viewport_x INTEGER NOT NULL DEFAULT 0,
       viewport_y INTEGER NOT NULL DEFAULT 0,
-      zoom INTEGER NOT NULL DEFAULT 1,
+      zoom REAL NOT NULL DEFAULT 1,
       updated_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_state 
+    ALTER COLUMN zoom TYPE REAL USING zoom::REAL;
   `)
 
   console.log('[SUCCESS] Tables created successfully!')

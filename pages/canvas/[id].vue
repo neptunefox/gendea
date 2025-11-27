@@ -112,13 +112,43 @@
       <NodePalette />
 
       <div v-if="isDragOver" class="drop-indicator">
-        <p>Drop to add node</p>
+        <p>{{ draggedType === 'idea' ? 'Drop idea to add to canvas' : 'Drop to add node' }}</p>
       </div>
 
       <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
         <Hammer :size="18" />
         <span>Coach</span>
       </button>
+
+      <div class="ideas-panel" :class="{ collapsed: isIdeasPanelCollapsed }">
+        <button class="panel-toggle" @click="isIdeasPanelCollapsed = !isIdeasPanelCollapsed">
+          <ChevronRight v-if="isIdeasPanelCollapsed" :size="16" />
+          <ChevronLeft v-else :size="16" />
+        </button>
+        <div v-if="!isIdeasPanelCollapsed" class="panel-content">
+          <div class="panel-header">
+            <Lightbulb :size="16" />
+            <span>Saved Ideas</span>
+          </div>
+          <div v-if="savedIdeas.length === 0" class="panel-empty">
+            <p>No saved ideas yet</p>
+          </div>
+          <div v-else class="ideas-list">
+            <div
+              v-for="idea in savedIdeas"
+              :key="idea.id"
+              class="idea-item"
+              :class="{ cauldron: idea.isCauldronOutput }"
+              draggable="true"
+              @dragstart="(e) => handleIdeaDragStart(e, idea)"
+              @dragend="handleIdeaDragEnd"
+            >
+              <Sparkles v-if="idea.isCauldronOutput" :size="12" class="cauldron-icon" />
+              <p>{{ idea.text }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -128,7 +158,7 @@ import { ref, computed, onMounted } from 'vue'
 import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer, Group } from 'lucide-vue-next'
+import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles } from 'lucide-vue-next'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -149,7 +179,39 @@ const router = useRouter()
 
 const projectId = computed(() => route.params.id as string)
 
-const { isDragOver, onDragOver, onDragLeave, onDrop } = useDragAndDrop()
+const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
+
+interface SavedIdea {
+  id: string
+  text: string
+  isCauldronOutput?: number
+  tags?: string[]
+}
+
+const savedIdeas = ref<SavedIdea[]>([])
+const isIdeasPanelCollapsed = ref(false)
+
+function handleIdeaDragStart(event: DragEvent, idea: SavedIdea) {
+  onDragStartSavedIdea(event, {
+    id: idea.id,
+    text: idea.text,
+    isCauldronOutput: !!idea.isCauldronOutput,
+    tags: idea.tags
+  })
+}
+
+function handleIdeaDragEnd() {
+  onDragEnd()
+}
+
+async function fetchSavedIdeas() {
+  try {
+    const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
+    savedIdeas.value = response.ideas
+  } catch (error) {
+    console.error('Failed to fetch saved ideas:', error)
+  }
+}
 
 function handleDragOver(event: DragEvent) {
   onDragOver(event)
@@ -367,6 +429,7 @@ function calculateBounds(nodes: Node[]) {
 
 onMounted(() => {
   loadCanvas()
+  fetchSavedIdeas()
 })
 </script>
 
@@ -479,6 +542,128 @@ onMounted(() => {
   font-weight: 600;
   font-size: 0.875rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ideas-panel {
+  position: fixed;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ideas-panel.collapsed {
+  padding: 0;
+}
+
+.panel-toggle {
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: white;
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8b7a75;
+  transition: all 0.2s ease;
+}
+
+.panel-toggle:hover {
+  background: #d4756f;
+  color: white;
+  border-color: #d4756f;
+}
+
+.panel-content {
+  padding: 0.75rem;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #8b7a75;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.panel-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #8b7a75;
+  font-size: 0.8125rem;
+}
+
+.ideas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-height: calc(60vh - 60px);
+}
+
+.idea-item {
+  padding: 0.625rem 0.75rem;
+  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
+  border: 1px solid #f0e5e0;
+  border-radius: 8px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.idea-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateX(-2px);
+}
+
+.idea-item:active {
+  cursor: grabbing;
+}
+
+.idea-item.cauldron {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-color: rgba(186, 104, 200, 0.3);
+}
+
+.idea-item .cauldron-icon {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #ba68c8;
+}
+
+.idea-item p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #40312b;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
 

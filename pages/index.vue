@@ -80,7 +80,10 @@
             v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
             :key="idea.id"
             class="idea-card"
-            :class="{ 'cauldron-output': idea.isCauldronOutput }"
+            :class="{ 'cauldron-output': idea.isCauldronOutput, 'dragging': isDraggingIdea === idea.id }"
+            draggable="true"
+            @dragstart="(e) => handleIdeaDragStart(e, idea)"
+            @dragend="handleIdeaDragEnd"
           >
             <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -241,7 +244,10 @@
               v-for="idea in savedIdeas"
               :key="idea.id"
               class="tray-item"
-              :class="{ 'tray-item-cauldron': idea.isCauldronOutput }"
+              :class="{ 'tray-item-cauldron': idea.isCauldronOutput, 'dragging': isDraggingIdea === idea.id }"
+              draggable="true"
+              @dragstart="(e) => handleIdeaDragStart(e, idea)"
+              @dragend="handleIdeaDragEnd"
             >
               <div class="tray-item-status" :data-status="idea.status" />
               <div class="tray-item-content">
@@ -302,9 +308,10 @@
 
 
 <script setup lang="ts">
-import { Lightbulb, Loader, Check, BookmarkPlus, CornerDownRight, Split, X, ArrowRight } from 'lucide-vue-next'
+import { Lightbulb, Loader, Check, BookmarkPlus, CornerDownRight, Split, X, ArrowRight, GripVertical } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useDragAndDrop } from '~/composables/useDragAndDrop'
 
 interface SparkIdea {
   text: string
@@ -377,6 +384,9 @@ const INPUT_HEIGHT_LIMIT = 100
 
 const router = useRouter()
 const route = useRoute()
+const { onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
+
+const isDraggingIdea = ref<string | null>(null)
 
 const placeholders = [
   'What do you want to explore?',
@@ -413,6 +423,20 @@ function toggleIdeaSelection(key: string, text: string, entry: JournalEntry) {
 
 function clearSelection() {
   selectedIdeas.value = new Map()
+}
+
+function handleIdeaDragStart(event: DragEvent, idea: SavedIdea) {
+  isDraggingIdea.value = idea.id
+  onDragStartSavedIdea(event, {
+    id: idea.id,
+    text: idea.text,
+    isCauldronOutput: !!idea.isCauldronOutput
+  })
+}
+
+function handleIdeaDragEnd() {
+  isDraggingIdea.value = null
+  onDragEnd()
 }
 
 async function handleBranchSelected() {
@@ -1095,6 +1119,16 @@ watch(
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
 }
 
+.idea-card.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  cursor: grabbing;
+}
+
+.idea-card {
+  cursor: grab;
+}
+
 .unpin-btn {
   position: absolute;
   top: 0.5rem;
@@ -1550,6 +1584,15 @@ watch(
 }
 
 .tray-item:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+
+.tray-item {
+  cursor: grab;
+}
+
+.tray-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
 
 .tray-item.tray-item-cauldron {
   background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);

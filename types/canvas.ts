@@ -76,6 +76,7 @@ export interface IdeaNodeData {
   text?: string
   tags?: string[]
   isCauldronOutput?: boolean
+  savedIdeaId?: string
 }
 
 export interface GoalNodeData {
