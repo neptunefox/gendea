@@ -104,7 +104,7 @@
   - Add grid/cluster layout for multiple imports
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 16.5_
 
-- [ ] 14. Create Canvas AI service integration
+- [x] 14. Create Canvas AI service integration
   - Create Canvas-specific LangChain chains
   - Implement "Expand" action (generate 3-5 connected nodes)
   - Implement "Tidy Up" action (organize nodes into clusters/flows)
