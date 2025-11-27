@@ -182,17 +182,20 @@ function editAnswer() {
 
 .input-field {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .answer-input {
   flex: 1;
+  min-width: 0;
   padding: 0.5rem 0.75rem;
   border: 1px solid #f0e5e0;
   border-radius: 8px;
   font-size: 0.875rem;
   color: #40312b;
   background: white;
+  box-sizing: border-box;
 }
 
 .answer-input:focus {
@@ -201,11 +204,14 @@ function editAnswer() {
 }
 
 .submit-btn {
-  padding: 0.5rem;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   background: #d4756f;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s ease;
   display: flex;
