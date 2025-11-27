@@ -80,17 +80,27 @@ async function saveResult(nextAction: 'next-test' | 'back-to-exploring') {
 
   isSaving.value = true
   try {
-    await $fetch(`/api/saved-ideas/${props.idea.id}`, {
-      method: 'PATCH',
-      body: {
-        testResult: {
-          outcome: outcome.value,
-          learnings: learnings.value.trim() || undefined,
-          completedAt: new Date().toISOString()
-        },
-        testCommitment: null
-      }
-    })
+    if (nextAction === 'next-test') {
+      await $fetch(`/api/saved-ideas/${props.idea.id}`, {
+        method: 'PATCH',
+        body: {
+          testCommitment: null,
+          testResult: null
+        }
+      })
+    } else {
+      await $fetch(`/api/saved-ideas/${props.idea.id}`, {
+        method: 'PATCH',
+        body: {
+          testResult: {
+            outcome: outcome.value,
+            learnings: learnings.value.trim() || undefined,
+            completedAt: new Date().toISOString()
+          },
+          testCommitment: null
+        }
+      })
+    }
 
     emit('next', nextAction)
   } catch (error) {
