@@ -242,9 +242,20 @@ const viewport = ref<Viewport>({
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
-const { getSelectedNodes, addNodes, updateNode, addEdges } = useVueFlow()
+const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady } = useVueFlow()
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
+
+let pendingViewport: Viewport | null = null
+let paneReady = false
+
+onPaneReady(() => {
+  paneReady = true
+  if (pendingViewport) {
+    setViewport(pendingViewport)
+    pendingViewport = null
+  }
+})
 
 async function handleConnect(connection: Connection) {
   if (!connection.source || !connection.target) return
@@ -326,10 +337,17 @@ async function loadCanvas() {
     elements.value = [...nodes, ...edges]
 
     if (data.state) {
-      viewport.value = {
+      const restoredViewport = {
         x: data.state.viewportX,
         y: data.state.viewportY,
         zoom: data.state.zoom
+      }
+      viewport.value = restoredViewport
+      
+      if (paneReady) {
+        setViewport(restoredViewport)
+      } else {
+        pendingViewport = restoredViewport
       }
     }
   } catch (error) {
