@@ -1,7 +1,7 @@
 <template>
   <div
     class="shape-node"
-    :class="[shapeClass, { selected: props.selected }]"
+    :class="[shapeClass, { selected: props.selected }, animationClass]"
     :style="shapeStyle"
   >
     <Handle v-if="shapeType !== 'arrow'" type="target" :position="Position.Top" />
@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 
 const props = defineProps<NodeProps>()
@@ -28,11 +28,16 @@ const shapeType = computed<ShapeType>(() => props.data.shape || 'rectangle')
 
 const shapeClass = computed(() => `shape-${shapeType.value}`)
 
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyleFromComposable = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
+
 const shapeStyle = computed(() => ({
   backgroundColor: props.data.fill || '#f0e5e0',
   borderColor: props.data.stroke || '#d4756f',
   width: props.data.width ? `${props.data.width}px` : undefined,
-  height: props.data.height ? `${props.data.height}px` : undefined
+  height: props.data.height ? `${props.data.height}px` : undefined,
+  ...animationStyleFromComposable.value
 }))
 </script>
 
@@ -42,11 +47,39 @@ const shapeStyle = computed(() => ({
   align-items: center;
   justify-content: center;
   border: 2px solid;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: box-shadow 0.15s ease;
+  will-change: transform, opacity;
 }
 
 .shape-node:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shape-node.node-appearing {
+  animation: nodeAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.shape-node.node-deleting {
+  animation: nodeDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.shape-node.node-staggered {
+  animation: nodeStagger 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes nodeAppear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nodeDelete {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes nodeStagger {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .shape-node.selected {

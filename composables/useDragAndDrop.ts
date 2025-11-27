@@ -1,6 +1,7 @@
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useVueFlow, type Node } from '@vue-flow/core'
 import type { CanvasNodeType } from '~/components/canvas/nodes'
+import { useCanvasAnimations } from './useCanvasAnimations'
 
 interface SavedIdeaDragData {
   id: string
@@ -20,6 +21,7 @@ const GRID_GAP = 30
 
 export function useDragAndDrop() {
   const { screenToFlowCoordinate, addNodes, getNodes } = useVueFlow()
+  const { markNodeAppearing, markNodesStaggered } = useCanvasAnimations()
 
   function onDragStart(event: DragEvent, type: CanvasNodeType) {
     if (!event.dataTransfer) return
@@ -164,6 +166,7 @@ export function useDragAndDrop() {
       }
 
       addNodes(newNode)
+      markNodeAppearing(node.id)
     } catch (error) {
       console.error('Failed to create node:', error)
     }
@@ -208,6 +211,7 @@ export function useDragAndDrop() {
         position,
         data: nodeData
       })
+      markNodeAppearing(node.id)
     } catch (error) {
       console.error('Failed to create node from saved idea:', error)
     }
@@ -262,6 +266,7 @@ export function useDragAndDrop() {
 
     if (createdNodes.length > 0) {
       addNodes(createdNodes)
+      markNodesStaggered(createdNodes.map(n => n.id))
     }
 
     return createdNodes

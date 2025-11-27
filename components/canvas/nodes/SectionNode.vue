@@ -1,8 +1,8 @@
 <template>
   <div
     class="section-node"
-    :class="{ selected: props.selected, collapsed: isCollapsed }"
-    :style="sectionStyle"
+    :class="[{ selected: props.selected, collapsed: isCollapsed }, animationClass]"
+    :style="{ ...sectionStyle, ...animationStyle }"
   >
     <div class="section-header" @dblclick="startEditing">
       <div class="section-title-area">
@@ -36,11 +36,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, inject } from 'vue'
 import { type NodeProps } from '@vue-flow/core'
 import { ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps<NodeProps>()
+
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const colors = [
   'rgba(212, 117, 111, 0.1)',
@@ -127,11 +131,30 @@ function toggleCollapse() {
   border: 2px dashed;
   border-radius: 12px;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  will-change: transform, opacity;
 }
 
 .section-node:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.section-node.node-appearing {
+  animation: sectionAppear 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.section-node.node-deleting {
+  animation: sectionDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sectionAppear {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sectionDelete {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 .section-node.selected {

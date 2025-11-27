@@ -1,8 +1,8 @@
 <template>
   <div
     class="sticky-note-node"
-    :style="{ backgroundColor: nodeColor }"
-    :class="{ selected: props.selected }"
+    :style="{ backgroundColor: nodeColor, ...animationStyle }"
+    :class="[{ selected: props.selected }, animationClass]"
   >
     <Handle type="target" :position="Position.Top" />
     
@@ -38,10 +38,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 
 const props = defineProps<NodeProps>()
+
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const colors = ['#fff9c4', '#ffccbc', '#c8e6c9', '#b3e5fc', '#e1bee7', '#f5f5f5']
 
@@ -97,7 +101,35 @@ async function setColor(color: string) {
   display: flex;
   flex-direction: column;
   transform: rotate(-1deg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform;
+}
+
+.sticky-note-node.node-appearing {
+  animation: nodeAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.sticky-note-node.node-deleting {
+  animation: nodeDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.sticky-note-node.node-staggered {
+  animation: nodeStagger 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes nodeAppear {
+  from { opacity: 0; transform: rotate(-1deg) scale(0.8); }
+  to { opacity: 1; transform: rotate(-1deg) scale(1); }
+}
+
+@keyframes nodeDelete {
+  from { opacity: 1; transform: rotate(-1deg) scale(1); }
+  to { opacity: 0; transform: rotate(-1deg) scale(0.8); }
+}
+
+@keyframes nodeStagger {
+  from { opacity: 0; transform: rotate(-1deg) translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: rotate(-1deg) translateY(0) scale(1); }
 }
 
 .sticky-note-node:hover {

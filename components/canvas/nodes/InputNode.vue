@@ -1,5 +1,5 @@
 <template>
-  <div class="input-node" :class="{ selected: props.selected, answered: hasAnswer }">
+  <div class="input-node" :class="[{ selected: props.selected, answered: hasAnswer }, animationClass]" :style="animationStyle">
     <Handle type="target" :position="Position.Top" />
     
     <div class="input-header">
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { HelpCircle, Send } from 'lucide-vue-next'
 
@@ -44,6 +44,10 @@ const props = defineProps<NodeProps>()
 const answer = ref('')
 
 const hasAnswer = computed(() => !!props.data.answer)
+
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 async function submitAnswer() {
   if (!answer.value.trim()) return
@@ -76,11 +80,39 @@ function editAnswer() {
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(212, 117, 111, 0.15);
-  transition: all 0.2s ease;
+  transition: box-shadow 0.15s ease;
+  will-change: transform, opacity;
 }
 
 .input-node:hover {
   box-shadow: 0 4px 16px rgba(212, 117, 111, 0.25);
+}
+
+.input-node.node-appearing {
+  animation: nodeAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.input-node.node-deleting {
+  animation: nodeDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.input-node.node-staggered {
+  animation: nodeStagger 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes nodeAppear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nodeDelete {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes nodeStagger {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .input-node.selected {

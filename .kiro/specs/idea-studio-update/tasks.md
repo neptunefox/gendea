@@ -134,7 +134,7 @@
   - Sync workflow state changes from Canvas actions
   - _Requirements: 6.5, 18.4_
 
-- [ ] 18. Implement Canvas animations
+- [x] 18. Implement Canvas animations
   - Add 60fps drag animation for nodes
   - Add edge drawing animation from source to target
   - Add fade-out animation for node deletion

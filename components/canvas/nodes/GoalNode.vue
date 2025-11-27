@@ -1,5 +1,5 @@
 <template>
-  <div class="goal-node" :class="{ selected: props.selected, achieved: isAchieved, 'coach-origin': isCoachOrigin }">
+  <div class="goal-node" :class="[{ selected: props.selected, achieved: isAchieved, 'coach-origin': isCoachOrigin }, animationClass]" :style="animationStyle">
     <Handle type="target" :position="Position.Top" />
     
     <div class="goal-header">
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { Target, Check, TrendingUp, Trophy, Hammer } from 'lucide-vue-next'
 
@@ -40,6 +40,10 @@ const props = defineProps<NodeProps>()
 
 const isAchieved = computed(() => !!props.data.achieved)
 const isCoachOrigin = computed(() => !!props.data.coachOrigin)
+
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 async function markAchieved() {
   try {
@@ -61,11 +65,39 @@ async function markAchieved() {
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(102, 187, 106, 0.2);
-  transition: all 0.2s ease;
+  transition: box-shadow 0.15s ease;
+  will-change: transform, opacity;
 }
 
 .goal-node:hover {
   box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3);
+}
+
+.goal-node.node-appearing {
+  animation: nodeAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.goal-node.node-deleting {
+  animation: nodeDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.goal-node.node-staggered {
+  animation: nodeStagger 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes nodeAppear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nodeDelete {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes nodeStagger {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .goal-node.selected {

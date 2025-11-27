@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow, type EdgeProps } from '@vue-flow/core'
 import { EDGE_STYLES, EDGE_RELATIONSHIP_LABELS, type EdgeRelationshipType } from '~/types/canvas'
 
@@ -70,6 +70,7 @@ const showLabel = ref(false)
 const isEditing = ref(false)
 const editType = ref<EdgeRelationshipType>('relates-to')
 const editLabel = ref('')
+const isAnimating = ref(true)
 
 const edgeType = computed<EdgeRelationshipType>(() => {
   const type = props.data?.relationshipType || props.type
@@ -83,11 +84,23 @@ const displayLabel = computed(() => {
 
 const edgeStyle = computed(() => {
   const style = EDGE_STYLES[edgeType.value] || EDGE_STYLES['relates-to']
-  return {
+  const baseStyle: Record<string, any> = {
     stroke: style.stroke,
     strokeWidth: style.strokeWidth,
     strokeDasharray: style.strokeDasharray
   }
+  if (isAnimating.value) {
+    baseStyle.strokeDasharray = '1000'
+    baseStyle.strokeDashoffset = '1000'
+    baseStyle.animation = 'edgeDraw 0.3s ease forwards'
+  }
+  return baseStyle
+})
+
+onMounted(() => {
+  setTimeout(() => {
+    isAnimating.value = false
+  }, 300)
 })
 
 const markerEnd = computed(() => `url(#arrow-${edgeType.value})`)
@@ -247,5 +260,14 @@ export default {
 
 .cancel-btn:hover {
   background: #e5d5d0;
+}
+
+@keyframes edgeDraw {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 </style>

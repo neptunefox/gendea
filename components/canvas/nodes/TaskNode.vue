@@ -1,5 +1,5 @@
 <template>
-  <div class="task-node" :class="{ selected: props.selected, completed: isCompleted, 'coach-origin': isCoachOrigin }">
+  <div class="task-node" :class="[{ selected: props.selected, completed: isCompleted, 'coach-origin': isCoachOrigin }, animationClass]" :style="animationStyle">
     <Handle type="target" :position="Position.Top" />
     
     <div v-if="isCoachOrigin" class="coach-indicator">
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { Square, CheckSquare, Calendar, Hammer } from 'lucide-vue-next'
 
@@ -36,6 +36,10 @@ const props = defineProps<NodeProps>()
 
 const isCompleted = computed(() => !!props.data.completed)
 const isCoachOrigin = computed(() => !!props.data.coachOrigin)
+
+const canvasAnimations = inject<any>('canvasAnimations')
+const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
+const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 async function toggleComplete() {
   try {
@@ -62,12 +66,40 @@ function formatDate(dateStr: string): string {
   border-radius: 10px;
   padding: 0.875rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  will-change: transform, opacity;
 }
 
 .task-node:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   border-color: #d4756f;
+}
+
+.task-node.node-appearing {
+  animation: nodeAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.task-node.node-deleting {
+  animation: nodeDelete 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.task-node.node-staggered {
+  animation: nodeStagger 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes nodeAppear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nodeDelete {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes nodeStagger {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .task-node.selected {

@@ -16,6 +16,7 @@
         :selection-mode="SelectionMode.Partial"
         @viewport-change="handleViewportChange"
         @selection-end="handleSelectionEnd"
+        @connect="handleConnect"
       >
         <svg>
           <defs>
@@ -154,8 +155,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node } from '@vue-flow/core'
+import { ref, computed, onMounted, onUnmounted, provide } from 'vue'
+import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Connection } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles } from 'lucide-vue-next'
@@ -173,6 +174,7 @@ import {
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 import NodePalette from '~/components/canvas/NodePalette.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
 
 const route = useRoute()
 const router = useRouter()
@@ -180,6 +182,9 @@ const router = useRouter()
 const projectId = computed(() => route.params.id as string)
 
 const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
+const canvasAnimations = useCanvasAnimations()
+
+provide('canvasAnimations', canvasAnimations)
 
 interface SavedIdea {
   id: string
@@ -237,9 +242,38 @@ const viewport = ref<Viewport>({
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
-const { getSelectedNodes, addNodes, updateNode } = useVueFlow()
+const { getSelectedNodes, addNodes, updateNode, addEdges } = useVueFlow()
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
+
+async function handleConnect(connection: Connection) {
+  if (!connection.source || !connection.target) return
+
+  try {
+    const { edge } = await $fetch('/api/canvas/edges', {
+      method: 'POST',
+      body: {
+        projectId: projectId.value,
+        sourceId: connection.source,
+        targetId: connection.target,
+        type: 'relationship',
+        relationshipType: 'relates-to'
+      }
+    })
+
+    addEdges({
+      id: edge.id,
+      source: connection.source,
+      target: connection.target,
+      type: 'relationship',
+      data: {
+        relationshipType: 'relates-to'
+      }
+    })
+  } catch (error) {
+    console.error('Failed to create edge:', error)
+  }
+}
 
 async function loadCanvas() {
   if (!projectId.value) return
@@ -391,6 +425,7 @@ async function groupSelectedNodes() {
       ...sectionNode,
       id: created.id
     })
+    canvasAnimations.markNodeAppearing(created.id)
 
     for (const node of nodes) {
       const relativePosition = {
@@ -810,5 +845,70 @@ onUnmounted(() => {
   background: rgba(212, 117, 111, 0.05);
   border: 2px solid #d4756f;
   border-radius: 8px;
+}
+
+.vue-flow__node {
+  transition: transform 0.016s linear;
+}
+
+.vue-flow__node.dragging {
+  z-index: 1000 !important;
+}
+
+.vue-flow__edge path {
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes nodeDelete {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes nodeStagger {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sectionAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes edgeDraw {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 </style>

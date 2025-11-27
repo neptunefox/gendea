@@ -106,8 +106,14 @@ export function useCanvas(projectId: Ref<string>) {
     }
   }
 
-  async function deleteNode(id: string) {
+  async function deleteNode(id: string, animate: boolean = true) {
     try {
+      if (animate) {
+        const { useCanvasAnimations } = await import('./useCanvasAnimations')
+        const { markNodeDeleting } = useCanvasAnimations()
+        await markNodeDeleting(id)
+      }
+
       await $fetch(`/api/canvas/nodes/${id}`, {
         method: 'DELETE'
       })
