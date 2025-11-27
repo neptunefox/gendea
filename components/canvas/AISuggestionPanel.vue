@@ -3,7 +3,7 @@
     <div class="suggestion-header">
       <Lightbulb :size="16" class="suggestion-icon" />
       <span>AI Suggestion</span>
-      <button class="dismiss-btn" @click="handleDismiss" title="Dismiss">
+      <button class="dismiss-btn" title="Dismiss" @click="handleDismiss">
         <X :size="14" />
       </button>
     </div>
@@ -214,7 +214,11 @@ function handleApply() {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

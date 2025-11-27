@@ -13,7 +13,7 @@
           {{ suggestion.action }}
           <ArrowRight :size="16" />
         </button>
-        <button class="dismiss-btn" @click="$emit('dismiss')" title="Dismiss">
+        <button class="dismiss-btn" title="Dismiss" @click="$emit('dismiss')">
           <X :size="16" />
         </button>
       </div>
@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
 import { Sparkles, Hammer, LayoutGrid, Target, ArrowRight, X } from 'lucide-vue-next'
+
 import type { FlowSuggestion } from '~/composables/useFlowGuidance'
 
 interface Props {

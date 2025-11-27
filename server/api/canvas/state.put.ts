@@ -46,7 +46,10 @@ export default defineEventHandler(async event => {
       .returning()
 
     if (result.length === 0) {
-      const [currentState] = await db.select().from(canvasState).where(eq(canvasState.projectId, projectId))
+      const [currentState] = await db
+        .select()
+        .from(canvasState)
+        .where(eq(canvasState.projectId, projectId))
       throw createError({
         statusCode: 409,
         message: 'Conflict: Canvas state was modified by another user',

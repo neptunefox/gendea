@@ -4,8 +4,9 @@ import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages
 import { StringOutputParser } from '@langchain/core/output_parsers'
 import { ChatOllama } from '@langchain/ollama'
 import { ChatOpenAI } from '@langchain/openai'
-import { useRuntimeConfig } from '#imports'
 import type { z } from 'zod'
+
+import { useRuntimeConfig } from '#imports'
 
 interface LangChainConfig {
   provider: 'ollama' | 'openrouter'
@@ -181,7 +182,7 @@ class LangChainService {
   }
 
   private fixJson(jsonStr: string): string {
-    let fixed = jsonStr
+    const fixed = jsonStr
       .replace(/,\s*([}\]])/g, '$1')
       .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')
       .replace(/:\s*'([^']*)'/g, ': "$1"')

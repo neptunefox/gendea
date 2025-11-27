@@ -9,7 +9,9 @@
       <div class="progress-bar">
         <div class="progress-fill" :style="{ width: `${planSummary.progressPercent}%` }" />
       </div>
-      <span class="progress-text">{{ planSummary.completedTasks }}/{{ planSummary.totalTasks }} tasks</span>
+      <span class="progress-text"
+        >{{ planSummary.completedTasks }}/{{ planSummary.totalTasks }} tasks</span
+      >
     </div>
 
     <div v-if="planSummary.goalNodes.length > 0" class="goals-section">
@@ -35,15 +37,13 @@
       </p>
     </div>
 
-    <button class="view-canvas-btn" @click="$emit('viewCanvas')">
-      View full plan →
-    </button>
+    <button class="view-canvas-btn" @click="$emit('viewCanvas')">View full plan →</button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { LayoutGrid, Target, Square, CheckSquare } from 'lucide-vue-next'
+import { computed } from 'vue'
 
 interface PlanNode {
   id: string

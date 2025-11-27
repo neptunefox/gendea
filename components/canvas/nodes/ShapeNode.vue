@@ -6,7 +6,7 @@
   >
     <Handle v-if="shapeType !== 'arrow'" type="target" :position="Position.Top" />
     <Handle v-if="shapeType === 'arrow'" type="target" :position="Position.Left" />
-    
+
     <div class="shape-content">
       <span v-if="props.data.label" class="shape-label">{{ props.data.label }}</span>
     </div>
@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
+import { computed, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -30,7 +30,9 @@ const shapeClass = computed(() => `shape-${shapeType.value}`)
 
 const canvasAnimations = inject<any>('canvasAnimations')
 const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
-const animationStyleFromComposable = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
+const animationStyleFromComposable = computed(
+  () => canvasAnimations?.getNodeAnimationStyle(props.id) || {}
+)
 
 const shapeStyle = computed(() => ({
   backgroundColor: props.data.fill || '#f0e5e0',
@@ -68,18 +70,36 @@ const shapeStyle = computed(() => ({
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.8); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .shape-node.selected {

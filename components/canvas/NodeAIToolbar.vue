@@ -4,8 +4,8 @@
       class="ai-btn"
       :class="{ loading: isExpanding }"
       :disabled="isExpanding"
-      @click="handleExpand"
       title="Generate related ideas"
+      @click="handleExpand"
     >
       <Loader2 v-if="isExpanding" :size="16" class="spin" />
       <Sparkles v-else :size="16" />
@@ -16,8 +16,8 @@
       class="ai-btn"
       :class="{ loading: isSuggestingTools }"
       :disabled="isSuggestingTools"
-      @click="handleSuggestTools"
       title="Suggest helpful tools"
+      @click="handleSuggestTools"
     >
       <Loader2 v-if="isSuggestingTools" :size="16" class="spin" />
       <Wrench v-else :size="16" />
@@ -28,8 +28,8 @@
       class="ai-btn"
       :class="{ loading: isAddingContext }"
       :disabled="isAddingContext"
-      @click="handleAddContext"
       title="Add clarifying questions"
+      @click="handleAddContext"
     >
       <Loader2 v-if="isAddingContext" :size="16" class="spin" />
       <HelpCircle v-else :size="16" />
@@ -42,8 +42,8 @@
       class="ai-btn delete-btn"
       :class="{ loading: isDeleting }"
       :disabled="isDeleting"
-      @click="handleDelete"
       title="Delete node (Del)"
+      @click="handleDelete"
     >
       <Loader2 v-if="isDeleting" :size="16" class="spin" />
       <Trash2 v-else :size="16" />
@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { Sparkles, Wrench, HelpCircle, Loader2, Trash2 } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
 
 interface SelectedNode {
   id: string
@@ -83,8 +83,8 @@ const visible = computed(() => props.selectedNode !== null)
 
 const toolbarPosition = computed(() => {
   if (!props.selectedNode) return {}
-  const x = (props.selectedNode.position.x * props.viewport.zoom) + props.viewport.x
-  const y = (props.selectedNode.position.y * props.viewport.zoom) + props.viewport.y - 60
+  const x = props.selectedNode.position.x * props.viewport.zoom + props.viewport.x
+  const y = props.selectedNode.position.y * props.viewport.zoom + props.viewport.y - 60
   return {
     left: `${x}px`,
     top: `${y}px`
@@ -290,7 +290,11 @@ function handleDelete() {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

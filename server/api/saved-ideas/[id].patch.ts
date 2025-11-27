@@ -6,8 +6,8 @@ import { db } from '../../db'
 
 async function syncIdeaTextToCanvasNodes(ideaId: string, newText: string) {
   const allNodes = await db.select().from(canvasNodes)
-  
-  const matchingNodes = allNodes.filter((node) => {
+
+  const matchingNodes = allNodes.filter(node => {
     const data = node.data as Record<string, unknown>
     return data.savedIdeaId === ideaId
   })
@@ -15,7 +15,7 @@ async function syncIdeaTextToCanvasNodes(ideaId: string, newText: string) {
   for (const node of matchingNodes) {
     const data = node.data as Record<string, unknown>
     if (data.coachOrigin) continue
-    
+
     await db
       .update(canvasNodes)
       .set({
@@ -36,7 +36,7 @@ async function findOrCreateGoalNode(projectId: string, northStar: string) {
     .where(eq(canvasNodes.projectId, projectId))
 
   const existingGoalNode = existingNodes.find(
-    (n) => n.type === 'goal' && (n.data as Record<string, unknown>).coachOrigin === true
+    n => n.type === 'goal' && (n.data as Record<string, unknown>).coachOrigin === true
   )
 
   if (existingGoalNode) {
@@ -87,7 +87,7 @@ async function findOrCreateTestNode(
     .where(eq(canvasNodes.projectId, projectId))
 
   const existingTestNode = existingNodes.find(
-    (n) => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
+    n => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
   )
 
   const taskText = `Test: ${testCommitment.description}\n📅 ${testCommitment.when} @ ${testCommitment.where}\n✓ Success: ${testCommitment.successSignal}`
@@ -204,17 +204,15 @@ export default defineEventHandler(async event => {
     }
 
     if (isBuilding && body.testResult) {
-      const existingNodes = await db
-        .select()
-        .from(canvasNodes)
-        .where(eq(canvasNodes.projectId, id))
+      const existingNodes = await db.select().from(canvasNodes).where(eq(canvasNodes.projectId, id))
 
       const testNode = existingNodes.find(
-        (n) => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
+        n => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
       )
 
       if (testNode) {
-        const completed = body.testResult.outcome === 'worked' || body.testResult.outcome === 'completed'
+        const completed =
+          body.testResult.outcome === 'worked' || body.testResult.outcome === 'completed'
         await db
           .update(canvasNodes)
           .set({

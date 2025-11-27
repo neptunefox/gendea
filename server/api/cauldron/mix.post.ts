@@ -3,9 +3,12 @@ import { createError } from 'h3'
 
 import { cauldronIngredients, cauldronSessions } from '../../../db/schema'
 import { db } from '../../db'
-import { useLangChainService } from '../../utils/langchain-service'
+import {
+  CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
+  buildCauldronSynthesisPrompt
+} from '../../utils/langchain-prompts'
 import { CauldronOutputSchema } from '../../utils/langchain-schemas'
-import { CAULDRON_SYNTHESIS_SYSTEM_PROMPT, buildCauldronSynthesisPrompt } from '../../utils/langchain-prompts'
+import { useLangChainService } from '../../utils/langchain-service'
 import { validateRequired, validateUUID } from '../../utils/validation'
 
 export default defineEventHandler(async event => {

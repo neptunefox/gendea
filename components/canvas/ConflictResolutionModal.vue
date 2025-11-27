@@ -12,10 +12,14 @@ const emit = defineEmits<{
 
 const conflictTypeLabel = computed(() => {
   switch (props.conflict.type) {
-    case 'node': return 'Node'
-    case 'edge': return 'Connection'
-    case 'state': return 'Canvas View'
-    default: return 'Item'
+    case 'node':
+      return 'Node'
+    case 'edge':
+      return 'Connection'
+    case 'state':
+      return 'Canvas View'
+    default:
+      return 'Item'
   }
 })
 
@@ -23,7 +27,9 @@ function getDisplayData(data: any) {
   if (props.conflict.type === 'node') {
     return {
       type: data.type,
-      position: data.position ? `(${Math.round(data.position.x)}, ${Math.round(data.position.y)})` : 'N/A',
+      position: data.position
+        ? `(${Math.round(data.position.x)}, ${Math.round(data.position.y)})`
+        : 'N/A',
       content: data.data?.label || data.data?.text || 'No content'
     }
   }
@@ -47,14 +53,23 @@ function getDisplayData(data: any) {
   <div class="conflict-overlay">
     <div class="conflict-modal">
       <div class="conflict-header">
-        <svg class="conflict-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg
+          class="conflict-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
         </svg>
         <h3>{{ conflictTypeLabel }} Modified</h3>
       </div>
-      
+
       <p class="conflict-message">
-        This {{ conflictTypeLabel.toLowerCase() }} was modified by another session. Choose how to proceed:
+        This {{ conflictTypeLabel.toLowerCase() }} was modified by another session. Choose how to
+        proceed:
       </p>
 
       <div class="conflict-comparison">
@@ -69,11 +84,11 @@ function getDisplayData(data: any) {
             </template>
           </div>
         </div>
-        
+
         <div class="conflict-divider">
           <span>vs</span>
         </div>
-        
+
         <div class="conflict-version">
           <h4>Server Version</h4>
           <div class="version-data">
@@ -94,14 +109,10 @@ function getDisplayData(data: any) {
         <button class="btn btn-server" @click="emit('resolve', 'use-server')">
           Use Server Version
         </button>
-        <button class="btn btn-reload" @click="emit('resolve', 'reload')">
-          Reload Canvas
-        </button>
+        <button class="btn btn-reload" @click="emit('resolve', 'reload')">Reload Canvas</button>
       </div>
 
-      <button class="dismiss-btn" @click="emit('dismiss')">
-        Dismiss
-      </button>
+      <button class="dismiss-btn" @click="emit('dismiss')">Dismiss</button>
     </div>
   </div>
 </template>

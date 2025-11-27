@@ -3,11 +3,22 @@ import { eq } from 'drizzle-orm'
 import { canvasNodes, canvasEdges, canvasState, savedIdeas, branches } from '../../../db/schema'
 import { db } from '../../db'
 
-type WorkflowState = 'Seeded' | 'Diverging' | 'Clarifying' | 'Planning' | 'Testing' | 'Reviewing' | 'Stalled' | 'Action crisis' | 'Archived'
+type WorkflowState =
+  | 'Seeded'
+  | 'Diverging'
+  | 'Clarifying'
+  | 'Planning'
+  | 'Testing'
+  | 'Reviewing'
+  | 'Stalled'
+  | 'Action crisis'
+  | 'Archived'
 
-function deriveWorkflowState(idea: { status: string; testCommitment?: unknown; testResult?: unknown } | null): WorkflowState {
+function deriveWorkflowState(
+  idea: { status: string; testCommitment?: unknown; testResult?: unknown } | null
+): WorkflowState {
   if (!idea) return 'Seeded'
-  
+
   if (idea.status === 'done') return 'Archived'
   if (idea.status === 'building') {
     if (idea.testResult) return 'Reviewing'
@@ -28,37 +39,43 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const nodes = await db.select({
-    id: canvasNodes.id,
-    projectId: canvasNodes.projectId,
-    type: canvasNodes.type,
-    position: canvasNodes.position,
-    data: canvasNodes.data,
-    parentNodeId: canvasNodes.parentNodeId,
-    dismissedSuggestions: canvasNodes.dismissedSuggestions,
-    version: canvasNodes.version,
-    createdAt: canvasNodes.createdAt,
-    updatedAt: canvasNodes.updatedAt
-  }).from(canvasNodes).where(eq(canvasNodes.projectId, projectId))
+  const nodes = await db
+    .select({
+      id: canvasNodes.id,
+      projectId: canvasNodes.projectId,
+      type: canvasNodes.type,
+      position: canvasNodes.position,
+      data: canvasNodes.data,
+      parentNodeId: canvasNodes.parentNodeId,
+      dismissedSuggestions: canvasNodes.dismissedSuggestions,
+      version: canvasNodes.version,
+      createdAt: canvasNodes.createdAt,
+      updatedAt: canvasNodes.updatedAt
+    })
+    .from(canvasNodes)
+    .where(eq(canvasNodes.projectId, projectId))
 
-  const edges = await db.select({
-    id: canvasEdges.id,
-    projectId: canvasEdges.projectId,
-    sourceId: canvasEdges.sourceId,
-    targetId: canvasEdges.targetId,
-    type: canvasEdges.type,
-    label: canvasEdges.label,
-    style: canvasEdges.style,
-    version: canvasEdges.version,
-    createdAt: canvasEdges.createdAt
-  }).from(canvasEdges).where(eq(canvasEdges.projectId, projectId))
+  const edges = await db
+    .select({
+      id: canvasEdges.id,
+      projectId: canvasEdges.projectId,
+      sourceId: canvasEdges.sourceId,
+      targetId: canvasEdges.targetId,
+      type: canvasEdges.type,
+      label: canvasEdges.label,
+      style: canvasEdges.style,
+      version: canvasEdges.version,
+      createdAt: canvasEdges.createdAt
+    })
+    .from(canvasEdges)
+    .where(eq(canvasEdges.projectId, projectId))
 
   const [state] = await db.select().from(canvasState).where(eq(canvasState.projectId, projectId))
 
   const [idea] = await db.select().from(savedIdeas).where(eq(savedIdeas.id, projectId))
-  
+
   let workflowState: WorkflowState = 'Seeded'
-  
+
   if (idea?.branchId) {
     const [branch] = await db.select().from(branches).where(eq(branches.id, idea.branchId))
     if (branch) {

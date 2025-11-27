@@ -87,9 +87,12 @@
             v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
             :key="idea.id"
             class="idea-card"
-            :class="{ 'cauldron-output': idea.isCauldronOutput, 'dragging': isDraggingIdea === idea.id }"
+            :class="{
+              'cauldron-output': idea.isCauldronOutput,
+              dragging: isDraggingIdea === idea.id
+            }"
             draggable="true"
-            @dragstart="(e) => handleIdeaDragStart(e, idea)"
+            @dragstart="e => handleIdeaDragStart(e, idea)"
             @dragend="handleIdeaDragEnd"
           >
             <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
@@ -151,9 +154,7 @@
               <Split :size="16" />
               Branch all
             </button>
-            <button class="selection-btn secondary" @click="clearSelection">
-              Clear
-            </button>
+            <button class="selection-btn secondary" @click="clearSelection">Clear</button>
           </div>
         </div>
         <div v-if="isGenerating" class="loading-card">
@@ -251,20 +252,19 @@
               v-for="idea in savedIdeas"
               :key="idea.id"
               class="tray-item"
-              :class="{ 'tray-item-cauldron': idea.isCauldronOutput, 'dragging': isDraggingIdea === idea.id }"
+              :class="{
+                'tray-item-cauldron': idea.isCauldronOutput,
+                dragging: isDraggingIdea === idea.id
+              }"
               draggable="true"
-              @dragstart="(e) => handleIdeaDragStart(e, idea)"
+              @dragstart="e => handleIdeaDragStart(e, idea)"
               @dragend="handleIdeaDragEnd"
             >
               <div class="tray-item-status" :data-status="idea.status" />
               <div class="tray-item-content">
                 <p class="tray-item-text">{{ idea.text }}</p>
                 <div class="tray-item-actions">
-                  <button
-                    class="tray-action"
-                    title="Explore"
-                    @click="handleExploreIdea(idea.text)"
-                  >
+                  <button class="tray-action" title="Explore" @click="handleExploreIdea(idea.text)">
                     <Lightbulb :size="14" />
                   </button>
                   <button
@@ -313,14 +313,24 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
-import { Lightbulb, Loader, Check, BookmarkPlus, CornerDownRight, Split, X, ArrowRight, GripVertical } from 'lucide-vue-next'
+import {
+  Lightbulb,
+  Loader,
+  Check,
+  BookmarkPlus,
+  CornerDownRight,
+  Split,
+  X,
+  ArrowRight,
+  GripVertical
+} from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
 import { useFlowGuidance } from '~/composables/useFlowGuidance'
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 
 interface SparkIdea {
   text: string
@@ -788,7 +798,6 @@ watch(
 )
 </script>
 
-
 <style scoped>
 .spark-page {
   min-height: 100vh;
@@ -885,7 +894,9 @@ watch(
 .mini-pin.mini-pin-cauldron {
   background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
   border: 2px solid #d4756f;
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2), 0 0 20px rgba(212, 117, 111, 0.1);
+  box-shadow:
+    0 4px 12px rgba(212, 117, 111, 0.2),
+    0 0 20px rgba(212, 117, 111, 0.1);
 }
 
 .mini-tack {
@@ -906,7 +917,9 @@ watch(
   height: 14px;
   top: -7px;
   background: linear-gradient(135deg, #d4756f 0%, #e08a7f 100%);
-  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.6), 0 0 12px rgba(212, 117, 111, 0.3);
+  box-shadow:
+    0 2px 8px rgba(212, 117, 111, 0.6),
+    0 0 12px rgba(212, 117, 111, 0.3);
 }
 
 .mini-pin-status {
@@ -921,18 +934,40 @@ watch(
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.mini-pin-status[data-status='ready'] { background: #fff0da; }
-.mini-pin-status[data-status='building'] { background: #e9f8ec; }
-.mini-pin-status[data-status='done'] { background: #e9edff; }
+.mini-pin-status[data-status='ready'] {
+  background: #fff0da;
+}
+.mini-pin-status[data-status='building'] {
+  background: #e9f8ec;
+}
+.mini-pin-status[data-status='done'] {
+  background: #e9edff;
+}
 
-.mini-pin-0 { transform: rotate(-2deg); }
-.mini-pin-1 { transform: rotate(1.5deg); }
-.mini-pin-2 { transform: rotate(-1deg); }
-.mini-pin-3 { transform: rotate(2deg); }
-.mini-pin-4 { transform: rotate(-1.5deg); }
-.mini-pin-5 { transform: rotate(1deg); }
-.mini-pin-6 { transform: rotate(-2.5deg); }
-.mini-pin-7 { transform: rotate(1.8deg); }
+.mini-pin-0 {
+  transform: rotate(-2deg);
+}
+.mini-pin-1 {
+  transform: rotate(1.5deg);
+}
+.mini-pin-2 {
+  transform: rotate(-1deg);
+}
+.mini-pin-3 {
+  transform: rotate(2deg);
+}
+.mini-pin-4 {
+  transform: rotate(-1.5deg);
+}
+.mini-pin-5 {
+  transform: rotate(1deg);
+}
+.mini-pin-6 {
+  transform: rotate(-2.5deg);
+}
+.mini-pin-7 {
+  transform: rotate(1.8deg);
+}
 
 .mini-pin:hover {
   transform: translateY(-4px) rotate(-2deg);
@@ -1008,10 +1043,21 @@ watch(
   top: 0;
 }
 
-.slide-up-enter-active { transition: all 0.5s ease-out; }
-.slide-up-leave-active { transition: all 0.5s ease-in; position: absolute; }
-.slide-up-enter-from { opacity: 0; transform: translateY(26px); }
-.slide-up-leave-to { opacity: 0; transform: translateY(-26px); }
+.slide-up-enter-active {
+  transition: all 0.5s ease-out;
+}
+.slide-up-leave-active {
+  transition: all 0.5s ease-in;
+  position: absolute;
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-26px);
+}
 
 .spark-input-wrapper:focus-within {
   border-color: #d4756f;
@@ -1172,8 +1218,14 @@ watch(
   color: #8a7566;
 }
 
-.idea-card:hover .unpin-btn { opacity: 1; }
-.unpin-btn:hover { background: #fff; color: #d4756f; transform: scale(1.1); }
+.idea-card:hover .unpin-btn {
+  opacity: 1;
+}
+.unpin-btn:hover {
+  background: #fff;
+  color: #d4756f;
+  transform: scale(1.1);
+}
 
 .cauldron-badge {
   display: inline-flex;
@@ -1203,9 +1255,18 @@ watch(
   color: #8b5a8f;
 }
 
-.idea-status[data-status='ready'] { background: #fff0da; color: #9b7455; }
-.idea-status[data-status='building'] { background: #e9f8ec; color: #4a7c59; }
-.idea-status[data-status='done'] { background: #e9edff; color: #5a6b9b; }
+.idea-status[data-status='ready'] {
+  background: #fff0da;
+  color: #9b7455;
+}
+.idea-status[data-status='building'] {
+  background: #e9f8ec;
+  color: #4a7c59;
+}
+.idea-status[data-status='done'] {
+  background: #e9edff;
+  color: #5a6b9b;
+}
 
 .idea-text {
   margin: 0 0 1rem 0;
@@ -1232,7 +1293,10 @@ watch(
   transition: all 0.2s ease;
 }
 
-.action-btn:hover { background: #c26660; transform: translateY(-1px); }
+.action-btn:hover {
+  background: #c26660;
+  transform: translateY(-1px);
+}
 
 .action-btn.primary {
   background: linear-gradient(135deg, #ff9ad8, #f67176);
@@ -1303,9 +1367,17 @@ watch(
   transition: all 0.2s ease;
 }
 
-.selection-btn:hover { background: #c26660; }
-.selection-btn.secondary { background: transparent; color: #8a7566; border: 1px solid #e5e5e5; }
-.selection-btn.secondary:hover { background: #f5f5f5; }
+.selection-btn:hover {
+  background: #c26660;
+}
+.selection-btn.secondary {
+  background: transparent;
+  color: #8a7566;
+  border: 1px solid #e5e5e5;
+}
+.selection-btn.secondary:hover {
+  background: #f5f5f5;
+}
 
 .loading-card {
   text-align: center;
@@ -1333,8 +1405,12 @@ watch(
   gap: 1rem;
 }
 
-.journal-entry.latest { background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%); }
-.journal-entry.branched { border: 1px solid rgba(212, 117, 111, 0.3); }
+.journal-entry.latest {
+  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
+}
+.journal-entry.branched {
+  border: 1px solid rgba(212, 117, 111, 0.3);
+}
 
 .branch-indicator {
   display: flex;
@@ -1348,8 +1424,15 @@ watch(
   color: #8a7566;
 }
 
-.branch-indicator svg { flex-shrink: 0; color: #d4756f; }
-.branch-indicator span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.branch-indicator svg {
+  flex-shrink: 0;
+  color: #d4756f;
+}
+.branch-indicator span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .entry-header {
   display: flex;
@@ -1385,7 +1468,10 @@ watch(
   padding: 0.25rem 0;
 }
 
-.expand-prompt-btn:hover { color: #c26660; text-decoration: underline; }
+.expand-prompt-btn:hover {
+  color: #c26660;
+  text-decoration: underline;
+}
 
 .entry-meta {
   display: flex;
@@ -1524,8 +1610,14 @@ watch(
   z-index: 10;
 }
 
-.icon-action-btn:hover::after { opacity: 1; }
-.icon-action-btn:hover { background: rgba(212, 117, 111, 0.15); color: #c26660; transform: translateY(-1px); }
+.icon-action-btn:hover::after {
+  opacity: 1;
+}
+.icon-action-btn:hover {
+  background: rgba(212, 117, 111, 0.15);
+  color: #c26660;
+  transform: translateY(-1px);
+}
 
 .collection-tray {
   position: fixed;
@@ -1571,7 +1663,10 @@ watch(
   transition: all 0.2s ease;
 }
 
-.tray-close:hover { background: rgba(212, 117, 111, 0.1); color: #d4756f; }
+.tray-close:hover {
+  background: rgba(212, 117, 111, 0.1);
+  color: #d4756f;
+}
 
 .tray-content {
   flex: 1;
@@ -1590,7 +1685,10 @@ watch(
   gap: 0.75rem;
 }
 
-.tray-empty p { margin: 0; font-size: 0.9375rem; }
+.tray-empty p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
 
 .tray-list {
   display: flex;
@@ -1608,7 +1706,9 @@ watch(
   transition: all 0.2s ease;
 }
 
-.tray-item:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+.tray-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 
 .tray-item {
   cursor: grab;
@@ -1633,9 +1733,15 @@ watch(
   margin-top: 4px;
 }
 
-.tray-item-status[data-status='ready'] { background: #fff0da; }
-.tray-item-status[data-status='building'] { background: #e9f8ec; }
-.tray-item-status[data-status='done'] { background: #e9edff; }
+.tray-item-status[data-status='ready'] {
+  background: #fff0da;
+}
+.tray-item-status[data-status='building'] {
+  background: #e9f8ec;
+}
+.tray-item-status[data-status='done'] {
+  background: #e9edff;
+}
 
 .tray-item-content {
   flex: 1;
@@ -1672,14 +1778,33 @@ watch(
   transition: all 0.2s ease;
 }
 
-.tray-action:hover { background: rgba(212, 117, 111, 0.15); }
-.tray-action.primary { background: #d4756f; color: white; }
-.tray-action.primary:hover { background: #c26660; }
-.tray-action.building { background: linear-gradient(135deg, #ffd89b, #19547b); color: white; }
-.tray-action.danger:hover { background: rgba(220, 53, 69, 0.15); color: #dc3545; }
+.tray-action:hover {
+  background: rgba(212, 117, 111, 0.15);
+}
+.tray-action.primary {
+  background: #d4756f;
+  color: white;
+}
+.tray-action.primary:hover {
+  background: #c26660;
+}
+.tray-action.building {
+  background: linear-gradient(135deg, #ffd89b, #19547b);
+  color: white;
+}
+.tray-action.danger:hover {
+  background: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
 
-.slide-tray-enter-active, .slide-tray-leave-active { transition: transform 0.3s ease; }
-.slide-tray-enter-from, .slide-tray-leave-to { transform: translateX(100%); }
+.slide-tray-enter-active,
+.slide-tray-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-tray-enter-from,
+.slide-tray-leave-to {
+  transform: translateX(100%);
+}
 
 .toast {
   position: fixed;
@@ -1697,10 +1822,19 @@ watch(
   border: 1px solid #f0e5e0;
 }
 
-.toast svg { color: #4a7c59; }
+.toast svg {
+  color: #4a7c59;
+}
 
-.toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
-.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(-10px); }
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 
 .floating-input-btn {
   position: fixed;
@@ -1721,27 +1855,65 @@ watch(
   z-index: 100;
 }
 
-.floating-input-btn:hover { transform: scale(1.1); box-shadow: 0 12px 32px rgba(212, 117, 111, 0.5); }
+.floating-input-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px rgba(212, 117, 111, 0.5);
+}
 
-.spin { animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-.idea-list-enter-active { transition: all 0.3s ease-out; }
-.idea-list-leave-active { transition: all 0.3s ease-in; }
-.idea-list-enter-from { opacity: 0; transform: translateY(20px); }
-.idea-list-leave-to { opacity: 0; transform: translateY(-20px); }
-.idea-list-move { transition: transform 0.3s ease; }
+.idea-list-enter-active {
+  transition: all 0.3s ease-out;
+}
+.idea-list-leave-active {
+  transition: all 0.3s ease-in;
+}
+.idea-list-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.idea-list-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.idea-list-move {
+  transition: transform 0.3s ease;
+}
 
 @media (max-width: 900px) {
-  .spark-layout.with-tray { max-width: 100%; margin-right: 0; }
-  .collection-tray { width: 100%; }
+  .spark-layout.with-tray {
+    max-width: 100%;
+    margin-right: 0;
+  }
+  .collection-tray {
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {
-  .spark-page { padding: 1rem 1rem 3rem; }
-  .ideas-grid { grid-template-columns: 1fr; }
-  .idea-deck { grid-template-columns: 1fr; }
-  .runs-header { flex-direction: column; align-items: flex-start; }
-  .selection-actions { width: 100%; justify-content: space-between; }
+  .spark-page {
+    padding: 1rem 1rem 3rem;
+  }
+  .ideas-grid {
+    grid-template-columns: 1fr;
+  }
+  .idea-deck {
+    grid-template-columns: 1fr;
+  }
+  .runs-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .selection-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 </style>

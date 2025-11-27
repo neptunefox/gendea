@@ -1,7 +1,15 @@
 <template>
-  <div class="idea-node" :class="[{ selected: props.selected, cauldron: isCauldronOutput }, animationClass, workflowClass]" :style="animationStyle">
+  <div
+    class="idea-node"
+    :class="[
+      { selected: props.selected, cauldron: isCauldronOutput },
+      animationClass,
+      workflowClass
+    ]"
+    :style="animationStyle"
+  >
     <Handle type="target" :position="Position.Top" />
-    
+
     <div class="idea-header">
       <Lightbulb :size="18" class="idea-icon" />
       <span v-if="isCauldronOutput" class="cauldron-badge">
@@ -25,9 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { Lightbulb, Sparkles } from 'lucide-vue-next'
+import { computed, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -38,7 +46,9 @@ const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(pr
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const workflowHighlights = inject<any>('workflowHighlights')
-const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
+const workflowClass = computed(
+  () => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || ''
+)
 </script>
 
 <style scoped>
@@ -50,7 +60,9 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(255, 213, 79, 0.2);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   will-change: transform, opacity;
 }
 
@@ -72,18 +84,36 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.8); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .idea-node.selected {
@@ -159,7 +189,9 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 
 .idea-node.workflow-testing-highlight {
   border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(33, 150, 243, 0.2),
+    0 4px 12px rgba(33, 150, 243, 0.15);
   animation: testingPulse 2s ease-in-out infinite;
 }
 
@@ -175,7 +207,16 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 }
 
 @keyframes testingPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(33, 150, 243, 0.2),
+      0 4px 12px rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(33, 150, 243, 0.1),
+      0 4px 16px rgba(33, 150, 243, 0.25);
+  }
 }
 </style>

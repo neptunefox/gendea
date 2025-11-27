@@ -1,7 +1,11 @@
 <template>
-  <div class="text-block-node" :class="[{ selected: props.selected }, animationClass, workflowClass]" :style="animationStyle">
+  <div
+    class="text-block-node"
+    :class="[{ selected: props.selected }, animationClass, workflowClass]"
+    :style="animationStyle"
+  >
     <Handle type="target" :position="Position.Top" />
-    
+
     <div
       v-if="isEditing"
       ref="editorRef"
@@ -21,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
+import { ref, computed, nextTick, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -35,7 +39,9 @@ const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(pr
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const workflowHighlights = inject<any>('workflowHighlights')
-const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
+const workflowClass = computed(
+  () => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || ''
+)
 
 const formattedText = computed(() => {
   const text = props.data.text || ''
@@ -105,18 +111,36 @@ async function saveText() {
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.8); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .text-block-node.selected {
@@ -158,7 +182,9 @@ async function saveText() {
 
 .text-block-node.workflow-testing-highlight {
   border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(33, 150, 243, 0.2),
+    0 4px 12px rgba(33, 150, 243, 0.15);
   animation: testingPulse 2s ease-in-out infinite;
 }
 
@@ -174,7 +200,16 @@ async function saveText() {
 }
 
 @keyframes testingPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(33, 150, 243, 0.2),
+      0 4px 12px rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(33, 150, 243, 0.1),
+      0 4px 16px rgba(33, 150, 243, 0.25);
+  }
 }
 </style>

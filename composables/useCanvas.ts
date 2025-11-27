@@ -65,12 +65,14 @@ export function useCanvas(projectId: Ref<string>) {
         version: edge.version
       }))
 
-      state.value = data.state ? {
-        viewportX: data.state.viewportX,
-        viewportY: data.state.viewportY,
-        zoom: data.state.zoom,
-        version: data.state.version
-      } : null
+      state.value = data.state
+        ? {
+            viewportX: data.state.viewportX,
+            viewportY: data.state.viewportY,
+            zoom: data.state.zoom,
+            version: data.state.version
+          }
+        : null
     } catch (error) {
       console.error('Failed to load canvas:', error)
     } finally {
@@ -105,7 +107,7 @@ export function useCanvas(projectId: Ref<string>) {
 
   async function updateNode(id: string, updates: Partial<Omit<CanvasNode, 'id'>>) {
     const existingNode = nodes.value.find(n => n.id === id)
-    
+
     try {
       const { node: updated } = await $fetch(`/api/canvas/nodes/${id}`, {
         method: 'PATCH',
@@ -133,7 +135,7 @@ export function useCanvas(projectId: Ref<string>) {
         conflict.value = {
           type: 'node',
           id,
-          localData: existingNode || { id, ...updates } as CanvasNode,
+          localData: existingNode || ({ id, ...updates } as CanvasNode),
           serverData: {
             id: serverData.id,
             type: serverData.type,
@@ -200,9 +202,12 @@ export function useCanvas(projectId: Ref<string>) {
     }
   }
 
-  async function updateEdge(id: string, updates: Partial<Omit<CanvasEdge, 'id' | 'source' | 'target'>>) {
+  async function updateEdge(
+    id: string,
+    updates: Partial<Omit<CanvasEdge, 'id' | 'source' | 'target'>>
+  ) {
     const existingEdge = edges.value.find(e => e.id === id)
-    
+
     try {
       const { edge: updated } = await $fetch(`/api/canvas/edges/${id}`, {
         method: 'PATCH',
@@ -232,7 +237,7 @@ export function useCanvas(projectId: Ref<string>) {
         conflict.value = {
           type: 'edge',
           id,
-          localData: existingEdge || { id, ...updates } as CanvasEdge,
+          localData: existingEdge || ({ id, ...updates } as CanvasEdge),
           serverData: {
             id: serverData.id,
             source: serverData.sourceId,

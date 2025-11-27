@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { detectDisconnectedClusters } from '../../../utils/canvas-ai-service'
+
 import { canvasNodes, canvasEdges } from '../../../../db/schema'
 import { db } from '../../../db'
+import { detectDisconnectedClusters } from '../../../utils/canvas-ai-service'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

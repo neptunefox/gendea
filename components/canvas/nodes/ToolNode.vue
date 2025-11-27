@@ -1,7 +1,11 @@
 <template>
-  <div class="tool-node" :class="[{ selected: props.selected }, animationClass, workflowClass]" :style="animationStyle">
+  <div
+    class="tool-node"
+    :class="[{ selected: props.selected }, animationClass, workflowClass]"
+    :style="animationStyle"
+  >
     <Handle type="target" :position="Position.Top" />
-    
+
     <div class="tool-header">
       <Wrench :size="18" class="tool-icon" />
       <span class="tool-label">Tool / Resource</span>
@@ -32,9 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { Wrench, ExternalLink } from 'lucide-vue-next'
+import { computed, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -43,7 +47,9 @@ const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(pr
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const workflowHighlights = inject<any>('workflowHighlights')
-const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
+const workflowClass = computed(
+  () => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || ''
+)
 </script>
 
 <style scoped>
@@ -75,18 +81,36 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.8); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .tool-node.selected {
@@ -149,7 +173,9 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 
 .tool-node.workflow-testing-highlight {
   border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(33, 150, 243, 0.2),
+    0 4px 12px rgba(33, 150, 243, 0.15);
   animation: testingPulse 2s ease-in-out infinite;
 }
 
@@ -165,7 +191,16 @@ const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, 
 }
 
 @keyframes testingPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(33, 150, 243, 0.2),
+      0 4px 12px rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(33, 150, 243, 0.1),
+      0 4px 16px rgba(33, 150, 243, 0.25);
+  }
 }
 </style>

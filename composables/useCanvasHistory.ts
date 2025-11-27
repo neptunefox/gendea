@@ -1,7 +1,15 @@
 import { ref, computed, type Ref } from 'vue'
 
 interface HistoryEntry {
-  type: 'node-add' | 'node-delete' | 'node-move' | 'node-update' | 'edge-add' | 'edge-delete' | 'edge-update' | 'group'
+  type:
+    | 'node-add'
+    | 'node-delete'
+    | 'node-move'
+    | 'node-update'
+    | 'edge-add'
+    | 'edge-delete'
+    | 'edge-update'
+    | 'group'
   timestamp: number
   data: any
   undo: () => Promise<void>
@@ -102,7 +110,11 @@ export function useCanvasHistory(projectId: Ref<string>) {
     })
   }
 
-  function recordNodeMove(nodeId: string, oldPosition: { x: number; y: number }, newPosition: { x: number; y: number }) {
+  function recordNodeMove(
+    nodeId: string,
+    oldPosition: { x: number; y: number },
+    newPosition: { x: number; y: number }
+  ) {
     pushEntry({
       type: 'node-move',
       data: { nodeId, oldPosition, newPosition },

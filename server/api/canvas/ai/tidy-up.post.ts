@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { tidyUpNodes } from '../../../utils/canvas-ai-service'
+
 import { canvasNodes } from '../../../../db/schema'
 import { db } from '../../../db'
+import { tidyUpNodes } from '../../../utils/canvas-ai-service'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
@@ -14,14 +15,9 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const allNodes = await db
-    .select()
-    .from(canvasNodes)
-    .where(eq(canvasNodes.projectId, projectId))
+  const allNodes = await db.select().from(canvasNodes).where(eq(canvasNodes.projectId, projectId))
 
-  const nodesToOrganize = nodeIds
-    ? allNodes.filter(n => nodeIds.includes(n.id))
-    : allNodes
+  const nodesToOrganize = nodeIds ? allNodes.filter(n => nodeIds.includes(n.id)) : allNodes
 
   if (nodesToOrganize.length === 0) {
     return { clusters: [] }

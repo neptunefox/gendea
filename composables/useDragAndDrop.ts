@@ -1,7 +1,10 @@
-import { ref, computed, inject } from 'vue'
 import { useVueFlow, type Node } from '@vue-flow/core'
-import type { CanvasNodeType } from '~/components/canvas/nodes'
+import { ref, computed, inject } from 'vue'
+
 import { useCanvasAnimations } from './useCanvasAnimations'
+
+import type { CanvasNodeType } from '~/components/canvas/nodes'
+
 
 interface SavedIdeaDragData {
   id: string
@@ -109,12 +112,18 @@ export function useDragAndDrop() {
         x: basePosition.x + col * (NODE_WIDTH + GRID_GAP),
         y: basePosition.y + row * (NODE_HEIGHT + GRID_GAP)
       }
-      const safePosition = findNonCollidingPosition(gridPosition, [...existingNodes, ...positions.map((p, idx) => ({
-        id: `temp-${idx}`,
-        position: p,
-        data: {},
-        dimensions: { width: NODE_WIDTH, height: NODE_HEIGHT }
-      } as unknown as Node))])
+      const safePosition = findNonCollidingPosition(gridPosition, [
+        ...existingNodes,
+        ...positions.map(
+          (p, idx) =>
+            ({
+              id: `temp-${idx}`,
+              position: p,
+              data: {},
+              dimensions: { width: NODE_WIDTH, height: NODE_HEIGHT }
+            }) as unknown as Node
+        )
+      ])
       positions.push(safePosition)
     }
 

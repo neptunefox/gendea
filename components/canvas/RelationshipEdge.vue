@@ -58,8 +58,15 @@
 </template>
 
 <script setup lang="ts">
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  getBezierPath,
+  useVueFlow,
+  type EdgeProps
+} from '@vue-flow/core'
 import { ref, computed, watch, onMounted } from 'vue'
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow, type EdgeProps } from '@vue-flow/core'
+
 import { EDGE_STYLES, EDGE_RELATIONSHIP_LABELS, type EdgeRelationshipType } from '~/types/canvas'
 
 const props = defineProps<EdgeProps>()

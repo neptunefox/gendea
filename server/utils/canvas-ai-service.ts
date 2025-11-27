@@ -1,22 +1,3 @@
-import { useLangChainService } from './langchain-service'
-import {
-  CanvasExpandSchema,
-  CanvasTidyUpSchema,
-  CanvasConnectionLabelSchema,
-  ProactiveQuestionSchema,
-  ProactiveToolSchema,
-  IncompleteNodeSchema,
-  UnrelatedConnectionSchema,
-  DisconnectedClustersSchema,
-  type CanvasExpand,
-  type CanvasTidyUp,
-  type CanvasConnectionLabel,
-  type ProactiveQuestion,
-  type ProactiveTool,
-  type IncompleteNode,
-  type UnrelatedConnection,
-  type DisconnectedClusters
-} from './langchain-schemas'
 import {
   CANVAS_EXPAND_SYSTEM_PROMPT,
   CANVAS_TIDY_UP_SYSTEM_PROMPT,
@@ -35,6 +16,25 @@ import {
   buildUnrelatedConnectionPrompt,
   buildDisconnectedClustersPrompt
 } from './langchain-prompts'
+import {
+  CanvasExpandSchema,
+  CanvasTidyUpSchema,
+  CanvasConnectionLabelSchema,
+  ProactiveQuestionSchema,
+  ProactiveToolSchema,
+  IncompleteNodeSchema,
+  UnrelatedConnectionSchema,
+  DisconnectedClustersSchema,
+  type CanvasExpand,
+  type CanvasTidyUp,
+  type CanvasConnectionLabel,
+  type ProactiveQuestion,
+  type ProactiveTool,
+  type IncompleteNode,
+  type UnrelatedConnection,
+  type DisconnectedClusters
+} from './langchain-schemas'
+import { useLangChainService } from './langchain-service'
 import type { CanvasNodeData } from './langchain-types'
 
 export interface ExpandResult {
@@ -63,11 +63,7 @@ export interface TidyUpResult {
   }>
 }
 
-
-export async function expandNode(
-  nodeContent: string,
-  nodeType: string
-): Promise<ExpandResult> {
+export async function expandNode(nodeContent: string, nodeType: string): Promise<ExpandResult> {
   const langChain = useLangChainService()
   const prompt = buildCanvasExpandPrompt(nodeContent, nodeType)
 
@@ -87,9 +83,7 @@ export async function expandNode(
   }
 }
 
-export async function tidyUpNodes(
-  nodes: CanvasNodeData[]
-): Promise<TidyUpResult> {
+export async function tidyUpNodes(nodes: CanvasNodeData[]): Promise<TidyUpResult> {
   const langChain = useLangChainService()
   const prompt = buildCanvasTidyUpPrompt(
     nodes.map(n => ({ id: n.id, type: n.type, content: n.content }))
@@ -132,9 +126,7 @@ export async function detectVagueIdea(
   })
 }
 
-export async function suggestTool(
-  nodeContent: string
-): Promise<ProactiveTool> {
+export async function suggestTool(nodeContent: string): Promise<ProactiveTool> {
   const langChain = useLangChainService()
   const prompt = buildProactiveToolPrompt(nodeContent)
 

@@ -102,7 +102,6 @@ Output JSON: {"ideas":["test 1","test 2"],"anchor":"why evidence matters"}`,
   }
 ]
 
-
 export default defineEventHandler(async event => {
   const body = await readBody(event)
   const { input, history, isBranch } = body as {
@@ -115,9 +114,10 @@ export default defineEventHandler(async event => {
     throw createError({ statusCode: 400, statusMessage: 'Input is required' })
   }
 
-  const normalizedHistory = Array.isArray(history) && isBranch
-    ? history.filter(entry => entry?.prompt && typeof entry.prompt === 'string')
-    : []
+  const normalizedHistory =
+    Array.isArray(history) && isBranch
+      ? history.filter(entry => entry?.prompt && typeof entry.prompt === 'string')
+      : []
 
   const seenIdeas = buildHistorySet(normalizedHistory)
   const coreIdeas = await generateSparkIdeas(input, normalizedHistory, seenIdeas)
@@ -172,7 +172,10 @@ Generate 5-6 fresh ideas as a JSON array.`
     throw new Error('No valid ideas generated')
   } catch (error) {
     console.error('Failed to generate spark ideas:', error)
-    throw createError({ statusCode: 500, statusMessage: 'Failed to generate ideas. Please try again.' })
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to generate ideas. Please try again.'
+    })
   }
 }
 
@@ -207,7 +210,8 @@ Format: {"ideas":["idea one","idea two"],"anchor":"one sentence insight"}`
     })
 
     const freshIdeas = result.ideas.filter(text => !seenIdeas.has(normalizeIdea(text)))
-    const finalIdeas = freshIdeas.length > 0 ? freshIdeas : blueprint.fallbackIdeas(topic).slice(0, 2)
+    const finalIdeas =
+      freshIdeas.length > 0 ? freshIdeas : blueprint.fallbackIdeas(topic).slice(0, 2)
 
     finalIdeas.forEach(text => seenIdeas.add(normalizeIdea(text)))
 
@@ -234,7 +238,6 @@ Format: {"ideas":["idea one","idea two"],"anchor":"one sentence insight"}`
     }
   }
 }
-
 
 function buildNudges(topic: string): SparkNudge[] {
   return [
@@ -271,7 +274,10 @@ function buildHistorySet(history: SparkHistoryEntry[]): Set<string> {
 }
 
 function normalizeIdea(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
 }
 
 async function persistSparkRun(entry: {

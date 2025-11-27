@@ -35,9 +35,12 @@ export function useCanvasAnimations() {
   function markNodesStaggered(nodeIds: string[], baseDelay: number = 50): void {
     nodeIds.forEach((id, index) => {
       staggeredNodes.value.set(id, index * baseDelay)
-      setTimeout(() => {
-        staggeredNodes.value.delete(id)
-      }, defaultConfig.duration + index * baseDelay)
+      setTimeout(
+        () => {
+          staggeredNodes.value.delete(id)
+        },
+        defaultConfig.duration + index * baseDelay
+      )
     })
   }
 

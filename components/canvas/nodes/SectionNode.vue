@@ -11,12 +11,12 @@
         </button>
         <input
           v-if="isEditing"
+          ref="inputRef"
           v-model="editLabel"
           class="section-input nodrag"
           @blur="saveLabel"
           @keydown.enter="saveLabel"
           @keydown.escape="cancelEdit"
-          ref="inputRef"
         />
         <span v-else class="section-label">{{ props.data.label || 'Section' }}</span>
       </div>
@@ -36,9 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, inject } from 'vue'
-import { type NodeProps } from '@vue-flow/core'
+import type { NodeProps } from '@vue-flow/core'
 import { ChevronDown } from 'lucide-vue-next'
+import { ref, computed, nextTick, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -131,7 +131,9 @@ function toggleCollapse() {
   border: 2px dashed;
   border-radius: 12px;
   overflow: hidden;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
   will-change: transform, opacity;
 }
 
@@ -148,13 +150,25 @@ function toggleCollapse() {
 }
 
 @keyframes sectionAppear {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes sectionDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.95); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
 
 .section-node.selected {

@@ -37,10 +37,7 @@
           </button>
         </div>
 
-        <CanvasPlanProgress
-          :plan-summary="planSummary"
-          @view-canvas="navigateToCanvas"
-        />
+        <CanvasPlanProgress :plan-summary="planSummary" @view-canvas="navigateToCanvas" />
 
         <div class="context-actions">
           <button class="ghost-btn" @click="backToExploring">← Back to exploring</button>
@@ -103,7 +100,12 @@
       </div>
     </transition>
 
-    <button v-if="idea" class="floating-toggle-btn" @click="navigateToCanvas" title="Switch to Canvas">
+    <button
+      v-if="idea"
+      class="floating-toggle-btn"
+      title="Switch to Canvas"
+      @click="navigateToCanvas"
+    >
       <LayoutGrid :size="18" />
       <span>Canvas</span>
     </button>
@@ -122,14 +124,14 @@ import { ArrowLeft, Loader, Check, LayoutGrid } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import CanvasPlanProgress from '~/components/coach/CanvasPlanProgress.vue'
-import { useFlowGuidance } from '~/composables/useFlowGuidance'
 import CommitPhase from '~/components/coach/CommitPhase.vue'
 import LearnPhase from '~/components/coach/LearnPhase.vue'
 import PreMortemTool from '~/components/coach/PreMortemTool.vue'
 import ReferenceClassTool from '~/components/coach/ReferenceClassTool.vue'
 import TestPhase from '~/components/coach/TestPhase.vue'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
 
 interface SavedIdea {
   id: string

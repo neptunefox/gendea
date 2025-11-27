@@ -390,9 +390,10 @@ export function buildDisconnectedClustersPrompt(
   edges: Array<{ sourceId: string; targetId: string }>
 ): string {
   const nodesList = nodes.map(n => `[${n.id}] (${n.type}): ${n.content}`).join('\n')
-  const edgesList = edges.length > 0
-    ? edges.map(e => `${e.sourceId} -> ${e.targetId}`).join('\n')
-    : 'No connections'
+  const edgesList =
+    edges.length > 0
+      ? edges.map(e => `${e.sourceId} -> ${e.targetId}`).join('\n')
+      : 'No connections'
 
   return `Analyze these canvas nodes and their connections:
 

@@ -12,7 +12,13 @@
       <p>Loading canvas...</p>
     </div>
 
-    <div v-else class="canvas-container" @drop="handleDrop" @dragover="handleDragOver" @dragleave="handleDragLeave">
+    <div
+      v-else
+      class="canvas-container"
+      @drop="handleDrop"
+      @dragover="handleDragOver"
+      @dragleave="handleDragLeave"
+    >
       <VueFlow
         v-model="elements"
         :default-viewport="viewport"
@@ -112,11 +118,16 @@
       </VueFlow>
 
       <div v-if="selectedNodes.length > 1" class="selection-toolbar">
-        <button class="group-btn" @click="groupSelectedNodes" title="Group selected nodes">
+        <button class="group-btn" title="Group selected nodes" @click="groupSelectedNodes">
           <Group :size="18" />
           <span>Group ({{ selectedNodes.length }})</span>
         </button>
-        <button class="ai-tidy-btn" @click="handleTidyUp" :disabled="isTidying" title="AI organize nodes">
+        <button
+          class="ai-tidy-btn"
+          :disabled="isTidying"
+          title="AI organize nodes"
+          @click="handleTidyUp"
+        >
           <Loader2 v-if="isTidying" :size="18" class="spin" />
           <Wand2 v-else :size="18" />
           <span>Tidy Up</span>
@@ -148,7 +159,11 @@
         <p>{{ draggedType === 'idea' ? 'Drop idea to add to canvas' : 'Drop to add node' }}</p>
       </div>
 
-      <div v-if="isTestingState || isStalledState || isReviewingState" class="workflow-state-indicator" :class="workflowStateClass">
+      <div
+        v-if="isTestingState || isStalledState || isReviewingState"
+        class="workflow-state-indicator"
+        :class="workflowStateClass"
+      >
         <FlaskConical v-if="isTestingState" :size="16" />
         <AlertTriangle v-else-if="isStalledState" :size="16" />
         <CheckCircle2 v-else-if="isReviewingState" :size="16" />
@@ -160,16 +175,16 @@
           <button
             class="toolbar-btn"
             :disabled="!canvasHistory.canUndo.value"
-            @click="handleUndo"
             title="Undo (Ctrl+Z)"
+            @click="handleUndo"
           >
             <Undo2 :size="16" />
           </button>
           <button
             class="toolbar-btn"
             :disabled="!canvasHistory.canRedo.value"
-            @click="handleRedo"
             title="Redo (Ctrl+Y)"
+            @click="handleRedo"
           >
             <Redo2 :size="16" />
           </button>
@@ -177,13 +192,13 @@
         <div class="toolbar-divider" />
         <button
           class="toolbar-btn shortcuts-btn"
-          @click="showShortcuts = !showShortcuts"
           title="Keyboard shortcuts"
+          @click="showShortcuts = !showShortcuts"
         >
           <Keyboard :size="16" />
         </button>
         <div class="toolbar-divider" />
-        <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
+        <button class="toggle-view-btn" title="Switch to Coach" @click="navigateToCoach">
           <Hammer :size="18" />
           <span>Coach</span>
         </button>
@@ -268,7 +283,7 @@
               class="idea-item"
               :class="{ cauldron: idea.isCauldronOutput }"
               draggable="true"
-              @dragstart="(e) => handleIdeaDragStart(e, idea)"
+              @dragstart="e => handleIdeaDragStart(e, idea)"
               @dragend="handleIdeaDragEnd"
             >
               <Sparkles v-if="idea.isCauldronOutput" :size="12" class="cauldron-icon" />
@@ -282,13 +297,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, provide, watch, reactive } from 'vue'
-import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Connection } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2, FlaskConical, AlertTriangle, CheckCircle2, Undo2, Redo2, Keyboard } from 'lucide-vue-next'
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import { useFlowGuidance } from '~/composables/useFlowGuidance'
+import {
+  VueFlow,
+  useVueFlow,
+  SelectionMode,
+  type Viewport,
+  type Node,
+  type Connection
+} from '@vue-flow/core'
+import {
+  Hammer,
+  Group,
+  ChevronLeft,
+  ChevronRight,
+  Lightbulb,
+  Sparkles,
+  Wand2,
+  Loader2,
+  FlaskConical,
+  AlertTriangle,
+  CheckCircle2,
+  Undo2,
+  Redo2,
+  Keyboard
+} from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted, provide, watch, reactive } from 'vue'
+
+import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
+import ConflictResolutionModal from '~/components/canvas/ConflictResolutionModal.vue'
+import EdgeSuggestionPopup from '~/components/canvas/EdgeSuggestionPopup.vue'
+import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
+import NodePalette from '~/components/canvas/NodePalette.vue'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -301,17 +342,14 @@ import {
   SectionNode
 } from '~/components/canvas/nodes'
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
-import NodePalette from '~/components/canvas/NodePalette.vue'
-import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
-import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
-import ConflictResolutionModal from '~/components/canvas/ConflictResolutionModal.vue'
-import EdgeSuggestionPopup from '~/components/canvas/EdgeSuggestionPopup.vue'
-import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useCanvas, type ConflictInfo } from '~/composables/useCanvas'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
 import { useCanvasHistory } from '~/composables/useCanvasHistory'
-import type { WorkflowState } from '~/types/workflow'
+import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import { useFlowGuidance } from '~/composables/useFlowGuidance'
 import type { EdgeRelationshipType } from '~/types/canvas'
+import type { WorkflowState } from '~/types/workflow'
 
 const route = useRoute()
 const router = useRouter()
@@ -319,7 +357,15 @@ const flowGuidance = useFlowGuidance()
 
 const projectId = computed(() => route.params.id as string)
 
-const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
+const {
+  isDragOver,
+  draggedType,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onDragStartSavedIdea,
+  onDragEnd
+} = useDragAndDrop()
 const canvasAnimations = useCanvasAnimations()
 const { conflict, hasConflict, resolveConflict, dismissConflict } = useCanvas(projectId)
 const canvasHistory = useCanvasHistory(projectId)
@@ -331,7 +377,9 @@ const workflowState = ref<WorkflowState>('Seeded')
 const lastWorkflowStateChange = ref<number>(Date.now())
 
 const isTestingState = computed(() => workflowState.value === 'Testing')
-const isStalledState = computed(() => workflowState.value === 'Stalled' || workflowState.value === 'Action crisis')
+const isStalledState = computed(
+  () => workflowState.value === 'Stalled' || workflowState.value === 'Action crisis'
+)
 const isReviewingState = computed(() => workflowState.value === 'Reviewing')
 
 function isTestRelatedNode(nodeType: string, nodeData: Record<string, unknown>): boolean {
@@ -358,7 +406,11 @@ function isCompletedNode(nodeType: string, nodeData: Record<string, unknown>): b
   return false
 }
 
-function getNodeWorkflowClass(nodeId: string, nodeType: string, nodeData: Record<string, unknown>): string {
+function getNodeWorkflowClass(
+  nodeId: string,
+  nodeType: string,
+  nodeData: Record<string, unknown>
+): string {
   const classes: string[] = []
 
   if (isTestingState.value && isTestRelatedNode(nodeType, nodeData)) {
@@ -388,7 +440,8 @@ provide('workflowHighlights', workflowHighlights)
 
 const workflowStateLabel = computed(() => {
   if (isTestingState.value) return 'Testing'
-  if (isStalledState.value) return workflowState.value === 'Action crisis' ? 'Action Crisis' : 'Stalled'
+  if (isStalledState.value)
+    return workflowState.value === 'Action crisis' ? 'Action Crisis' : 'Stalled'
   if (isReviewingState.value) return 'Reviewing'
   return ''
 })
@@ -457,7 +510,16 @@ const viewport = ref<Viewport>({
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
-const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady, onNodeDragStop, fitView } = useVueFlow()
+const {
+  getSelectedNodes,
+  addNodes,
+  updateNode,
+  addEdges,
+  setViewport,
+  onPaneReady,
+  onNodeDragStop,
+  fitView
+} = useVueFlow()
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
 
@@ -516,15 +578,15 @@ onNodeDragStart(({ node }) => {
 
 onNodeDragStop(async ({ node }) => {
   if (!projectId.value) return
-  
+
   const startPos = dragStartPositions.value.get(node.id)
   const newPos = { x: Math.round(node.position.x), y: Math.round(node.position.y) }
-  
+
   if (startPos && (startPos.x !== newPos.x || startPos.y !== newPos.y)) {
     canvasHistory.recordNodeMove(node.id, startPos, newPos)
   }
   dragStartPositions.value.delete(node.id)
-  
+
   try {
     const nodeData = node.data as Record<string, unknown>
     const response = await $fetch(`/api/canvas/nodes/${node.id}`, {
@@ -550,7 +612,7 @@ async function handleConnect(connection: Connection) {
 
   const sourceNode = elements.value.find((e: any) => e.id === connection.source && !e.source)
   const targetNode = elements.value.find((e: any) => e.id === connection.target && !e.source)
-  
+
   const sourceContent = sourceNode ? getNodeContent(sourceNode) : ''
   const targetContent = targetNode ? getNodeContent(targetNode) : ''
 
@@ -608,10 +670,14 @@ async function fetchEdgeSuggestion(
 
     const midX = (sourceNode.position.x + targetNode.position.x) / 2
     const midY = (sourceNode.position.y + targetNode.position.y) / 2
-    
+
     const canvasRect = document.querySelector('.vue-flow')?.getBoundingClientRect()
-    const screenX = canvasRect ? canvasRect.left + (midX * viewport.value.zoom + viewport.value.x) : midX
-    const screenY = canvasRect ? canvasRect.top + (midY * viewport.value.zoom + viewport.value.y) : midY
+    const screenX = canvasRect
+      ? canvasRect.left + (midX * viewport.value.zoom + viewport.value.x)
+      : midX
+    const screenY = canvasRect
+      ? canvasRect.top + (midY * viewport.value.zoom + viewport.value.y)
+      : midY
 
     edgeSuggestion.value = {
       edgeId,
@@ -626,7 +692,11 @@ async function fetchEdgeSuggestion(
   }
 }
 
-async function handleEdgeSuggestionAccept(edgeId: string, type: EdgeRelationshipType, label: string | null) {
+async function handleEdgeSuggestionAccept(
+  edgeId: string,
+  type: EdgeRelationshipType,
+  label: string | null
+) {
   try {
     await $fetch(`/api/canvas/edges/${edgeId}`, {
       method: 'PATCH',
@@ -666,12 +736,12 @@ async function checkConnectionRelatedness(sourceId: string, targetId: string) {
 
   const sourceNode = elements.value.find((e: any) => e.id === sourceId && !e.source)
   const targetNode = elements.value.find((e: any) => e.id === targetId && !e.source)
-  
+
   if (!sourceNode || !targetNode) return
 
   const sourceContent = getNodeContent(sourceNode)
   const targetContent = getNodeContent(targetNode)
-  
+
   if (!sourceContent || !targetContent) return
 
   try {
@@ -764,7 +834,7 @@ async function loadCanvas() {
         zoom: data.state.zoom
       }
       viewport.value = restoredViewport
-      
+
       if (paneReady) {
         setViewport(restoredViewport)
       } else {
@@ -866,14 +936,20 @@ function handleAIError(message: string) {
 async function handleDeleteNode(nodeId: string) {
   try {
     const nodeToDelete = elements.value.find((e: any) => e.id === nodeId && !e.source)
-    const connectedEdges = elements.value.filter((e: any) => e.source === nodeId || e.target === nodeId)
-    
+    const connectedEdges = elements.value.filter(
+      (e: any) => e.source === nodeId || e.target === nodeId
+    )
+
     if (nodeToDelete) {
-      canvasHistory.recordNodeDelete(nodeId, {
-        type: nodeToDelete.type,
-        position: nodeToDelete.position,
-        data: nodeToDelete.data
-      }, connectedEdges)
+      canvasHistory.recordNodeDelete(
+        nodeId,
+        {
+          type: nodeToDelete.type,
+          position: nodeToDelete.position,
+          data: nodeToDelete.data
+        },
+        connectedEdges
+      )
     }
 
     await canvasAnimations.markNodeDeleting(nodeId)
@@ -891,7 +967,7 @@ async function handleDeleteNode(nodeId: string) {
 async function handleDeleteSelectedNodes() {
   const nodes = selectedNodes.value
   if (nodes.length === 0) return
-  
+
   for (const node of nodes) {
     await handleDeleteNode(node.id)
   }
@@ -899,7 +975,8 @@ async function handleDeleteSelectedNodes() {
 
 async function handleKeyDown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+  const isEditing =
+    target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
 
   if (event.key === 'Delete' || event.key === 'Backspace') {
     if (isEditing) return
@@ -918,7 +995,10 @@ async function handleKeyDown(event: KeyboardEvent) {
     return
   }
 
-  if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+  if (
+    (event.ctrlKey || event.metaKey) &&
+    (event.key === 'y' || (event.key === 'z' && event.shiftKey))
+  ) {
     if (isEditing) return
     event.preventDefault()
     if (canvasHistory.canRedo.value) {
@@ -1016,7 +1096,7 @@ function dismissSuggestion() {
   if (currentSuggestion.value) {
     const key = `${currentSuggestion.value.type}-${currentSuggestion.value.nodeId || 'global'}`
     dismissedSuggestions.value.add(key)
-    
+
     if (currentSuggestion.value.nodeId) {
       $fetch('/api/canvas/ai/dismiss-suggestion', {
         method: 'POST',
@@ -1085,15 +1165,18 @@ async function checkForDisconnectedClusters() {
 
 let clusterCheckTimeout: NodeJS.Timeout | null = null
 
-watch(() => elements.value.length, () => {
-  if (clusterCheckTimeout) clearTimeout(clusterCheckTimeout)
-  clusterCheckTimeout = setTimeout(checkForDisconnectedClusters, 5000)
+watch(
+  () => elements.value.length,
+  () => {
+    if (clusterCheckTimeout) clearTimeout(clusterCheckTimeout)
+    clusterCheckTimeout = setTimeout(checkForDisconnectedClusters, 5000)
 
-  const taskNodes = elements.value.filter((e: any) => !e.source && e.type === 'task')
-  if (taskNodes.length >= 3) {
-    flowGuidance.showSuggestion(flowGuidance.suggestions.canvasToCoach)
+    const taskNodes = elements.value.filter((e: any) => !e.source && e.type === 'task')
+    if (taskNodes.length >= 3) {
+      flowGuidance.showSuggestion(flowGuidance.suggestions.canvasToCoach)
+    }
   }
-})
+)
 
 async function groupSelectedNodes() {
   const nodes = selectedNodes.value
@@ -1206,7 +1289,7 @@ async function syncCanvasData() {
   if (!projectId.value) return
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
-    
+
     if (data.workflowState) {
       const newState = data.workflowState as WorkflowState
       if (workflowState.value !== newState) {
@@ -1214,18 +1297,24 @@ async function syncCanvasData() {
         lastWorkflowStateChange.value = Date.now()
       }
     }
-    
-    const currentNodeIds = new Set(elements.value.filter((e: any) => !e.source).map((n: any) => n.id))
-    const currentEdgeIds = new Set(elements.value.filter((e: any) => e.source).map((e: any) => e.id))
-    
+
+    const currentNodeIds = new Set(
+      elements.value.filter((e: any) => !e.source).map((n: any) => n.id)
+    )
+    const currentEdgeIds = new Set(
+      elements.value.filter((e: any) => e.source).map((e: any) => e.id)
+    )
+
     const serverNodeIds = new Set(data.nodes.map((n: any) => n.id))
     const serverEdgeIds = new Set(data.edges.map((e: any) => e.id))
-    
-    const hasNodeChanges = data.nodes.some((n: any) => !currentNodeIds.has(n.id)) ||
+
+    const hasNodeChanges =
+      data.nodes.some((n: any) => !currentNodeIds.has(n.id)) ||
       [...currentNodeIds].some(id => !serverNodeIds.has(id))
-    const hasEdgeChanges = data.edges.some((e: any) => !currentEdgeIds.has(e.id)) ||
+    const hasEdgeChanges =
+      data.edges.some((e: any) => !currentEdgeIds.has(e.id)) ||
       [...currentEdgeIds].some(id => !serverEdgeIds.has(id))
-    
+
     if (hasNodeChanges || hasEdgeChanges) {
       const sectionNodes = data.nodes
         .filter((node: any) => node.type === 'section')
@@ -1363,14 +1452,22 @@ onUnmounted(() => {
 }
 
 @keyframes stateIndicatorAppear {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .workflow-state-indicator.state-testing {
   color: #1976d2;
   border: 1px solid rgba(33, 150, 243, 0.3);
-  animation: stateIndicatorAppear 0.3s ease, testingGlow 2s ease-in-out infinite;
+  animation:
+    stateIndicatorAppear 0.3s ease,
+    testingGlow 2s ease-in-out infinite;
 }
 
 .workflow-state-indicator.state-stalled {
@@ -1386,8 +1483,13 @@ onUnmounted(() => {
 }
 
 @keyframes testingGlow {
-  0%, 100% { box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15); }
-  50% { box-shadow: 0 2px 16px rgba(33, 150, 243, 0.3); }
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(33, 150, 243, 0.3);
+  }
 }
 
 .canvas-toolbar {
@@ -1477,8 +1579,14 @@ onUnmounted(() => {
 }
 
 @keyframes panelAppear {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .shortcuts-header {
@@ -1603,8 +1711,12 @@ kbd {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .drop-indicator {
@@ -1892,7 +2004,9 @@ kbd {
 }
 
 .vue-flow__edge path {
-  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  transition:
+    stroke 0.15s ease,
+    stroke-width 0.15s ease;
 }
 
 .vue-flow__edge.selected path {
@@ -1900,7 +2014,9 @@ kbd {
 }
 
 .vue-flow__handle {
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .vue-flow__handle:hover {
@@ -1976,18 +2092,30 @@ kbd {
   }
 
   @keyframes nodeAppear {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes nodeDelete {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
   }
 
   @keyframes nodeStagger {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 }
 </style>

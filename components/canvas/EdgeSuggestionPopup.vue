@@ -46,9 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import { Sparkles, Check, X } from 'lucide-vue-next'
-import { EDGE_RELATIONSHIP_TYPES, EDGE_RELATIONSHIP_LABELS, type EdgeRelationshipType } from '~/types/canvas'
+import { ref, watch } from 'vue'
+
+import {
+  EDGE_RELATIONSHIP_TYPES,
+  EDGE_RELATIONSHIP_LABELS,
+  type EdgeRelationshipType
+} from '~/types/canvas'
 
 interface Props {
   isVisible: boolean
@@ -68,13 +73,19 @@ const emit = defineEmits<{
 const selectedType = ref<EdgeRelationshipType>(props.suggestedType)
 const customLabel = ref(props.suggestedLabel)
 
-watch(() => props.suggestedType, (newType) => {
-  selectedType.value = newType
-})
+watch(
+  () => props.suggestedType,
+  newType => {
+    selectedType.value = newType
+  }
+)
 
-watch(() => props.suggestedLabel, (newLabel) => {
-  customLabel.value = newLabel
-})
+watch(
+  () => props.suggestedLabel,
+  newLabel => {
+    customLabel.value = newLabel
+  }
+)
 
 function handleAccept() {
   emit('accept', props.edgeId, selectedType.value, customLabel.value || null)

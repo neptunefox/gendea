@@ -9,7 +9,11 @@ export class ConflictError extends Error {
   currentVersion: number
   currentData: typeof canvasNodes.$inferSelect | null
 
-  constructor(message: string, currentVersion: number, currentData: typeof canvasNodes.$inferSelect | null) {
+  constructor(
+    message: string,
+    currentVersion: number,
+    currentData: typeof canvasNodes.$inferSelect | null
+  ) {
     super(message)
     this.name = 'ConflictError'
     this.currentVersion = currentVersion
@@ -17,9 +21,21 @@ export class ConflictError extends Error {
   }
 }
 
-type WorkflowState = 'Seeded' | 'Diverging' | 'Clarifying' | 'Planning' | 'Testing' | 'Reviewing' | 'Stalled' | 'Action crisis' | 'Archived'
+type WorkflowState =
+  | 'Seeded'
+  | 'Diverging'
+  | 'Clarifying'
+  | 'Planning'
+  | 'Testing'
+  | 'Reviewing'
+  | 'Stalled'
+  | 'Action crisis'
+  | 'Archived'
 
-async function syncTaskCompletionToCoach(node: typeof canvasNodes.$inferSelect, completed: boolean) {
+async function syncTaskCompletionToCoach(
+  node: typeof canvasNodes.$inferSelect,
+  completed: boolean
+) {
   const data = node.data as Record<string, unknown>
   if (node.type !== 'task' || !data.coachOrigin || !data.savedIdeaId) {
     return
@@ -41,7 +57,7 @@ async function syncTaskCompletionToCoach(node: typeof canvasNodes.$inferSelect, 
           }
         })
         .where(eq(savedIdeas.id, savedIdeaId))
-      
+
       if (idea.branchId) {
         await transitionWorkflowOnTaskComplete(idea.branchId)
       }
@@ -98,7 +114,7 @@ export default defineEventHandler(async event => {
   const expectedVersion = body.version as number | undefined
 
   const [existingNode] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, id))
-  
+
   if (!existingNode) {
     throw createError({
       statusCode: 404,

@@ -1,7 +1,11 @@
 <template>
-  <div class="input-node" :class="[{ selected: props.selected, answered: hasAnswer }, animationClass, workflowClass]" :style="animationStyle">
+  <div
+    class="input-node"
+    :class="[{ selected: props.selected, answered: hasAnswer }, animationClass, workflowClass]"
+    :style="animationStyle"
+  >
     <Handle type="target" :position="Position.Top" />
-    
+
     <div class="input-header">
       <HelpCircle :size="18" class="question-icon" />
       <span class="input-label">Question</span>
@@ -19,7 +23,7 @@
         placeholder="Type your answer..."
         @keydown.enter="submitAnswer"
       />
-      <button class="submit-btn" @click="submitAnswer" :disabled="!answer.trim()">
+      <button class="submit-btn" :disabled="!answer.trim()" @click="submitAnswer">
         <Send :size="14" />
       </button>
     </div>
@@ -35,9 +39,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
 import { HelpCircle, Send } from 'lucide-vue-next'
+import { ref, computed, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -50,11 +54,13 @@ const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(pr
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const workflowHighlights = inject<any>('workflowHighlights')
-const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
+const workflowClass = computed(
+  () => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || ''
+)
 
 async function submitAnswer() {
   if (!answer.value.trim()) return
-  
+
   try {
     await $fetch(`/api/canvas/nodes/${props.id}`, {
       method: 'PATCH',
@@ -104,18 +110,36 @@ function editAnswer() {
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.8); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .input-node.selected {
@@ -242,7 +266,9 @@ function editAnswer() {
 
 .input-node.workflow-testing-highlight {
   border-color: #2196f3;
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(33, 150, 243, 0.2),
+    0 4px 12px rgba(33, 150, 243, 0.15);
   animation: testingPulse 2s ease-in-out infinite;
 }
 
@@ -258,7 +284,16 @@ function editAnswer() {
 }
 
 @keyframes testingPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(33, 150, 243, 0.2),
+      0 4px 12px rgba(33, 150, 243, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(33, 150, 243, 0.1),
+      0 4px 16px rgba(33, 150, 243, 0.25);
+  }
 }
 </style>

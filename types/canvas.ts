@@ -9,8 +9,8 @@ export const EDGE_RELATIONSHIP_TYPES: EdgeRelationshipType[] = [
 
 export const EDGE_RELATIONSHIP_LABELS: Record<EdgeRelationshipType, string> = {
   'leads-to': 'Leads to',
-  'requires': 'Requires',
-  'blocks': 'Blocks',
+  requires: 'Requires',
+  blocks: 'Blocks',
   'relates-to': 'Relates to'
 }
 
@@ -110,12 +110,12 @@ export const EDGE_STYLES: Record<EdgeRelationshipType, EdgeStyle> = {
     strokeWidth: 2,
     strokeDasharray: 'none'
   },
-  'requires': {
+  requires: {
     stroke: '#8b7a75',
     strokeWidth: 2,
     strokeDasharray: '5,5'
   },
-  'blocks': {
+  blocks: {
     stroke: '#c26660',
     strokeWidth: 3,
     strokeDasharray: 'none'

@@ -1,6 +1,6 @@
-import { detectVagueIdea, suggestTool } from '../../../utils/canvas-ai-service'
 import { canvasNodes, canvasEdges } from '../../../../db/schema'
 import { db } from '../../../db'
+import { detectVagueIdea, suggestTool } from '../../../utils/canvas-ai-service'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

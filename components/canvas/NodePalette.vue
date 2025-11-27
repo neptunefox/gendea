@@ -1,20 +1,24 @@
 <template>
   <div class="node-palette" :class="{ collapsed: isCollapsed }">
-    <button class="toggle-btn" @click="isCollapsed = !isCollapsed" :title="isCollapsed ? 'Expand palette' : 'Collapse palette'">
+    <button
+      class="toggle-btn"
+      :title="isCollapsed ? 'Expand palette' : 'Collapse palette'"
+      @click="isCollapsed = !isCollapsed"
+    >
       <ChevronLeft v-if="!isCollapsed" :size="16" />
       <ChevronRight v-else :size="16" />
     </button>
 
     <div v-if="!isCollapsed" class="palette-content">
       <div class="palette-header">Add Nodes</div>
-      
+
       <div class="palette-items">
         <div
           v-for="item in paletteItems"
           :key="item.type"
           class="palette-item"
           draggable="true"
-          @dragstart="(e) => onDragStart(e, item.type)"
+          @dragstart="e => onDragStart(e, item.type)"
           @dragend="onDragEnd"
         >
           <div class="item-icon" :style="{ background: item.color }">
@@ -28,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import {
   StickyNote,
   Square,
@@ -42,8 +45,10 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-vue-next'
-import { useDragAndDrop } from '~/composables/useDragAndDrop'
+import { ref } from 'vue'
+
 import type { CanvasNodeType } from '~/components/canvas/nodes'
+import { useDragAndDrop } from '~/composables/useDragAndDrop'
 
 const { onDragStart, onDragEnd } = useDragAndDrop()
 
@@ -51,13 +56,43 @@ const isCollapsed = ref(false)
 
 const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: string }[] = [
   { type: 'sticky-note', label: 'Sticky Note', icon: StickyNote, color: '#fff9c4' },
-  { type: 'idea', label: 'Idea', icon: Lightbulb, color: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
-  { type: 'task', label: 'Task', icon: CheckSquare, color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
-  { type: 'goal', label: 'Goal', icon: Target, color: 'linear-gradient(135deg, #d4756f 0%, #c26660 100%)' },
-  { type: 'input', label: 'Question', icon: HelpCircle, color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { type: 'tool', label: 'Tool', icon: Wrench, color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' },
+  {
+    type: 'idea',
+    label: 'Idea',
+    icon: Lightbulb,
+    color: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+  },
+  {
+    type: 'task',
+    label: 'Task',
+    icon: CheckSquare,
+    color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+  },
+  {
+    type: 'goal',
+    label: 'Goal',
+    icon: Target,
+    color: 'linear-gradient(135deg, #d4756f 0%, #c26660 100%)'
+  },
+  {
+    type: 'input',
+    label: 'Question',
+    icon: HelpCircle,
+    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+  },
+  {
+    type: 'tool',
+    label: 'Tool',
+    icon: Wrench,
+    color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+  },
   { type: 'text-block', label: 'Text', icon: Type, color: '#f5f5f5' },
-  { type: 'shape', label: 'Shape', icon: Square, color: 'linear-gradient(135deg, #d4756f 0%, #e8a5a0 100%)' },
+  {
+    type: 'shape',
+    label: 'Shape',
+    icon: Square,
+    color: 'linear-gradient(135deg, #d4756f 0%, #e8a5a0 100%)'
+  },
   { type: 'section', label: 'Section', icon: LayoutGrid, color: 'rgba(212, 117, 111, 0.1)' }
 ]
 </script>

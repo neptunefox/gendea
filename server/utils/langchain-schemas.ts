@@ -167,18 +167,13 @@ export const IncompleteNodeSchema = z.object({
 })
 
 export const UnrelatedConnectionSchema = z.object({
-  areUnrelated: z
-    .boolean()
-    .describe('True if the two nodes have no clear logical connection'),
+  areUnrelated: z.boolean().describe('True if the two nodes have no clear logical connection'),
   suggestedIntermediateSteps: z
     .array(z.string())
     .max(3)
     .optional()
     .describe('1-3 intermediate steps that could bridge the gap between the nodes'),
-  reasoning: z
-    .string()
-    .optional()
-    .describe('Brief explanation of why these nodes seem unrelated')
+  reasoning: z.string().optional().describe('Brief explanation of why these nodes seem unrelated')
 })
 
 export const DisconnectedClustersSchema = z.object({

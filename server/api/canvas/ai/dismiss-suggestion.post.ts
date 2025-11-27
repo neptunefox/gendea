@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm'
+
 import { canvasNodes } from '../../../../db/schema'
 import { db } from '../../../db'
 
@@ -13,11 +14,7 @@ export default defineEventHandler(async event => {
     })
   }
 
-  const [node] = await db
-    .select()
-    .from(canvasNodes)
-    .where(eq(canvasNodes.id, nodeId))
-    .limit(1)
+  const [node] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, nodeId)).limit(1)
 
   if (!node) {
     throw createError({

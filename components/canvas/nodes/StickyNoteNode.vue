@@ -5,15 +5,15 @@
     :class="[{ selected: props.selected }, animationClass, workflowClass]"
   >
     <Handle type="target" :position="Position.Top" />
-    
+
     <div class="sticky-content">
       <textarea
         v-if="isEditing"
+        ref="textareaRef"
         v-model="editText"
         class="sticky-textarea nodrag"
         @blur="saveText"
         @keydown.enter.ctrl="saveText"
-        ref="textareaRef"
       />
       <div v-else class="sticky-text" @dblclick="startEditing">
         {{ props.data.text || 'Double-click to edit' }}
@@ -38,8 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, inject } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
+import { ref, computed, nextTick, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
 
@@ -48,7 +48,9 @@ const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(pr
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
 
 const workflowHighlights = inject<any>('workflowHighlights')
-const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
+const workflowClass = computed(
+  () => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || ''
+)
 
 const colors = ['#fff9c4', '#ffccbc', '#c8e6c9', '#b3e5fc', '#e1bee7', '#f5f5f5']
 
@@ -93,7 +95,6 @@ async function setColor(color: string) {
 }
 </script>
 
-
 <style scoped>
 .sticky-note-node {
   min-width: 180px;
@@ -104,7 +105,9 @@ async function setColor(color: string) {
   display: flex;
   flex-direction: column;
   transform: rotate(-1deg);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   will-change: transform;
 }
 
@@ -121,18 +124,36 @@ async function setColor(color: string) {
 }
 
 @keyframes nodeAppear {
-  from { opacity: 0; transform: rotate(-1deg) scale(0.8); }
-  to { opacity: 1; transform: rotate(-1deg) scale(1); }
+  from {
+    opacity: 0;
+    transform: rotate(-1deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1deg) scale(1);
+  }
 }
 
 @keyframes nodeDelete {
-  from { opacity: 1; transform: rotate(-1deg) scale(1); }
-  to { opacity: 0; transform: rotate(-1deg) scale(0.8); }
+  from {
+    opacity: 1;
+    transform: rotate(-1deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(-1deg) scale(0.8);
+  }
 }
 
 @keyframes nodeStagger {
-  from { opacity: 0; transform: rotate(-1deg) translateY(20px) scale(0.9); }
-  to { opacity: 1; transform: rotate(-1deg) translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: rotate(-1deg) translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1deg) translateY(0) scale(1);
+  }
 }
 
 .sticky-note-node:hover {
@@ -208,20 +229,35 @@ async function setColor(color: string) {
 }
 
 .sticky-note-node.workflow-testing-highlight {
-  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 0 0 3px rgba(33, 150, 243, 0.3),
+    2px 2px 8px rgba(0, 0, 0, 0.15);
   animation: testingPulse 2s ease-in-out infinite;
 }
 
 .sticky-note-node.workflow-blocked {
-  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.4), 2px 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 0 0 2px rgba(194, 102, 96, 0.4),
+    2px 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .sticky-note-node.workflow-incomplete {
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 0 0 2px rgba(255, 152, 0, 0.3),
+    2px 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes testingPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.15), 2px 2px 12px rgba(0, 0, 0, 0.2); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(33, 150, 243, 0.3),
+      2px 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(33, 150, 243, 0.15),
+      2px 2px 12px rgba(0, 0, 0, 0.2);
+  }
 }
 </style>
