@@ -45,7 +45,7 @@ function handleAction() {
 
 <style scoped>
 .flow-guidance-banner {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
@@ -54,7 +54,6 @@ function handleAction() {
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(212, 117, 111, 0.15);
   backdrop-filter: blur(8px);
-  max-width: 100%;
 }
 
 .banner-icon {

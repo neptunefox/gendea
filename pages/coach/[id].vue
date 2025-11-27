@@ -1,11 +1,13 @@
 <template>
   <div class="coach-workspace">
-    <FlowGuidanceBanner
-      :suggestion="flowGuidance.currentSuggestion.value"
-      :is-visible="flowGuidance.isVisible.value"
-      @dismiss="flowGuidance.dismissSuggestion()"
-      @action="handleFlowGuidanceAction"
-    />
+    <div class="banner-wrapper">
+      <FlowGuidanceBanner
+        :suggestion="flowGuidance.currentSuggestion.value"
+        :is-visible="flowGuidance.isVisible.value"
+        @dismiss="flowGuidance.dismissSuggestion()"
+        @action="handleFlowGuidanceAction"
+      />
+    </div>
 
     <div v-if="isLoading" class="loading-state">
       <Loader :size="32" class="spin" />
@@ -361,6 +363,18 @@ onUnmounted(() => {
   padding: 2rem 1.5rem 4rem;
 }
 
+.banner-wrapper {
+  max-width: 1400px;
+  margin: 0 auto 1rem;
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 2rem;
+}
+
+.banner-wrapper > * {
+  grid-column: 2;
+}
+
 .loading-state,
 .error-state {
   display: flex;
@@ -688,6 +702,10 @@ onUnmounted(() => {
 }
 
 @media (max-width: 1200px) {
+  .banner-wrapper {
+    display: block;
+  }
+
   .workspace-layout {
     grid-template-columns: 1fr;
     gap: 2rem;
