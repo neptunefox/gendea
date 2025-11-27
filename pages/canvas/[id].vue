@@ -155,10 +155,80 @@
         <span>{{ workflowStateLabel }}</span>
       </div>
 
-      <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
-        <Hammer :size="18" />
-        <span>Coach</span>
-      </button>
+      <div class="canvas-toolbar">
+        <div class="history-controls">
+          <button
+            class="toolbar-btn"
+            :disabled="!canvasHistory.canUndo.value"
+            @click="handleUndo"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 :size="16" />
+          </button>
+          <button
+            class="toolbar-btn"
+            :disabled="!canvasHistory.canRedo.value"
+            @click="handleRedo"
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo2 :size="16" />
+          </button>
+        </div>
+        <div class="toolbar-divider" />
+        <button
+          class="toolbar-btn shortcuts-btn"
+          @click="showShortcuts = !showShortcuts"
+          title="Keyboard shortcuts"
+        >
+          <Keyboard :size="16" />
+        </button>
+        <div class="toolbar-divider" />
+        <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
+          <Hammer :size="18" />
+          <span>Coach</span>
+        </button>
+      </div>
+
+      <div v-if="showShortcuts" class="shortcuts-panel">
+        <div class="shortcuts-header">
+          <span>Keyboard Shortcuts</span>
+          <button class="close-shortcuts" @click="showShortcuts = false">×</button>
+        </div>
+        <div class="shortcuts-list">
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>Z</kbd>
+            <span>Undo</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>Y</kbd>
+            <span>Redo</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>A</kbd>
+            <span>Select all</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>G</kbd>
+            <span>Group selected</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Ctrl</kbd> + <kbd>0</kbd>
+            <span>Fit view</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Delete</kbd>
+            <span>Delete selected</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Esc</kbd>
+            <span>Deselect all</span>
+          </div>
+          <div class="shortcut-item">
+            <kbd>Shift</kbd> + Click
+            <span>Multi-select</span>
+          </div>
+        </div>
+      </div>
 
       <ConflictResolutionModal
         v-if="hasConflict && conflict"
@@ -216,7 +286,7 @@ import { ref, computed, onMounted, onUnmounted, provide, watch, reactive } from 
 import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Connection } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2, FlaskConical, AlertTriangle, CheckCircle2 } from 'lucide-vue-next'
+import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2, FlaskConical, AlertTriangle, CheckCircle2, Undo2, Redo2, Keyboard } from 'lucide-vue-next'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useFlowGuidance } from '~/composables/useFlowGuidance'
 import {
@@ -239,6 +309,7 @@ import EdgeSuggestionPopup from '~/components/canvas/EdgeSuggestionPopup.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
 import { useCanvas, type ConflictInfo } from '~/composables/useCanvas'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
+import { useCanvasHistory } from '~/composables/useCanvasHistory'
 import type { WorkflowState } from '~/types/workflow'
 import type { EdgeRelationshipType } from '~/types/canvas'
 
@@ -251,8 +322,10 @@ const projectId = computed(() => route.params.id as string)
 const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
 const canvasAnimations = useCanvasAnimations()
 const { conflict, hasConflict, resolveConflict, dismissConflict } = useCanvas(projectId)
+const canvasHistory = useCanvasHistory(projectId)
 
 provide('canvasAnimations', canvasAnimations)
+provide('canvasHistory', canvasHistory)
 
 const workflowState = ref<WorkflowState>('Seeded')
 const lastWorkflowStateChange = ref<number>(Date.now())
@@ -336,6 +409,7 @@ interface SavedIdea {
 
 const savedIdeas = ref<SavedIdea[]>([])
 const isIdeasPanelCollapsed = ref(false)
+const showShortcuts = ref(false)
 
 function handleIdeaDragStart(event: DragEvent, idea: SavedIdea) {
   onDragStartSavedIdea(event, {
@@ -383,7 +457,7 @@ const viewport = ref<Viewport>({
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
-const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady, onNodeDragStop } = useVueFlow()
+const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady, onNodeDragStop, fitView } = useVueFlow()
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
 
@@ -424,6 +498,7 @@ const isLoadingEdgeSuggestion = ref(false)
 
 let pendingViewport: Viewport | null = null
 let paneReady = false
+const dragStartPositions = ref<Map<string, { x: number; y: number }>>(new Map())
 
 onPaneReady(() => {
   paneReady = true
@@ -433,17 +508,29 @@ onPaneReady(() => {
   }
 })
 
+const { onNodeDragStart } = useVueFlow()
+
+onNodeDragStart(({ node }) => {
+  dragStartPositions.value.set(node.id, { x: node.position.x, y: node.position.y })
+})
+
 onNodeDragStop(async ({ node }) => {
   if (!projectId.value) return
+  
+  const startPos = dragStartPositions.value.get(node.id)
+  const newPos = { x: Math.round(node.position.x), y: Math.round(node.position.y) }
+  
+  if (startPos && (startPos.x !== newPos.x || startPos.y !== newPos.y)) {
+    canvasHistory.recordNodeMove(node.id, startPos, newPos)
+  }
+  dragStartPositions.value.delete(node.id)
+  
   try {
     const nodeData = node.data as Record<string, unknown>
     const response = await $fetch(`/api/canvas/nodes/${node.id}`, {
       method: 'PATCH',
       body: {
-        position: {
-          x: Math.round(node.position.x),
-          y: Math.round(node.position.y)
-        },
+        position: newPos,
         version: nodeData?.version
       }
     })
@@ -490,11 +577,16 @@ async function handleConnect(connection: Connection) {
       }
     })
 
+    canvasHistory.recordEdgeAdd(edge.id, {
+      source: connection.source,
+      target: connection.target,
+      type: 'relationship',
+      label: null
+    })
+
     if (sourceContent && targetContent) {
       fetchEdgeSuggestion(edge.id, sourceContent, targetContent, sourceNode, targetNode)
     }
-
-    checkConnectionRelatedness(connection.source, connection.target)
   } catch (error) {
     console.error('Failed to create edge:', error)
   }
@@ -773,6 +865,17 @@ function handleAIError(message: string) {
 
 async function handleDeleteNode(nodeId: string) {
   try {
+    const nodeToDelete = elements.value.find((e: any) => e.id === nodeId && !e.source)
+    const connectedEdges = elements.value.filter((e: any) => e.source === nodeId || e.target === nodeId)
+    
+    if (nodeToDelete) {
+      canvasHistory.recordNodeDelete(nodeId, {
+        type: nodeToDelete.type,
+        position: nodeToDelete.position,
+        data: nodeToDelete.data
+      }, connectedEdges)
+    }
+
     await canvasAnimations.markNodeDeleting(nodeId)
     await $fetch(`/api/canvas/nodes/${nodeId}`, { method: 'DELETE' })
     elements.value = elements.value.filter((e: any) => {
@@ -794,14 +897,92 @@ async function handleDeleteSelectedNodes() {
   }
 }
 
-function handleKeyDown(event: KeyboardEvent) {
+async function handleKeyDown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+
   if (event.key === 'Delete' || event.key === 'Backspace') {
-    const target = event.target as HTMLElement
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-      return
-    }
+    if (isEditing) return
     event.preventDefault()
     handleDeleteSelectedNodes()
+    return
+  }
+
+  if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+    if (isEditing) return
+    event.preventDefault()
+    if (canvasHistory.canUndo.value) {
+      await canvasHistory.undo()
+      await loadCanvas()
+    }
+    return
+  }
+
+  if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+    if (isEditing) return
+    event.preventDefault()
+    if (canvasHistory.canRedo.value) {
+      await canvasHistory.redo()
+      await loadCanvas()
+    }
+    return
+  }
+
+  if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+    if (isEditing) return
+    event.preventDefault()
+    selectAllNodes()
+    return
+  }
+
+  if (event.key === 'Escape') {
+    if (isEditing) return
+    deselectAll()
+    return
+  }
+
+  if ((event.ctrlKey || event.metaKey) && event.key === 'g') {
+    if (isEditing) return
+    event.preventDefault()
+    if (selectedNodes.value.length >= 2) {
+      groupSelectedNodes()
+    }
+    return
+  }
+
+  if (event.key === '0' && (event.ctrlKey || event.metaKey)) {
+    if (isEditing) return
+    event.preventDefault()
+    fitView()
+    return
+  }
+}
+
+function selectAllNodes() {
+  const nodes = elements.value.filter((e: any) => !e.source)
+  nodes.forEach((node: any) => {
+    updateNode(node.id, { selected: true })
+  })
+}
+
+function deselectAll() {
+  const nodes = elements.value.filter((e: any) => !e.source)
+  nodes.forEach((node: any) => {
+    updateNode(node.id, { selected: false })
+  })
+}
+
+async function handleUndo() {
+  if (canvasHistory.canUndo.value) {
+    await canvasHistory.undo()
+    await loadCanvas()
+  }
+}
+
+async function handleRedo() {
+  if (canvasHistory.canRedo.value) {
+    await canvasHistory.redo()
+    await loadCanvas()
   }
 }
 
@@ -1209,32 +1390,150 @@ onUnmounted(() => {
   50% { box-shadow: 0 2px 16px rgba(33, 150, 243, 0.3); }
 }
 
-.toggle-view-btn {
+.canvas-toolbar {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.9);
+  padding: 0.375rem;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
-  color: #40312b;
   border: 1px solid rgba(212, 117, 111, 0.2);
   border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
 
-.toggle-view-btn:hover {
-  background: white;
-  border-color: #d4756f;
+.history-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: #40312b;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toolbar-btn:hover:not(:disabled) {
+  background: rgba(212, 117, 111, 0.1);
   color: #d4756f;
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(212, 117, 111, 0.2);
+  margin: 0 0.25rem;
+}
+
+.toggle-view-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  color: #40312b;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toggle-view-btn:hover {
+  background: rgba(212, 117, 111, 0.1);
+  color: #d4756f;
+}
+
+.shortcuts-panel {
+  position: fixed;
+  bottom: 5rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  z-index: 20;
+  min-width: 220px;
+  animation: panelAppear 0.15s ease;
+}
+
+@keyframes panelAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.shortcuts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(212, 117, 111, 0.1);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: #40312b;
+}
+
+.close-shortcuts {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #8b7a75;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-shortcuts:hover {
+  color: #d4756f;
+}
+
+.shortcuts-list {
+  padding: 0.5rem;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.8125rem;
+  color: #40312b;
+}
+
+.shortcut-item span {
+  margin-left: auto;
+  color: #8b7a75;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  background: #f5f0ed;
+  border: 1px solid #e0d5d0;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #40312b;
 }
 
 .selection-toolbar {
@@ -1452,6 +1751,89 @@ onUnmounted(() => {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .canvas-toolbar {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.25rem;
+  }
+
+  .toggle-view-btn span {
+    display: none;
+  }
+
+  .toggle-view-btn {
+    padding: 0.5rem;
+  }
+
+  .shortcuts-btn {
+    display: none;
+  }
+
+  .shortcuts-panel {
+    bottom: 4.5rem;
+    right: 1rem;
+    min-width: 200px;
+  }
+
+  .ideas-panel {
+    max-height: 40vh;
+    right: 0.5rem;
+  }
+
+  .panel-content {
+    width: 180px;
+    padding: 0.5rem;
+  }
+
+  .selection-toolbar {
+    bottom: 1rem;
+    padding: 0.375rem;
+  }
+
+  .group-btn,
+  .ai-tidy-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .workflow-state-indicator {
+    bottom: 4rem;
+    right: 1rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas-flow-banner {
+    max-width: calc(100vw - 2rem);
+    left: 1rem;
+    transform: none;
+  }
+
+  .ideas-panel {
+    display: none;
+  }
+
+  .selection-toolbar {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .ideas-panel {
+    max-height: 70vh;
+  }
+
+  .panel-content {
+    width: 260px;
+  }
+}
 </style>
 
 <style>
@@ -1471,13 +1853,12 @@ onUnmounted(() => {
   background: white;
   border: 1px solid #f0e5e0;
   color: #40312b;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .vue-flow__controls-button:hover {
   background: rgba(212, 117, 111, 0.1);
   border-color: #d4756f;
-  transform: scale(1.05);
 }
 
 .vue-flow__selection {
@@ -1493,15 +1874,45 @@ onUnmounted(() => {
 }
 
 .vue-flow__node {
-  transition: transform 0.016s linear;
+  transition: box-shadow 0.15s ease;
+  will-change: transform;
+}
+
+.vue-flow__node.selected {
+  z-index: 100;
 }
 
 .vue-flow__node.dragging {
   z-index: 1000 !important;
+  cursor: grabbing;
+}
+
+.vue-flow__edge {
+  transition: opacity 0.15s ease;
 }
 
 .vue-flow__edge path {
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+
+.vue-flow__edge.selected path {
+  stroke-width: 3;
+}
+
+.vue-flow__handle {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.vue-flow__handle:hover {
+  transform: scale(1.3);
+}
+
+.vue-flow__pane {
+  cursor: grab;
+}
+
+.vue-flow__pane:active {
+  cursor: grabbing;
 }
 
 @keyframes nodeAppear {
@@ -1554,6 +1965,29 @@ onUnmounted(() => {
   }
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vue-flow__node,
+  .vue-flow__edge,
+  .vue-flow__handle {
+    transition: none;
+  }
+
+  @keyframes nodeAppear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes nodeDelete {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes nodeStagger {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 </style>
