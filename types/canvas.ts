@@ -23,7 +23,6 @@ export type CanvasNodeType =
   | 'task'
   | 'idea'
   | 'goal'
-  | 'section'
 
 export const CANVAS_NODE_TYPES: CanvasNodeType[] = [
   'sticky-note',
@@ -33,8 +32,7 @@ export const CANVAS_NODE_TYPES: CanvasNodeType[] = [
   'tool',
   'task',
   'idea',
-  'goal',
-  'section'
+  'goal'
 ]
 
 export interface StickyNoteData {
@@ -89,13 +87,6 @@ export interface GoalNodeData {
   achievedAt?: string
   coachOrigin?: boolean
   savedIdeaId?: string
-}
-
-export interface SectionNodeData {
-  label?: string
-  color?: string
-  width?: number
-  height?: number
 }
 
 export interface EdgeStyle {

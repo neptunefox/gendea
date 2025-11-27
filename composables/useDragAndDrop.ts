@@ -163,18 +163,12 @@ export function useDragAndDrop() {
         }
       })
 
-      const newNode: any = {
+      addNodes({
         id: node.id,
         type,
         position,
         data: nodeData
-      }
-
-      if (type === 'section') {
-        newNode.zIndex = -1
-      }
-
-      addNodes(newNode)
+      })
       markNodeAppearing(node.id)
     } catch (error) {
       console.error('Failed to create node:', error)
@@ -315,8 +309,6 @@ function getDefaultNodeData(type: CanvasNodeType): Record<string, any> {
       return { text: 'New idea' }
     case 'goal':
       return { title: 'New goal', description: '' }
-    case 'section':
-      return { label: 'New Section', width: 400, height: 300 }
     default:
       return {}
   }

@@ -41,7 +41,6 @@ import {
   CheckSquare,
   Lightbulb,
   Target,
-  LayoutGrid,
   ChevronLeft,
   ChevronRight
 } from 'lucide-vue-next'
@@ -92,8 +91,7 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
     label: 'Shape',
     icon: Square,
     color: 'linear-gradient(135deg, #d4756f 0%, #e8a5a0 100%)'
-  },
-  { type: 'section', label: 'Section', icon: LayoutGrid, color: 'rgba(212, 117, 111, 0.1)' }
+  }
 ]
 </script>
 

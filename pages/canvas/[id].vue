@@ -108,9 +108,6 @@
         <template #node-goal="nodeProps">
           <GoalNode v-bind="nodeProps" />
         </template>
-        <template #node-section="nodeProps">
-          <SectionNode v-bind="nodeProps" />
-        </template>
 
         <template #edge-relationship="edgeProps">
           <RelationshipEdge v-bind="edgeProps" />
@@ -118,10 +115,6 @@
       </VueFlow>
 
       <div v-if="selectedNodes.length > 1" class="selection-toolbar">
-        <button class="group-btn" title="Group selected nodes" @click="groupSelectedNodes">
-          <Group :size="18" />
-          <span>Group ({{ selectedNodes.length }})</span>
-        </button>
         <button
           class="ai-tidy-btn"
           :disabled="isTidying"
@@ -223,10 +216,6 @@
             <span>Select all</span>
           </div>
           <div class="shortcut-item">
-            <kbd>Ctrl</kbd> + <kbd>G</kbd>
-            <span>Group selected</span>
-          </div>
-          <div class="shortcut-item">
             <kbd>Ctrl</kbd> + <kbd>0</kbd>
             <span>Fit view</span>
           </div>
@@ -309,7 +298,6 @@ import {
 } from '@vue-flow/core'
 import {
   Hammer,
-  Group,
   ChevronLeft,
   ChevronRight,
   Lightbulb,
@@ -338,8 +326,7 @@ import {
   ToolNode,
   TaskNode,
   IdeaNode,
-  GoalNode,
-  SectionNode
+  GoalNode
 } from '~/components/canvas/nodes'
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
@@ -521,7 +508,7 @@ const {
   fitView
 } = useVueFlow()
 
-const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
+const selectedNodes = computed(() => getSelectedNodes.value)
 
 const singleSelectedNode = computed(() => {
   const nodes = selectedNodes.value
@@ -774,33 +761,12 @@ async function loadCanvas() {
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
 
-    const sectionNodes = data.nodes
-      .filter((node: any) => node.type === 'section')
-      .map((node: any) => ({
-        id: node.id,
-        type: node.type,
-        position: node.position,
-        data: { ...node.data, version: node.version },
-        zIndex: -1
-      }))
-
-    const childNodes = data.nodes
-      .filter((node: any) => node.type !== 'section')
-      .map((node: any) => {
-        const nodeData: any = {
-          id: node.id,
-          type: node.type,
-          position: node.position,
-          data: { ...node.data, version: node.version }
-        }
-        if (node.parentNodeId) {
-          nodeData.parentNode = node.parentNodeId
-          nodeData.extent = 'parent'
-        }
-        return nodeData
-      })
-
-    const nodes = [...sectionNodes, ...childNodes]
+    const nodes = data.nodes.map((node: any) => ({
+      id: node.id,
+      type: node.type,
+      position: node.position,
+      data: { ...node.data, version: node.version }
+    }))
 
     const edges = data.edges.map((edge: any) => {
       const relationshipType = edge.style?.relationshipType || edge.type || 'relates-to'
@@ -1021,15 +987,6 @@ async function handleKeyDown(event: KeyboardEvent) {
     return
   }
 
-  if ((event.ctrlKey || event.metaKey) && event.key === 'g') {
-    if (isEditing) return
-    event.preventDefault()
-    if (selectedNodes.value.length >= 2) {
-      groupSelectedNodes()
-    }
-    return
-  }
-
   if (event.key === '0' && (event.ctrlKey || event.metaKey)) {
     if (isEditing) return
     event.preventDefault()
@@ -1178,101 +1135,6 @@ watch(
   }
 )
 
-async function groupSelectedNodes() {
-  const nodes = selectedNodes.value
-  if (nodes.length < 2) return
-
-  const bounds = calculateBounds(nodes)
-  const padding = 40
-
-  const sectionId = `section-${Date.now()}`
-  const sectionNode = {
-    id: sectionId,
-    type: 'section',
-    position: {
-      x: bounds.minX - padding,
-      y: bounds.minY - padding - 40
-    },
-    data: {
-      label: 'New Section',
-      width: bounds.maxX - bounds.minX + padding * 2,
-      height: bounds.maxY - bounds.minY + padding * 2 + 40
-    },
-    zIndex: -1
-  }
-
-  try {
-    const { node: created } = await $fetch('/api/canvas/nodes', {
-      method: 'POST',
-      body: {
-        projectId: projectId.value,
-        type: sectionNode.type,
-        position: sectionNode.position,
-        data: sectionNode.data
-      }
-    })
-
-    addNodes({
-      ...sectionNode,
-      id: created.id
-    })
-    canvasAnimations.markNodeAppearing(created.id)
-
-    for (const node of nodes) {
-      const relativePosition = {
-        x: node.position.x - sectionNode.position.x,
-        y: node.position.y - sectionNode.position.y
-      }
-
-      const nodeData = node.data as Record<string, unknown>
-      try {
-        const response = await $fetch(`/api/canvas/nodes/${node.id}`, {
-          method: 'PATCH',
-          body: {
-            position: relativePosition,
-            parentNode: created.id,
-            version: nodeData?.version
-          }
-        })
-
-        updateNode(node.id, {
-          position: relativePosition,
-          parentNode: created.id,
-          extent: 'parent',
-          data: { ...nodeData, version: response.node?.version }
-        })
-      } catch (error: any) {
-        if (error?.statusCode === 409) {
-          await loadCanvas()
-          return
-        }
-        throw error
-      }
-    }
-  } catch (error) {
-    console.error('Failed to group nodes:', error)
-  }
-}
-
-function calculateBounds(nodes: Node[]) {
-  let minX = Infinity
-  let minY = Infinity
-  let maxX = -Infinity
-  let maxY = -Infinity
-
-  for (const node of nodes) {
-    const width = node.dimensions?.width || 200
-    const height = node.dimensions?.height || 100
-
-    minX = Math.min(minX, node.position.x)
-    minY = Math.min(minY, node.position.y)
-    maxX = Math.max(maxX, node.position.x + width)
-    maxY = Math.max(maxY, node.position.y + height)
-  }
-
-  return { minX, minY, maxX, maxY }
-}
-
 async function saveLastActiveView() {
   if (!projectId.value) return
   try {
@@ -1316,33 +1178,12 @@ async function syncCanvasData() {
       [...currentEdgeIds].some(id => !serverEdgeIds.has(id))
 
     if (hasNodeChanges || hasEdgeChanges) {
-      const sectionNodes = data.nodes
-        .filter((node: any) => node.type === 'section')
-        .map((node: any) => ({
-          id: node.id,
-          type: node.type,
-          position: node.position,
-          data: { ...node.data, version: node.version },
-          zIndex: -1
-        }))
-
-      const childNodes = data.nodes
-        .filter((node: any) => node.type !== 'section')
-        .map((node: any) => {
-          const nodeData: any = {
-            id: node.id,
-            type: node.type,
-            position: node.position,
-            data: { ...node.data, version: node.version }
-          }
-          if (node.parentNodeId) {
-            nodeData.parentNode = node.parentNodeId
-            nodeData.extent = 'parent'
-          }
-          return nodeData
-        })
-
-      const nodes = [...sectionNodes, ...childNodes]
+      const nodes = data.nodes.map((node: any) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: { ...node.data, version: node.version }
+      }))
 
       const edges = data.edges.map((edge: any) => {
         const relationshipType = edge.style?.relationshipType || edge.type || 'relates-to'
@@ -1660,26 +1501,6 @@ kbd {
   z-index: 20;
 }
 
-.group-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.group-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
-}
-
 .ai-tidy-btn {
   display: flex;
   align-items: center;
@@ -1904,7 +1725,6 @@ kbd {
     padding: 0.375rem;
   }
 
-  .group-btn,
   .ai-tidy-btn {
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
@@ -2061,17 +1881,6 @@ kbd {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes sectionAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
