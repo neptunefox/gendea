@@ -36,11 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { Handle, Position, type NodeProps } from '@vue-flow/core'
+import { Handle, Position, useVueFlow, type NodeProps } from '@vue-flow/core'
 import { Square, CheckSquare, Calendar, Hammer } from 'lucide-vue-next'
 import { computed, inject } from 'vue'
 
 const props = defineProps<NodeProps>()
+const { updateNode } = useVueFlow()
 
 const isCompleted = computed(() => !!props.data.completed)
 const isCoachOrigin = computed(() => !!props.data.coachOrigin)
@@ -56,10 +57,15 @@ const workflowClass = computed(
 
 async function toggleComplete() {
   try {
-    await $fetch(`/api/canvas/nodes/${props.id}`, {
-      method: 'PATCH',
-      body: { data: { ...props.data, completed: !isCompleted.value } }
-    })
+    const newCompleted = !isCompleted.value
+    const response = await $fetch<{ node: { data: Record<string, unknown>; version: number } }>(
+      `/api/canvas/nodes/${props.id}`,
+      {
+        method: 'PATCH',
+        body: { data: { ...props.data, completed: newCompleted } }
+      }
+    )
+    updateNode(props.id, { data: { ...response.node.data, version: response.node.version } })
   } catch (error) {
     console.error('Failed to toggle task:', error)
   }
