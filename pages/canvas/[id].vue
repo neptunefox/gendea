@@ -242,7 +242,7 @@ const viewport = ref<Viewport>({
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 let syncInterval: NodeJS.Timeout | null = null
 
-const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady } = useVueFlow()
+const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneReady, onNodeDragStop } = useVueFlow()
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
 
@@ -254,6 +254,23 @@ onPaneReady(() => {
   if (pendingViewport) {
     setViewport(pendingViewport)
     pendingViewport = null
+  }
+})
+
+onNodeDragStop(async ({ node }) => {
+  if (!projectId.value) return
+  try {
+    await $fetch(`/api/canvas/nodes/${node.id}`, {
+      method: 'PATCH',
+      body: {
+        position: {
+          x: Math.round(node.position.x),
+          y: Math.round(node.position.y)
+        }
+      }
+    })
+  } catch (error) {
+    console.error('Failed to save node position:', error)
   }
 })
 
