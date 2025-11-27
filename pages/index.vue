@@ -719,7 +719,7 @@ watch(
   flex-direction: column;
   width: 100%;
   max-width: 700px;
-  margin: 0 auto;
+  margin: 6rem auto 0;
   background: white;
   border: 1px solid #f0e5e0;
   border-radius: 20px;
