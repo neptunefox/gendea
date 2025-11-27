@@ -1,7 +1,10 @@
 import { eq } from 'drizzle-orm'
 
-import { canvasNodes, savedIdeas } from '../../../../db/schema'
+import { canvasNodes, savedIdeas, branches } from '../../../../db/schema'
+import { workflowService } from '../../../../lib/workflow-service'
 import { db } from '../../../db'
+
+type WorkflowState = 'Seeded' | 'Diverging' | 'Clarifying' | 'Planning' | 'Testing' | 'Reviewing' | 'Stalled' | 'Action crisis' | 'Archived'
 
 async function syncTaskCompletionToCoach(node: typeof canvasNodes.$inferSelect, completed: boolean) {
   const data = node.data as Record<string, unknown>
@@ -25,6 +28,10 @@ async function syncTaskCompletionToCoach(node: typeof canvasNodes.$inferSelect, 
           }
         })
         .where(eq(savedIdeas.id, savedIdeaId))
+      
+      if (idea.branchId) {
+        await transitionWorkflowOnTaskComplete(idea.branchId)
+      }
     } else if (!completed && idea.testResult) {
       await db
         .update(savedIdeas)
@@ -35,6 +42,32 @@ async function syncTaskCompletionToCoach(node: typeof canvasNodes.$inferSelect, 
     }
   } catch (error) {
     console.error('Failed to sync task completion to Coach:', error)
+  }
+}
+
+async function transitionWorkflowOnTaskComplete(branchId: string) {
+  try {
+    const [branch] = await db.select().from(branches).where(eq(branches.id, branchId))
+    if (!branch) return
+
+    if (branch.state === 'Testing') {
+      workflowService.getOrCreateActor(branchId, {
+        missedPlans: branch.missedPlans
+      })
+
+      const snapshot = workflowService.transition(branchId, { type: 'LOG_ENTRY' })
+
+      await db
+        .update(branches)
+        .set({
+          state: snapshot.value as WorkflowState,
+          missedPlans: snapshot.context.missedPlans,
+          updatedAt: new Date()
+        })
+        .where(eq(branches.id, branchId))
+    }
+  } catch (error) {
+    console.error('Failed to transition workflow on task complete:', error)
   }
 }
 

@@ -159,7 +159,7 @@
   - Implement suggestion dismissal tracking
   - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5_
 
-- [ ] 21. Integrate Canvas with workflow state machine
+- [x] 21. Integrate Canvas with workflow state machine
   - Display test-related nodes prominently in "Testing" state
   - Highlight incomplete/blocked nodes in "Stalled" state
   - Show progress indicators on completed nodes in "Reviewing" state

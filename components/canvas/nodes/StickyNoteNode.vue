@@ -2,7 +2,7 @@
   <div
     class="sticky-note-node"
     :style="{ backgroundColor: nodeColor, ...animationStyle }"
-    :class="[{ selected: props.selected }, animationClass]"
+    :class="[{ selected: props.selected }, animationClass, workflowClass]"
   >
     <Handle type="target" :position="Position.Top" />
     
@@ -46,6 +46,9 @@ const props = defineProps<NodeProps>()
 const canvasAnimations = inject<any>('canvasAnimations')
 const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
+
+const workflowHighlights = inject<any>('workflowHighlights')
+const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
 
 const colors = ['#fff9c4', '#ffccbc', '#c8e6c9', '#b3e5fc', '#e1bee7', '#f5f5f5']
 
@@ -202,5 +205,23 @@ async function setColor(color: string) {
 .color-btn.active {
   outline: 2px solid #40312b;
   outline-offset: 1px;
+}
+
+.sticky-note-node.workflow-testing-highlight {
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15);
+  animation: testingPulse 2s ease-in-out infinite;
+}
+
+.sticky-note-node.workflow-blocked {
+  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.4), 2px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sticky-note-node.workflow-incomplete {
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes testingPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3), 2px 2px 8px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.15), 2px 2px 12px rgba(0, 0, 0, 0.2); }
 }
 </style>

@@ -140,6 +140,13 @@
         <p>{{ draggedType === 'idea' ? 'Drop idea to add to canvas' : 'Drop to add node' }}</p>
       </div>
 
+      <div v-if="isTestingState || isStalledState || isReviewingState" class="workflow-state-indicator" :class="workflowStateClass">
+        <FlaskConical v-if="isTestingState" :size="16" />
+        <AlertTriangle v-else-if="isStalledState" :size="16" />
+        <CheckCircle2 v-else-if="isReviewingState" :size="16" />
+        <span>{{ workflowStateLabel }}</span>
+      </div>
+
       <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
         <Hammer :size="18" />
         <span>Coach</span>
@@ -179,11 +186,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, provide, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, provide, watch, reactive } from 'vue'
 import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Connection } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2 } from 'lucide-vue-next'
+import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2, FlaskConical, AlertTriangle, CheckCircle2 } from 'lucide-vue-next'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -201,6 +208,7 @@ import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
 import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
+import type { WorkflowState } from '~/types/workflow'
 
 const route = useRoute()
 const router = useRouter()
@@ -211,6 +219,79 @@ const { isDragOver, draggedType, onDragOver, onDragLeave, onDrop, onDragStartSav
 const canvasAnimations = useCanvasAnimations()
 
 provide('canvasAnimations', canvasAnimations)
+
+const workflowState = ref<WorkflowState>('Seeded')
+const lastWorkflowStateChange = ref<number>(Date.now())
+
+const isTestingState = computed(() => workflowState.value === 'Testing')
+const isStalledState = computed(() => workflowState.value === 'Stalled' || workflowState.value === 'Action crisis')
+const isReviewingState = computed(() => workflowState.value === 'Reviewing')
+
+function isTestRelatedNode(nodeType: string, nodeData: Record<string, unknown>): boolean {
+  if (nodeType === 'task' && nodeData.coachOrigin) return true
+  if (nodeType === 'task' && nodeData.testCommitmentId) return true
+  const text = String(nodeData.text || '').toLowerCase()
+  return text.includes('test') || text.includes('experiment') || text.includes('validate')
+}
+
+function isBlockedNode(nodeId: string): boolean {
+  const edges = elements.value.filter((e: any) => e.source)
+  return edges.some((e: any) => e.target === nodeId && e.data?.relationshipType === 'blocks')
+}
+
+function isIncompleteNode(nodeType: string, nodeData: Record<string, unknown>): boolean {
+  if (nodeType === 'task') return !nodeData.completed
+  if (nodeType === 'goal') return !nodeData.achieved
+  return false
+}
+
+function isCompletedNode(nodeType: string, nodeData: Record<string, unknown>): boolean {
+  if (nodeType === 'task') return !!nodeData.completed
+  if (nodeType === 'goal') return !!nodeData.achieved
+  return false
+}
+
+function getNodeWorkflowClass(nodeId: string, nodeType: string, nodeData: Record<string, unknown>): string {
+  const classes: string[] = []
+
+  if (isTestingState.value && isTestRelatedNode(nodeType, nodeData)) {
+    classes.push('workflow-testing-highlight')
+  }
+
+  if (isStalledState.value) {
+    if (isBlockedNode(nodeId)) {
+      classes.push('workflow-blocked')
+    } else if (isIncompleteNode(nodeType, nodeData)) {
+      classes.push('workflow-incomplete')
+    }
+  }
+
+  if (isReviewingState.value && isCompletedNode(nodeType, nodeData)) {
+    classes.push('workflow-completed')
+  }
+
+  return classes.join(' ')
+}
+
+const workflowHighlights = reactive({
+  getNodeClass: getNodeWorkflowClass
+})
+
+provide('workflowHighlights', workflowHighlights)
+
+const workflowStateLabel = computed(() => {
+  if (isTestingState.value) return 'Testing'
+  if (isStalledState.value) return workflowState.value === 'Action crisis' ? 'Action Crisis' : 'Stalled'
+  if (isReviewingState.value) return 'Reviewing'
+  return ''
+})
+
+const workflowStateClass = computed(() => {
+  if (isTestingState.value) return 'state-testing'
+  if (isStalledState.value) return 'state-stalled'
+  if (isReviewingState.value) return 'state-reviewing'
+  return ''
+})
 
 interface SavedIdea {
   id: string
@@ -444,6 +525,14 @@ async function loadCanvas() {
     })
 
     elements.value = [...nodes, ...edges]
+
+    if (data.workflowState) {
+      const newState = data.workflowState as WorkflowState
+      if (workflowState.value !== newState) {
+        workflowState.value = newState
+        lastWorkflowStateChange.value = Date.now()
+      }
+    }
 
     if (data.state) {
       const restoredViewport = {
@@ -781,6 +870,14 @@ async function syncCanvasData() {
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
     
+    if (data.workflowState) {
+      const newState = data.workflowState as WorkflowState
+      if (workflowState.value !== newState) {
+        workflowState.value = newState
+        lastWorkflowStateChange.value = Date.now()
+      }
+    }
+    
     const currentNodeIds = new Set(elements.value.filter((e: any) => !e.source).map((n: any) => n.id))
     const currentEdgeIds = new Set(elements.value.filter((e: any) => e.source).map((e: any) => e.id))
     
@@ -895,6 +992,54 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+.workflow-state-indicator {
+  position: fixed;
+  bottom: 4.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  animation: stateIndicatorAppear 0.3s ease;
+}
+
+@keyframes stateIndicatorAppear {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.workflow-state-indicator.state-testing {
+  color: #1976d2;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+  animation: stateIndicatorAppear 0.3s ease, testingGlow 2s ease-in-out infinite;
+}
+
+.workflow-state-indicator.state-stalled {
+  color: #c26660;
+  border: 1px solid rgba(194, 102, 96, 0.3);
+  background: rgba(255, 245, 245, 0.95);
+}
+
+.workflow-state-indicator.state-reviewing {
+  color: #388e3c;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: rgba(245, 255, 245, 0.95);
+}
+
+@keyframes testingGlow {
+  0%, 100% { box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15); }
+  50% { box-shadow: 0 2px 16px rgba(33, 150, 243, 0.3); }
 }
 
 .toggle-view-btn {

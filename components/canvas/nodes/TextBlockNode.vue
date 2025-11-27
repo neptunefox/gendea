@@ -1,5 +1,5 @@
 <template>
-  <div class="text-block-node" :class="[{ selected: props.selected }, animationClass]" :style="animationStyle">
+  <div class="text-block-node" :class="[{ selected: props.selected }, animationClass, workflowClass]" :style="animationStyle">
     <Handle type="target" :position="Position.Top" />
     
     <div
@@ -33,6 +33,9 @@ const editorRef = ref<HTMLDivElement | null>(null)
 const canvasAnimations = inject<any>('canvasAnimations')
 const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
+
+const workflowHighlights = inject<any>('workflowHighlights')
+const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
 
 const formattedText = computed(() => {
   const text = props.data.text || ''
@@ -151,5 +154,27 @@ async function saveText() {
   border-radius: 4px;
   padding: 0.25rem;
   margin: -0.25rem;
+}
+
+.text-block-node.workflow-testing-highlight {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  animation: testingPulse 2s ease-in-out infinite;
+}
+
+.text-block-node.workflow-blocked {
+  border-color: #c26660;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
+  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+}
+
+.text-block-node.workflow-incomplete {
+  border-color: #ff9800;
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+}
+
+@keyframes testingPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
+  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
 }
 </style>

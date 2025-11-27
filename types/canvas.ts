@@ -126,3 +126,13 @@ export const EDGE_STYLES: Record<EdgeRelationshipType, EdgeStyle> = {
     strokeDasharray: '3,3'
   }
 }
+
+export type WorkflowStateIndicator = 'testing' | 'stalled' | 'reviewing' | null
+
+export interface WorkflowNodeHighlight {
+  nodeId: string
+  indicator: WorkflowStateIndicator
+  isTestRelated: boolean
+  isBlocked: boolean
+  isCompleted: boolean
+}

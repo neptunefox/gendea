@@ -1,5 +1,5 @@
 <template>
-  <div class="task-node" :class="[{ selected: props.selected, completed: isCompleted, 'coach-origin': isCoachOrigin }, animationClass]" :style="animationStyle">
+  <div class="task-node" :class="[{ selected: props.selected, completed: isCompleted, 'coach-origin': isCoachOrigin }, animationClass, workflowClass]" :style="animationStyle">
     <Handle type="target" :position="Position.Top" />
     
     <div v-if="isCoachOrigin" class="coach-indicator">
@@ -40,6 +40,9 @@ const isCoachOrigin = computed(() => !!props.data.coachOrigin)
 const canvasAnimations = inject<any>('canvasAnimations')
 const animationClass = computed(() => canvasAnimations?.getNodeAnimationClass(props.id) || '')
 const animationStyle = computed(() => canvasAnimations?.getNodeAnimationStyle(props.id) || {})
+
+const workflowHighlights = inject<any>('workflowHighlights')
+const workflowClass = computed(() => workflowHighlights?.getNodeClass(props.id, props.type, props.data) || '')
 
 async function toggleComplete() {
   try {
@@ -180,5 +183,49 @@ function formatDate(dateStr: string): string {
   color: #d4756f;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.task-node.workflow-testing-highlight {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15);
+  animation: testingPulse 2s ease-in-out infinite;
+}
+
+.task-node.workflow-blocked {
+  border-color: #c26660;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
+  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+}
+
+.task-node.workflow-incomplete {
+  border-color: #ff9800;
+  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+}
+
+.task-node.workflow-completed {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.task-node.workflow-completed::after {
+  content: '✓';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+@keyframes testingPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2), 0 4px 12px rgba(33, 150, 243, 0.15); }
+  50% { box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.1), 0 4px 16px rgba(33, 150, 243, 0.25); }
 }
 </style>
