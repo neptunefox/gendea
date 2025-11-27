@@ -239,8 +239,17 @@ async function main() {
   `)
 
   await db.execute(sql`
-    ALTER TABLE canvas_nodes 
+    ALTER TABLE canvas_nodes
     ADD COLUMN IF NOT EXISTS parent_node_id UUID;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'canvas_nodes' AND column_name = 'canvas_id') THEN
+        ALTER TABLE canvas_nodes RENAME COLUMN canvas_id TO project_id;
+      END IF;
+    END $$;
   `)
 
   await db.execute(sql`
@@ -257,6 +266,75 @@ async function main() {
   `)
 
   await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'canvas_edges' AND column_name = 'canvas_id') THEN
+        ALTER TABLE canvas_edges RENAME COLUMN canvas_id TO project_id;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'canvas_edges' AND column_name = 'source') THEN
+        ALTER TABLE canvas_edges RENAME COLUMN source TO source_id;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'canvas_edges' AND column_name = 'target') THEN
+        ALTER TABLE canvas_edges RENAME COLUMN target TO target_id;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'canvas_nodes_canvas_id_fkey' AND table_name = 'canvas_nodes') THEN
+        ALTER TABLE canvas_nodes DROP CONSTRAINT canvas_nodes_canvas_id_fkey;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'canvas_edges_canvas_id_fkey' AND table_name = 'canvas_edges') THEN
+        ALTER TABLE canvas_edges DROP CONSTRAINT canvas_edges_canvas_id_fkey;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'canvas_state_canvas_id_fkey' AND table_name = 'canvas_state') THEN
+        ALTER TABLE canvas_state DROP CONSTRAINT canvas_state_canvas_id_fkey;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_edges
+    ADD COLUMN IF NOT EXISTS label TEXT;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_edges
+    ADD COLUMN IF NOT EXISTS style JSONB;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE canvas_edges
+    ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
+  `)
+
+  await db.execute(sql`
     CREATE TABLE IF NOT EXISTS canvas_state (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       project_id UUID NOT NULL UNIQUE,
@@ -268,12 +346,21 @@ async function main() {
   `)
 
   await db.execute(sql`
-    ALTER TABLE canvas_state 
+    ALTER TABLE canvas_state
     ALTER COLUMN zoom TYPE REAL USING zoom::REAL;
   `)
 
   await db.execute(sql`
-    ALTER TABLE saved_ideas 
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'canvas_state' AND column_name = 'canvas_id') THEN
+        ALTER TABLE canvas_state RENAME COLUMN canvas_id TO project_id;
+      END IF;
+    END $$;
+  `)
+
+  await db.execute(sql`
+    ALTER TABLE saved_ideas
     ADD COLUMN IF NOT EXISTS last_active_view TEXT DEFAULT 'coach';
   `)
 

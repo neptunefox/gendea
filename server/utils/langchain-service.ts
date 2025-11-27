@@ -35,7 +35,9 @@ class LangChainService {
     const runtimeConfig = useRuntimeConfig()
 
     this.config = {
-      provider: (config?.provider || runtimeConfig.llmProvider || 'ollama') as 'ollama' | 'openrouter',
+      provider: (config?.provider || runtimeConfig.llmProvider || 'ollama') as
+        | 'ollama'
+        | 'openrouter',
       model: config?.model || runtimeConfig.llmModel || 'gemma3:4b',
       baseURL: config?.baseURL || runtimeConfig.llmBaseUrl || 'http://localhost:11434',
       apiKey: config?.apiKey || runtimeConfig.llmApiKey,
@@ -62,8 +64,8 @@ class LangChainService {
       }
 
       return new ChatOpenAI({
-        openAIApiKey: this.config.apiKey,
-        modelName: this.config.model,
+        apiKey: this.config.apiKey,
+        model: this.config.model,
         temperature: this.config.temperature,
         configuration: {
           baseURL: 'https://openrouter.ai/api/v1',
@@ -86,7 +88,12 @@ class LangChainService {
 
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
-        const messages = this.buildMessages(prompt, systemPrompt, context, attempt > 0 ? lastError?.message : undefined)
+        const messages = this.buildMessages(
+          prompt,
+          systemPrompt,
+          context,
+          attempt > 0 ? lastError?.message : undefined
+        )
         const chain = this.model.pipe(this.outputParser)
         const rawOutput = await chain.invoke(messages)
 
@@ -139,7 +146,8 @@ class LangChainService {
   }
 
   private extractJson(raw: string): string {
-    const cleaned = raw.trim()
+    const cleaned = raw
+      .trim()
       .replace(/```json\s*/gi, '')
       .replace(/```\s*/g, '')
       .trim()
