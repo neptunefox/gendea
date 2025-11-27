@@ -168,6 +168,7 @@ export const savedIdeas = pgTable('saved_ideas', {
     completedAt: string
   }>(),
   dismissedNudges: jsonb('dismissed_nudges').$type<string[]>().default([]),
+  lastActiveView: text('last_active_view', { enum: ['coach', 'canvas'] }).default('coach'),
   createdAt: timestamp('created_at').notNull().defaultNow()
 })
 

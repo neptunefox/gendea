@@ -38,6 +38,10 @@ export default defineEventHandler(async event => {
     updateData.dismissedNudges = body.dismissedNudges
   }
 
+  if (body.lastActiveView !== undefined) {
+    updateData.lastActiveView = body.lastActiveView
+  }
+
   try {
     const [current] = await db.select().from(savedIdeas).where(eq(savedIdeas.id, id))
 

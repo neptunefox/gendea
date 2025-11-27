@@ -154,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
@@ -235,6 +235,7 @@ const viewport = ref<Viewport>({
 })
 
 let viewportSaveTimeout: NodeJS.Timeout | null = null
+let syncInterval: NodeJS.Timeout | null = null
 
 const { getSelectedNodes, addNodes, updateNode } = useVueFlow()
 
@@ -334,8 +335,16 @@ async function saveViewport(vp: Viewport) {
   }
 }
 
-function navigateToCoach() {
+async function navigateToCoach() {
   if (projectId.value) {
+    try {
+      await $fetch(`/api/saved-ideas/${projectId.value}`, {
+        method: 'PATCH',
+        body: { lastActiveView: 'coach' }
+      })
+    } catch (error) {
+      console.error('Failed to save view preference:', error)
+    }
     router.push(`/coach/${projectId.value}`)
   }
 }
@@ -427,9 +436,107 @@ function calculateBounds(nodes: Node[]) {
   return { minX, minY, maxX, maxY }
 }
 
+async function saveLastActiveView() {
+  if (!projectId.value) return
+  try {
+    await $fetch(`/api/saved-ideas/${projectId.value}`, {
+      method: 'PATCH',
+      body: { lastActiveView: 'canvas' }
+    })
+  } catch (error) {
+    console.error('Failed to save view preference:', error)
+  }
+}
+
+async function syncCanvasData() {
+  if (!projectId.value) return
+  try {
+    const data = await $fetch(`/api/canvas/${projectId.value}`)
+    
+    const currentNodeIds = new Set(elements.value.filter((e: any) => !e.source).map((n: any) => n.id))
+    const currentEdgeIds = new Set(elements.value.filter((e: any) => e.source).map((e: any) => e.id))
+    
+    const serverNodeIds = new Set(data.nodes.map((n: any) => n.id))
+    const serverEdgeIds = new Set(data.edges.map((e: any) => e.id))
+    
+    const hasNodeChanges = data.nodes.some((n: any) => !currentNodeIds.has(n.id)) ||
+      [...currentNodeIds].some(id => !serverNodeIds.has(id))
+    const hasEdgeChanges = data.edges.some((e: any) => !currentEdgeIds.has(e.id)) ||
+      [...currentEdgeIds].some(id => !serverEdgeIds.has(id))
+    
+    if (hasNodeChanges || hasEdgeChanges) {
+      const sectionNodes = data.nodes
+        .filter((node: any) => node.type === 'section')
+        .map((node: any) => ({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data,
+          zIndex: -1
+        }))
+
+      const childNodes = data.nodes
+        .filter((node: any) => node.type !== 'section')
+        .map((node: any) => {
+          const nodeData: any = {
+            id: node.id,
+            type: node.type,
+            position: node.position,
+            data: node.data
+          }
+          if (node.parentNodeId) {
+            nodeData.parentNode = node.parentNodeId
+            nodeData.extent = 'parent'
+          }
+          return nodeData
+        })
+
+      const nodes = [...sectionNodes, ...childNodes]
+
+      const edges = data.edges.map((edge: any) => {
+        const relationshipType = edge.style?.relationshipType || edge.type || 'relates-to'
+        return {
+          id: edge.id,
+          source: edge.sourceId,
+          target: edge.targetId,
+          type: 'relationship',
+          label: edge.label,
+          data: {
+            relationshipType
+          }
+        }
+      })
+
+      elements.value = [...nodes, ...edges]
+    }
+  } catch (error) {
+    console.error('Canvas sync failed:', error)
+  }
+}
+
+function startSync() {
+  syncInterval = setInterval(syncCanvasData, 2000)
+}
+
+function stopSync() {
+  if (syncInterval) {
+    clearInterval(syncInterval)
+    syncInterval = null
+  }
+}
+
 onMounted(() => {
   loadCanvas()
   fetchSavedIdeas()
+  saveLastActiveView()
+  startSync()
+})
+
+onUnmounted(() => {
+  stopSync()
+  if (viewportSaveTimeout) {
+    clearTimeout(viewportSaveTimeout)
+  }
 })
 </script>
 

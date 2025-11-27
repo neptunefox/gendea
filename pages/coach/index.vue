@@ -23,7 +23,7 @@
           v-for="project in activeProjects"
           :key="project.id"
           class="project-card"
-          @click="$router.push(`/coach/${project.id}`)"
+          @click="navigateToProject(project)"
         >
           <div class="project-header">
             <h3>{{ project.text }}</h3>
@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { Loader } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 interface SavedIdea {
   id: string
@@ -72,10 +73,21 @@ interface SavedIdea {
     successSignal: string
     committedAt: string
   }
+  lastActiveView?: 'coach' | 'canvas'
 }
 
+const router = useRouter()
 const activeProjects = ref<SavedIdea[]>([])
 const isLoading = ref(true)
+
+function navigateToProject(project: SavedIdea) {
+  const view = project.lastActiveView || 'coach'
+  if (view === 'canvas') {
+    router.push(`/canvas/${project.id}`)
+  } else {
+    router.push(`/coach/${project.id}`)
+  }
+}
 
 async function loadActiveProjects() {
   try {

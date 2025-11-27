@@ -31,7 +31,6 @@
         </div>
 
         <div class="context-actions">
-          <button class="ghost-btn" @click="navigateToCanvas">Switch to Canvas</button>
           <button class="ghost-btn" @click="backToExploring">← Back to exploring</button>
         </div>
       </aside>
@@ -92,6 +91,11 @@
       </div>
     </transition>
 
+    <button v-if="idea" class="floating-toggle-btn" @click="navigateToCanvas" title="Switch to Canvas">
+      <LayoutGrid :size="18" />
+      <span>Canvas</span>
+    </button>
+
     <transition name="toast">
       <div v-if="showToast" class="toast">
         <Check :size="20" />
@@ -102,8 +106,8 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, Loader, Check } from 'lucide-vue-next'
-import { ref, computed, onMounted } from 'vue'
+import { ArrowLeft, Loader, Check, LayoutGrid } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import CommitPhase from '~/components/coach/CommitPhase.vue'
@@ -141,6 +145,7 @@ const showNorthStarPrompt = ref(false)
 const northStarInput = ref('')
 const showToast = ref(false)
 const toastMessage = ref('')
+let syncInterval: NodeJS.Timeout | null = null
 
 const northStar = computed(() => idea.value?.northStar || '')
 
@@ -185,8 +190,16 @@ async function saveNorthStar() {
   }
 }
 
-function navigateToCanvas() {
+async function navigateToCanvas() {
   const ideaId = route.params.id as string
+  try {
+    await $fetch(`/api/saved-ideas/${ideaId}`, {
+      method: 'PATCH',
+      body: { lastActiveView: 'canvas' }
+    })
+  } catch (error) {
+    console.error('Failed to save view preference:', error)
+  }
   router.push(`/canvas/${ideaId}`)
 }
 
@@ -231,8 +244,50 @@ function showToastMessage(message: string) {
   }, 2200)
 }
 
+async function saveLastActiveView() {
+  const ideaId = route.params.id as string
+  try {
+    await $fetch(`/api/saved-ideas/${ideaId}`, {
+      method: 'PATCH',
+      body: { lastActiveView: 'coach' }
+    })
+  } catch (error) {
+    console.error('Failed to save view preference:', error)
+  }
+}
+
+async function syncData() {
+  const ideaId = route.params.id as string
+  try {
+    const { ideas } = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
+    const updated = ideas.find(i => i.id === ideaId)
+    if (updated && idea.value) {
+      idea.value = updated
+    }
+  } catch (error) {
+    console.error('Sync failed:', error)
+  }
+}
+
+function startSync() {
+  syncInterval = setInterval(syncData, 2000)
+}
+
+function stopSync() {
+  if (syncInterval) {
+    clearInterval(syncInterval)
+    syncInterval = null
+  }
+}
+
 onMounted(() => {
   loadIdea()
+  saveLastActiveView()
+  startSync()
+})
+
+onUnmounted(() => {
+  stopSync()
 })
 </script>
 
@@ -363,6 +418,34 @@ onMounted(() => {
   background: rgba(255, 215, 189, 0.2);
   border-color: rgba(212, 117, 111, 0.4);
   color: #d4756f;
+}
+
+.floating-toggle-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  color: #40312b;
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.floating-toggle-btn:hover {
+  background: white;
+  border-color: #d4756f;
+  color: #d4756f;
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
 }
 
 .context-actions {

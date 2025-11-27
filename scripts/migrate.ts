@@ -272,6 +272,11 @@ async function main() {
     ALTER COLUMN zoom TYPE REAL USING zoom::REAL;
   `)
 
+  await db.execute(sql`
+    ALTER TABLE saved_ideas 
+    ADD COLUMN IF NOT EXISTS last_active_view TEXT DEFAULT 'coach';
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

@@ -113,7 +113,7 @@
   - Add Tool Node generation for identified needs
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 1.4_
 
-- [ ] 15. Implement Canvas-Coach view toggle
+- [x] 15. Implement Canvas-Coach view toggle
   - Add toggle button in Coach view to switch to Canvas
   - Add toggle button in Canvas view to switch to Coach
   - Preserve project context during toggle
