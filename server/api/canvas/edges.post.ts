@@ -3,7 +3,7 @@ import { db } from '../../db'
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { projectId, sourceId, targetId, type, label, style } = body
+  const { projectId, sourceId, targetId, type, label, style, relationshipType } = body
 
   if (!projectId || !sourceId || !targetId) {
     throw createError({
@@ -12,15 +12,22 @@ export default defineEventHandler(async event => {
     })
   }
 
+  const edgeStyle = style || {}
+  if (relationshipType) {
+    edgeStyle.relationshipType = relationshipType
+  } else if (!edgeStyle.relationshipType) {
+    edgeStyle.relationshipType = 'relates-to'
+  }
+
   const [edge] = await db
     .insert(canvasEdges)
     .values({
       projectId,
       sourceId,
       targetId,
-      type: type || null,
+      type: type || 'relationship',
       label: label || null,
-      style: style || null
+      style: edgeStyle
     })
     .returning()
 

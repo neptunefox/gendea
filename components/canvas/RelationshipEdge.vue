@@ -1,111 +1,126 @@
 <template>
-  <g>
-    <path
-      :id="id"
-      :d="path"
-      :style="edgeStyle"
-      class="vue-flow__edge-path"
-      :marker-end="markerEnd"
-    />
-    
-    <path
-      :d="path"
-      class="vue-flow__edge-interaction"
-      fill="none"
-      stroke="transparent"
-      stroke-width="20"
-      @mouseenter="showLabel = true"
-      @mouseleave="showLabel = false"
-      @click="handleEdgeClick"
-    />
+  <BaseEdge :id="id" :path="path" :style="edgeStyle" :marker-end="markerEnd" />
 
-    <foreignObject
-      v-if="showLabel && label"
-      :x="labelX - labelWidth / 2"
-      :y="labelY - labelHeight / 2"
-      :width="labelWidth"
-      :height="labelHeight"
-      class="edge-label-wrapper"
+  <path
+    :d="path"
+    class="vue-flow__edge-interaction"
+    fill="none"
+    stroke="transparent"
+    stroke-width="20"
+    @mouseenter="showLabel = true"
+    @mouseleave="showLabel = false"
+    @click="handleEdgeClick"
+  />
+
+  <EdgeLabelRenderer>
+    <div
+      v-if="showLabel && displayLabel"
+      :style="{
+        position: 'absolute',
+        transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+        pointerEvents: 'none'
+      }"
+      class="edge-label nodrag nopan"
     >
-      <div class="edge-label">
-        {{ label }}
-      </div>
-    </foreignObject>
+      {{ displayLabel }}
+    </div>
 
-    <foreignObject
+    <div
       v-if="isEditing"
-      :x="labelX - 100"
-      :y="labelY - 60"
-      width="200"
-      height="120"
-      class="edge-editor-wrapper"
+      :style="{
+        position: 'absolute',
+        transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+        pointerEvents: 'all'
+      }"
+      class="edge-editor nodrag nopan"
+      @click.stop
     >
-      <div class="edge-editor" @click.stop>
-        <select v-model="editType" class="edge-type-select">
-          <option value="leads-to">Leads to</option>
-          <option value="requires">Requires</option>
-          <option value="blocks">Blocks</option>
-          <option value="relates-to">Relates to</option>
-        </select>
-        <input
-          v-model="editLabel"
-          type="text"
-          class="edge-label-input"
-          placeholder="Label (optional)"
-        />
-        <div class="edge-editor-actions">
-          <button @click="saveEdit" class="save-btn">Save</button>
-          <button @click="cancelEdit" class="cancel-btn">Cancel</button>
-        </div>
+      <select v-model="editType" class="edge-type-select">
+        <option value="leads-to">Leads to</option>
+        <option value="requires">Requires</option>
+        <option value="blocks">Blocks</option>
+        <option value="relates-to">Relates to</option>
+      </select>
+      <input
+        v-model="editLabel"
+        type="text"
+        class="edge-label-input"
+        placeholder="Label (optional)"
+        @keydown.enter="saveEdit"
+        @keydown.escape="cancelEdit"
+      />
+      <div class="edge-editor-actions">
+        <button class="save-btn" @click="saveEdit">Save</button>
+        <button class="cancel-btn" @click="cancelEdit">Cancel</button>
       </div>
-    </foreignObject>
-  </g>
+    </div>
+  </EdgeLabelRenderer>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { EdgeProps, getBezierPath } from '@vue-flow/core'
-import { EDGE_STYLES, type EdgeRelationshipType } from '~/types/canvas'
+import { ref, computed, watch } from 'vue'
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, useVueFlow, type EdgeProps } from '@vue-flow/core'
+import { EDGE_STYLES, EDGE_RELATIONSHIP_LABELS, type EdgeRelationshipType } from '~/types/canvas'
 
 const props = defineProps<EdgeProps>()
 
+const { updateEdge, findEdge } = useVueFlow()
+
 const showLabel = ref(false)
 const isEditing = ref(false)
-const editType = ref<EdgeRelationshipType>((props.type as EdgeRelationshipType) || 'relates-to')
-const editLabel = ref(props.label || '')
+const editType = ref<EdgeRelationshipType>('relates-to')
+const editLabel = ref('')
 
-const labelWidth = 120
-const labelHeight = 32
+const edgeType = computed<EdgeRelationshipType>(() => {
+  const type = props.data?.relationshipType || props.type
+  return (type as EdgeRelationshipType) || 'relates-to'
+})
 
-const edgeType = computed<EdgeRelationshipType>(() => (props.type as EdgeRelationshipType) || 'relates-to')
+const displayLabel = computed(() => {
+  if (props.label) return props.label
+  return EDGE_RELATIONSHIP_LABELS[edgeType.value]
+})
 
 const edgeStyle = computed(() => {
   const style = EDGE_STYLES[edgeType.value] || EDGE_STYLES['relates-to']
   return {
     stroke: style.stroke,
-    strokeWidth: `${style.strokeWidth}px`,
-    strokeDasharray: style.strokeDasharray,
-    fill: 'none'
+    strokeWidth: style.strokeWidth,
+    strokeDasharray: style.strokeDasharray
   }
 })
 
-const markerEnd = computed(() => {
-  return `url(#arrow-${edgeType.value})`
-})
+const markerEnd = computed(() => `url(#arrow-${edgeType.value})`)
 
-const [path, labelX, labelY] = getBezierPath({
-  sourceX: props.sourceX,
-  sourceY: props.sourceY,
-  sourcePosition: props.sourcePosition,
-  targetX: props.targetX,
-  targetY: props.targetY,
-  targetPosition: props.targetPosition
-})
+const pathData = computed(() =>
+  getBezierPath({
+    sourceX: props.sourceX,
+    sourceY: props.sourceY,
+    sourcePosition: props.sourcePosition,
+    targetX: props.targetX,
+    targetY: props.targetY,
+    targetPosition: props.targetPosition
+  })
+)
+
+const path = computed(() => pathData.value[0])
+const labelX = computed(() => pathData.value[1])
+const labelY = computed(() => pathData.value[2])
+
+watch(
+  () => props.data?.relationshipType,
+  newType => {
+    if (newType) {
+      editType.value = newType as EdgeRelationshipType
+    }
+  },
+  { immediate: true }
+)
 
 function handleEdgeClick() {
   isEditing.value = true
-  editType.value = (props.type as EdgeRelationshipType) || 'relates-to'
-  editLabel.value = props.label || ''
+  editType.value = edgeType.value
+  editLabel.value = (props.label as string) || ''
 }
 
 async function saveEdit() {
@@ -113,11 +128,26 @@ async function saveEdit() {
     await $fetch(`/api/canvas/edges/${props.id}`, {
       method: 'PATCH',
       body: {
-        type: editType.value,
-        label: editLabel.value || null
+        type: 'relationship',
+        label: editLabel.value || null,
+        style: {
+          relationshipType: editType.value
+        }
       }
     })
-    
+
+    const edge = findEdge(props.id)
+    if (edge) {
+      updateEdge(edge, {
+        ...edge,
+        label: editLabel.value || undefined,
+        data: {
+          ...edge.data,
+          relationshipType: editType.value
+        }
+      })
+    }
+
     isEditing.value = false
   } catch (error) {
     console.error('Failed to update edge:', error)
@@ -126,22 +156,20 @@ async function saveEdit() {
 
 function cancelEdit() {
   isEditing.value = false
-  editType.value = (props.type as EdgeRelationshipType) || 'relates-to'
-  editLabel.value = props.label || ''
+  editType.value = edgeType.value
+  editLabel.value = (props.label as string) || ''
+}
+</script>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false
 }
 </script>
 
 <style scoped>
-.vue-flow__edge-path {
-  transition: stroke-width 0.2s ease;
-}
-
-.vue-flow__edge-interaction:hover + .vue-flow__edge-path {
-  stroke-width: 4px !important;
-}
-
-.edge-label-wrapper {
-  pointer-events: none;
+.vue-flow__edge-interaction {
+  cursor: pointer;
 }
 
 .edge-label {
@@ -157,10 +185,6 @@ function cancelEdit() {
   text-align: center;
 }
 
-.edge-editor-wrapper {
-  pointer-events: all;
-}
-
 .edge-editor {
   background: white;
   border: 1px solid #d4756f;
@@ -170,6 +194,7 @@ function cancelEdit() {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 180px;
 }
 
 .edge-type-select,

@@ -12,6 +12,55 @@
         :max-zoom="4"
         @viewport-change="handleViewportChange"
       >
+        <svg>
+          <defs>
+            <marker
+              id="arrow-leads-to"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4756f" />
+            </marker>
+            <marker
+              id="arrow-requires"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b7a75" />
+            </marker>
+            <marker
+              id="arrow-blocks"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="8"
+              markerHeight="8"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#c26660" />
+            </marker>
+            <marker
+              id="arrow-relates-to"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#b8a8a3" />
+            </marker>
+          </defs>
+        </svg>
+
         <Background variant="dots" :gap="20" :size="1" />
         <Controls position="bottom-left" />
 
@@ -92,7 +141,7 @@ async function loadCanvas() {
 
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
-    
+
     const nodes = data.nodes.map((node: any) => ({
       id: node.id,
       type: node.type,
@@ -100,14 +149,19 @@ async function loadCanvas() {
       data: node.data
     }))
 
-    const edges = data.edges.map((edge: any) => ({
-      id: edge.id,
-      source: edge.sourceId,
-      target: edge.targetId,
-      type: edge.type,
-      label: edge.label,
-      style: edge.style
-    }))
+    const edges = data.edges.map((edge: any) => {
+      const relationshipType = edge.style?.relationshipType || edge.type || 'relates-to'
+      return {
+        id: edge.id,
+        source: edge.sourceId,
+        target: edge.targetId,
+        type: 'relationship',
+        label: edge.label,
+        data: {
+          relationshipType
+        }
+      }
+    })
 
     elements.value = [...nodes, ...edges]
 

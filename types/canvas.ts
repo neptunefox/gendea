@@ -7,6 +7,13 @@ export const EDGE_RELATIONSHIP_TYPES: EdgeRelationshipType[] = [
   'relates-to'
 ]
 
+export const EDGE_RELATIONSHIP_LABELS: Record<EdgeRelationshipType, string> = {
+  'leads-to': 'Leads to',
+  'requires': 'Requires',
+  'blocks': 'Blocks',
+  'relates-to': 'Relates to'
+}
+
 export type CanvasNodeType =
   | 'sticky-note'
   | 'shape'
