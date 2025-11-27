@@ -74,6 +74,7 @@ function formatDate(dateStr: string): string {
 <style scoped>
 .task-node {
   min-width: 200px;
+  max-width: 280px;
   background: white;
   border: 2px solid #f0e5e0;
   border-radius: 10px;
