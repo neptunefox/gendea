@@ -5,11 +5,17 @@ import {
   CanvasConnectionLabelSchema,
   ProactiveQuestionSchema,
   ProactiveToolSchema,
+  IncompleteNodeSchema,
+  UnrelatedConnectionSchema,
+  DisconnectedClustersSchema,
   type CanvasExpand,
   type CanvasTidyUp,
   type CanvasConnectionLabel,
   type ProactiveQuestion,
-  type ProactiveTool
+  type ProactiveTool,
+  type IncompleteNode,
+  type UnrelatedConnection,
+  type DisconnectedClusters
 } from './langchain-schemas'
 import {
   CANVAS_EXPAND_SYSTEM_PROMPT,
@@ -17,11 +23,17 @@ import {
   CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
   PROACTIVE_QUESTION_SYSTEM_PROMPT,
   PROACTIVE_TOOL_SYSTEM_PROMPT,
+  INCOMPLETE_NODE_SYSTEM_PROMPT,
+  UNRELATED_CONNECTION_SYSTEM_PROMPT,
+  DISCONNECTED_CLUSTERS_SYSTEM_PROMPT,
   buildCanvasExpandPrompt,
   buildCanvasTidyUpPrompt,
   buildCanvasConnectionLabelPrompt,
   buildProactiveQuestionPrompt,
-  buildProactiveToolPrompt
+  buildProactiveToolPrompt,
+  buildIncompleteNodePrompt,
+  buildUnrelatedConnectionPrompt,
+  buildDisconnectedClustersPrompt
 } from './langchain-prompts'
 import type { CanvasNodeData } from './langchain-types'
 
@@ -130,6 +142,48 @@ export async function suggestTool(
     prompt,
     systemPrompt: PROACTIVE_TOOL_SYSTEM_PROMPT,
     schema: ProactiveToolSchema
+  })
+}
+
+export async function detectIncompleteNode(
+  nodeContent: string,
+  nodeType: string
+): Promise<IncompleteNode> {
+  const langChain = useLangChainService()
+  const prompt = buildIncompleteNodePrompt(nodeContent, nodeType)
+
+  return langChain.generateStructured<typeof IncompleteNodeSchema>({
+    prompt,
+    systemPrompt: INCOMPLETE_NODE_SYSTEM_PROMPT,
+    schema: IncompleteNodeSchema
+  })
+}
+
+export async function detectUnrelatedConnection(
+  sourceContent: string,
+  targetContent: string
+): Promise<UnrelatedConnection> {
+  const langChain = useLangChainService()
+  const prompt = buildUnrelatedConnectionPrompt(sourceContent, targetContent)
+
+  return langChain.generateStructured<typeof UnrelatedConnectionSchema>({
+    prompt,
+    systemPrompt: UNRELATED_CONNECTION_SYSTEM_PROMPT,
+    schema: UnrelatedConnectionSchema
+  })
+}
+
+export async function detectDisconnectedClusters(
+  nodes: Array<{ id: string; type: string; content: string }>,
+  edges: Array<{ sourceId: string; targetId: string }>
+): Promise<DisconnectedClusters> {
+  const langChain = useLangChainService()
+  const prompt = buildDisconnectedClustersPrompt(nodes, edges)
+
+  return langChain.generateStructured<typeof DisconnectedClustersSchema>({
+    prompt,
+    systemPrompt: DISCONNECTED_CLUSTERS_SYSTEM_PROMPT,
+    schema: DisconnectedClustersSchema
   })
 }
 

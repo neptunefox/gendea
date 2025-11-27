@@ -151,3 +151,55 @@ export type CanvasTidyUp = z.infer<typeof CanvasTidyUpSchema>
 export type CanvasConnectionLabel = z.infer<typeof CanvasConnectionLabelSchema>
 export type ProactiveQuestion = z.infer<typeof ProactiveQuestionSchema>
 export type ProactiveTool = z.infer<typeof ProactiveToolSchema>
+
+export const IncompleteNodeSchema = z.object({
+  isIncomplete: z
+    .boolean()
+    .describe('True if the node lacks essential information to be actionable'),
+  missingElements: z
+    .array(z.string())
+    .optional()
+    .describe('List of missing elements (e.g., "specific timeline", "success criteria")'),
+  suggestedQuestion: z
+    .string()
+    .optional()
+    .describe('A follow-up question to help complete the node')
+})
+
+export const UnrelatedConnectionSchema = z.object({
+  areUnrelated: z
+    .boolean()
+    .describe('True if the two nodes have no clear logical connection'),
+  suggestedIntermediateSteps: z
+    .array(z.string())
+    .max(3)
+    .optional()
+    .describe('1-3 intermediate steps that could bridge the gap between the nodes'),
+  reasoning: z
+    .string()
+    .optional()
+    .describe('Brief explanation of why these nodes seem unrelated')
+})
+
+export const DisconnectedClustersSchema = z.object({
+  hasDisconnectedClusters: z
+    .boolean()
+    .describe('True if there are multiple disconnected groups of nodes'),
+  clusters: z
+    .array(
+      z.object({
+        nodeIds: z.array(z.string()).describe('IDs of nodes in this cluster'),
+        theme: z.string().describe('Common theme or purpose of this cluster')
+      })
+    )
+    .optional()
+    .describe('Identified clusters of related nodes'),
+  suggestedAction: z
+    .enum(['group', 'connect', 'organize'])
+    .optional()
+    .describe('Recommended action: group into sections, connect with edges, or reorganize layout')
+})
+
+export type IncompleteNode = z.infer<typeof IncompleteNodeSchema>
+export type UnrelatedConnection = z.infer<typeof UnrelatedConnectionSchema>
+export type DisconnectedClusters = z.infer<typeof DisconnectedClustersSchema>

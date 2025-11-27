@@ -108,7 +108,29 @@
           <Group :size="18" />
           <span>Group ({{ selectedNodes.length }})</span>
         </button>
+        <button class="ai-tidy-btn" @click="handleTidyUp" :disabled="isTidying" title="AI organize nodes">
+          <Loader2 v-if="isTidying" :size="18" class="spin" />
+          <Wand2 v-else :size="18" />
+          <span>Tidy Up</span>
+        </button>
       </div>
+
+      <NodeAIToolbar
+        v-if="singleSelectedNode"
+        :selected-node="singleSelectedNode"
+        :project-id="projectId"
+        :viewport="viewport"
+        @nodes-created="handleAINodesCreated"
+        @error="handleAIError"
+      />
+
+      <AISuggestionPanel
+        v-if="currentSuggestion"
+        :suggestion="currentSuggestion"
+        :project-id="projectId"
+        @dismiss="dismissSuggestion"
+        @apply="applySuggestion"
+      />
 
       <NodePalette />
 
@@ -155,11 +177,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, provide } from 'vue'
+import { ref, computed, onMounted, onUnmounted, provide, watch } from 'vue'
 import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node, type Connection } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles } from 'lucide-vue-next'
+import { Hammer, Group, ChevronLeft, ChevronRight, Lightbulb, Sparkles, Wand2, Loader2 } from 'lucide-vue-next'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -173,6 +195,8 @@ import {
 } from '~/components/canvas/nodes'
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 import NodePalette from '~/components/canvas/NodePalette.vue'
+import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
+import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
 import { useDragAndDrop } from '~/composables/useDragAndDrop'
 import { useCanvasAnimations } from '~/composables/useCanvasAnimations'
 
@@ -246,6 +270,32 @@ const { getSelectedNodes, addNodes, updateNode, addEdges, setViewport, onPaneRea
 
 const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
 
+const singleSelectedNode = computed(() => {
+  const nodes = selectedNodes.value
+  if (nodes.length !== 1) return null
+  const node = nodes[0]
+  return {
+    id: node.id,
+    type: node.type,
+    position: node.position,
+    data: node.data as Record<string, unknown>
+  }
+})
+
+interface Suggestion {
+  type: 'clusters' | 'intermediate' | 'incomplete'
+  message: string
+  action?: string
+  actionLabel?: string
+  clusters?: Array<{ nodeIds: string[]; theme: string }>
+  steps?: string[]
+  nodeId?: string
+}
+
+const currentSuggestion = ref<Suggestion | null>(null)
+const isTidying = ref(false)
+const dismissedSuggestions = ref<Set<string>>(new Set())
+
 let pendingViewport: Viewport | null = null
 let paneReady = false
 
@@ -298,9 +348,49 @@ async function handleConnect(connection: Connection) {
         relationshipType: 'relates-to'
       }
     })
+
+    checkConnectionRelatedness(connection.source, connection.target)
   } catch (error) {
     console.error('Failed to create edge:', error)
   }
+}
+
+async function checkConnectionRelatedness(sourceId: string, targetId: string) {
+  const suggestionKey = `intermediate-${sourceId}-${targetId}`
+  if (dismissedSuggestions.value.has(suggestionKey)) return
+
+  const sourceNode = elements.value.find((e: any) => e.id === sourceId && !e.source)
+  const targetNode = elements.value.find((e: any) => e.id === targetId && !e.source)
+  
+  if (!sourceNode || !targetNode) return
+
+  const sourceContent = getNodeContent(sourceNode)
+  const targetContent = getNodeContent(targetNode)
+  
+  if (!sourceContent || !targetContent) return
+
+  try {
+    const result = await $fetch('/api/canvas/ai/detect-unrelated', {
+      method: 'POST',
+      body: { sourceContent, targetContent }
+    })
+
+    if (result.areUnrelated && result.suggestedIntermediateSteps?.length) {
+      currentSuggestion.value = {
+        type: 'intermediate',
+        message: result.reasoning || 'These nodes might benefit from intermediate steps.',
+        steps: result.suggestedIntermediateSteps,
+        nodeId: sourceId
+      }
+    }
+  } catch (error) {
+    console.error('Failed to check connection relatedness:', error)
+  }
+}
+
+function getNodeContent(node: any): string {
+  const data = node.data || {}
+  return data.text || data.question || data.name || ''
 }
 
 async function loadCanvas() {
@@ -421,6 +511,138 @@ async function navigateToCoach() {
 function handleSelectionEnd() {
   // Selection box completed - nodes are automatically selected by Vue Flow
 }
+
+function handleAINodesCreated(nodes: any[], edges: any[]) {
+  for (const node of nodes) {
+    addNodes({
+      id: node.id,
+      type: node.type,
+      position: node.position,
+      data: node.data
+    })
+    canvasAnimations.markNodeStaggered(node.id, nodes.indexOf(node))
+  }
+
+  for (const edge of edges) {
+    addEdges({
+      id: edge.id,
+      source: edge.sourceId,
+      target: edge.targetId,
+      type: 'relationship',
+      data: {
+        relationshipType: edge.type || 'relates-to'
+      }
+    })
+  }
+}
+
+function handleAIError(message: string) {
+  console.warn('AI action:', message)
+}
+
+async function handleTidyUp() {
+  if (isTidying.value) return
+  isTidying.value = true
+
+  try {
+    const nodeIds = selectedNodes.value.map(n => n.id)
+    const result = await $fetch('/api/canvas/ai/tidy-up', {
+      method: 'POST',
+      body: {
+        projectId: projectId.value,
+        nodeIds
+      }
+    })
+
+    if (result.updatedPositions) {
+      for (const [nodeId, position] of Object.entries(result.updatedPositions)) {
+        updateNode(nodeId, { position: position as { x: number; y: number } })
+      }
+    }
+  } catch (error) {
+    console.error('Failed to tidy up nodes:', error)
+  } finally {
+    isTidying.value = false
+  }
+}
+
+function dismissSuggestion() {
+  if (currentSuggestion.value) {
+    const key = `${currentSuggestion.value.type}-${currentSuggestion.value.nodeId || 'global'}`
+    dismissedSuggestions.value.add(key)
+    
+    if (currentSuggestion.value.nodeId) {
+      $fetch('/api/canvas/ai/dismiss-suggestion', {
+        method: 'POST',
+        body: {
+          nodeId: currentSuggestion.value.nodeId,
+          suggestionType: currentSuggestion.value.type
+        }
+      }).catch(console.error)
+    }
+  }
+  currentSuggestion.value = null
+}
+
+async function applySuggestion(action: string) {
+  if (!currentSuggestion.value) return
+
+  if (action === 'tidy' && currentSuggestion.value.clusters) {
+    isTidying.value = true
+    try {
+      const result = await $fetch('/api/canvas/ai/tidy-up', {
+        method: 'POST',
+        body: { projectId: projectId.value }
+      })
+
+      if (result.updatedPositions) {
+        for (const [nodeId, position] of Object.entries(result.updatedPositions)) {
+          updateNode(nodeId, { position: position as { x: number; y: number } })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to apply suggestion:', error)
+    } finally {
+      isTidying.value = false
+    }
+  }
+
+  currentSuggestion.value = null
+}
+
+async function checkForDisconnectedClusters() {
+  const nodes = elements.value.filter((e: any) => !e.source)
+  if (nodes.length < 4) return
+
+  const suggestionKey = 'clusters-global'
+  if (dismissedSuggestions.value.has(suggestionKey)) return
+
+  try {
+    const result = await $fetch('/api/canvas/ai/detect-clusters', {
+      method: 'POST',
+      body: { projectId: projectId.value }
+    })
+
+    if (result.hasDisconnectedClusters && result.clusters && result.clusters.length > 1) {
+      currentSuggestion.value = {
+        type: 'clusters',
+        message: `Found ${result.clusters.length} disconnected groups of nodes. Would you like to organize them?`,
+        action: 'tidy',
+        actionLabel: 'Organize Canvas',
+        clusters: result.clusters
+      }
+    }
+  } catch (error) {
+    console.error('Failed to check for clusters:', error)
+  }
+}
+
+let clusterCheckTimeout: NodeJS.Timeout | null = null
+
+watch(() => elements.value.length, () => {
+  if (clusterCheckTimeout) clearTimeout(clusterCheckTimeout)
+  clusterCheckTimeout = setTimeout(checkForDisconnectedClusters, 5000)
+})
 
 async function groupSelectedNodes() {
   const nodes = selectedNodes.value
@@ -607,6 +829,9 @@ onUnmounted(() => {
   if (viewportSaveTimeout) {
     clearTimeout(viewportSaveTimeout)
   }
+  if (clusterCheckTimeout) {
+    clearTimeout(clusterCheckTimeout)
+  }
 })
 </script>
 
@@ -696,6 +921,41 @@ onUnmounted(() => {
 .group-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+}
+
+.ai-tidy-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
+  color: #40312b;
+  border: 1px solid #f0e5e0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-tidy-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+  border-color: #d4756f;
+  color: white;
+}
+
+.ai-tidy-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .drop-indicator {

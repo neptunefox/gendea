@@ -277,6 +277,11 @@ async function main() {
     ADD COLUMN IF NOT EXISTS last_active_view TEXT DEFAULT 'coach';
   `)
 
+  await db.execute(sql`
+    ALTER TABLE canvas_nodes 
+    ADD COLUMN IF NOT EXISTS dismissed_suggestions JSONB DEFAULT '[]'::jsonb;
+  `)
+
   console.log('[SUCCESS] Tables created successfully!')
 
   await client.end()

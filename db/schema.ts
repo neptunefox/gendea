@@ -227,6 +227,7 @@ export const canvasNodes = pgTable('canvas_nodes', {
   position: jsonb('position').$type<{ x: number; y: number }>().notNull(),
   data: jsonb('data').$type<Record<string, unknown>>().notNull(),
   parentNodeId: uuid('parent_node_id'),
+  dismissedSuggestions: jsonb('dismissed_suggestions').$type<string[]>().default([]),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })

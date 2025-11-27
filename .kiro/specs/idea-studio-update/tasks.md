@@ -148,7 +148,7 @@
   - Restore viewport state on Canvas load
   - _Requirements: 14.4, 5.2_
 
-- [ ] 20. Implement Canvas contextual AI suggestions
+- [x] 20. Implement Canvas contextual AI suggestions
   - Detect incomplete node information
   - Suggest follow-up questions for incomplete nodes
   - Detect unrelated node connections
