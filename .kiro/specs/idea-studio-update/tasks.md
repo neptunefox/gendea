@@ -61,7 +61,7 @@
   - Implement Canvas state persistence
   - _Requirements: 6.1, 14.1, 14.2, 14.3_
 
-- [ ] 9. Create custom Canvas node types
+- [x] 9. Create custom Canvas node types
   - Implement Sticky Note node component
   - Implement Shape node component (rectangle, circle, arrow)
   - Implement Text Block node component

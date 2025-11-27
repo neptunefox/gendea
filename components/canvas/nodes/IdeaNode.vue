@@ -1,0 +1,124 @@
+<template>
+  <div class="idea-node" :class="{ selected: props.selected, cauldron: isCauldronOutput }">
+    <Handle type="target" :position="Position.Top" />
+    
+    <div class="idea-header">
+      <Lightbulb :size="18" class="idea-icon" />
+      <span v-if="isCauldronOutput" class="cauldron-badge">
+        <Sparkles :size="12" />
+        Cauldron
+      </span>
+    </div>
+
+    <div class="idea-text">
+      {{ props.data.text || 'Untitled idea' }}
+    </div>
+
+    <div v-if="props.data.tags?.length" class="idea-tags">
+      <span v-for="tag in props.data.tags" :key="tag" class="tag">
+        {{ tag }}
+      </span>
+    </div>
+
+    <Handle type="source" :position="Position.Bottom" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { Handle, Position, type NodeProps } from '@vue-flow/core'
+import { Lightbulb, Sparkles } from 'lucide-vue-next'
+
+const props = defineProps<NodeProps>()
+
+const isCauldronOutput = computed(() => !!props.data.isCauldronOutput)
+</script>
+
+<style scoped>
+.idea-node {
+  min-width: 200px;
+  max-width: 280px;
+  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
+  border: 2px solid #ffd54f;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(255, 213, 79, 0.2);
+  transition: all 0.2s ease;
+}
+
+.idea-node:hover {
+  box-shadow: 0 4px 16px rgba(255, 213, 79, 0.3);
+  transform: translateY(-1px);
+}
+
+.idea-node.selected {
+  outline: 2px solid #ffd54f;
+  outline-offset: 2px;
+}
+
+.idea-node.cauldron {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-color: #ba68c8;
+  box-shadow: 0 2px 8px rgba(186, 104, 200, 0.2);
+}
+
+.idea-node.cauldron:hover {
+  box-shadow: 0 4px 16px rgba(186, 104, 200, 0.3);
+}
+
+.idea-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.idea-icon {
+  color: #ffa000;
+}
+
+.idea-node.cauldron .idea-icon {
+  color: #ba68c8;
+}
+
+.cauldron-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(186, 104, 200, 0.2);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #9c27b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.idea-text {
+  font-size: 0.9375rem;
+  color: #40312b;
+  line-height: 1.5;
+}
+
+.idea-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.tag {
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 160, 0, 0.15);
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #f57c00;
+}
+
+.idea-node.cauldron .tag {
+  background: rgba(186, 104, 200, 0.15);
+  color: #9c27b0;
+}
+</style>

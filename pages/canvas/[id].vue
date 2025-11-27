@@ -14,6 +14,35 @@
       >
         <Background variant="dots" :gap="20" :size="1" />
         <Controls position="bottom-left" />
+
+        <template #node-sticky-note="nodeProps">
+          <StickyNoteNode v-bind="nodeProps" />
+        </template>
+        <template #node-shape="nodeProps">
+          <ShapeNode v-bind="nodeProps" />
+        </template>
+        <template #node-text-block="nodeProps">
+          <TextBlockNode v-bind="nodeProps" />
+        </template>
+        <template #node-input="nodeProps">
+          <InputNode v-bind="nodeProps" />
+        </template>
+        <template #node-tool="nodeProps">
+          <ToolNode v-bind="nodeProps" />
+        </template>
+        <template #node-task="nodeProps">
+          <TaskNode v-bind="nodeProps" />
+        </template>
+        <template #node-idea="nodeProps">
+          <IdeaNode v-bind="nodeProps" />
+        </template>
+        <template #node-goal="nodeProps">
+          <GoalNode v-bind="nodeProps" />
+        </template>
+
+        <template #edge-relationship="edgeProps">
+          <RelationshipEdge v-bind="edgeProps" />
+        </template>
       </VueFlow>
 
       <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
@@ -30,6 +59,17 @@ import { VueFlow, type Viewport } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { Hammer } from 'lucide-vue-next'
+import {
+  StickyNoteNode,
+  ShapeNode,
+  TextBlockNode,
+  InputNode,
+  ToolNode,
+  TaskNode,
+  IdeaNode,
+  GoalNode
+} from '~/components/canvas/nodes'
+import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 
 const route = useRoute()
 const router = useRouter()
