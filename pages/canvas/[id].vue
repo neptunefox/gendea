@@ -122,6 +122,7 @@
         :viewport="viewport"
         @nodes-created="handleAINodesCreated"
         @error="handleAIError"
+        @delete-node="handleDeleteNode"
       />
 
       <AISuggestionPanel
@@ -540,6 +541,40 @@ function handleAIError(message: string) {
   console.warn('AI action:', message)
 }
 
+async function handleDeleteNode(nodeId: string) {
+  try {
+    await canvasAnimations.markNodeDeleting(nodeId)
+    await $fetch(`/api/canvas/nodes/${nodeId}`, { method: 'DELETE' })
+    elements.value = elements.value.filter((e: any) => {
+      if (e.id === nodeId) return false
+      if (e.source === nodeId || e.target === nodeId) return false
+      return true
+    })
+  } catch (error) {
+    console.error('Failed to delete node:', error)
+  }
+}
+
+async function handleDeleteSelectedNodes() {
+  const nodes = selectedNodes.value
+  if (nodes.length === 0) return
+  
+  for (const node of nodes) {
+    await handleDeleteNode(node.id)
+  }
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.key === 'Delete' || event.key === 'Backspace') {
+    const target = event.target as HTMLElement
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+      return
+    }
+    event.preventDefault()
+    handleDeleteSelectedNodes()
+  }
+}
+
 async function handleTidyUp() {
   if (isTidying.value) return
   isTidying.value = true
@@ -822,10 +857,12 @@ onMounted(() => {
   fetchSavedIdeas()
   saveLastActiveView()
   startSync()
+  window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
   stopSync()
+  window.removeEventListener('keydown', handleKeyDown)
   if (viewportSaveTimeout) {
     clearTimeout(viewportSaveTimeout)
   }

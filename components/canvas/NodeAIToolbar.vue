@@ -35,12 +35,25 @@
       <HelpCircle v-else :size="16" />
       <span>Context</span>
     </button>
+
+    <div class="toolbar-divider" />
+
+    <button
+      class="ai-btn delete-btn"
+      :class="{ loading: isDeleting }"
+      :disabled="isDeleting"
+      @click="handleDelete"
+      title="Delete node (Del)"
+    >
+      <Loader2 v-if="isDeleting" :size="16" class="spin" />
+      <Trash2 v-else :size="16" />
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Sparkles, Wrench, HelpCircle, Loader2 } from 'lucide-vue-next'
+import { Sparkles, Wrench, HelpCircle, Loader2, Trash2 } from 'lucide-vue-next'
 
 interface SelectedNode {
   id: string
@@ -58,11 +71,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'nodes-created', nodes: any[], edges: any[]): void
   (e: 'error', message: string): void
+  (e: 'delete-node', nodeId: string): void
 }>()
 
 const isExpanding = ref(false)
 const isSuggestingTools = ref(false)
 const isAddingContext = ref(false)
+const isDeleting = ref(false)
 
 const visible = computed(() => props.selectedNode !== null)
 
@@ -203,6 +218,11 @@ async function handleAddContext() {
     isAddingContext.value = false
   }
 }
+
+function handleDelete() {
+  if (!props.selectedNode || isDeleting.value) return
+  emit('delete-node', props.selectedNode.id)
+}
 </script>
 
 <style scoped>
@@ -248,6 +268,21 @@ async function handleAddContext() {
 
 .ai-btn.loading {
   background: rgba(212, 117, 111, 0.1);
+}
+
+.toolbar-divider {
+  width: 1px;
+  background: #f0e5e0;
+  margin: 0.25rem 0;
+}
+
+.delete-btn {
+  padding: 0.5rem;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c26660 0%, #a85550 100%);
+  border-color: #c26660;
 }
 
 .spin {
