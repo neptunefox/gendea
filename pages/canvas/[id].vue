@@ -253,14 +253,27 @@
       />
 
       <div class="ideas-panel" :class="{ collapsed: isIdeasPanelCollapsed }">
-        <button class="panel-toggle" @click="isIdeasPanelCollapsed = !isIdeasPanelCollapsed">
-          <ChevronRight v-if="isIdeasPanelCollapsed" :size="16" />
-          <ChevronLeft v-else :size="16" />
+        <button
+          v-if="isIdeasPanelCollapsed"
+          class="panel-toggle"
+          title="Show saved ideas"
+          @click="isIdeasPanelCollapsed = false"
+        >
+          <Lightbulb :size="16" />
         </button>
-        <div v-if="!isIdeasPanelCollapsed" class="panel-content">
-          <div class="panel-header">
-            <Lightbulb :size="16" />
-            <span>Saved Ideas</span>
+        <div v-else class="panel-content">
+          <div class="panel-header-row">
+            <div class="panel-header">
+              <Lightbulb :size="16" />
+              <span>Saved Ideas</span>
+            </div>
+            <button
+              class="panel-toggle"
+              title="Hide panel"
+              @click="isIdeasPanelCollapsed = true"
+            >
+              <ChevronRight :size="14" />
+            </button>
           </div>
           <div v-if="savedIdeas.length === 0" class="panel-empty">
             <p>No saved ideas yet</p>
@@ -1577,28 +1590,42 @@ kbd {
   max-height: 60vh;
   display: flex;
   flex-direction: column;
+  transition: all 0.2s ease;
 }
 
 .ideas-panel.collapsed {
   padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .panel-toggle {
-  position: absolute;
-  top: 50%;
-  left: -12px;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  background: white;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(212, 117, 111, 0.2);
-  border-radius: 50%;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #8b7a75;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ideas-panel:not(.collapsed) .panel-toggle {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  border-radius: 4px;
 }
 
 .panel-toggle:hover {
@@ -1607,12 +1634,24 @@ kbd {
   border-color: #d4756f;
 }
 
+.ideas-panel:not(.collapsed) .panel-toggle:hover {
+  background: rgba(212, 117, 111, 0.1);
+  color: #d4756f;
+}
+
 .panel-content {
   padding: 0.75rem;
   width: 220px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
 
 .panel-header {
@@ -1624,8 +1663,6 @@ kbd {
   color: #8b7a75;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-  padding: 0 0.25rem;
 }
 
 .panel-empty {
