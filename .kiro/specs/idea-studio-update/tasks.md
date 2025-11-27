@@ -175,7 +175,7 @@
   - Add suggestion to plan next steps in Canvas from Coach
   - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5_
 
-- [ ] 23. Implement Canvas idea update sync
+- [x] 23. Implement Canvas idea update sync
   - Listen for Saved Idea updates
   - Update corresponding Canvas nodes when ideas change
   - Handle idea deletion (remove or mark Canvas nodes)

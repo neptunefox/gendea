@@ -4,6 +4,31 @@ import { createError } from 'h3'
 import { savedIdeas, canvasState, canvasNodes } from '../../../db/schema'
 import { db } from '../../db'
 
+async function syncIdeaTextToCanvasNodes(ideaId: string, newText: string) {
+  const allNodes = await db.select().from(canvasNodes)
+  
+  const matchingNodes = allNodes.filter((node) => {
+    const data = node.data as Record<string, unknown>
+    return data.savedIdeaId === ideaId
+  })
+
+  for (const node of matchingNodes) {
+    const data = node.data as Record<string, unknown>
+    if (data.coachOrigin) continue
+    
+    await db
+      .update(canvasNodes)
+      .set({
+        data: {
+          ...data,
+          text: newText
+        },
+        updatedAt: new Date()
+      })
+      .where(eq(canvasNodes.id, node.id))
+  }
+}
+
 async function findOrCreateGoalNode(projectId: string, northStar: string) {
   const existingNodes = await db
     .select()
@@ -138,6 +163,10 @@ export default defineEventHandler(async event => {
     updateData.lastActiveView = body.lastActiveView
   }
 
+  if (body.text !== undefined) {
+    updateData.text = body.text
+  }
+
   try {
     const [current] = await db.select().from(savedIdeas).where(eq(savedIdeas.id, id))
 
@@ -194,6 +223,10 @@ export default defineEventHandler(async event => {
           })
           .where(eq(canvasNodes.id, testNode.id))
       }
+    }
+
+    if (body.text !== undefined && body.text !== current?.text) {
+      await syncIdeaTextToCanvasNodes(id, body.text)
     }
 
     return { idea: updated }
