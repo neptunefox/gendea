@@ -128,7 +128,7 @@
   - Add visual indicators for Coach-originated nodes
   - _Requirements: 6.4_
 
-- [ ] 17. Implement Canvas-to-Coach data sync
+- [x] 17. Implement Canvas-to-Coach data sync
   - Reflect Canvas plan structure in Coach progress view
   - Update Coach when Canvas tasks are completed
   - Sync workflow state changes from Canvas actions

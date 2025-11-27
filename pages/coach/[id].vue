@@ -30,6 +30,11 @@
           </button>
         </div>
 
+        <CanvasPlanProgress
+          :plan-summary="planSummary"
+          @view-canvas="navigateToCanvas"
+        />
+
         <div class="context-actions">
           <button class="ghost-btn" @click="backToExploring">← Back to exploring</button>
         </div>
@@ -110,6 +115,7 @@ import { ArrowLeft, Loader, Check, LayoutGrid } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import CanvasPlanProgress from '~/components/coach/CanvasPlanProgress.vue'
 import CommitPhase from '~/components/coach/CommitPhase.vue'
 import LearnPhase from '~/components/coach/LearnPhase.vue'
 import PreMortemTool from '~/components/coach/PreMortemTool.vue'
@@ -136,10 +142,29 @@ interface SavedIdea {
   northStar?: string
 }
 
+interface PlanNode {
+  id: string
+  type: string
+  text: string
+  completed?: boolean
+  coachOrigin?: boolean
+}
+
+interface PlanSummary {
+  totalNodes: number
+  taskNodes: PlanNode[]
+  goalNodes: PlanNode[]
+  completedTasks: number
+  totalTasks: number
+  progressPercent: number
+  hasStructure: boolean
+}
+
 const route = useRoute()
 const router = useRouter()
 
 const idea = ref<SavedIdea | null>(null)
+const planSummary = ref<PlanSummary | null>(null)
 const isLoading = ref(true)
 const showNorthStarPrompt = ref(false)
 const northStarInput = ref('')
@@ -165,6 +190,15 @@ async function loadIdea() {
     console.error('Failed to load idea:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+async function loadPlanSummary() {
+  const ideaId = route.params.id as string
+  try {
+    planSummary.value = await $fetch<PlanSummary>(`/api/canvas/plan-summary/${ideaId}`)
+  } catch (error) {
+    console.error('Failed to load plan summary:', error)
   }
 }
 
@@ -259,11 +293,15 @@ async function saveLastActiveView() {
 async function syncData() {
   const ideaId = route.params.id as string
   try {
-    const { ideas } = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
-    const updated = ideas.find(i => i.id === ideaId)
+    const [ideasResponse, planResponse] = await Promise.all([
+      $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas'),
+      $fetch<PlanSummary>(`/api/canvas/plan-summary/${ideaId}`)
+    ])
+    const updated = ideasResponse.ideas.find(i => i.id === ideaId)
     if (updated && idea.value) {
       idea.value = updated
     }
+    planSummary.value = planResponse
   } catch (error) {
     console.error('Sync failed:', error)
   }
@@ -282,6 +320,7 @@ function stopSync() {
 
 onMounted(() => {
   loadIdea()
+  loadPlanSummary()
   saveLastActiveView()
   startSync()
 })
