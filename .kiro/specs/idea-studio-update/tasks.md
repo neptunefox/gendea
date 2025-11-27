@@ -81,7 +81,7 @@
   - Register custom edge types with Vue Flow
   - _Requirements: 7.4, 12.1, 12.2, 12.3, 12.4_
 
-- [ ] 11. Implement Canvas grouping functionality
+- [x] 11. Implement Canvas grouping functionality
   - Add multi-select for nodes
   - Create Section/Frame container component
   - Implement group movement (all nodes move together)

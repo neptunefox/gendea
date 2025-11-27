@@ -6,6 +6,7 @@ export { default as ToolNode } from './ToolNode.vue'
 export { default as TaskNode } from './TaskNode.vue'
 export { default as IdeaNode } from './IdeaNode.vue'
 export { default as GoalNode } from './GoalNode.vue'
+export { default as SectionNode } from './SectionNode.vue'
 
 export const nodeTypes = [
   'sticky-note',
@@ -15,7 +16,8 @@ export const nodeTypes = [
   'tool',
   'task',
   'idea',
-  'goal'
+  'goal',
+  'section'
 ] as const
 
 export type CanvasNodeType = (typeof nodeTypes)[number]

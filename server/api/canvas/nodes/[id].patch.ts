@@ -31,6 +31,10 @@ export default defineEventHandler(async event => {
     updateData.type = body.type
   }
 
+  if (body.parentNode !== undefined) {
+    updateData.parentNodeId = body.parentNode
+  }
+
   await db.update(canvasNodes).set(updateData).where(eq(canvasNodes.id, id))
 
   const [updated] = await db.select().from(canvasNodes).where(eq(canvasNodes.id, id))

@@ -10,7 +10,12 @@
         :default-viewport="viewport"
         :min-zoom="0.1"
         :max-zoom="4"
+        :selection-key-code="null"
+        :multi-selection-key-code="'Shift'"
+        :pan-on-scroll="true"
+        :selection-mode="SelectionMode.Partial"
         @viewport-change="handleViewportChange"
+        @selection-end="handleSelectionEnd"
       >
         <svg>
           <defs>
@@ -88,11 +93,21 @@
         <template #node-goal="nodeProps">
           <GoalNode v-bind="nodeProps" />
         </template>
+        <template #node-section="nodeProps">
+          <SectionNode v-bind="nodeProps" />
+        </template>
 
         <template #edge-relationship="edgeProps">
           <RelationshipEdge v-bind="edgeProps" />
         </template>
       </VueFlow>
+
+      <div v-if="selectedNodes.length > 1" class="selection-toolbar">
+        <button class="group-btn" @click="groupSelectedNodes" title="Group selected nodes">
+          <Group :size="18" />
+          <span>Group ({{ selectedNodes.length }})</span>
+        </button>
+      </div>
 
       <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
         <Hammer :size="18" />
@@ -103,11 +118,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { VueFlow, type Viewport } from '@vue-flow/core'
+import { ref, computed, onMounted } from 'vue'
+import { VueFlow, useVueFlow, SelectionMode, type Viewport, type Node } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { Hammer } from 'lucide-vue-next'
+import { Hammer, Group } from 'lucide-vue-next'
 import {
   StickyNoteNode,
   ShapeNode,
@@ -116,7 +131,8 @@ import {
   ToolNode,
   TaskNode,
   IdeaNode,
-  GoalNode
+  GoalNode,
+  SectionNode
 } from '~/components/canvas/nodes'
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
 
@@ -125,7 +141,7 @@ const router = useRouter()
 
 const projectId = computed(() => route.params.id as string)
 
-const elements = ref([])
+const elements = ref<any[]>([])
 const isLoading = ref(true)
 
 const viewport = ref<Viewport>({
@@ -136,18 +152,43 @@ const viewport = ref<Viewport>({
 
 let viewportSaveTimeout: NodeJS.Timeout | null = null
 
+const { getSelectedNodes, addNodes, updateNode } = useVueFlow()
+
+const selectedNodes = computed(() => getSelectedNodes.value.filter(n => n.type !== 'section'))
+
 async function loadCanvas() {
   if (!projectId.value) return
 
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
 
-    const nodes = data.nodes.map((node: any) => ({
-      id: node.id,
-      type: node.type,
-      position: node.position,
-      data: node.data
-    }))
+    const sectionNodes = data.nodes
+      .filter((node: any) => node.type === 'section')
+      .map((node: any) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        data: node.data,
+        zIndex: -1
+      }))
+
+    const childNodes = data.nodes
+      .filter((node: any) => node.type !== 'section')
+      .map((node: any) => {
+        const nodeData: any = {
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data
+        }
+        if (node.parentNodeId) {
+          nodeData.parentNode = node.parentNodeId
+          nodeData.extent = 'parent'
+        }
+        return nodeData
+      })
+
+    const nodes = [...sectionNodes, ...childNodes]
 
     const edges = data.edges.map((edge: any) => {
       const relationshipType = edge.style?.relationshipType || edge.type || 'relates-to'
@@ -215,6 +256,93 @@ function navigateToCoach() {
   }
 }
 
+function handleSelectionEnd() {
+  // Selection box completed - nodes are automatically selected by Vue Flow
+}
+
+async function groupSelectedNodes() {
+  const nodes = selectedNodes.value
+  if (nodes.length < 2) return
+
+  const bounds = calculateBounds(nodes)
+  const padding = 40
+
+  const sectionId = `section-${Date.now()}`
+  const sectionNode = {
+    id: sectionId,
+    type: 'section',
+    position: {
+      x: bounds.minX - padding,
+      y: bounds.minY - padding - 40
+    },
+    data: {
+      label: 'New Section',
+      width: bounds.maxX - bounds.minX + padding * 2,
+      height: bounds.maxY - bounds.minY + padding * 2 + 40
+    },
+    zIndex: -1
+  }
+
+  try {
+    const { node: created } = await $fetch('/api/canvas/nodes', {
+      method: 'POST',
+      body: {
+        projectId: projectId.value,
+        type: sectionNode.type,
+        position: sectionNode.position,
+        data: sectionNode.data
+      }
+    })
+
+    addNodes({
+      ...sectionNode,
+      id: created.id
+    })
+
+    for (const node of nodes) {
+      const relativePosition = {
+        x: node.position.x - sectionNode.position.x,
+        y: node.position.y - sectionNode.position.y
+      }
+
+      await $fetch(`/api/canvas/nodes/${node.id}`, {
+        method: 'PATCH',
+        body: {
+          position: relativePosition,
+          parentNode: created.id
+        }
+      })
+
+      updateNode(node.id, {
+        position: relativePosition,
+        parentNode: created.id,
+        extent: 'parent'
+      })
+    }
+  } catch (error) {
+    console.error('Failed to group nodes:', error)
+  }
+}
+
+function calculateBounds(nodes: Node[]) {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+
+  for (const node of nodes) {
+    const width = node.dimensions?.width || 200
+    const height = node.dimensions?.height || 100
+
+    minX = Math.min(minX, node.position.x)
+    minY = Math.min(minY, node.position.y)
+    maxX = Math.max(maxX, node.position.x + width)
+    maxY = Math.max(maxY, node.position.y + height)
+  }
+
+  return { minX, minY, maxX, maxY }
+}
+
 onMounted(() => {
   loadCanvas()
 })
@@ -271,6 +399,42 @@ onMounted(() => {
   color: #d4756f;
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
 }
+
+.selection-toolbar {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 117, 111, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+}
+
+.group-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.group-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+}
 </style>
 
 <style>
@@ -297,5 +461,17 @@ onMounted(() => {
   background: rgba(212, 117, 111, 0.1);
   border-color: #d4756f;
   transform: scale(1.05);
+}
+
+.vue-flow__selection {
+  background: rgba(212, 117, 111, 0.08);
+  border: 2px dashed #d4756f;
+  border-radius: 4px;
+}
+
+.vue-flow__nodesselection-rect {
+  background: rgba(212, 117, 111, 0.05);
+  border: 2px solid #d4756f;
+  border-radius: 8px;
 }
 </style>
