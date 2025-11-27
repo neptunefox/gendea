@@ -4,7 +4,7 @@
       <p>Loading canvas...</p>
     </div>
 
-    <div v-else class="canvas-container">
+    <div v-else class="canvas-container" @drop="handleDrop" @dragover="handleDragOver" @dragleave="handleDragLeave">
       <VueFlow
         v-model="elements"
         :default-viewport="viewport"
@@ -109,6 +109,12 @@
         </button>
       </div>
 
+      <NodePalette />
+
+      <div v-if="isDragOver" class="drop-indicator">
+        <p>Drop to add node</p>
+      </div>
+
       <button class="toggle-view-btn" @click="navigateToCoach" title="Switch to Coach">
         <Hammer :size="18" />
         <span>Coach</span>
@@ -135,11 +141,27 @@ import {
   SectionNode
 } from '~/components/canvas/nodes'
 import RelationshipEdge from '~/components/canvas/RelationshipEdge.vue'
+import NodePalette from '~/components/canvas/NodePalette.vue'
+import { useDragAndDrop } from '~/composables/useDragAndDrop'
 
 const route = useRoute()
 const router = useRouter()
 
 const projectId = computed(() => route.params.id as string)
+
+const { isDragOver, onDragOver, onDragLeave, onDrop } = useDragAndDrop()
+
+function handleDragOver(event: DragEvent) {
+  onDragOver(event)
+}
+
+function handleDragLeave() {
+  onDragLeave()
+}
+
+function handleDrop(event: DragEvent) {
+  onDrop(event, projectId.value)
+}
 
 const elements = ref<any[]>([])
 const isLoading = ref(true)
@@ -434,6 +456,29 @@ onMounted(() => {
 .group-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+}
+
+.drop-indicator {
+  position: absolute;
+  inset: 0;
+  background: rgba(212, 117, 111, 0.08);
+  border: 2px dashed #d4756f;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.drop-indicator p {
+  background: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  color: #d4756f;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>
 

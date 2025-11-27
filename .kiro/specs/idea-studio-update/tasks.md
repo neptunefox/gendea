@@ -88,7 +88,7 @@
   - Add visual container styling
   - _Requirements: 5.4, 7.5_
 
-- [ ] 12. Implement drag-and-drop for Canvas
+- [x] 12. Implement drag-and-drop for Canvas
   - Set up Vue Flow DnD preset
   - Create node palette component
   - Implement drag preview
