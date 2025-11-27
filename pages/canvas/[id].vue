@@ -1771,6 +1771,7 @@ kbd {
 <style>
 @import '@vue-flow/core/dist/style.css';
 @import '@vue-flow/core/dist/theme-default.css';
+@import '@vue-flow/controls/dist/style.css';
 
 .vue-flow {
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
@@ -1779,18 +1780,33 @@ kbd {
 .vue-flow__controls {
   bottom: 1rem;
   left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .vue-flow__controls-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   background: white;
   border: 1px solid #f0e5e0;
   color: #40312b;
   transition: all 0.15s ease;
+  margin: 0;
+  padding: 0;
 }
 
 .vue-flow__controls-button:hover {
   background: rgba(212, 117, 111, 0.1);
   border-color: #d4756f;
+}
+
+.vue-flow__controls-button svg {
+  width: 14px;
+  height: 14px;
 }
 
 .vue-flow__selection {
