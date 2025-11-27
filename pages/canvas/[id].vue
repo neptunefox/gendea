@@ -36,47 +36,47 @@
           <defs>
             <marker
               id="arrow-leads-to"
-              viewBox="0 0 10 10"
+              viewBox="0 0 12 12"
               refX="10"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4756f" />
-            </marker>
-            <marker
-              id="arrow-requires"
-              viewBox="0 0 10 10"
-              refX="10"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b7a75" />
-            </marker>
-            <marker
-              id="arrow-blocks"
-              viewBox="0 0 10 10"
-              refX="10"
-              refY="5"
+              refY="6"
               markerWidth="8"
               markerHeight="8"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#c26660" />
+              <path d="M 2 2 L 10 6 L 2 10 Q 4 6 2 2" fill="#d4756f" />
+            </marker>
+            <marker
+              id="arrow-requires"
+              viewBox="0 0 12 12"
+              refX="10"
+              refY="6"
+              markerWidth="7"
+              markerHeight="7"
+              orient="auto-start-reverse"
+            >
+              <path d="M 2 2 L 10 6 L 2 10 Q 4 6 2 2" fill="#8b7a75" />
+            </marker>
+            <marker
+              id="arrow-blocks"
+              viewBox="0 0 12 12"
+              refX="10"
+              refY="6"
+              markerWidth="9"
+              markerHeight="9"
+              orient="auto-start-reverse"
+            >
+              <path d="M 2 2 L 10 6 L 2 10 Q 4 6 2 2" fill="#c26660" />
             </marker>
             <marker
               id="arrow-relates-to"
-              viewBox="0 0 10 10"
+              viewBox="0 0 12 12"
               refX="10"
-              refY="5"
-              markerWidth="5"
-              markerHeight="5"
+              refY="6"
+              markerWidth="6"
+              markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#b8a8a3" />
+              <path d="M 2 2 L 10 6 L 2 10 Q 4 6 2 2" fill="#b8a8a3" />
             </marker>
           </defs>
         </svg>

@@ -98,13 +98,13 @@ export interface EdgeStyle {
 export const EDGE_STYLES: Record<EdgeRelationshipType, EdgeStyle> = {
   'leads-to': {
     stroke: '#d4756f',
-    strokeWidth: 2,
+    strokeWidth: 2.5,
     strokeDasharray: 'none'
   },
   requires: {
     stroke: '#8b7a75',
     strokeWidth: 2,
-    strokeDasharray: '5,5'
+    strokeDasharray: '8,4'
   },
   blocks: {
     stroke: '#c26660',
@@ -113,8 +113,8 @@ export const EDGE_STYLES: Record<EdgeRelationshipType, EdgeStyle> = {
   },
   'relates-to': {
     stroke: '#b8a8a3',
-    strokeWidth: 1.5,
-    strokeDasharray: '3,3'
+    strokeWidth: 2,
+    strokeDasharray: '4,4'
   }
 }
 

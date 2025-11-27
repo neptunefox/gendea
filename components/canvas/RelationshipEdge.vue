@@ -1,4 +1,5 @@
 <template>
+  <path :d="path" class="edge-glow" :style="glowStyle" />
   <BaseEdge :id="id" :path="path" :style="edgeStyle" :marker-end="markerEnd" />
 
   <path
@@ -6,7 +7,7 @@
     class="vue-flow__edge-interaction"
     fill="none"
     stroke="transparent"
-    stroke-width="20"
+    stroke-width="24"
     @mouseenter="showLabel = true"
     @mouseleave="showLabel = false"
     @click="handleEdgeClick"
@@ -94,7 +95,9 @@ const edgeStyle = computed(() => {
   const baseStyle: Record<string, any> = {
     stroke: style.stroke,
     strokeWidth: style.strokeWidth,
-    strokeDasharray: style.strokeDasharray
+    strokeDasharray: style.strokeDasharray,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round'
   }
   if (isAnimating.value) {
     baseStyle.strokeDasharray = '1000'
@@ -102,6 +105,18 @@ const edgeStyle = computed(() => {
     baseStyle.animation = 'edgeDraw 0.3s ease forwards'
   }
   return baseStyle
+})
+
+const glowStyle = computed(() => {
+  const style = EDGE_STYLES[edgeType.value] || EDGE_STYLES['relates-to']
+  return {
+    stroke: style.stroke,
+    strokeWidth: style.strokeWidth + 6,
+    strokeOpacity: showLabel.value ? 0.15 : 0,
+    strokeLinecap: 'round',
+    fill: 'none',
+    transition: 'stroke-opacity 0.2s ease'
+  }
 })
 
 onMounted(() => {
@@ -112,16 +127,18 @@ onMounted(() => {
 
 const markerEnd = computed(() => `url(#arrow-${edgeType.value})`)
 
-const pathData = computed(() =>
-  getBezierPath({
+const pathData = computed(() => {
+  const curvature = 0.4
+  return getBezierPath({
     sourceX: props.sourceX,
     sourceY: props.sourceY,
     sourcePosition: props.sourcePosition,
     targetX: props.targetX,
     targetY: props.targetY,
-    targetPosition: props.targetPosition
+    targetPosition: props.targetPosition,
+    curvature
   })
-)
+})
 
 const path = computed(() => pathData.value[0])
 const labelX = computed(() => pathData.value[1])
@@ -188,6 +205,10 @@ export default {
 </script>
 
 <style scoped>
+.edge-glow {
+  pointer-events: none;
+}
+
 .vue-flow__edge-interaction {
   cursor: pointer;
 }
@@ -195,14 +216,29 @@ export default {
 .edge-label {
   background: white;
   border: 1px solid #f0e5e0;
-  border-radius: 6px;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
+  border-radius: 12px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: #40312b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   white-space: nowrap;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+  animation: labelFadeIn 0.15s ease;
+}
+
+@keyframes labelFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .edge-editor {

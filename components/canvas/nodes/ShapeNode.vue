@@ -4,15 +4,14 @@
     :class="[shapeClass, { selected: props.selected }, animationClass]"
     :style="shapeStyle"
   >
-    <Handle v-if="shapeType !== 'arrow'" type="target" :position="Position.Top" />
-    <Handle v-if="shapeType === 'arrow'" type="target" :position="Position.Left" />
+    <Handle id="top" type="target" :position="Position.Top" class="handle handle-top" />
+    <Handle id="right" type="source" :position="Position.Right" class="handle handle-right" />
+    <Handle id="bottom" type="source" :position="Position.Bottom" class="handle handle-bottom" />
+    <Handle id="left" type="target" :position="Position.Left" class="handle handle-left" />
 
     <div class="shape-content">
       <span v-if="props.data.label" class="shape-label">{{ props.data.label }}</span>
     </div>
-
-    <Handle v-if="shapeType !== 'arrow'" type="source" :position="Position.Bottom" />
-    <Handle v-if="shapeType === 'arrow'" type="source" :position="Position.Right" />
   </div>
 </template>
 
@@ -157,5 +156,44 @@ const shapeStyle = computed(() => ({
   font-size: 0.875rem;
   font-weight: 500;
   color: #40312b;
+}
+
+.handle {
+  width: 8px !important;
+  height: 8px !important;
+  background: #d4756f !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  opacity: 0;
+  transition: all 0.2s ease;
+  cursor: crosshair;
+}
+
+.handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.shape-node:hover .handle {
+  opacity: 1;
+}
+
+.handle:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.25);
+}
+
+:deep(.vue-flow__handle-connecting),
+:deep(.vue-flow__handle-valid) {
+  opacity: 1 !important;
+  background: #66bb6a !important;
+  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  transform: scale(1.2) !important;
 }
 </style>
