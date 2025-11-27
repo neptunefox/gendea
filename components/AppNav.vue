@@ -9,11 +9,11 @@
       <NuxtLink to="/" class="nav-link" title="Ideas">
         <Sparkles :size="20" />
       </NuxtLink>
-      <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
-        <FlaskConical :size="20" />
-      </NuxtLink>
       <NuxtLink to="/coach" class="nav-link" title="Coach">
         <Hammer :size="20" />
+      </NuxtLink>
+      <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
+        <FlaskConical :size="20" />
       </NuxtLink>
       <NuxtLink to="/history" class="nav-link" title="History">
         <Clock :size="20" />
