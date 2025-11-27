@@ -1,6 +1,6 @@
 <template>
   <div class="spark-page">
-    <div class="spark-layout" :class="{ 'with-tray': showCollectionTray }">
+    <div class="spark-layout">
       <FlowGuidanceBanner
         :suggestion="flowGuidance.currentSuggestion.value"
         :is-visible="flowGuidance.isVisible.value"
@@ -202,70 +202,6 @@
       </section>
     </div>
 
-    <transition name="slide-tray">
-      <aside v-if="showCollectionTray" class="collection-tray">
-        <div class="tray-header">
-          <h3>Collection</h3>
-          <button class="tray-close" @click="showCollectionTray = false">
-            <X :size="18" />
-          </button>
-        </div>
-        <div class="tray-content">
-          <div v-if="savedIdeas.length === 0" class="tray-empty">
-            <BookmarkPlus :size="32" />
-            <p>Save ideas to build your collection</p>
-          </div>
-          <div v-else class="tray-list">
-            <div
-              v-for="idea in savedIdeas"
-              :key="idea.id"
-              class="tray-item"
-              :class="{
-                'tray-item-cauldron': idea.isCauldronOutput,
-                dragging: isDraggingIdea === idea.id
-              }"
-              draggable="true"
-              @dragstart="e => handleIdeaDragStart(e, idea)"
-              @dragend="handleIdeaDragEnd"
-            >
-              <div class="tray-item-status" :data-status="idea.status" />
-              <div class="tray-item-content">
-                <p class="tray-item-text">{{ idea.text }}</p>
-                <div class="tray-item-actions">
-                  <button class="tray-action" title="Explore" @click="handleExploreIdea(idea.text)">
-                    <Lightbulb :size="14" />
-                  </button>
-                  <button
-                    v-if="idea.status !== 'building'"
-                    class="tray-action primary"
-                    title="Start building"
-                    @click="startBuilding(idea)"
-                  >
-                    <ArrowRight :size="14" />
-                  </button>
-                  <button
-                    v-else
-                    class="tray-action building"
-                    title="Continue"
-                    @click="$router.push(`/coach/${idea.id}`)"
-                  >
-                    <ArrowRight :size="14" />
-                  </button>
-                  <button
-                    class="tray-action danger"
-                    title="Remove"
-                    @click="handleDeleteIdea(idea.id)"
-                  >
-                    <X :size="14" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </transition>
-
     <transition name="toast">
       <div v-if="showToast" class="toast">
         <Check :size="20" />
@@ -361,7 +297,6 @@ const toastMessage = ref('')
 const lastPrompt = ref('')
 const resumingRunId = ref<string | null>(null)
 const showAllIdeas = ref(false)
-const showCollectionTray = ref(false)
 const selectedIdeas = ref<Map<string, { text: string; entry: JournalEntry }>>(new Map())
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
@@ -777,11 +712,6 @@ watch(
   flex-direction: column;
   gap: 2.5rem;
   transition: max-width 0.3s ease;
-}
-
-.spark-layout.with-tray {
-  max-width: 800px;
-  margin-right: 340px;
 }
 
 .spark-input-wrapper {
@@ -1407,193 +1337,6 @@ watch(
   transform: translateY(-1px);
 }
 
-.collection-tray {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 320px;
-  background: white;
-  border-left: 1px solid #f0e5e0;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-}
-
-.tray-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f0e5e0;
-  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
-}
-
-.tray-header h3 {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #40312b;
-}
-
-.tray-close {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: #8a7566;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.tray-close:hover {
-  background: rgba(212, 117, 111, 0.1);
-  color: #d4756f;
-}
-
-.tray-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-}
-
-.tray-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: #8a7566;
-  text-align: center;
-  gap: 0.75rem;
-}
-
-.tray-empty p {
-  margin: 0;
-  font-size: 0.9375rem;
-}
-
-.tray-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.tray-item {
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.875rem;
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
-  border: 1px solid #f0e5e0;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.tray-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.tray-item {
-  cursor: grab;
-}
-
-.tray-item.dragging {
-  opacity: 0.5;
-  cursor: grabbing;
-}
-
-.tray-item.tray-item-cauldron {
-  background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
-  border-color: rgba(212, 117, 111, 0.3);
-}
-
-.tray-item-status {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #fde7ff;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
-
-.tray-item-status[data-status='ready'] {
-  background: #fff0da;
-}
-.tray-item-status[data-status='building'] {
-  background: #e9f8ec;
-}
-.tray-item-status[data-status='done'] {
-  background: #e9edff;
-}
-
-.tray-item-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.tray-item-text {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
-  color: #40312b;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.tray-item-actions {
-  display: flex;
-  gap: 0.35rem;
-}
-
-.tray-action {
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: rgba(212, 117, 111, 0.08);
-  color: #d4756f;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.tray-action:hover {
-  background: rgba(212, 117, 111, 0.15);
-}
-.tray-action.primary {
-  background: #d4756f;
-  color: white;
-}
-.tray-action.primary:hover {
-  background: #c26660;
-}
-.tray-action.building {
-  background: linear-gradient(135deg, #ffd89b, #19547b);
-  color: white;
-}
-.tray-action.danger:hover {
-  background: rgba(220, 53, 69, 0.15);
-  color: #dc3545;
-}
-
-.slide-tray-enter-active,
-.slide-tray-leave-active {
-  transition: transform 0.3s ease;
-}
-.slide-tray-enter-from,
-.slide-tray-leave-to {
-  transform: translateX(100%);
-}
-
 .toast {
   position: fixed;
   top: 5rem;
@@ -1673,16 +1416,6 @@ watch(
 }
 .idea-list-move {
   transition: transform 0.3s ease;
-}
-
-@media (max-width: 900px) {
-  .spark-layout.with-tray {
-    max-width: 100%;
-    margin-right: 0;
-  }
-  .collection-tray {
-    width: 100%;
-  }
 }
 
 @media (max-width: 640px) {
