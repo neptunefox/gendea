@@ -122,7 +122,7 @@
   - Save last active view preference
   - _Requirements: 6.2, 6.3, 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 16. Implement Coach-to-Canvas data sync
+- [x] 16. Implement Coach-to-Canvas data sync
   - Create Canvas node when Test/Goal is defined in Coach
   - Update Canvas nodes when Coach data changes
   - Add visual indicators for Coach-originated nodes

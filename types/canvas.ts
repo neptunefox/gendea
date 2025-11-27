@@ -70,6 +70,9 @@ export interface TaskNodeData {
   text?: string
   completed?: boolean
   dueDate?: string
+  coachOrigin?: boolean
+  savedIdeaId?: string
+  testCommitmentId?: string
 }
 
 export interface IdeaNodeData {
@@ -84,6 +87,8 @@ export interface GoalNodeData {
   metric?: string
   achieved?: boolean
   achievedAt?: string
+  coachOrigin?: boolean
+  savedIdeaId?: string
 }
 
 export interface SectionNodeData {

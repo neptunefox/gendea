@@ -1,8 +1,104 @@
 import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { savedIdeas, canvasState } from '../../../db/schema'
+import { savedIdeas, canvasState, canvasNodes } from '../../../db/schema'
 import { db } from '../../db'
+
+async function findOrCreateGoalNode(projectId: string, northStar: string) {
+  const existingNodes = await db
+    .select()
+    .from(canvasNodes)
+    .where(eq(canvasNodes.projectId, projectId))
+
+  const existingGoalNode = existingNodes.find(
+    (n) => n.type === 'goal' && (n.data as Record<string, unknown>).coachOrigin === true
+  )
+
+  if (existingGoalNode) {
+    await db
+      .update(canvasNodes)
+      .set({
+        data: {
+          ...(existingGoalNode.data as Record<string, unknown>),
+          text: northStar
+        },
+        updatedAt: new Date()
+      })
+      .where(eq(canvasNodes.id, existingGoalNode.id))
+    return existingGoalNode
+  }
+
+  const [newNode] = await db
+    .insert(canvasNodes)
+    .values({
+      projectId,
+      type: 'goal',
+      position: { x: 250, y: 50 },
+      data: {
+        text: northStar,
+        coachOrigin: true,
+        savedIdeaId: projectId
+      }
+    })
+    .returning()
+
+  return newNode
+}
+
+async function findOrCreateTestNode(
+  projectId: string,
+  testCommitment: {
+    description: string
+    when: string
+    where: string
+    successSignal: string
+    committedAt: string
+  }
+) {
+  const existingNodes = await db
+    .select()
+    .from(canvasNodes)
+    .where(eq(canvasNodes.projectId, projectId))
+
+  const existingTestNode = existingNodes.find(
+    (n) => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
+  )
+
+  const taskText = `Test: ${testCommitment.description}\n📅 ${testCommitment.when} @ ${testCommitment.where}\n✓ Success: ${testCommitment.successSignal}`
+
+  if (existingTestNode) {
+    await db
+      .update(canvasNodes)
+      .set({
+        data: {
+          ...(existingTestNode.data as Record<string, unknown>),
+          text: taskText,
+          dueDate: testCommitment.when
+        },
+        updatedAt: new Date()
+      })
+      .where(eq(canvasNodes.id, existingTestNode.id))
+    return existingTestNode
+  }
+
+  const [newNode] = await db
+    .insert(canvasNodes)
+    .values({
+      projectId,
+      type: 'task',
+      position: { x: 250, y: 200 },
+      data: {
+        text: taskText,
+        completed: false,
+        coachOrigin: true,
+        savedIdeaId: projectId,
+        testCommitmentId: testCommitment.committedAt
+      }
+    })
+    .returning()
+
+  return newNode
+}
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')
@@ -62,6 +158,41 @@ export default defineEventHandler(async event => {
           viewportY: 0,
           zoom: 1
         })
+      }
+    }
+
+    const isBuilding = updated?.status === 'building' || current?.status === 'building'
+
+    if (isBuilding && body.northStar && body.northStar.trim()) {
+      await findOrCreateGoalNode(id, body.northStar)
+    }
+
+    if (isBuilding && body.testCommitment) {
+      await findOrCreateTestNode(id, body.testCommitment)
+    }
+
+    if (isBuilding && body.testResult) {
+      const existingNodes = await db
+        .select()
+        .from(canvasNodes)
+        .where(eq(canvasNodes.projectId, id))
+
+      const testNode = existingNodes.find(
+        (n) => n.type === 'task' && (n.data as Record<string, unknown>).coachOrigin === true
+      )
+
+      if (testNode) {
+        const completed = body.testResult.outcome === 'worked' || body.testResult.outcome === 'completed'
+        await db
+          .update(canvasNodes)
+          .set({
+            data: {
+              ...(testNode.data as Record<string, unknown>),
+              completed
+            },
+            updatedAt: new Date()
+          })
+          .where(eq(canvasNodes.id, testNode.id))
       }
     }
 

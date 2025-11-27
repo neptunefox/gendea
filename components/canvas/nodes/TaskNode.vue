@@ -1,6 +1,11 @@
 <template>
-  <div class="task-node" :class="{ selected: props.selected, completed: isCompleted }">
+  <div class="task-node" :class="{ selected: props.selected, completed: isCompleted, 'coach-origin': isCoachOrigin }">
     <Handle type="target" :position="Position.Top" />
+    
+    <div v-if="isCoachOrigin" class="coach-indicator">
+      <Hammer :size="12" />
+      <span>From Coach</span>
+    </div>
     
     <div class="task-content">
       <button class="checkbox nodrag" @click="toggleComplete">
@@ -25,11 +30,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Handle, Position, type NodeProps } from '@vue-flow/core'
-import { Square, CheckSquare, Calendar } from 'lucide-vue-next'
+import { Square, CheckSquare, Calendar, Hammer } from 'lucide-vue-next'
 
 const props = defineProps<NodeProps>()
 
 const isCompleted = computed(() => !!props.data.completed)
+const isCoachOrigin = computed(() => !!props.data.coachOrigin)
 
 async function toggleComplete() {
   try {
@@ -121,5 +127,26 @@ function formatDate(dateStr: string): string {
   border-top: 1px solid #f0e5e0;
   font-size: 0.75rem;
   color: #8b7a75;
+}
+
+.task-node.coach-origin {
+  border-style: dashed;
+  border-color: #d4756f;
+  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 100%);
+}
+
+.coach-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(212, 117, 111, 0.1);
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #d4756f;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 </style>
