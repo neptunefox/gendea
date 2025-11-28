@@ -609,6 +609,7 @@ onNodeDragStop(async ({ node }) => {
 
 async function handleConnect(connection: Connection) {
   if (!connection.source || !connection.target) return
+  if (connection.source === connection.target) return
 
   const sourceNode = elements.value.find((e: any) => e.id === connection.source && !e.source)
   const targetNode = elements.value.find((e: any) => e.id === connection.target && !e.source)
