@@ -82,6 +82,7 @@ function setZIndex(newZIndex: number) {
 }
 
 function handleDragStart(event: DragEvent) {
+  stopRepositioning()
   isDragging.value = true
   dragStartTime.value = Date.now()
   if (event.dataTransfer) {
@@ -92,10 +93,16 @@ function handleDragStart(event: DragEvent) {
 }
 
 function handleDragEnd() {
-  setTimeout(() => {
-    isDragging.value = false
-  }, 100)
+  isDragging.value = false
   emit('dragEnd')
+}
+
+function stopRepositioning() {
+  if (isRepositioning.value) {
+    isRepositioning.value = false
+    window.removeEventListener('mousemove', handleMouseMove)
+    window.removeEventListener('mouseup', handleMouseUp)
+  }
 }
 
 function handleMouseDown(event: MouseEvent) {
@@ -132,13 +139,12 @@ function handleMouseMove(event: MouseEvent) {
 }
 
 function handleMouseUp() {
-  if (!isRepositioning.value) return
-  
-  isRepositioning.value = false
-  
   window.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('mouseup', handleMouseUp)
   
+  if (!isRepositioning.value) return
+  
+  isRepositioning.value = false
   emit('positionSet', { x: position.value.x, y: position.value.y, width: 220, height: 100 })
 }
 
@@ -162,8 +168,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', handleMouseMove)
-  window.removeEventListener('mouseup', handleMouseUp)
+  stopRepositioning()
 })
 </script>
 
