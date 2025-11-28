@@ -1,6 +1,7 @@
 export interface Position {
   x: number
   y: number
+  side: 'left' | 'right'
 }
 
 export interface CardBounds {
@@ -45,26 +46,26 @@ export interface PositionConfig {
 }
 
 export const DEFAULT_CONFIG: PositionConfig = {
-  cardWidth: 280,
-  cardHeight: 150,
+  cardWidth: 220,
+  cardHeight: 100,
   cardIndex: 0,
-  sideMargin: 80,
-  navHeight: 120,
-  bottomInputHeight: 200,
-  cauldronRadius: 350,
-  minDistanceFromCauldron: 450,
-  cardPadding: 40
+  sideMargin: 20,
+  navHeight: 60,
+  bottomInputHeight: 120,
+  cauldronRadius: 300,
+  minDistanceFromCauldron: 320,
+  cardPadding: 50
 }
 
 export function createSafeZones(viewport: ViewportDimensions, config: PositionConfig): SafeZone[] {
   const centerX = viewport.width / 2
-  const centerY = viewport.height / 2
+  const cauldronY = 280
 
   return [
     {
       type: 'circle',
       centerX,
-      centerY,
+      centerY: cauldronY,
       radius: config.cauldronRadius
     },
     {
@@ -76,10 +77,10 @@ export function createSafeZones(viewport: ViewportDimensions, config: PositionCo
     },
     {
       type: 'rectangle',
-      left: centerX - 300,
-      top: viewport.height - config.bottomInputHeight,
-      width: 600,
-      height: config.bottomInputHeight
+      left: centerX - 350,
+      top: 480,
+      width: 700,
+      height: 200
     }
   ]
 }
@@ -154,50 +155,32 @@ export function generateSafePosition(
   config: Partial<PositionConfig> = {}
 ): Position {
   const fullConfig = { ...DEFAULT_CONFIG, ...config }
-  const { cardWidth, cardHeight, cardIndex, sideMargin, navHeight, bottomInputHeight, minDistanceFromCauldron } = fullConfig
+  const { cardWidth, cardHeight, cardIndex, sideMargin, navHeight, cardPadding } = fullConfig
 
   const centerX = viewport.width / 2
-  const centerY = viewport.height / 2
+  const cauldronY = 280
   const safeZones = createSafeZones(viewport, fullConfig)
 
-  let x = 0
-  let y = 0
-  let attempts = 0
-  const maxAttempts = 100
+  const edgeOffset = sideMargin + 40
 
-  while (attempts < maxAttempts) {
-    const baseAngle = cardIndex * (360 / 10)
-    const randomOffset = (Math.random() - 0.5) * 30
-    const angle = (baseAngle + randomOffset) * (Math.PI / 180)
-    const distance = minDistanceFromCauldron + cardIndex * 20 + Math.random() * 80
+  const slots = [
+    { x: edgeOffset, y: navHeight + 20, side: 'left' as const },
+    { x: edgeOffset, y: navHeight + 20, side: 'right' as const },
+    { x: edgeOffset, y: navHeight + 140, side: 'left' as const },
+    { x: edgeOffset, y: navHeight + 140, side: 'right' as const },
+    { x: edgeOffset, y: navHeight + 260, side: 'left' as const },
+    { x: edgeOffset, y: navHeight + 260, side: 'right' as const },
+    { x: edgeOffset, y: navHeight + 380, side: 'left' as const },
+    { x: edgeOffset, y: navHeight + 380, side: 'right' as const },
+  ]
 
-    x = centerX + Math.cos(angle) * distance - cardWidth / 2
-    y = centerY + Math.sin(angle) * distance - cardHeight / 2
+  const slotIndex = cardIndex % slots.length
+  const baseSlot = slots[slotIndex]
+  
+  let x = baseSlot.x + (Math.random() - 0.5) * 40
+  let y = baseSlot.y + (Math.random() - 0.5) * 40
 
-    x = Math.max(sideMargin, Math.min(x, viewport.width - cardWidth - sideMargin))
-    y = Math.max(navHeight, Math.min(y, viewport.height - cardHeight - bottomInputHeight))
+  y = Math.max(navHeight, Math.min(y, viewport.height - cardHeight - 50))
 
-    const cardBounds: CardBounds = { x, y, width: cardWidth, height: cardHeight }
-
-    if (!isPositionValid(cardBounds, safeZones)) {
-      attempts++
-      continue
-    }
-
-    if (!checkCardOverlap(cardBounds, existingPositions, fullConfig.cardPadding)) {
-      return { x, y }
-    }
-
-    attempts++
-  }
-
-  const fallbackAngle = (cardIndex * (360 / 10) + 180) * (Math.PI / 180)
-  const fallbackDistance = minDistanceFromCauldron + cardIndex * 30 + 100
-  x = centerX + Math.cos(fallbackAngle) * fallbackDistance - cardWidth / 2
-  y = centerY + Math.sin(fallbackAngle) * fallbackDistance - cardHeight / 2
-
-  x = Math.max(sideMargin, Math.min(x, viewport.width - cardWidth - sideMargin))
-  y = Math.max(navHeight, Math.min(y, viewport.height - cardHeight - bottomInputHeight))
-
-  return { x, y }
+  return { x, y, side: baseSlot.side }
 }

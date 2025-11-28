@@ -43,16 +43,26 @@ const emit = defineEmits<{
 
 const isDragging = ref(false)
 const isDissolving = ref(false)
-const position = ref({ x: 0, y: 0 })
+const position = ref({ x: 0, y: 0, side: 'left' as 'left' | 'right' })
 const zIndex = ref(10 + props.index)
 const dragStartTime = ref(0)
 const isRepositioning = ref(false)
 const dragOffset = ref({ x: 0, y: 0 })
 
-const positionStyle = computed(() => ({
-  left: `${position.value.x}px`,
-  top: `${position.value.y}px`
-}))
+const positionStyle = computed(() => {
+  if (position.value.side === 'right') {
+    return {
+      right: `${position.value.x}px`,
+      top: `${position.value.y}px`,
+      left: 'auto'
+    }
+  }
+  return {
+    left: `${position.value.x}px`,
+    top: `${position.value.y}px`,
+    right: 'auto'
+  }
+})
 
 function bringToFront() {
   zIndex.value = 100
@@ -111,12 +121,13 @@ function handleMouseMove(event: MouseEvent) {
   
   const viewportWidth = window.innerWidth
   const viewportHeight = window.innerHeight
-  const cardWidth = 280
-  const cardHeight = 150
+  const cardWidth = 220
+  const cardHeight = 100
   
   position.value = {
     x: Math.max(0, Math.min(newX, viewportWidth - cardWidth)),
-    y: Math.max(0, Math.min(newY, viewportHeight - cardHeight))
+    y: Math.max(0, Math.min(newY, viewportHeight - cardHeight)),
+    side: 'left'
   }
 }
 
@@ -128,7 +139,7 @@ function handleMouseUp() {
   window.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('mouseup', handleMouseUp)
   
-  emit('positionSet', { x: position.value.x, y: position.value.y, width: 280, height: 150 })
+  emit('positionSet', { x: position.value.x, y: position.value.y, width: 220, height: 100 })
 }
 
 function dissolve() {
@@ -145,8 +156,9 @@ defineExpose({
 
 onMounted(() => {
   const viewport = { width: window.innerWidth, height: window.innerHeight }
-  position.value = generateSafePosition(viewport, props.existingPositions, { cardIndex: props.index })
-  emit('positionSet', { x: position.value.x, y: position.value.y, width: 280, height: 150 })
+  const pos = generateSafePosition(viewport, props.existingPositions, { cardIndex: props.index })
+  position.value = { x: pos.x, y: pos.y, side: pos.side }
+  emit('positionSet', { x: pos.x, y: pos.y, width: 220, height: 100 })
 })
 
 onUnmounted(() => {
