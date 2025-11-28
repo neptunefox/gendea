@@ -38,6 +38,10 @@
       <div v-if="ingredients.length > 0 && ingredients.length < 3" class="ingredient-counter">
         {{ 3 - ingredients.length }} more
       </div>
+      <div v-else-if="isMixing && streamingText" class="streaming-text">
+        {{ streamingText }}
+        <span class="cursor"></span>
+      </div>
       <div v-else-if="ingredients.length >= 3 && isMixing" class="mixing-indicator"></div>
 
       <div v-if="ingredients.length > 0" class="ingredients-list">
@@ -78,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 interface CauldronIngredient {
   id: string
@@ -93,9 +97,17 @@ interface CauldronIngredient {
 interface Props {
   ingredients: CauldronIngredient[]
   isMixing: boolean
+  streamingText?: string
 }
 
 const props = defineProps<Props>()
+
+const streamingText = computed(() => {
+  if (!props.streamingText) return ''
+  const maxLen = 80
+  if (props.streamingText.length <= maxLen) return props.streamingText
+  return '...' + props.streamingText.slice(-maxLen)
+})
 
 const emit = defineEmits<{
   drop: [event: DragEvent]
@@ -455,6 +467,33 @@ defineExpose({
 .mixing-indicator {
   width: 100%;
   height: 100%;
+}
+
+.streaming-text {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-width: 240px;
+  max-height: 60px;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 0.95;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: rgba(255, 255, 255, 0.9);
+  margin-left: 2px;
+  animation: blink 0.6s infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .ingredients-list {

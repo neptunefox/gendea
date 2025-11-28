@@ -25,6 +25,13 @@ interface GenerateOptions<T extends z.ZodType> {
   maxRetries?: number
 }
 
+interface StreamOptions {
+  prompt: string
+  systemPrompt?: string
+  context?: Array<{ role: 'user' | 'assistant'; content: string }>
+  onToken: (token: string) => void
+}
+
 type Message = { role: 'human' | 'ai'; content: string }
 
 class LangChainService {
@@ -205,6 +212,25 @@ class LangChainService {
       console.error('LangChain generation failed, using fallback:', error)
       return fallback
     }
+  }
+
+  async streamText(options: StreamOptions): Promise<string> {
+    const { prompt, systemPrompt, context = [], onToken } = options
+    const messages = this.buildMessages(prompt, systemPrompt, context, undefined)
+
+    let fullText = ''
+
+    const stream = await this.model.stream(messages)
+
+    for await (const chunk of stream) {
+      const content = typeof chunk.content === 'string' ? chunk.content : ''
+      if (content) {
+        fullText += content
+        onToken(content)
+      }
+    }
+
+    return fullText
   }
 }
 

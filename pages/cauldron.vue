@@ -40,6 +40,7 @@
             ref="cauldronPotRef"
             :ingredients="ingredients"
             :is-mixing="isMixing && !output"
+            :streaming-text="streamingText"
             @drop="handleDrop"
           />
 
@@ -140,6 +141,7 @@ const ingredients = ref<CauldronIngredient[]>([])
 const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
 const output = ref<string | null>(null)
+const streamingText = ref('')
 const manualInput = ref('')
 const isLoading = ref(true)
 const showToast = ref(false)
@@ -476,41 +478,60 @@ function handleFlowGuidanceAction() {
   }
 }
 
+async function streamMix(sessionId: string, isRemix = false) {
+  isMixing.value = true
+  streamingText.value = ''
+
+  try {
+    const response = await fetch('/api/cauldron/mix-stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId })
+    })
+
+    const reader = response.body?.pipeThrough(new TextDecoderStream()).getReader()
+    if (!reader) throw new Error('No reader')
+
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+
+      const lines = value.split('\n').filter(line => line.startsWith('data: '))
+      for (const line of lines) {
+        const data = JSON.parse(line.slice(6))
+        if (data.token) {
+          streamingText.value += data.token
+        }
+        if (data.done) {
+          output.value = data.output
+          if (!isRemix) {
+            flowGuidance.showSuggestion(flowGuidance.suggestions.cauldronToBuild)
+          }
+        }
+        if (data.error) {
+          showToastMessage('Failed to mix ideas')
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to mix:', error)
+    showToastMessage('Failed to mix ideas')
+  } finally {
+    isMixing.value = false
+    streamingText.value = ''
+  }
+}
+
 watch(
   () => ingredients.value.length,
   async (newCount, oldCount) => {
     if (newCount >= 3 && !isMixing.value && !output.value && currentSession.value) {
-      isMixing.value = true
-      try {
-        const { output: mixedOutput } = await $fetch<{ output: string }>('/api/cauldron/mix', {
-          method: 'POST',
-          body: { sessionId: currentSession.value.id }
-        })
-        output.value = mixedOutput
-        flowGuidance.showSuggestion(flowGuidance.suggestions.cauldronToBuild)
-      } catch (error) {
-        console.error('Failed to mix:', error)
-        showToastMessage('Failed to mix ideas')
-      } finally {
-        isMixing.value = false
-      }
+      await streamMix(currentSession.value.id)
     }
 
     if (newCount > 3 && oldCount && oldCount >= 3 && !isMixing.value && currentSession.value) {
       triggerRemixHintPulse()
-      isMixing.value = true
-      try {
-        const { output: mixedOutput } = await $fetch<{ output: string }>('/api/cauldron/mix', {
-          method: 'POST',
-          body: { sessionId: currentSession.value.id }
-        })
-        output.value = mixedOutput
-      } catch (error) {
-        console.error('Failed to remix:', error)
-        showToastMessage('Failed to remix ideas')
-      } finally {
-        isMixing.value = false
-      }
+      await streamMix(currentSession.value.id, true)
     }
   }
 )
