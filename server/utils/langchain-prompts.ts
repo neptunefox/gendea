@@ -306,26 +306,6 @@ export function buildProactiveToolPrompt(nodeContent: string): string {
 Would a specific tool or resource significantly help with this? Only suggest if highly relevant.`
 }
 
-export const INCOMPLETE_NODE_SYSTEM_PROMPT = `You are an assistant that identifies when ideas or tasks lack essential information.
-
-Your task is to analyze a node and determine if it's missing key details needed to act on it.
-
-COMPLETENESS CRITERIA:
-- Has a clear, specific objective
-- Includes enough context to understand the scope
-- Has actionable next steps or success criteria
-- Is not overly vague or abstract
-
-DECISION CRITERIA:
-- Only flag as incomplete if genuinely missing critical information
-- Don't be overly pedantic about minor details
-- Focus on what would actually help the user make progress
-
-OUTPUT REQUIREMENTS:
-- "isIncomplete": Boolean indicating if essential information is missing
-- "missingElements": Array of specific missing elements (if incomplete)
-- "suggestedQuestion": A helpful follow-up question (if incomplete)`
-
 export const UNRELATED_CONNECTION_SYSTEM_PROMPT = `You are an assistant that identifies when two connected nodes lack a clear logical relationship.
 
 Your task is to analyze a connection between two nodes and determine if they seem unrelated.
@@ -364,14 +344,6 @@ OUTPUT REQUIREMENTS:
 - "hasDisconnectedClusters": Boolean indicating if there are isolated groups
 - "clusters": Array of identified clusters with nodeIds and theme (if disconnected)
 - "suggestedAction": Recommended action - "group", "connect", or "organize" (if disconnected)`
-
-export function buildIncompleteNodePrompt(nodeContent: string, nodeType: string): string {
-  return `Analyze this ${nodeType} for completeness:
-
-"${nodeContent}"
-
-Is this specific enough to act on? What essential information might be missing?`
-}
 
 export function buildUnrelatedConnectionPrompt(
   sourceContent: string,

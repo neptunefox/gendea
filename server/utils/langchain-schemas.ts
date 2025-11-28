@@ -152,20 +152,6 @@ export type CanvasConnectionLabel = z.infer<typeof CanvasConnectionLabelSchema>
 export type ProactiveQuestion = z.infer<typeof ProactiveQuestionSchema>
 export type ProactiveTool = z.infer<typeof ProactiveToolSchema>
 
-export const IncompleteNodeSchema = z.object({
-  isIncomplete: z
-    .boolean()
-    .describe('True if the node lacks essential information to be actionable'),
-  missingElements: z
-    .array(z.string())
-    .optional()
-    .describe('List of missing elements (e.g., "specific timeline", "success criteria")'),
-  suggestedQuestion: z
-    .string()
-    .optional()
-    .describe('A follow-up question to help complete the node')
-})
-
 export const UnrelatedConnectionSchema = z.object({
   areUnrelated: z.boolean().describe('True if the two nodes have no clear logical connection'),
   suggestedIntermediateSteps: z
@@ -195,6 +181,5 @@ export const DisconnectedClustersSchema = z.object({
     .describe('Recommended action: group into sections, connect with edges, or reorganize layout')
 })
 
-export type IncompleteNode = z.infer<typeof IncompleteNodeSchema>
 export type UnrelatedConnection = z.infer<typeof UnrelatedConnectionSchema>
 export type DisconnectedClusters = z.infer<typeof DisconnectedClustersSchema>

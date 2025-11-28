@@ -4,7 +4,6 @@ import {
   CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
   PROACTIVE_QUESTION_SYSTEM_PROMPT,
   PROACTIVE_TOOL_SYSTEM_PROMPT,
-  INCOMPLETE_NODE_SYSTEM_PROMPT,
   UNRELATED_CONNECTION_SYSTEM_PROMPT,
   DISCONNECTED_CLUSTERS_SYSTEM_PROMPT,
   buildCanvasExpandPrompt,
@@ -12,7 +11,6 @@ import {
   buildCanvasConnectionLabelPrompt,
   buildProactiveQuestionPrompt,
   buildProactiveToolPrompt,
-  buildIncompleteNodePrompt,
   buildUnrelatedConnectionPrompt,
   buildDisconnectedClustersPrompt
 } from './langchain-prompts'
@@ -22,15 +20,10 @@ import {
   CanvasConnectionLabelSchema,
   ProactiveQuestionSchema,
   ProactiveToolSchema,
-  IncompleteNodeSchema,
   UnrelatedConnectionSchema,
   DisconnectedClustersSchema,
-  type CanvasExpand,
-  type CanvasTidyUp,
-  type CanvasConnectionLabel,
   type ProactiveQuestion,
   type ProactiveTool,
-  type IncompleteNode,
   type UnrelatedConnection,
   type DisconnectedClusters
 } from './langchain-schemas'
@@ -134,20 +127,6 @@ export async function suggestTool(nodeContent: string): Promise<ProactiveTool> {
     prompt,
     systemPrompt: PROACTIVE_TOOL_SYSTEM_PROMPT,
     schema: ProactiveToolSchema
-  })
-}
-
-export async function detectIncompleteNode(
-  nodeContent: string,
-  nodeType: string
-): Promise<IncompleteNode> {
-  const langChain = useLangChainService()
-  const prompt = buildIncompleteNodePrompt(nodeContent, nodeType)
-
-  return langChain.generateStructured<typeof IncompleteNodeSchema>({
-    prompt,
-    systemPrompt: INCOMPLETE_NODE_SYSTEM_PROMPT,
-    schema: IncompleteNodeSchema
   })
 }
 

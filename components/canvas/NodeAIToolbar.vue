@@ -15,26 +15,14 @@
 
       <button
         class="ai-btn"
-        :class="{ loading: isSuggestingTools }"
-        :disabled="isSuggestingTools"
-        title="Suggest helpful tools"
-        @click="handleSuggestTools"
+        :class="{ loading: isAssisting }"
+        :disabled="isAssisting"
+        title="Get suggestions and clarifying questions"
+        @click="handleAssist"
       >
-        <Loader2 v-if="isSuggestingTools" :size="16" class="spin" />
-        <Wrench v-else :size="16" />
-        <span>Tools</span>
-      </button>
-
-      <button
-        class="ai-btn"
-        :class="{ loading: isAddingContext }"
-        :disabled="isAddingContext"
-        title="Add clarifying questions"
-        @click="handleAddContext"
-      >
-        <Loader2 v-if="isAddingContext" :size="16" class="spin" />
-        <HelpCircle v-else :size="16" />
-        <span>Context</span>
+        <Loader2 v-if="isAssisting" :size="16" class="spin" />
+        <Wand2 v-else :size="16" />
+        <span>Assist</span>
       </button>
 
       <div class="toolbar-divider" />
@@ -54,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { Sparkles, Wrench, HelpCircle, Loader2, Trash2 } from 'lucide-vue-next'
+import { Sparkles, Wand2, Loader2, Trash2 } from 'lucide-vue-next'
 import { ref, computed } from 'vue'
 
 interface SelectedNode {
@@ -77,8 +65,7 @@ const emit = defineEmits<{
 }>()
 
 const isExpanding = ref(false)
-const isSuggestingTools = ref(false)
-const isAddingContext = ref(false)
+const isAssisting = ref(false)
 const isDeleting = ref(false)
 
 const visible = computed(() => props.selectedNode !== null)
@@ -129,9 +116,9 @@ async function handleExpand() {
   }
 }
 
-async function handleSuggestTools() {
-  if (!props.selectedNode || isSuggestingTools.value) return
-  isSuggestingTools.value = true
+async function handleAssist() {
+  if (!props.selectedNode || isAssisting.value) return
+  isAssisting.value = true
 
   try {
     const content = getNodeContent(props.selectedNode)
@@ -153,72 +140,13 @@ async function handleSuggestTools() {
     if (result.nodes.length > 0 || result.edges.length > 0) {
       emit('nodes-created', result.nodes, result.edges)
     } else {
-      emit('error', 'No tools suggested for this node')
+      emit('error', 'No suggestions for this node')
     }
   } catch (error) {
-    console.error('Failed to suggest tools:', error)
-    emit('error', 'Failed to suggest tools')
+    console.error('Failed to assist:', error)
+    emit('error', 'Failed to get suggestions')
   } finally {
-    isSuggestingTools.value = false
-  }
-}
-
-async function handleAddContext() {
-  if (!props.selectedNode || isAddingContext.value) return
-  isAddingContext.value = true
-
-  try {
-    const content = getNodeContent(props.selectedNode)
-    if (!content) {
-      emit('error', 'Node has no content to analyze')
-      return
-    }
-
-    const result = await $fetch('/api/canvas/ai/detect-incomplete', {
-      method: 'POST',
-      body: {
-        nodeContent: content,
-        nodeType: props.selectedNode.type
-      }
-    })
-
-    if (result.isIncomplete && result.suggestedQuestion) {
-      const nodeResult = await $fetch('/api/canvas/nodes', {
-        method: 'POST',
-        body: {
-          projectId: props.projectId,
-          type: 'input',
-          position: {
-            x: props.selectedNode.position.x + 250,
-            y: props.selectedNode.position.y
-          },
-          data: {
-            question: result.suggestedQuestion,
-            missingElements: result.missingElements
-          }
-        }
-      })
-
-      const edgeResult = await $fetch('/api/canvas/edges', {
-        method: 'POST',
-        body: {
-          projectId: props.projectId,
-          sourceId: props.selectedNode.id,
-          targetId: nodeResult.node.id,
-          type: 'relationship',
-          relationshipType: 'requires'
-        }
-      })
-
-      emit('nodes-created', [nodeResult.node], [edgeResult.edge])
-    } else {
-      emit('error', 'Node appears complete')
-    }
-  } catch (error) {
-    console.error('Failed to add context:', error)
-    emit('error', 'Failed to add context')
-  } finally {
-    isAddingContext.value = false
+    isAssisting.value = false
   }
 }
 
