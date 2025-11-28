@@ -1,5 +1,5 @@
 <template>
-  <div class="cauldron-page">
+  <div class="cauldron-page" @click="handleBackgroundClick">
     <FlowGuidanceBanner
       :suggestion="flowGuidance.currentSuggestion.value"
       :is-visible="flowGuidance.isVisible.value"
@@ -23,11 +23,13 @@
               :idea="idea"
               :index="index"
               :duration="15000"
+              :is-selected="selectedIdeaId === idea.id"
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
               @dissolved="handleIdeaDissolved"
               @dropped="handleIdeaDropped"
               @expired="handleIdeaExpired"
+              @select="handleIdeaSelect"
             />
           </TransitionGroup>
         </div>
@@ -132,6 +134,7 @@ const flowGuidance = useFlowGuidance()
 const floatingIdeas = ref<FloatingIdea[]>([])
 const displayedIdeas = ref<FloatingIdea[]>([])
 const recentlyDisplayedIds = ref<Set<string>>(new Set())
+const selectedIdeaId = ref<string | null>(null)
 const ingredients = ref<CauldronIngredient[]>([])
 const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
@@ -235,6 +238,17 @@ function getNextIdea(): FloatingIdea | null {
   return available[randomIndex]
 }
 
+function handleIdeaSelect(idea: FloatingIdea) {
+  selectedIdeaId.value = idea.id
+}
+
+function handleBackgroundClick(event: MouseEvent) {
+  const target = event.target as HTMLElement
+  if (!target.closest('.floating-idea')) {
+    selectedIdeaId.value = null
+  }
+}
+
 function handleIdeaDragStart(idea: FloatingIdea) {
   draggedIdea.value = idea
 }
@@ -306,6 +320,10 @@ async function handleDrop(_event: DragEvent) {
 }
 
 function handleIdeaDissolved(idea: FloatingIdea) {
+  if (selectedIdeaId.value === idea.id) {
+    selectedIdeaId.value = null
+  }
+
   const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
 
   if (index !== -1) {
@@ -319,6 +337,10 @@ function handleIdeaDissolved(idea: FloatingIdea) {
 }
 
 function handleIdeaExpired(idea: FloatingIdea) {
+  if (selectedIdeaId.value === idea.id) {
+    selectedIdeaId.value = null
+  }
+
   const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
   if (index === -1) return
 

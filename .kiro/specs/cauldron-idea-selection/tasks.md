@@ -1,7 +1,7 @@
 # Implementation Plan
 
-- [ ] 1. Add selection state management to Cauldron page
-  - [ ] 1.1 Add selectedIdeaId ref and selection handlers to cauldron.vue
+- [x] 1. Add selection state management to Cauldron page
+  - [x] 1.1 Add selectedIdeaId ref and selection handlers to cauldron.vue
     - Add `selectedIdeaId: Ref<string | null>` state
     - Add `handleIdeaSelect(idea)` to set selectedIdeaId
     - Add `handleBackgroundClick(event)` to deselect when clicking outside ideas
