@@ -48,6 +48,7 @@ const zIndex = ref(10 + props.index)
 const dragStartTime = ref(0)
 const isRepositioning = ref(false)
 const dragOffset = ref({ x: 0, y: 0 })
+const initialRect = ref<DOMRect | null>(null)
 
 const positionStyle = computed(() => {
   if (position.value.side === 'right') {
@@ -108,20 +109,31 @@ function stopRepositioning() {
 function handleMouseDown(event: MouseEvent) {
   if (event.button !== 0) return
   
-  isRepositioning.value = true
-  zIndex.value = 200
+  const target = event.currentTarget as HTMLElement
+  initialRect.value = target.getBoundingClientRect()
   
   dragOffset.value = {
-    x: event.clientX - position.value.x,
-    y: event.clientY - position.value.y
+    x: event.clientX - initialRect.value.left,
+    y: event.clientY - initialRect.value.top
   }
+  
+  zIndex.value = 200
   
   window.addEventListener('mousemove', handleMouseMove)
   window.addEventListener('mouseup', handleMouseUp)
 }
 
 function handleMouseMove(event: MouseEvent) {
-  if (!isRepositioning.value) return
+  if (!initialRect.value) return
+  
+  if (!isRepositioning.value) {
+    position.value = {
+      x: initialRect.value.left,
+      y: initialRect.value.top,
+      side: 'left'
+    }
+    isRepositioning.value = true
+  }
   
   const newX = event.clientX - dragOffset.value.x
   const newY = event.clientY - dragOffset.value.y
@@ -141,6 +153,8 @@ function handleMouseMove(event: MouseEvent) {
 function handleMouseUp() {
   window.removeEventListener('mousemove', handleMouseMove)
   window.removeEventListener('mouseup', handleMouseUp)
+  
+  initialRect.value = null
   
   if (!isRepositioning.value) return
   
