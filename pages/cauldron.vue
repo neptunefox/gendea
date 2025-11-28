@@ -78,7 +78,7 @@
               <Plus :size="20" />
             </button>
           </div>
-          <p class="remix-hint-text">
+          <p :class="['remix-hint-text', { pulse: remixHintPulse }]">
             <Sparkles :size="14" />
             Drop ideas or type above to remix your result
           </p>
@@ -157,6 +157,7 @@ const manualInput = ref('')
 const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
+const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 const ideaRefs = ref<Map<string, { dissolve: () => void; setZIndex: (z: number) => void }>>(
   new Map()
@@ -459,6 +460,13 @@ function showToastMessage(message: string) {
   }, 2200)
 }
 
+function triggerRemixHintPulse() {
+  remixHintPulse.value = true
+  setTimeout(() => {
+    remixHintPulse.value = false
+  }, 600)
+}
+
 function handleFlowGuidanceAction() {
   const suggestion = flowGuidance.currentSuggestion.value
   if (suggestion?.id === 'cauldron-to-build' && output.value) {
@@ -488,6 +496,7 @@ watch(
     }
 
     if (newCount > 3 && oldCount && oldCount >= 3 && !isMixing.value && currentSession.value) {
+      triggerRemixHintPulse()
       isMixing.value = true
       try {
         const { output: mixedOutput } = await $fetch<{ output: string }>('/api/cauldron/mix', {
@@ -721,6 +730,25 @@ onUnmounted(() => {
   white-space: nowrap;
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.remix-hint-text.pulse {
+  animation: remix-pulse 0.6s ease-out;
+}
+
+@keyframes remix-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
 }
 
 .reset-btn {

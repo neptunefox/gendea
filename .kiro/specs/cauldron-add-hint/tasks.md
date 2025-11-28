@@ -24,7 +24,7 @@
     - Add subtle hint text styling with coral color
     - Add hover state for additional context
     - _Requirements: 2.2, 3.1, 3.2, 3.3_
-  - [ ] 2.3 Add highlight animation when idea is added
+  - [x] 2.3 Add highlight animation when idea is added
     - Brief pulse animation on hint when new ingredient added after output exists
     - _Requirements: 2.3_
   - [ ]* 2.4 Write property test for remix hint visibility
