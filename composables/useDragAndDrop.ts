@@ -22,9 +22,19 @@ const NODE_HEIGHT = 120
 const COLLISION_PADDING = 20
 const GRID_GAP = 30
 
+interface NodeAddedCallback {
+  (nodeId: string, nodeData: { type: string; position: { x: number; y: number }; data: any }): void
+}
+
+let onNodeAddedCallback: NodeAddedCallback | null = null
+
 export function useDragAndDrop() {
   const { screenToFlowCoordinate, addNodes, getNodes } = useVueFlow()
   const { markNodeAppearing, markNodesStaggered } = useCanvasAnimations()
+
+  function setOnNodeAdded(callback: NodeAddedCallback | null) {
+    onNodeAddedCallback = callback
+  }
 
   function onDragStart(event: DragEvent, type: CanvasNodeType) {
     if (!event.dataTransfer) return
@@ -170,6 +180,7 @@ export function useDragAndDrop() {
         data: nodeData
       })
       markNodeAppearing(node.id)
+      onNodeAddedCallback?.(node.id, { type, position, data: nodeData })
     } catch (error) {
       console.error('Failed to create node:', error)
     }
@@ -215,6 +226,7 @@ export function useDragAndDrop() {
         data: nodeData
       })
       markNodeAppearing(node.id)
+      onNodeAddedCallback?.(node.id, { type: 'idea', position, data: nodeData })
     } catch (error) {
       console.error('Failed to create node from saved idea:', error)
     }
@@ -270,6 +282,9 @@ export function useDragAndDrop() {
     if (createdNodes.length > 0) {
       addNodes(createdNodes)
       markNodesStaggered(createdNodes.map(n => n.id))
+      for (const node of createdNodes) {
+        onNodeAddedCallback?.(node.id, { type: node.type, position: node.position, data: node.data })
+      }
     }
 
     return createdNodes
@@ -287,7 +302,8 @@ export function useDragAndDrop() {
     onDrop,
     importMultipleSavedIdeas,
     findNonCollidingPosition,
-    calculateGridPositions
+    calculateGridPositions,
+    setOnNodeAdded
   }
 }
 

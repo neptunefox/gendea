@@ -364,11 +364,16 @@ const {
   onDragLeave,
   onDrop,
   onDragStartSavedIdea,
-  onDragEnd
+  onDragEnd,
+  setOnNodeAdded
 } = useDragAndDrop()
 const canvasAnimations = useCanvasAnimations()
 const { conflict, hasConflict, resolveConflict, dismissConflict } = useCanvas(projectId)
 const canvasHistory = useCanvasHistory(projectId)
+
+setOnNodeAdded((nodeId, nodeData) => {
+  canvasHistory.recordNodeAdd(nodeId, nodeData)
+})
 
 provide('canvasAnimations', canvasAnimations)
 provide('canvasHistory', canvasHistory)
@@ -893,6 +898,11 @@ function handleAINodesCreated(nodes: any[], edges: any[]) {
       data: { ...node.data, version: node.version }
     })
     canvasAnimations.markNodeStaggered(node.id, nodes.indexOf(node))
+    canvasHistory.recordNodeAdd(node.id, {
+      type: node.type,
+      position: node.position,
+      data: node.data
+    })
   }
 
   for (const edge of edges) {
@@ -905,6 +915,12 @@ function handleAINodesCreated(nodes: any[], edges: any[]) {
         relationshipType: edge.type || 'relates-to',
         version: edge.version
       }
+    })
+    canvasHistory.recordEdgeAdd(edge.id, {
+      source: edge.sourceId,
+      target: edge.targetId,
+      type: edge.type || 'relates-to',
+      label: edge.label
     })
   }
 }
