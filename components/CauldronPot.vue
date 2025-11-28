@@ -11,6 +11,19 @@
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
   >
+    <div class="universe-interior">
+      <div class="nebula-layer"></div>
+      <div class="stars-layer">
+        <div
+          v-for="star in stars"
+          :key="star.id"
+          class="star"
+          :style="star.style"
+        ></div>
+      </div>
+      <div class="shooting-star" v-if="isMixing || isDragOver"></div>
+    </div>
+
     <div class="liquid-rim"></div>
 
     <div class="pot-body">
@@ -87,6 +100,25 @@ const activeBubbles = ref<Array<{ id: number; style: Record<string, string> }>>(
 const mixingBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 let bubbleIdCounter = 0
 let mixingBubbleInterval: NodeJS.Timeout | null = null
+
+const stars = ref<Array<{ id: number; style: Record<string, string> }>>([])
+
+function generateStars() {
+  const starCount = 35
+  stars.value = Array.from({ length: starCount }, (_, i) => ({
+    id: i,
+    style: {
+      width: `${Math.random() * 3 + 1}px`,
+      height: `${Math.random() * 3 + 1}px`,
+      top: `${Math.random() * 70 + 15}%`,
+      left: `${Math.random() * 70 + 15}%`,
+      animationDelay: `${Math.random() * 3}s`,
+      animationDuration: `${Math.random() * 2 + 1}s`
+    }
+  }))
+}
+
+generateStars()
 
 function handleDragOver(event: DragEvent) {
   event.preventDefault()
@@ -226,13 +258,121 @@ defineExpose({
   }
 }
 
+.universe-interior {
+  position: absolute;
+  top: 12px;
+  left: 18%;
+  right: 18%;
+  height: 70%;
+  border-radius: 50% / 40% 40% 60% 60%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.nebula-layer {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 30% 40%, rgba(147, 51, 234, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(236, 72, 153, 0.5) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 70%, rgba(16, 185, 129, 0.4) 0%, transparent 35%),
+    linear-gradient(180deg, #0f0a1e 0%, #1a0a2e 50%, #0d1b2a 100%);
+  animation: nebula-shift 8s ease-in-out infinite;
+}
+
+.cauldron-pot.mixing .nebula-layer {
+  animation: nebula-shift 3s ease-in-out infinite;
+}
+
+@keyframes nebula-shift {
+  0%, 100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    filter: hue-rotate(20deg) brightness(1.2);
+  }
+}
+
+.stars-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.6);
+  animation: twinkle var(--duration, 2s) ease-in-out infinite;
+  animation-duration: inherit;
+}
+
+.star:nth-child(3n) {
+  background: #fef3c7;
+  box-shadow: 0 0 4px 1px rgba(254, 243, 199, 0.7);
+}
+
+.star:nth-child(5n) {
+  background: #c4b5fd;
+  box-shadow: 0 0 4px 1px rgba(196, 181, 253, 0.7);
+}
+
+.star:nth-child(7n) {
+  background: #a5f3fc;
+  box-shadow: 0 0 4px 1px rgba(165, 243, 252, 0.7);
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  top: 30%;
+  left: 20%;
+  box-shadow: 
+    0 0 6px 2px rgba(255, 255, 255, 0.8),
+    -20px 0 15px 1px rgba(255, 255, 255, 0.4),
+    -40px 0 20px 0px rgba(255, 255, 255, 0.2);
+  animation: shoot 2s ease-in-out infinite;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(80px) translateY(40px);
+    opacity: 0;
+  }
+}
+
 .liquid-rim {
   position: absolute;
   top: 14px;
   left: 20%;
   right: 20%;
   height: 16px;
-  background: linear-gradient(180deg, rgba(255, 190, 170, 0.75) 0%, rgba(200, 120, 100, 0.2) 100%);
+  background: linear-gradient(180deg, rgba(200, 160, 220, 0.7) 0%, rgba(100, 60, 120, 0.3) 100%);
   border-radius: 50%;
   z-index: 5;
 }
@@ -242,7 +382,7 @@ defineExpose({
   top: 10px;
   left: 18%;
   right: 18%;
-  background: linear-gradient(180deg, rgba(255, 200, 180, 0.8) 0%, rgba(210, 130, 110, 0.3) 100%);
+  background: linear-gradient(180deg, rgba(220, 180, 240, 0.8) 0%, rgba(120, 80, 160, 0.4) 100%);
 }
 
 .pot-body {
@@ -302,10 +442,10 @@ defineExpose({
 
 .bubble {
   position: absolute;
-  background: rgba(255, 255, 255, 0.4);
+  background: radial-gradient(circle at 30% 30%, rgba(196, 181, 253, 0.6), rgba(147, 51, 234, 0.3));
   border-radius: 50%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 6;
   animation: bubble-rise 1.5s ease-out forwards;
 }
 
@@ -329,10 +469,10 @@ defineExpose({
 
 .mixing-bubble {
   position: absolute;
-  background: rgba(255, 255, 255, 0.35);
+  background: radial-gradient(circle at 30% 30%, rgba(165, 243, 252, 0.5), rgba(59, 130, 246, 0.3));
   border-radius: 50%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 6;
   animation: mixing-bubble-rise 2s ease-out forwards;
 }
 
@@ -410,8 +550,8 @@ defineExpose({
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(212, 117, 111, 0.05) 50%,
+    rgba(147, 51, 234, 0.15) 0%,
+    rgba(236, 72, 153, 0.1) 50%,
     transparent 70%
   );
   animation: gentle-glow 2s ease-in-out infinite;
