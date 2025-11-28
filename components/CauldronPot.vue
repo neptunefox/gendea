@@ -4,25 +4,32 @@
     :class="{
       'drag-over': isDragOver,
       'manual-add': showManualAddEffect,
-      mixing: isMixing
+      mixing: isMixing,
+      'has-ingredients': ingredients.length > 0
     }"
     @drop="handleDrop"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
   >
+    <div class="liquid-rim"></div>
+
     <div class="pot-body">
-      <div v-if="ingredients.length < 3" class="ingredient-counter">
+      <div v-if="ingredients.length === 0" class="ingredient-counter empty">Drop ideas here</div>
+      <div v-else-if="ingredients.length < 3" class="ingredient-counter">
         {{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }} needed
       </div>
       <div v-else-if="isMixing" class="mixing-indicator"></div>
-      <div v-else class="ingredients-list">
+
+      <div v-if="ingredients.length > 0" class="ingredients-list">
         <div
-          v-for="(ingredient, index) in ingredients"
+          v-for="ingredient in ingredients.slice(-3)"
           :key="ingredient.id"
-          class="ingredient-item"
+          class="ingredient-chip"
         >
-          {{ index + 1 }}. {{ ingredient.content.slice(0, 40)
-          }}{{ ingredient.content.length > 40 ? '...' : '' }}
+          {{ ingredient.content.slice(0, 25) }}{{ ingredient.content.length > 25 ? '...' : '' }}
+        </div>
+        <div v-if="ingredients.length > 3" class="more-count">
+          +{{ ingredients.length - 3 }} more
         </div>
       </div>
     </div>
@@ -47,18 +54,11 @@
       <div v-if="showManualAddEffect" class="manual-add-particle"></div>
     </transition>
 
-    <transition name="fade">
-      <div v-if="isMixing" class="mixing-hint">
-        <Plus :size="14" />
-        <span>Keep adding ideas to refine</span>
-      </div>
-    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Plus } from 'lucide-vue-next'
 
 interface CauldronIngredient {
   id: string
@@ -184,88 +184,88 @@ defineExpose({
 
 <style scoped>
 .cauldron-pot {
-  width: 100%;
-  max-width: 500px;
-  aspect-ratio: 1;
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  border-radius: 50%;
+  width: 280px;
+  height: 140px;
+  background: linear-gradient(180deg, #c9625c 0%, #9e4540 60%, #7a3530 100%);
+  border-radius: 50% / 30% 30% 70% 70%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 8px 32px rgba(212, 117, 111, 0.3),
-    0 0 0 0 rgba(212, 117, 111, 0);
+    0 12px 28px rgba(122, 53, 48, 0.4),
+    inset 0 -20px 30px rgba(0, 0, 0, 0.2),
+    inset 0 8px 12px rgba(255, 255, 255, 0.1);
   position: relative;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  flex-shrink: 0;
 }
+
 
 .cauldron-pot.drag-over {
   transform: scale(1.03);
   box-shadow:
-    0 12px 48px rgba(212, 117, 111, 0.4),
-    0 0 20px rgba(212, 117, 111, 0.3);
+    0 16px 36px rgba(122, 53, 48, 0.5),
+    inset 0 -20px 30px rgba(0, 0, 0, 0.2),
+    inset 0 8px 12px rgba(255, 255, 255, 0.1),
+    0 0 0 4px rgba(212, 117, 111, 0.25);
 }
 
 .cauldron-pot.mixing {
-  animation: simmer 2.5s ease-in-out infinite;
+  animation: simmer 2s ease-in-out infinite;
 }
 
 @keyframes simmer {
   0%,
   100% {
     transform: scale(1);
-    box-shadow:
-      0 8px 32px rgba(212, 117, 111, 0.32),
-      0 0 18px rgba(212, 117, 111, 0.2);
   }
   50% {
-    transform: scale(1.005);
-    box-shadow:
-      0 8px 32px rgba(212, 117, 111, 0.36),
-      0 0 24px rgba(212, 117, 111, 0.25);
+    transform: scale(1.01);
   }
 }
 
-.pot-body {
-  width: 85%;
-  height: 85%;
-  background: rgba(255, 255, 255, 0.1);
+.liquid-rim {
+  position: absolute;
+  top: 14px;
+  left: 20%;
+  right: 20%;
+  height: 16px;
+  background: linear-gradient(180deg, rgba(255, 190, 170, 0.75) 0%, rgba(200, 120, 100, 0.2) 100%);
   border-radius: 50%;
+  z-index: 5;
+}
+
+.cauldron-pot.has-ingredients .liquid-rim {
+  height: 22px;
+  top: 10px;
+  left: 18%;
+  right: 18%;
+  background: linear-gradient(180deg, rgba(255, 200, 180, 0.8) 0%, rgba(210, 130, 110, 0.3) 100%);
+}
+
+.pot-body {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  gap: 0.375rem;
   color: white;
   text-align: center;
   position: relative;
   z-index: 2;
-}
-
-.cauldron-pot.mixing .pot-body {
-  animation: liquid-swirl 4s ease-in-out infinite;
-}
-
-@keyframes liquid-swirl {
-  0%,
-  100% {
-    background: rgba(255, 255, 255, 0.1);
-  }
-  25% {
-    background: rgba(255, 255, 255, 0.12);
-  }
-  50% {
-    background: rgba(255, 255, 255, 0.11);
-  }
-  75% {
-    background: rgba(255, 255, 255, 0.13);
-  }
+  padding-top: 10px;
 }
 
 .ingredient-counter {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.ingredient-counter.empty {
+  opacity: 0.8;
 }
 
 .mixing-indicator {
@@ -275,19 +275,29 @@ defineExpose({
 
 .ingredients-list {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  max-height: 100%;
-  overflow-y: auto;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-content: center;
+  max-width: 260px;
 }
 
-.ingredient-item {
-  font-size: 0.9375rem;
-  text-align: left;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+.ingredient-chip {
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 8px;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-count {
+  font-size: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  opacity: 0.9;
 }
 
 .bubble {
@@ -419,40 +429,14 @@ defineExpose({
   }
 }
 
-.mixing-hint {
-  position: absolute;
-  bottom: -2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: rgba(212, 117, 111, 0.7);
-  font-size: 0.875rem;
-  white-space: nowrap;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
 @media (max-width: 768px) {
   .cauldron-pot {
-    max-width: 350px;
+    width: 240px;
+    height: 120px;
   }
 
   .ingredient-counter {
-    font-size: 1.25rem;
-  }
-
-  .mixing-indicator {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
 }
 </style>

@@ -79,8 +79,8 @@ function getSteamStyle(index: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  padding: 2rem;
+  gap: 0.75rem;
+  padding: 1rem;
   z-index: 10;
 }
 
@@ -133,14 +133,14 @@ function getSteamStyle(index: number) {
 .output-card {
   position: relative;
   background: linear-gradient(135deg, #fef3f0 0%, #fce8e3 100%);
-  border: 3px solid #d4756f;
-  border-radius: 20px;
-  padding: 2.5rem;
-  max-width: 600px;
+  border: 2px solid #d4756f;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 480px;
   width: 100%;
   box-shadow:
-    0 12px 40px rgba(212, 117, 111, 0.25),
-    0 0 60px rgba(212, 117, 111, 0.15);
+    0 8px 24px rgba(212, 117, 111, 0.2),
+    0 0 40px rgba(212, 117, 111, 0.1);
   z-index: 2;
 }
 
@@ -150,9 +150,9 @@ function getSteamStyle(index: number) {
 }
 
 .output-title {
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 0.75rem 0;
   color: #40312b;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 700;
   text-align: center;
   background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
@@ -163,23 +163,23 @@ function getSteamStyle(index: number) {
 
 .output-text {
   color: #40312b;
-  font-size: 1.125rem;
-  line-height: 1.7;
-  margin: 0 0 2rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
   text-align: center;
 }
 
 .output-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .action-btn {
-  padding: 0.875rem 1.75rem;
+  padding: 0.625rem 1.25rem;
   border: none;
-  border-radius: 14px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -187,10 +187,10 @@ function getSteamStyle(index: number) {
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  font-size: 1rem;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .action-btn.primary {

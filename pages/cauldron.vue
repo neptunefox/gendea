@@ -22,32 +22,34 @@
               :ref="(el: any) => setIdeaRef(idea.id, el)"
               :idea="idea"
               :index="index"
-              :existing-positions="Array.from(cardPositions.values())"
-              @position-set="
-                (pos: { x: number; y: number; width: number; height: number }) =>
-                  cardPositions.set(idea.id, pos)
-              "
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
               @dissolved="handleIdeaDissolved"
-              @bring-to-top="handleBringToTop"
             />
           </TransitionGroup>
         </div>
 
         <div class="cauldron-center">
+          <CauldronOutput
+            v-if="output"
+            :output="output"
+            @save="handleSaveOutput"
+            @save-and-build="handleSaveAndBuild"
+            @reset="handleReset"
+          />
+
           <CauldronPot
             ref="cauldronPotRef"
             :ingredients="ingredients"
-            :is-mixing="isMixing"
+            :is-mixing="isMixing && !output"
             @drop="handleDrop"
           />
 
-          <div v-if="!output" class="manual-input-wrapper">
+          <div class="manual-input-wrapper">
             <input
               v-model="manualInput"
               type="text"
-              placeholder="Add your own idea..."
+              :placeholder="output ? 'Add another idea to remix...' : 'Add your own idea...'"
               class="manual-input"
               @keydown.enter="handleManualSubmit"
             />
@@ -59,37 +61,15 @@
               <Plus :size="20" />
             </button>
           </div>
-        </div>
 
-        <div v-if="output" class="remix-hint-section">
-          <div class="remix-input-wrapper">
-            <input
-              v-model="manualInput"
-              type="text"
-              placeholder="Add another idea to remix..."
-              class="manual-input"
-              @keydown.enter="handleManualSubmit"
-            />
-            <button
-              class="submit-manual-btn"
-              :disabled="!manualInput.trim()"
-              @click="handleManualSubmit"
-            >
-              <Plus :size="20" />
-            </button>
-          </div>
-          <p :class="['remix-hint-text', { pulse: remixHintPulse }]">
+          <p :class="['hint-text', { pulse: remixHintPulse }]">
             <Sparkles :size="14" />
-            Drop ideas or type above to remix your result
+            <span v-if="output">Drop ideas or type above to remix your result</span>
+            <span v-else-if="isMixing">Keep adding ideas to refine</span>
+            <span v-else-if="ingredients.length > 0">{{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }} to start mixing</span>
+            <span v-else>Drop or type ideas to begin</span>
           </p>
         </div>
-
-        <CauldronOutput
-          :output="output"
-          @save="handleSaveOutput"
-          @save-and-build="handleSaveAndBuild"
-          @reset="handleReset"
-        />
 
         <button v-if="ingredients.length > 0 && !output" class="reset-btn" @click="handleReset">
           Reset cauldron
@@ -159,32 +139,15 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
-const ideaRefs = ref<Map<string, { dissolve: () => void; setZIndex: (z: number) => void }>>(
-  new Map()
-)
+const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
-const cardPositions = ref<Map<string, { x: number; y: number; width: number; height: number }>>(
-  new Map()
-)
-const topZIndex = ref(100)
 let rotationInterval: NodeJS.Timeout | null = null
 
-function setIdeaRef(
-  ideaId: string,
-  el: { dissolve: () => void; setZIndex: (z: number) => void } | null
-) {
+function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
   if (el) {
     ideaRefs.value.set(ideaId, el)
   } else {
     ideaRefs.value.delete(ideaId)
-  }
-}
-
-function handleBringToTop(ideaId: string) {
-  const ideaRef = ideaRefs.value.get(ideaId)
-  if (ideaRef && typeof ideaRef.setZIndex === 'function') {
-    topZIndex.value += 1
-    ideaRef.setZIndex(topZIndex.value)
   }
 }
 
@@ -278,7 +241,6 @@ function rotateIdea() {
   const newIdea = getNextIdea()
 
   if (newIdea) {
-    cardPositions.value.delete(oldIdea.id)
     recentlyDisplayedIds.value.delete(oldIdea.id)
     recentlyDisplayedIds.value.add(newIdea.id)
     displayedIdeas.value[randomIndex] = newIdea
@@ -346,7 +308,6 @@ function handleIdeaDissolved(idea: FloatingIdea) {
   const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
 
   if (index !== -1) {
-    cardPositions.value.delete(idea.id)
     const newIdea = getNextIdea()
     if (newIdea) {
       recentlyDisplayedIds.value.delete(displayedIdeas.value[index].id)
@@ -530,8 +491,9 @@ onUnmounted(() => {
 .cauldron-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
-  padding: 6rem 1.5rem 4rem;
+  padding: 0;
   position: relative;
+  overflow-x: hidden;
 }
 
 .cauldron-page > .flow-guidance-banner {
@@ -544,13 +506,13 @@ onUnmounted(() => {
 }
 
 .cauldron-layout {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
   position: relative;
-  min-height: 200vh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loading-state {
@@ -583,7 +545,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 50;
+  z-index: 10;
 }
 
 .idea-fade-enter-active {
@@ -606,10 +568,16 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 2rem;
   position: relative;
-  z-index: 2;
+  z-index: 20;
+  min-width: 420px;
+  pointer-events: none;
+}
+
+.cauldron-center > * {
+  pointer-events: auto;
 }
 
 .manual-input-wrapper {
@@ -620,8 +588,7 @@ onUnmounted(() => {
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
-  width: 100%;
-  max-width: 500px;
+  width: 380px;
 }
 
 .manual-input-wrapper:focus-within {
@@ -677,9 +644,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+  width: 380px;
 }
 
 .remix-input-wrapper {
@@ -698,7 +663,7 @@ onUnmounted(() => {
   box-shadow: 0 4px 20px rgba(212, 117, 111, 0.15);
 }
 
-.remix-hint-text {
+.hint-text {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -708,31 +673,9 @@ onUnmounted(() => {
   margin: 0;
   cursor: default;
   transition: opacity 0.2s ease;
-  position: relative;
 }
 
-.remix-hint-text:hover {
-  opacity: 1;
-}
-
-.remix-hint-text:hover::after {
-  content: 'Adding more ideas will blend them with your current result';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background: #40312b;
-  color: white;
-  font-size: 0.75rem;
-  border-radius: 8px;
-  white-space: nowrap;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.remix-hint-text.pulse {
+.hint-text.pulse {
   animation: remix-pulse 0.6s ease-out;
 }
 
