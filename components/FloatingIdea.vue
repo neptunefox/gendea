@@ -316,14 +316,14 @@ onUnmounted(() => {
 
 .floating-idea.urgent .timer-ring {
   opacity: 1;
-  border-color: #d4756f;
-  box-shadow: 0 0 8px rgba(212, 117, 111, 0.5);
-  animation: pulse-urgent 0.8s ease-in-out infinite;
+  border-color: #c9857f;
+  box-shadow: 0 0 6px rgba(201, 133, 127, 0.35);
+  animation: pulse-urgent 1.2s ease-in-out infinite;
 }
 
 @keyframes pulse-urgent {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(212, 117, 111, 0.5); }
-  50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(212, 117, 111, 0.7); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 6px rgba(201, 133, 127, 0.35); }
+  50% { transform: scale(1.15); box-shadow: 0 0 8px rgba(201, 133, 127, 0.5); }
 }
 
 .timer-ring.frozen {
