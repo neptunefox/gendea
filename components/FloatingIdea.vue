@@ -2,12 +2,12 @@
   <div
     ref="ideaRef"
     class="floating-idea"
-    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent, selected: isSelected }"
+    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent, selected: isSelected, frozen: isFrozen }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
     @touchstart="handleTouchStart"
   >
-    <div class="timer-ring" :style="timerRingStyle" />
+    <div class="timer-ring" :class="{ frozen: isFrozen }" :style="timerRingStyle" />
     <div class="idea-content">
       {{ idea.text }}
     </div>
@@ -62,9 +62,10 @@ let timerInterval: NodeJS.Timeout | null = null
 
 const isUrgent = computed(() => timeRemaining.value <= URGENT_THRESHOLD)
 const timerProgress = computed(() => timeRemaining.value / props.duration)
+const isFrozen = computed(() => props.isSelected || isDragging.value)
 const timerRingStyle = computed(() => ({
   background: `conic-gradient(
-    ${isUrgent.value ? '#d4756f' : '#e8ddd8'} ${timerProgress.value * 360}deg,
+    ${isFrozen.value ? '#7eb8c9' : isUrgent.value ? '#d4756f' : '#e8ddd8'} ${timerProgress.value * 360}deg,
     transparent ${timerProgress.value * 360}deg
   )`
 }))
@@ -312,6 +313,19 @@ onUnmounted(() => {
 @keyframes pulse-urgent {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.2); }
+}
+
+.timer-ring.frozen {
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  box-shadow: 0 0 6px rgba(126, 184, 201, 0.6);
+  animation: pulse-frozen 2s ease-in-out infinite;
+}
+
+@keyframes pulse-frozen {
+  0%, 100% { box-shadow: 0 0 6px rgba(126, 184, 201, 0.6); }
+  50% { box-shadow: 0 0 10px rgba(126, 184, 201, 0.9); }
 }
 
 .floating-idea:hover {
