@@ -26,7 +26,7 @@
     - Create `utils/floating-position.ts` with position generation logic
     - Define safe zone interfaces and constants
     - _Requirements: 1.1, 1.2, 1.3_
-  - [ ] 2.2 Implement safe zone collision detection
+  - [x] 2.2 Implement safe zone collision detection
     - Add `isInsideSafeZone` function for circle and rectangle zones
     - Add `isPositionValid` function combining all safe zone checks
     - _Requirements: 1.1, 1.2, 1.3_
