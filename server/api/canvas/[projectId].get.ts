@@ -55,7 +55,7 @@ export default defineEventHandler(async event => {
     .from(canvasNodes)
     .where(eq(canvasNodes.projectId, projectId))
 
-  const edges = await db
+  const allEdges = await db
     .select({
       id: canvasEdges.id,
       projectId: canvasEdges.projectId,
@@ -69,6 +69,9 @@ export default defineEventHandler(async event => {
     })
     .from(canvasEdges)
     .where(eq(canvasEdges.projectId, projectId))
+
+  const nodeIds = new Set(nodes.map(n => n.id))
+  const edges = allEdges.filter(e => nodeIds.has(e.sourceId) && nodeIds.has(e.targetId))
 
   const [state] = await db.select().from(canvasState).where(eq(canvasState.projectId, projectId))
 
