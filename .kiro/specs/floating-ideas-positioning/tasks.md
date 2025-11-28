@@ -5,7 +5,7 @@
     - Add `isRepositioning` ref to track drag state
     - Add `dragOffset` ref to store cursor-to-card offset
     - _Requirements: 2.1, 2.2_
-  - [ ] 1.2 Implement mouse event handlers for repositioning
+  - [x] 1.2 Implement mouse event handlers for repositioning
     - Add `handleMouseDown` to start drag and calculate offset
     - Add `handleMouseMove` to update position during drag
     - Add `handleMouseUp` to end drag and persist position

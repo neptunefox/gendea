@@ -1,11 +1,12 @@
 <template>
   <div
     class="floating-idea"
-    :class="{ dragging: isDragging, dissolving: isDissolving }"
+    :class="{ dragging: isDragging, dissolving: isDissolving, repositioning: isRepositioning }"
     :style="{ ...positionStyle, zIndex: zIndex }"
     draggable="true"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd"
+    @mousedown="handleMouseDown"
     @mouseenter="bringToFront"
     @click="handleClick"
   >
@@ -16,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 interface FloatingIdea {
   id: string
@@ -182,6 +183,49 @@ function handleDragEnd() {
   emit('dragEnd')
 }
 
+function handleMouseDown(event: MouseEvent) {
+  if (event.button !== 0) return
+  
+  isRepositioning.value = true
+  zIndex.value = 200
+  
+  dragOffset.value = {
+    x: event.clientX - position.value.x,
+    y: event.clientY - position.value.y
+  }
+  
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mouseup', handleMouseUp)
+}
+
+function handleMouseMove(event: MouseEvent) {
+  if (!isRepositioning.value) return
+  
+  const newX = event.clientX - dragOffset.value.x
+  const newY = event.clientY - dragOffset.value.y
+  
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const cardWidth = 280
+  const cardHeight = 150
+  
+  position.value = {
+    x: Math.max(0, Math.min(newX, viewportWidth - cardWidth)),
+    y: Math.max(0, Math.min(newY, viewportHeight - cardHeight))
+  }
+}
+
+function handleMouseUp() {
+  if (!isRepositioning.value) return
+  
+  isRepositioning.value = false
+  
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('mouseup', handleMouseUp)
+  
+  emit('positionSet', { x: position.value.x, y: position.value.y, width: 280, height: 150 })
+}
+
 function dissolve() {
   isDissolving.value = true
   setTimeout(() => {
@@ -197,6 +241,11 @@ defineExpose({
 onMounted(() => {
   position.value = getRandomEdgePosition()
   emit('positionSet', { x: position.value.x, y: position.value.y, width: 280, height: 150 })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('mouseup', handleMouseUp)
 })
 </script>
 
