@@ -22,10 +22,12 @@
               :ref="(el: any) => setIdeaRef(idea.id, el)"
               :idea="idea"
               :index="index"
+              :duration="15000"
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
               @dissolved="handleIdeaDissolved"
               @dropped="handleIdeaDropped"
+              @expired="handleIdeaExpired"
             />
           </TransitionGroup>
         </div>
@@ -89,7 +91,7 @@
 
 <script setup lang="ts">
 import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
@@ -140,11 +142,10 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
-const ideaRefs = ref<Map<string, { dissolve: () => void }>>(new Map())
+const ideaRefs = ref<Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>>(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
-let rotationInterval: NodeJS.Timeout | null = null
 
-function setIdeaRef(ideaId: string, el: { dissolve: () => void } | null) {
+function setIdeaRef(ideaId: string, el: { dissolve: () => void; resetTimer: (duration?: number) => void } | null) {
   if (el) {
     ideaRefs.value.set(ideaId, el)
   } else {
@@ -234,38 +235,6 @@ function getNextIdea(): FloatingIdea | null {
   return available[randomIndex]
 }
 
-function rotateIdea() {
-  if (displayedIdeas.value.length === 0) return
-
-  const randomIndex = Math.floor(Math.random() * displayedIdeas.value.length)
-  const oldIdea = displayedIdeas.value[randomIndex]
-  const newIdea = getNextIdea()
-
-  if (newIdea) {
-    recentlyDisplayedIds.value.delete(oldIdea.id)
-    recentlyDisplayedIds.value.add(newIdea.id)
-    displayedIdeas.value[randomIndex] = newIdea
-  }
-}
-
-function startAutoRotation() {
-  if (rotationInterval) return
-
-  rotationInterval = setInterval(
-    () => {
-      rotateIdea()
-    },
-    15000 + Math.random() * 5000
-  )
-}
-
-function stopAutoRotation() {
-  if (rotationInterval) {
-    clearInterval(rotationInterval)
-    rotationInterval = null
-  }
-}
-
 function handleIdeaDragStart(idea: FloatingIdea) {
   draggedIdea.value = idea
 }
@@ -346,6 +315,18 @@ function handleIdeaDissolved(idea: FloatingIdea) {
       recentlyDisplayedIds.value.add(newIdea.id)
       displayedIdeas.value[index] = newIdea
     }
+  }
+}
+
+function handleIdeaExpired(idea: FloatingIdea) {
+  const index = displayedIdeas.value.findIndex(i => i.id === idea.id)
+  if (index === -1) return
+
+  const newIdea = getNextIdea()
+  if (newIdea) {
+    recentlyDisplayedIds.value.delete(idea.id)
+    recentlyDisplayedIds.value.add(newIdea.id)
+    displayedIdeas.value[index] = newIdea
   }
 }
 
@@ -510,12 +491,7 @@ watch(
 onMounted(async () => {
   await loadSession()
   await loadFloatingIdeas()
-  startAutoRotation()
   flowGuidance.initialize()
-})
-
-onUnmounted(() => {
-  stopAutoRotation()
 })
 </script>
 

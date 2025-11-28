@@ -2,11 +2,12 @@
   <div
     ref="ideaRef"
     class="floating-idea"
-    :class="{ dragging: isDragging, dissolving: isDissolving }"
+    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
     @touchstart="handleTouchStart"
   >
+    <div class="timer-ring" :style="timerRingStyle" />
     <div class="idea-content">
       {{ idea.text }}
     </div>
@@ -14,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 import { generateShelfPosition } from '~/utils/floating-position'
 
@@ -27,14 +28,18 @@ interface FloatingIdea {
 interface Props {
   idea: FloatingIdea
   index: number
+  duration?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  duration: 15000
+})
 const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
   dragEnd: []
   dissolved: [idea: FloatingIdea]
   dropped: [idea: FloatingIdea, event: { clientX: number; clientY: number }]
+  expired: [idea: FloatingIdea]
 }>()
 
 const ideaRef = ref<HTMLElement | null>(null)
@@ -45,6 +50,19 @@ const originalPosition = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
 const dragOffset = ref({ x: 0, y: 0 })
 
+const timeRemaining = ref(props.duration)
+const URGENT_THRESHOLD = 5000
+let timerInterval: NodeJS.Timeout | null = null
+
+const isUrgent = computed(() => timeRemaining.value <= URGENT_THRESHOLD)
+const timerProgress = computed(() => timeRemaining.value / props.duration)
+const timerRingStyle = computed(() => ({
+  background: `conic-gradient(
+    ${isUrgent.value ? '#d4756f' : '#e8ddd8'} ${timerProgress.value * 360}deg,
+    transparent ${timerProgress.value * 360}deg
+  )`
+}))
+
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
   top: `${position.value.y}px`,
@@ -54,6 +72,29 @@ const positionStyle = computed(() => ({
 
 function setZIndex(newZIndex: number) {
   zIndex.value = newZIndex
+}
+
+function startTimer() {
+  if (timerInterval) return
+  timerInterval = setInterval(() => {
+    if (isDragging.value) return
+    timeRemaining.value -= 100
+    if (timeRemaining.value <= 0) {
+      stopTimer()
+      emit('expired', props.idea)
+    }
+  }, 100)
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+}
+
+function resetTimer(newDuration?: number) {
+  timeRemaining.value = newDuration ?? props.duration
 }
 
 function handleMouseDown(event: MouseEvent) {
@@ -158,17 +199,26 @@ function cleanup() {
 
 defineExpose({
   dissolve,
-  setZIndex
+  setZIndex,
+  resetTimer
+})
+
+watch(() => props.idea.id, () => {
+  resetTimer()
 })
 
 onMounted(() => {
   const viewport = { width: window.innerWidth, height: window.innerHeight }
   position.value = generateShelfPosition(viewport, props.index)
   originalPosition.value = { ...position.value }
+  const staggerOffset = props.index * 2000
+  timeRemaining.value = props.duration + staggerOffset
+  startTimer()
 })
 
 onUnmounted(() => {
   cleanup()
+  stopTimer()
 })
 </script>
 
@@ -191,6 +241,31 @@ onUnmounted(() => {
     border-color 0.2s ease,
     transform 0.2s ease,
     opacity 0.2s ease;
+}
+
+.timer-ring {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.floating-idea:hover .timer-ring {
+  opacity: 0.8;
+}
+
+.floating-idea.urgent .timer-ring {
+  opacity: 1;
+  animation: pulse-urgent 1s ease-in-out infinite;
+}
+
+@keyframes pulse-urgent {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
 .floating-idea:hover {
