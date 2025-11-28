@@ -38,8 +38,8 @@
     - **Property 4: Selection State Z-Index Elevation**
     - **Validates: Requirements 3.3**
 
-- [ ] 3. Implement single-selection constraint
-  - [ ] 3.1 Ensure only one idea selected at a time in cauldron.vue
+- [x] 3. Implement single-selection constraint
+  - [x] 3.1 Ensure only one idea selected at a time in cauldron.vue
     - Verify selecting new idea deselects previous
     - Clean up selectedIdeaId if referenced idea expires/dissolves
     - _Requirements: 1.4_
