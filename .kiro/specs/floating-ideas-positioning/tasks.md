@@ -22,7 +22,7 @@
     - _Requirements: 2.3_
 
 - [ ] 2. Enhance position calculation with safe zone avoidance
-  - [ ] 2.1 Extract position calculation to testable utility function
+  - [x] 2.1 Extract position calculation to testable utility function
     - Create `utils/floating-position.ts` with position generation logic
     - Define safe zone interfaces and constants
     - _Requirements: 1.1, 1.2, 1.3_
