@@ -15,7 +15,7 @@
     - **Validates: Requirements 1.1**
 
 - [ ] 2. Add remix hint section to cauldron page
-  - [ ] 2.1 Add remix input and hint when output exists
+  - [x] 2.1 Add remix input and hint when output exists
     - Show input field with "Add another idea to remix..." placeholder
     - Add hint text "Drop ideas or type above to remix your result" with Sparkles icon
     - _Requirements: 2.1_

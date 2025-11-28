@@ -61,6 +61,29 @@
           </div>
         </div>
 
+        <div v-if="output" class="remix-hint-section">
+          <div class="remix-input-wrapper">
+            <input
+              v-model="manualInput"
+              type="text"
+              placeholder="Add another idea to remix..."
+              class="manual-input"
+              @keydown.enter="handleManualSubmit"
+            />
+            <button
+              class="submit-manual-btn"
+              :disabled="!manualInput.trim()"
+              @click="handleManualSubmit"
+            >
+              <Plus :size="20" />
+            </button>
+          </div>
+          <p class="remix-hint-text">
+            <Sparkles :size="14" />
+            Drop ideas or type above to remix your result
+          </p>
+        </div>
+
         <CauldronOutput
           :output="output"
           @save="handleSaveOutput"
@@ -84,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { Check, Loader, Plus } from 'lucide-vue-next'
+import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
@@ -638,6 +661,42 @@ onUnmounted(() => {
 .submit-manual-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+.remix-hint-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.remix-input-wrapper {
+  display: flex;
+  gap: 0;
+  background: white;
+  border: 2px solid #f0e5e0;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.remix-input-wrapper:focus-within {
+  border-color: #d4756f;
+  box-shadow: 0 4px 20px rgba(212, 117, 111, 0.15);
+}
+
+.remix-hint-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d4756f;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin: 0;
 }
 
 .reset-btn {
