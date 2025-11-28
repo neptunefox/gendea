@@ -1,10 +1,7 @@
 # Implementation Plan
 
 - [ ] 1. Add mixing hint to CauldronPot component
-  - [-] 1.1 Add hint element that displays when isMixing is true
-
-
-
+  - [x] 1.1 Add hint element that displays when isMixing is true
     - Add conditional div with Plus icon and "Keep adding ideas to refine" text
     - Position hint below the pot-body content
     - _Requirements: 1.1_

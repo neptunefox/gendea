@@ -46,11 +46,19 @@
     <transition name="dissolve">
       <div v-if="showManualAddEffect" class="manual-add-particle"></div>
     </transition>
+
+    <transition name="fade">
+      <div v-if="isMixing" class="mixing-hint">
+        <Plus :size="14" />
+        <span>Keep adding ideas to refine</span>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { Plus } from 'lucide-vue-next'
 
 interface CauldronIngredient {
   id: string
@@ -409,6 +417,29 @@ defineExpose({
   50% {
     opacity: 0.8;
   }
+}
+
+.mixing-hint {
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: rgba(212, 117, 111, 0.7);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 @media (max-width: 768px) {
