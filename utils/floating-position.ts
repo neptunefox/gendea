@@ -19,8 +19,7 @@ export interface SideLayoutConfig {
   cardWidth: number
   cardHeight: number
   verticalGap: number
-  sideMargin: number
-  topMargin: number
+  horizontalOffset: number
   cardsPerSide: number
 }
 
@@ -28,8 +27,7 @@ export const DEFAULT_SIDE_CONFIG: SideLayoutConfig = {
   cardWidth: 200,
   cardHeight: 90,
   verticalGap: 16,
-  sideMargin: 230,
-  topMargin: 180,
+  horizontalOffset: 280,
   cardsPerSide: 3
 }
 
@@ -38,21 +36,26 @@ export function generateShelfPosition(
   cardIndex: number,
   config: Partial<SideLayoutConfig> = {}
 ): Position {
-  const { cardWidth, cardHeight, verticalGap, sideMargin, topMargin, cardsPerSide } = {
+  const { cardWidth, cardHeight, verticalGap, horizontalOffset, cardsPerSide } = {
     ...DEFAULT_SIDE_CONFIG,
     ...config
   }
 
+  const centerX = viewport.width / 2
+  const centerY = viewport.height / 2
+
   const isLeftSide = cardIndex < cardsPerSide
   const positionOnSide = isLeftSide ? cardIndex : cardIndex - cardsPerSide
 
-  const y = topMargin + positionOnSide * (cardHeight + verticalGap)
+  const totalHeight = cardsPerSide * cardHeight + (cardsPerSide - 1) * verticalGap
+  const startY = centerY - totalHeight / 2
+  const y = startY + positionOnSide * (cardHeight + verticalGap)
 
   let x: number
   if (isLeftSide) {
-    x = sideMargin
+    x = centerX - horizontalOffset - cardWidth
   } else {
-    x = viewport.width - cardWidth - sideMargin
+    x = centerX + horizontalOffset
   }
 
   return { x, y }
