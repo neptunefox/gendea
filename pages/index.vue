@@ -702,7 +702,7 @@ watch(
 .spark-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
-  padding: 2rem 1.5rem 4rem;
+  padding: 6rem 1.5rem 4rem;
 }
 
 .spark-layout {
@@ -719,7 +719,7 @@ watch(
   flex-direction: column;
   width: 100%;
   max-width: 700px;
-  margin: 6rem auto 0;
+  margin: 0 auto;
   background: white;
   border: 1px solid #f0e5e0;
   border-radius: 20px;

@@ -140,7 +140,7 @@ onMounted(async () => {
 
 <style scoped>
 .metrics-dashboard {
-  padding: 2rem;
+  padding: 6rem 2rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }

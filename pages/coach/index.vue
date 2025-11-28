@@ -121,7 +121,7 @@ onMounted(() => {
 .coach-dashboard {
   min-height: 100vh;
   background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
-  padding: 2rem 1.5rem 4rem;
+  padding: 6rem 1.5rem 4rem;
 }
 
 .coach-layout {
