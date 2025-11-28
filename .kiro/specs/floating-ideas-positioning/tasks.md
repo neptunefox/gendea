@@ -1,7 +1,7 @@
 # Implementation Plan
 
 - [ ] 1. Add mouse-based drag repositioning to FloatingIdea component
-  - [ ] 1.1 Add repositioning state and drag offset tracking
+  - [x] 1.1 Add repositioning state and drag offset tracking
     - Add `isRepositioning` ref to track drag state
     - Add `dragOffset` ref to store cursor-to-card offset
     - _Requirements: 2.1, 2.2_

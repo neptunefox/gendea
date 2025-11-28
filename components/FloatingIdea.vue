@@ -44,6 +44,8 @@ const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
 const dragStartTime = ref(0)
+const isRepositioning = ref(false)
+const dragOffset = ref({ x: 0, y: 0 })
 
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
