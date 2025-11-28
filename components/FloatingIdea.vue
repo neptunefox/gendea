@@ -2,7 +2,7 @@
   <div
     ref="ideaRef"
     class="floating-idea"
-    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent }"
+    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent, selected: isSelected }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
     @touchstart="handleTouchStart"
@@ -29,10 +29,12 @@ interface Props {
   idea: FloatingIdea
   index: number
   duration?: number
+  isSelected?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  duration: 15000
+  duration: 15000,
+  isSelected: false
 })
 const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
@@ -40,6 +42,7 @@ const emit = defineEmits<{
   dissolved: [idea: FloatingIdea]
   dropped: [idea: FloatingIdea, event: { clientX: number; clientY: number }]
   expired: [idea: FloatingIdea]
+  select: [idea: FloatingIdea]
 }>()
 
 const ideaRef = ref<HTMLElement | null>(null)
@@ -49,6 +52,9 @@ const position = ref({ x: 0, y: 0 })
 const originalPosition = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
 const dragOffset = ref({ x: 0, y: 0 })
+const hasDragged = ref(false)
+const dragStartPos = ref({ x: 0, y: 0 })
+const DRAG_THRESHOLD = 5
 
 const timeRemaining = ref(props.duration)
 const URGENT_THRESHOLD = 5000
@@ -63,10 +69,17 @@ const timerRingStyle = computed(() => ({
   )`
 }))
 
+const isSelected = computed(() => props.isSelected)
+const computedZIndex = computed(() => {
+  if (isDragging.value) return 200
+  if (props.isSelected) return 100
+  return zIndex.value
+})
+
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
   top: `${position.value.y}px`,
-  zIndex: zIndex.value,
+  zIndex: computedZIndex.value,
   transition: isDragging.value ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
 }))
 
@@ -77,7 +90,7 @@ function setZIndex(newZIndex: number) {
 function startTimer() {
   if (timerInterval) return
   timerInterval = setInterval(() => {
-    if (isDragging.value) return
+    if (isDragging.value || props.isSelected) return
     timeRemaining.value -= 100
     if (timeRemaining.value <= 0) {
       stopTimer()
@@ -114,6 +127,8 @@ function handleTouchStart(event: TouchEvent) {
 
 function startDrag(clientX: number, clientY: number) {
   isDragging.value = true
+  hasDragged.value = false
+  dragStartPos.value = { x: clientX, y: clientY }
   zIndex.value = 200
   originalPosition.value = { ...position.value }
   dragOffset.value = {
@@ -136,6 +151,11 @@ function handleTouchMove(event: TouchEvent) {
 }
 
 function updatePosition(clientX: number, clientY: number) {
+  const dx = Math.abs(clientX - dragStartPos.value.x)
+  const dy = Math.abs(clientY - dragStartPos.value.y)
+  if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+    hasDragged.value = true
+  }
   position.value = {
     x: clientX - dragOffset.value.x,
     y: clientY - dragOffset.value.y
@@ -158,6 +178,8 @@ function handleTouchEnd(event: TouchEvent) {
 function endDrag(clientX: number, clientY: number) {
   if (!isDragging.value) return
   
+  const wasClick = !hasDragged.value
+  
   if (ideaRef.value) {
     ideaRef.value.style.pointerEvents = 'none'
     ideaRef.value.style.visibility = 'hidden'
@@ -178,6 +200,9 @@ function endDrag(clientX: number, clientY: number) {
     emit('dropped', props.idea, { clientX, clientY })
   } else {
     position.value = { ...originalPosition.value }
+    if (wasClick) {
+      emit('select', props.idea)
+    }
   }
   
   emit('dragEnd')
@@ -294,6 +319,18 @@ onUnmounted(() => {
     0 8px 24px rgba(212, 117, 111, 0.25),
     0 12px 32px rgba(0, 0, 0, 0.15);
   border-color: #d4756f;
+}
+
+.floating-idea.selected {
+  border-color: #d4756f;
+  box-shadow:
+    0 6px 20px rgba(212, 117, 111, 0.2),
+    0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.floating-idea.selected .idea-content {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
 }
 
 .floating-idea.dissolving {

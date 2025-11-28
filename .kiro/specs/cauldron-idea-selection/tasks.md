@@ -9,13 +9,14 @@
     - Wire up `@select` event handler
     - _Requirements: 1.4, 2.1_
 
-- [ ] 2. Update FloatingIdea component for selection behavior
-  - [ ] 2.1 Add isSelected prop and select event to FloatingIdea
+- [x] 2. Update FloatingIdea component for selection behavior
+  - [x] 2.1 Add isSelected prop and select event to FloatingIdea
     - Add `isSelected: boolean` prop with default false
     - Add `select` event emission
     - Differentiate click from drag (only emit select on click without drag)
     - _Requirements: 1.1_
-  - [ ] 2.2 Implement timer pause/resume based on selection state
+
+  - [x] 2.2 Implement timer pause/resume based on selection state
     - Watch `isSelected` prop changes
     - Pause timer when isSelected becomes true
     - Resume timer from paused value when isSelected becomes false
@@ -26,7 +27,9 @@
   - [ ]* 2.4 Write property test for timer resume on deselection
     - **Property 3: Timer Resume on Deselection**
     - **Validates: Requirements 1.5, 2.3**
-  - [ ] 2.5 Add selected state visual styling
+
+  - [x] 2.5 Add selected state visual styling
+
     - Add `selected` CSS class with coral border, elevated shadow
     - Remove line-clamp when selected to show full text
     - Set higher z-index when selected
