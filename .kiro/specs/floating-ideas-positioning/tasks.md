@@ -17,7 +17,7 @@
     - Add scale and shadow effect during drag
     - Elevate z-index during drag
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
-  - [ ] 1.4 Pause drift animation during repositioning
+  - [x] 1.4 Pause drift animation during repositioning
     - Add CSS class to disable animation when `isRepositioning` is true
     - _Requirements: 2.3_
 
