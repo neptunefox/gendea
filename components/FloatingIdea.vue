@@ -1,11 +1,11 @@
 <template>
   <div
+    ref="ideaRef"
     class="floating-idea"
     :class="{ dragging: isDragging, dissolving: isDissolving }"
     :style="positionStyle"
-    draggable="true"
-    @dragstart="handleDragStart"
-    @dragend="handleDragEnd"
+    @mousedown="handleMouseDown"
+    @touchstart="handleTouchStart"
   >
     <div class="idea-content">
       {{ idea.text }}
@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 import { generateShelfPosition } from '~/utils/floating-position'
 
@@ -34,36 +34,111 @@ const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
   dragEnd: []
   dissolved: [idea: FloatingIdea]
+  dropped: [idea: FloatingIdea, event: { clientX: number; clientY: number }]
 }>()
 
+const ideaRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
+const originalPosition = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
+const dragOffset = ref({ x: 0, y: 0 })
 
 const positionStyle = computed(() => ({
   left: `${position.value.x}px`,
   top: `${position.value.y}px`,
-  zIndex: zIndex.value
+  zIndex: zIndex.value,
+  transition: isDragging.value ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
 }))
 
 function setZIndex(newZIndex: number) {
   zIndex.value = newZIndex
 }
 
-function handleDragStart(event: DragEvent) {
+function handleMouseDown(event: MouseEvent) {
+  event.preventDefault()
+  startDrag(event.clientX, event.clientY)
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
+}
+
+function handleTouchStart(event: TouchEvent) {
+  if (event.touches.length !== 1) return
+  const touch = event.touches[0]
+  startDrag(touch.clientX, touch.clientY)
+  document.addEventListener('touchmove', handleTouchMove, { passive: false })
+  document.addEventListener('touchend', handleTouchEnd)
+}
+
+function startDrag(clientX: number, clientY: number) {
   isDragging.value = true
   zIndex.value = 200
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move'
-    event.dataTransfer.setData('application/json', JSON.stringify(props.idea))
+  originalPosition.value = { ...position.value }
+  dragOffset.value = {
+    x: clientX - position.value.x,
+    y: clientY - position.value.y
   }
   emit('dragStart', props.idea)
 }
 
-function handleDragEnd() {
+function handleMouseMove(event: MouseEvent) {
+  if (!isDragging.value) return
+  updatePosition(event.clientX, event.clientY)
+}
+
+function handleTouchMove(event: TouchEvent) {
+  if (!isDragging.value || event.touches.length !== 1) return
+  event.preventDefault()
+  const touch = event.touches[0]
+  updatePosition(touch.clientX, touch.clientY)
+}
+
+function updatePosition(clientX: number, clientY: number) {
+  position.value = {
+    x: clientX - dragOffset.value.x,
+    y: clientY - dragOffset.value.y
+  }
+}
+
+function handleMouseUp(event: MouseEvent) {
+  endDrag(event.clientX, event.clientY)
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mouseup', handleMouseUp)
+}
+
+function handleTouchEnd(event: TouchEvent) {
+  const touch = event.changedTouches[0]
+  endDrag(touch.clientX, touch.clientY)
+  document.removeEventListener('touchmove', handleTouchMove)
+  document.removeEventListener('touchend', handleTouchEnd)
+}
+
+function endDrag(clientX: number, clientY: number) {
+  if (!isDragging.value) return
+  
+  if (ideaRef.value) {
+    ideaRef.value.style.pointerEvents = 'none'
+    ideaRef.value.style.visibility = 'hidden'
+  }
+  
+  const dropTarget = document.elementFromPoint(clientX, clientY)
+  const cauldronPot = dropTarget?.closest('.cauldron-pot')
+  
+  if (ideaRef.value) {
+    ideaRef.value.style.pointerEvents = ''
+    ideaRef.value.style.visibility = ''
+  }
+  
   isDragging.value = false
   zIndex.value = 10 + props.index
+  
+  if (cauldronPot) {
+    emit('dropped', props.idea, { clientX, clientY })
+  } else {
+    position.value = { ...originalPosition.value }
+  }
+  
   emit('dragEnd')
 }
 
@@ -74,6 +149,13 @@ function dissolve() {
   }, 600)
 }
 
+function cleanup() {
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mouseup', handleMouseUp)
+  document.removeEventListener('touchmove', handleTouchMove)
+  document.removeEventListener('touchend', handleTouchEnd)
+}
+
 defineExpose({
   dissolve,
   setZIndex
@@ -82,6 +164,11 @@ defineExpose({
 onMounted(() => {
   const viewport = { width: window.innerWidth, height: window.innerHeight }
   position.value = generateShelfPosition(viewport, props.index)
+  originalPosition.value = { ...position.value }
+})
+
+onUnmounted(() => {
+  cleanup()
 })
 </script>
 
@@ -115,9 +202,12 @@ onMounted(() => {
 }
 
 .floating-idea.dragging {
-  opacity: 0.5;
   cursor: grabbing;
-  transform: scale(0.95);
+  transform: scale(1.05);
+  box-shadow:
+    0 8px 24px rgba(212, 117, 111, 0.25),
+    0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: #d4756f;
 }
 
 .floating-idea.dissolving {

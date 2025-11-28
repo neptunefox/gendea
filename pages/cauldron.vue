@@ -14,7 +14,7 @@
       </div>
 
       <template v-else>
-        <div class="floating-ideas-container">
+        <div class="floating-ideas-container" :class="{ 'is-dragging': !!draggedIdea }">
           <TransitionGroup name="idea-fade">
             <FloatingIdea
               v-for="(idea, index) in displayedIdeas"
@@ -25,6 +25,7 @@
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
               @dissolved="handleIdeaDissolved"
+              @dropped="handleIdeaDropped"
             />
           </TransitionGroup>
         </div>
@@ -271,6 +272,37 @@ function handleIdeaDragStart(idea: FloatingIdea) {
 
 function handleIdeaDragEnd() {
   draggedIdea.value = null
+}
+
+async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; clientY: number }) {
+  if (!currentSession.value) return
+
+  const ideaRef = ideaRefs.value.get(idea.id)
+  if (ideaRef && typeof ideaRef.dissolve === 'function') {
+    ideaRef.dissolve()
+  }
+
+  if (cauldronPotRef.value && typeof cauldronPotRef.value.triggerManualAddAnimation === 'function') {
+    cauldronPotRef.value.triggerManualAddAnimation()
+  }
+
+  try {
+    await $fetch('/api/cauldron/add-ingredient', {
+      method: 'POST',
+      body: {
+        sessionId: currentSession.value.id,
+        sourceType: idea.source,
+        sourceId: idea.id,
+        content: idea.text
+      }
+    })
+
+    await loadSession()
+    showToastMessage('Idea added to cauldron')
+  } catch (error) {
+    console.error('Failed to add ingredient:', error)
+    showToastMessage('Failed to add idea')
+  }
 }
 
 async function handleDrop(_event: DragEvent) {
@@ -546,6 +578,10 @@ onUnmounted(() => {
   height: 100%;
   pointer-events: none;
   z-index: 10;
+}
+
+.floating-ideas-container.is-dragging {
+  z-index: 100;
 }
 
 .idea-fade-enter-active {
