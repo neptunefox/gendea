@@ -33,7 +33,7 @@
   - [ ]* 2.3 Write property test for safe zone avoidance
     - **Property 1: Safe Zone Avoidance**
     - **Validates: Requirements 1.1, 1.2, 1.3**
-  - [ ] 2.4 Implement card overlap detection
+  - [x] 2.4 Implement card overlap detection
     - Add `checkCardOverlap` function with 40px padding
     - _Requirements: 1.4_
   - [ ]* 2.5 Write property test for card spacing
