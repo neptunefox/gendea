@@ -258,7 +258,7 @@ onUnmounted(() => {
   border: 2px solid #f0e5e0;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(212, 117, 111, 0.1);
-  cursor: pointer;
+  cursor: grab;
   user-select: none;
   pointer-events: auto;
   transition:
@@ -281,6 +281,13 @@ onUnmounted(() => {
 .floating-idea.dragging {
   opacity: 0.5;
   cursor: grabbing;
+  animation: none;
+}
+
+.floating-idea.repositioning {
+  cursor: grabbing;
+  transform: scale(1.03);
+  box-shadow: 0 12px 28px rgba(212, 117, 111, 0.25);
   animation: none;
 }
 

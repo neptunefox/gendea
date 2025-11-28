@@ -11,7 +11,7 @@
     - Add `handleMouseUp` to end drag and persist position
     - Add global event listeners for mousemove/mouseup during drag
     - _Requirements: 2.1, 2.2, 2.4_
-  - [ ] 1.3 Add visual feedback styles for drag states
+  - [x] 1.3 Add visual feedback styles for drag states
     - Add grab cursor on hover
     - Add grabbing cursor during drag
     - Add scale and shadow effect during drag
