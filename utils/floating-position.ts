@@ -29,8 +29,8 @@ export const DEFAULT_SIDE_CONFIG: SideLayoutConfig = {
   cardHeight: 90,
   verticalGap: 16,
   sideMargin: 230,
-  topMargin: 100,
-  cardsPerSide: 4
+  topMargin: 180,
+  cardsPerSide: 3
 }
 
 export function generateShelfPosition(
