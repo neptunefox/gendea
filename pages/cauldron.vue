@@ -33,19 +33,19 @@
         </div>
 
         <div class="cauldron-center">
+          <CauldronPot
+            ref="cauldronPotRef"
+            :ingredients="ingredients"
+            :is-mixing="isMixing && !output"
+            @drop="handleDrop"
+          />
+
           <CauldronOutput
             v-if="output"
             :output="output"
             @save="handleSaveOutput"
             @save-and-build="handleSaveAndBuild"
             @reset="handleReset"
-          />
-
-          <CauldronPot
-            ref="cauldronPotRef"
-            :ingredients="ingredients"
-            :is-mixing="isMixing && !output"
-            @drop="handleDrop"
           />
 
           <div class="manual-input-wrapper">
