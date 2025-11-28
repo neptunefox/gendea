@@ -302,38 +302,42 @@ onUnmounted(() => {
   position: absolute;
   top: 6px;
   right: 6px;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
+  opacity: 0.85;
+  border: 1.5px solid rgba(212, 117, 111, 0.3);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .floating-idea:hover .timer-ring {
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .floating-idea.urgent .timer-ring {
   opacity: 1;
-  animation: pulse-urgent 1s ease-in-out infinite;
+  border-color: #d4756f;
+  box-shadow: 0 0 8px rgba(212, 117, 111, 0.5);
+  animation: pulse-urgent 0.8s ease-in-out infinite;
 }
 
 @keyframes pulse-urgent {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(212, 117, 111, 0.5); }
+  50% { transform: scale(1.25); box-shadow: 0 0 12px rgba(212, 117, 111, 0.7); }
 }
 
 .timer-ring.frozen {
   opacity: 1;
-  width: 10px;
-  height: 10px;
-  box-shadow: 0 0 6px rgba(126, 184, 201, 0.6);
+  width: 14px;
+  height: 14px;
+  border-color: rgba(126, 184, 201, 0.5);
+  box-shadow: 0 0 8px rgba(126, 184, 201, 0.6);
   animation: pulse-frozen 2s ease-in-out infinite;
 }
 
 @keyframes pulse-frozen {
-  0%, 100% { box-shadow: 0 0 6px rgba(126, 184, 201, 0.6); }
-  50% { box-shadow: 0 0 10px rgba(126, 184, 201, 0.9); }
+  0%, 100% { box-shadow: 0 0 8px rgba(126, 184, 201, 0.6); }
+  50% { box-shadow: 0 0 12px rgba(126, 184, 201, 0.9); }
 }
 
 .floating-idea:hover {
