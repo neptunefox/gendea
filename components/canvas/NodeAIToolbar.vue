@@ -1,42 +1,44 @@
 <template>
   <div v-if="visible" class="node-ai-toolbar" :style="toolbarPosition">
-    <button
-      class="ai-btn"
-      :class="{ loading: isExpanding }"
-      :disabled="isExpanding"
-      title="Generate related ideas"
-      @click="handleExpand"
-    >
-      <Loader2 v-if="isExpanding" :size="16" class="spin" />
-      <Sparkles v-else :size="16" />
-      <span>Expand</span>
-    </button>
+    <template v-if="isIdeaNode">
+      <button
+        class="ai-btn"
+        :class="{ loading: isExpanding }"
+        :disabled="isExpanding"
+        title="Generate related ideas"
+        @click="handleExpand"
+      >
+        <Loader2 v-if="isExpanding" :size="16" class="spin" />
+        <Sparkles v-else :size="16" />
+        <span>Expand</span>
+      </button>
 
-    <button
-      class="ai-btn"
-      :class="{ loading: isSuggestingTools }"
-      :disabled="isSuggestingTools"
-      title="Suggest helpful tools"
-      @click="handleSuggestTools"
-    >
-      <Loader2 v-if="isSuggestingTools" :size="16" class="spin" />
-      <Wrench v-else :size="16" />
-      <span>Tools</span>
-    </button>
+      <button
+        class="ai-btn"
+        :class="{ loading: isSuggestingTools }"
+        :disabled="isSuggestingTools"
+        title="Suggest helpful tools"
+        @click="handleSuggestTools"
+      >
+        <Loader2 v-if="isSuggestingTools" :size="16" class="spin" />
+        <Wrench v-else :size="16" />
+        <span>Tools</span>
+      </button>
 
-    <button
-      class="ai-btn"
-      :class="{ loading: isAddingContext }"
-      :disabled="isAddingContext"
-      title="Add clarifying questions"
-      @click="handleAddContext"
-    >
-      <Loader2 v-if="isAddingContext" :size="16" class="spin" />
-      <HelpCircle v-else :size="16" />
-      <span>Context</span>
-    </button>
+      <button
+        class="ai-btn"
+        :class="{ loading: isAddingContext }"
+        :disabled="isAddingContext"
+        title="Add clarifying questions"
+        @click="handleAddContext"
+      >
+        <Loader2 v-if="isAddingContext" :size="16" class="spin" />
+        <HelpCircle v-else :size="16" />
+        <span>Context</span>
+      </button>
 
-    <div class="toolbar-divider" />
+      <div class="toolbar-divider" />
+    </template>
 
     <button
       class="ai-btn delete-btn"
@@ -80,6 +82,7 @@ const isAddingContext = ref(false)
 const isDeleting = ref(false)
 
 const visible = computed(() => props.selectedNode !== null)
+const isIdeaNode = computed(() => props.selectedNode?.type === 'idea')
 
 const toolbarPosition = computed(() => {
   if (!props.selectedNode) return {}
