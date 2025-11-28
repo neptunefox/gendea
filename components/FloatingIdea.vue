@@ -6,6 +6,7 @@
     :style="positionStyle"
     @mousedown="handleMouseDown"
     @touchstart="handleTouchStart"
+    @dblclick="handleDoubleClick"
   >
     <div class="timer-ring" :class="{ frozen: isFrozen }" :style="timerRingStyle" />
     <div class="idea-content">
@@ -43,6 +44,7 @@ const emit = defineEmits<{
   dropped: [idea: FloatingIdea, event: { clientX: number; clientY: number }]
   expired: [idea: FloatingIdea]
   select: [idea: FloatingIdea]
+  throw: [idea: FloatingIdea]
 }>()
 
 const ideaRef = ref<HTMLElement | null>(null)
@@ -217,6 +219,12 @@ function endDrag(clientX: number, clientY: number) {
   }
   
   emit('dragEnd')
+}
+
+function handleDoubleClick(event: MouseEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+  emit('throw', props.idea)
 }
 
 function dissolve() {

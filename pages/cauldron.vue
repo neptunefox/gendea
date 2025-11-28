@@ -30,6 +30,7 @@
               @dropped="handleIdeaDropped"
               @expired="handleIdeaExpired"
               @select="handleIdeaSelect"
+              @throw="handleIdeaThrow"
             />
           </TransitionGroup>
         </div>
@@ -286,6 +287,10 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
     console.error('Failed to add ingredient:', error)
     showToastMessage('Failed to add idea')
   }
+}
+
+async function handleIdeaThrow(idea: FloatingIdea) {
+  await handleIdeaDropped(idea, { clientX: 0, clientY: 0 })
 }
 
 async function handleDrop(_event: DragEvent) {
