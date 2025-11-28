@@ -70,18 +70,28 @@ const timerRingStyle = computed(() => ({
 }))
 
 const isSelected = computed(() => props.isSelected)
+const isLeftSide = computed(() => props.index < 3)
 const computedZIndex = computed(() => {
   if (isDragging.value) return 200
   if (props.isSelected) return 100
   return zIndex.value
 })
 
-const positionStyle = computed(() => ({
-  left: `${position.value.x}px`,
-  top: `${position.value.y}px`,
-  zIndex: computedZIndex.value,
-  transition: isDragging.value ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
-}))
+const SELECTED_WIDTH = 280
+const DEFAULT_WIDTH = 200
+
+const positionStyle = computed(() => {
+  let leftPos = position.value.x
+  if (props.isSelected && isLeftSide.value) {
+    leftPos = position.value.x - (SELECTED_WIDTH - DEFAULT_WIDTH)
+  }
+  return {
+    left: `${leftPos}px`,
+    top: `${position.value.y}px`,
+    zIndex: computedZIndex.value,
+    transition: isDragging.value ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.2s ease'
+  }
+})
 
 function setZIndex(newZIndex: number) {
   zIndex.value = newZIndex
@@ -322,10 +332,12 @@ onUnmounted(() => {
 }
 
 .floating-idea.selected {
+  width: 280px;
   border-color: #d4756f;
   box-shadow:
     0 6px 20px rgba(212, 117, 111, 0.2),
     0 10px 28px rgba(0, 0, 0, 0.12);
+  transform: scale(1.02);
 }
 
 .floating-idea.selected .idea-content {
