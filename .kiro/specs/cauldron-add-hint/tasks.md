@@ -19,7 +19,7 @@
     - Show input field with "Add another idea to remix..." placeholder
     - Add hint text "Drop ideas or type above to remix your result" with Sparkles icon
     - _Requirements: 2.1_
-  - [ ] 2.2 Add remix hint styling
+  - [x] 2.2 Add remix hint styling
     - Style input wrapper similar to existing manual-input-wrapper
     - Add subtle hint text styling with coral color
     - Add hover state for additional context

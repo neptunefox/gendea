@@ -695,8 +695,32 @@ onUnmounted(() => {
   gap: 0.5rem;
   color: #d4756f;
   font-size: 0.875rem;
-  opacity: 0.8;
+  opacity: 0.7;
   margin: 0;
+  cursor: default;
+  transition: opacity 0.2s ease;
+  position: relative;
+}
+
+.remix-hint-text:hover {
+  opacity: 1;
+}
+
+.remix-hint-text:hover::after {
+  content: 'Adding more ideas will blend them with your current result';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #40312b;
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .reset-btn {
