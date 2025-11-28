@@ -45,7 +45,7 @@
     - Import and use `generateSafePosition` from utility
     - Pass viewport dimensions and existing positions
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
-  - [ ] 3.2 Preserve cauldron drop functionality
+  - [x] 3.2 Preserve cauldron drop functionality
     - Ensure HTML5 dragstart still works for cauldron detection
     - Test that dropping on cauldron adds ingredient
     - _Requirements: 2.5_
