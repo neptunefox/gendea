@@ -41,7 +41,7 @@
     - **Validates: Requirements 1.4**
 
 - [ ] 3. Integrate position utility into FloatingIdea component
-  - [ ] 3.1 Update FloatingIdea to use new position utility
+  - [x] 3.1 Update FloatingIdea to use new position utility
     - Import and use `generateSafePosition` from utility
     - Pass viewport dimensions and existing positions
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
