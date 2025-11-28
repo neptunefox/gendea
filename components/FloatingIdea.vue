@@ -197,6 +197,17 @@ function cleanup() {
   document.removeEventListener('touchend', handleTouchEnd)
 }
 
+function updatePositionForViewport() {
+  if (isDragging.value) return
+  const viewport = { width: window.innerWidth, height: window.innerHeight }
+  position.value = generateShelfPosition(viewport, props.index)
+  originalPosition.value = { ...position.value }
+}
+
+function handleResize() {
+  updatePositionForViewport()
+}
+
 defineExpose({
   dissolve,
   setZIndex,
@@ -208,17 +219,17 @@ watch(() => props.idea.id, () => {
 })
 
 onMounted(() => {
-  const viewport = { width: window.innerWidth, height: window.innerHeight }
-  position.value = generateShelfPosition(viewport, props.index)
-  originalPosition.value = { ...position.value }
+  updatePositionForViewport()
   const staggerOffset = props.index * 2000
   timeRemaining.value = props.duration + staggerOffset
   startTimer()
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
   cleanup()
   stopTimer()
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
