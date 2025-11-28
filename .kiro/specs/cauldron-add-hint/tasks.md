@@ -5,7 +5,7 @@
     - Add conditional div with Plus icon and "Keep adding ideas to refine" text
     - Position hint below the pot-body content
     - _Requirements: 1.1_
-  - [ ] 1.2 Add hint styling with fade animation
+  - [x] 1.2 Add hint styling with fade animation
     - Use coral color palette with reduced opacity
     - Add CSS transition for smooth fade-in/fade-out
     - Position to not obstruct drag-and-drop
