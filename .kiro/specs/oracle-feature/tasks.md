@@ -147,26 +147,25 @@
 ## Phase 6: Implement Oracle Frontend
 
 - [x] 11. Create Oracle types
-
   - [x] 11.1 Create types/oracle.ts
     - Define OracleSession interface
     - Define OracleMessage interface
     - _Requirements: 10.1, 10.2_
 
-- [ ] 12. Create Oracle page and components
-  - [ ] 12.1 Create pages/oracle.vue
+- [x] 12. Create Oracle page and components
+  - [x] 12.1 Create pages/oracle.vue
     - Handle session creation on mount
     - Load existing session if `idea` query param present
     - Apply dark theme styling
     - Fixed input at bottom of viewport
     - _Requirements: 2.1, 2.2, 6.1, 6.4_
-  - [ ] 12.2 Create components/OracleChat.vue
+  - [x] 12.2 Create components/OracleChat.vue
     - Display messages with proper alignment (user left, oracle right)
     - Handle message sending
     - Show loading state during Oracle response
     - Emit spark events
     - _Requirements: 3.5, 6.2_
-  - [ ] 12.3 Create components/OracleMessage.vue
+  - [x] 12.3 Create components/OracleMessage.vue
     - Render message content with appropriate styling based on role
     - Show "Spark →" button on Oracle messages
     - Apply message appear animation
