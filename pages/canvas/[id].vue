@@ -22,10 +22,11 @@
       <VueFlow
         v-model="elements"
         :default-viewport="viewport"
-        :min-zoom="0.1"
+        :min-zoom="0.25"
         :max-zoom="4"
         :selection-key-code="null"
         :multi-selection-key-code="'Shift'"
+        :delete-key-code="null"
         :pan-on-scroll="true"
         :selection-mode="SelectionMode.Partial"
         @viewport-change="handleViewportChange"
@@ -548,6 +549,7 @@ interface Suggestion {
 
 const currentSuggestion = ref<Suggestion | null>(null)
 const isTidying = ref(false)
+const isDeleting = ref(false)
 const dismissedSuggestions = ref<Set<string>>(new Set())
 
 interface EdgeSuggestion {
@@ -960,8 +962,13 @@ async function handleDeleteSelectedNodes() {
   const nodes = selectedNodes.value
   if (nodes.length === 0) return
 
-  for (const node of nodes) {
-    await handleDeleteNode(node.id)
+  isDeleting.value = true
+  try {
+    for (const node of nodes) {
+      await handleDeleteNode(node.id)
+    }
+  } finally {
+    isDeleting.value = false
   }
 }
 
@@ -1174,7 +1181,7 @@ async function saveLastActiveView() {
 }
 
 async function syncCanvasData() {
-  if (!projectId.value) return
+  if (!projectId.value || isDeleting.value) return
   try {
     const data = await $fetch(`/api/canvas/${projectId.value}`)
 
