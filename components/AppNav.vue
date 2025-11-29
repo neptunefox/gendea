@@ -8,11 +8,11 @@
       <NuxtLink to="/" class="nav-link" title="Spark">
         <Lightbulb :size="20" />
       </NuxtLink>
-      <NuxtLink to="/oracle" class="nav-link" title="Oracle">
-        <HelpCircle :size="20" />
-      </NuxtLink>
       <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
         <FlaskConical :size="20" />
+      </NuxtLink>
+      <NuxtLink to="/oracle" class="nav-link" title="Oracle">
+        <HelpCircle :size="20" />
       </NuxtLink>
       <NuxtLink to="/history" class="nav-link" title="History">
         <Clock :size="20" />
@@ -24,11 +24,11 @@
     <NuxtLink to="/" class="nav-link" title="Spark">
       <Lightbulb :size="20" />
     </NuxtLink>
-    <NuxtLink to="/oracle" class="nav-link" title="Oracle">
-      <HelpCircle :size="20" />
-    </NuxtLink>
     <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
       <FlaskConical :size="20" />
+    </NuxtLink>
+    <NuxtLink to="/oracle" class="nav-link" title="Oracle">
+      <HelpCircle :size="20" />
     </NuxtLink>
     <NuxtLink to="/history" class="nav-link" title="History">
       <Clock :size="20" />
