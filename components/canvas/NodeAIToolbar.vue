@@ -209,6 +209,7 @@ function handleDelete() {
 
 .delete-btn {
   padding: 0.5rem;
+  justify-content: center;
 }
 
 .delete-btn:hover:not(:disabled) {
