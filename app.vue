@@ -15,7 +15,7 @@
   --color-border-strong: rgba(0, 0, 0, 0.1);
   --color-text: #1C1917;
   --color-text-secondary: rgba(28, 25, 23, 0.6);
-  --color-text-tertiary: rgba(28, 25, 23, 0.4);
+  --color-text-tertiary: #9CA3AF;
 
   --color-primary: #D4756F;
   --color-primary-hover: #C26660;
@@ -23,8 +23,18 @@
   --color-primary-ring: rgba(212, 117, 111, 0.2);
 
   --color-success: #4A7C59;
+  --color-success-subtle: rgba(74, 124, 89, 0.2);
+  --color-success-bg: rgba(74, 124, 89, 0.05);
   --color-warning: #B45309;
   --color-error: #C26660;
+  --color-error-subtle: rgba(194, 102, 96, 0.2);
+  --color-error-bg: rgba(194, 102, 96, 0.05);
+  --color-info: #1976d2;
+  --color-info-subtle: rgba(33, 150, 243, 0.2);
+  --color-cauldron: #9575cd;
+
+  --color-surface-translucent: rgba(255, 255, 255, 0.95);
+  --color-border-subtle: rgba(0, 0, 0, 0.04);
 
   --text-xl: 1.5rem;
   --text-lg: 1.125rem;
@@ -48,10 +58,12 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-full: 999px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
 
   --nav-width: 56px;
 
