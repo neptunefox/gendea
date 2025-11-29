@@ -95,8 +95,8 @@
 
 ## Phase 5: Implement Oracle Backend
 
-- [ ] 8. Create Oracle service
-  - [ ] 8.1 Create server/utils/oracle-service.ts
+- [x] 8. Create Oracle service
+  - [x] 8.1 Create server/utils/oracle-service.ts
     - Implement Oracle system prompt
     - Create generateOracleResponse function using LangChain service
     - Add Zod schema for response validation
