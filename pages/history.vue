@@ -99,26 +99,28 @@ function resumeThread(id: string) {
 }
 
 .history-hero {
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-8);
 }
 
 .hero-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9b7455;
-  font-size: 0.75rem;
-  margin: 0 0 0.5rem;
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  margin: 0 0 var(--space-2);
 }
 
 .history-hero h1 {
-  margin: 0 0 0.75rem;
-  color: #2b1610;
-  font-size: 2rem;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
 }
 
 .history-hero p {
   margin: 0;
-  color: #5b463a;
+  color: var(--color-text-secondary);
   line-height: 1.6;
   max-width: 600px;
 }
@@ -132,18 +134,18 @@ function resumeThread(id: string) {
 .thread-item {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .thread-item:hover {
-  background: rgba(192, 102, 127, 0.03);
+  background: var(--color-primary-subtle);
 }
 
 .thread-main {
@@ -152,10 +154,10 @@ function resumeThread(id: string) {
 }
 
 .thread-item h3 {
-  margin: 0 0 0.25rem;
-  color: #2b1610;
-  font-size: 1rem;
-  font-weight: 400;
+  margin: 0 0 var(--space-1);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: var(--weight-normal);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -164,20 +166,20 @@ function resumeThread(id: string) {
 
 .thread-meta {
   margin: 0;
-  font-size: 0.85rem;
-  color: #a07c63;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
 }
 
 .resume-button {
   border: none;
   background: transparent;
-  color: #c0667f;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  color: var(--color-primary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-fast) var(--ease-out);
   flex-shrink: 0;
   opacity: 0;
 }
@@ -187,32 +189,32 @@ function resumeThread(id: string) {
 }
 
 .resume-button:hover {
-  background: rgba(192, 102, 127, 0.1);
+  background: var(--color-primary-ring);
 }
 
 .history-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: #7b7b7b;
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-tertiary);
 }
 
 .history-state.error {
-  color: #c23b3b;
+  color: var(--color-error);
 }
 
 .history-state .hint {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #9b7b7b;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
 }
 
 @media (max-width: 640px) {
   .history-page {
-    padding: 1.5rem 1rem;
+    padding: var(--space-6) var(--space-4);
   }
 
   .history-hero h1 {
-    font-size: 1.5rem;
+    font-size: var(--text-lg);
   }
 
   .thread-item {
