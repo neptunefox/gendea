@@ -5,11 +5,11 @@
     </NuxtLink>
 
     <div class="nav-links">
-      <NuxtLink to="/" class="nav-link" title="Ideas">
-        <Sparkles :size="20" />
+      <NuxtLink to="/" class="nav-link" title="Spark">
+        <Lightbulb :size="20" />
       </NuxtLink>
-      <NuxtLink to="/coach" class="nav-link" title="Coach">
-        <Hammer :size="20" />
+      <NuxtLink to="/oracle" class="nav-link" title="Oracle">
+        <HelpCircle :size="20" />
       </NuxtLink>
       <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
         <FlaskConical :size="20" />
@@ -21,11 +21,11 @@
   </nav>
 
   <nav class="app-nav-mobile">
-    <NuxtLink to="/" class="nav-link" title="Ideas">
-      <Sparkles :size="20" />
+    <NuxtLink to="/" class="nav-link" title="Spark">
+      <Lightbulb :size="20" />
     </NuxtLink>
-    <NuxtLink to="/coach" class="nav-link" title="Coach">
-      <Hammer :size="20" />
+    <NuxtLink to="/oracle" class="nav-link" title="Oracle">
+      <HelpCircle :size="20" />
     </NuxtLink>
     <NuxtLink to="/cauldron" class="nav-link" title="Cauldron">
       <FlaskConical :size="20" />
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { Sparkles, FlaskConical, Hammer, Clock } from 'lucide-vue-next'
+import { Lightbulb, HelpCircle, FlaskConical, Clock } from 'lucide-vue-next'
 </script>
 
 <style scoped>

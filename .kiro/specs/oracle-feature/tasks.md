@@ -41,12 +41,12 @@
     - Delete `lib/workflow-service.ts`
     - _Requirements: 1.1, 1.2_
 
-- [ ] 2. Clean up remaining references
-  - [ ] 2.1 Update AppNav to remove Canvas and Coach links
+- [x] 2. Clean up remaining references
+  - [x] 2.1 Update AppNav to remove Canvas and Coach links
     - Remove Coach link from navigation
     - Update icons: Spark uses Lightbulb, add Oracle with HelpCircle
     - _Requirements: 1.4, 9.1, 9.2, 9.3_
-  - [ ] 2.2 Clean up any broken imports across the codebase
+  - [x] 2.2 Clean up any broken imports across the codebase
     - Search for imports from deleted files
     - Remove or update references
     - _Requirements: 1.1, 1.2_

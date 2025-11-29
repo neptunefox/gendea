@@ -1,12 +1,5 @@
 <template>
   <div class="cauldron-page" @click="handleBackgroundClick">
-    <FlowGuidanceBanner
-      :suggestion="flowGuidance.currentSuggestion.value"
-      :is-visible="flowGuidance.isVisible.value"
-      @dismiss="flowGuidance.dismissSuggestion()"
-      @action="handleFlowGuidanceAction"
-    />
-
     <div class="cauldron-layout">
       <div v-if="isLoading" class="loading-state">
         <Loader :size="32" class="spin" />
@@ -48,7 +41,6 @@
             v-if="output"
             :output="output"
             @save="handleSaveOutput"
-            @save-and-build="handleSaveAndBuild"
             @reset="handleReset"
           />
 
@@ -103,8 +95,6 @@ import { ref, onMounted, watch } from 'vue'
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import { useFlowGuidance } from '~/composables/useFlowGuidance'
 
 interface FloatingIdea {
   id: string
@@ -133,8 +123,6 @@ interface CauldronSession {
 }
 
 const USER_ID = 'default-user'
-
-const flowGuidance = useFlowGuidance()
 
 const floatingIdeas = ref<FloatingIdea[]>([])
 const displayedIdeas = ref<FloatingIdea[]>([])
@@ -443,29 +431,6 @@ async function handleSaveOutput() {
   }
 }
 
-async function handleSaveAndBuild() {
-  if (!output.value || !currentSession.value) return
-
-  try {
-    const response = await $fetch<{ idea: { id: string } }>('/api/saved-ideas', {
-      method: 'POST',
-      body: {
-        text: output.value,
-        source: 'cauldron',
-        status: 'building',
-        isCauldronOutput: true,
-        cauldronSessionId: currentSession.value.id
-      }
-    })
-
-    showToastMessage('Saved - starting to build')
-    await navigateTo(`/coach/${response.idea.id}`)
-  } catch (error) {
-    console.error('Failed to save and build:', error)
-    showToastMessage('Failed to save')
-  }
-}
-
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
@@ -479,14 +444,6 @@ function triggerRemixHintPulse() {
   setTimeout(() => {
     remixHintPulse.value = false
   }, 600)
-}
-
-function handleFlowGuidanceAction() {
-  const suggestion = flowGuidance.currentSuggestion.value
-  if (suggestion?.id === 'cauldron-to-build' && output.value) {
-    flowGuidance.hideSuggestion()
-    handleSaveAndBuild()
-  }
 }
 
 async function streamMix(sessionId: string, isRemix = false) {
@@ -515,9 +472,6 @@ async function streamMix(sessionId: string, isRemix = false) {
         }
         if (data.done) {
           output.value = data.output
-          if (!isRemix) {
-            flowGuidance.showSuggestion(flowGuidance.suggestions.cauldronToBuild)
-          }
         }
         if (data.error) {
           showToastMessage('Failed to mix ideas')
@@ -550,7 +504,6 @@ watch(
 onMounted(async () => {
   await loadSession()
   await loadFloatingIdeas()
-  flowGuidance.initialize()
 })
 </script>
 

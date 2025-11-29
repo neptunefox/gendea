@@ -1,13 +1,6 @@
 <template>
   <div class="spark-page">
     <div class="spark-layout">
-      <FlowGuidanceBanner
-        :suggestion="flowGuidance.currentSuggestion.value"
-        :is-visible="flowGuidance.isVisible.value"
-        @dismiss="flowGuidance.dismissSuggestion()"
-        @action="handleFlowGuidanceAction"
-      />
-
       <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
         <textarea
           ref="inputField"
@@ -62,37 +55,10 @@
                 />
               </svg>
             </button>
-            <div v-if="idea.isCauldronOutput" class="cauldron-badge">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <path
-                  d="M8 12h8M12 8v8"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              Cauldron mix
-            </div>
-            <div class="idea-status" :data-status="idea.status">{{ idea.status }}</div>
             <p class="idea-text">{{ idea.text }}</p>
             <div class="idea-actions">
               <button class="action-btn" @click="handleExploreIdea(idea.text)">
                 Generate more
-              </button>
-              <button
-                v-if="idea.status === 'exploring' || idea.status === 'ready'"
-                class="action-btn primary"
-                @click="startBuilding(idea)"
-              >
-                Start building →
-              </button>
-              <button
-                v-else-if="idea.status === 'building'"
-                class="action-btn building"
-                @click="$router.push(`/coach/${idea.id}`)"
-              >
-                Continue building
               </button>
             </div>
           </div>
@@ -211,10 +177,6 @@ import { Loader, Check, BookmarkPlus, CornerDownRight, Split } from 'lucide-vue-
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import { useDragAndDrop } from '~/composables/useDragAndDrop'
-import { useFlowGuidance } from '~/composables/useFlowGuidance'
-
 interface SparkIdea {
   text: string
 }
@@ -284,8 +246,6 @@ const INPUT_HEIGHT_LIMIT = 100
 
 const router = useRouter()
 const route = useRoute()
-const { onDragStartSavedIdea, onDragEnd } = useDragAndDrop()
-const flowGuidance = useFlowGuidance()
 
 const isDraggingIdea = ref<string | null>(null)
 const generationCount = ref(0)
@@ -316,16 +276,18 @@ function clearSelection() {
 
 function handleIdeaDragStart(event: DragEvent, idea: SavedIdea) {
   isDraggingIdea.value = idea.id
-  onDragStartSavedIdea(event, {
-    id: idea.id,
-    text: idea.text,
-    isCauldronOutput: !!idea.isCauldronOutput
-  })
+  event.dataTransfer?.setData(
+    'application/json',
+    JSON.stringify({
+      id: idea.id,
+      text: idea.text,
+      source: 'saved'
+    })
+  )
 }
 
 function handleIdeaDragEnd() {
   isDraggingIdea.value = null
-  onDragEnd()
 }
 
 async function handleBranchSelected() {
@@ -378,9 +340,6 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
     }
 
     generationCount.value++
-    if (generationCount.value >= 2 && savedIdeas.value.length >= 2) {
-      flowGuidance.showSuggestion(flowGuidance.suggestions.sparkToCauldron)
-    }
   } catch (error: unknown) {
     console.error('Failed to generate ideas:', error)
     const message =
@@ -527,7 +486,6 @@ onMounted(async () => {
   fetchSavedIdeas()
   await nextTick()
   adjustInputHeight()
-  flowGuidance.initialize()
 })
 
 async function fetchSavedIdeas() {
@@ -574,33 +532,6 @@ async function resumeFromHistory(runId: string) {
   } finally {
     clearQueryParam('resume')
     resumingRunId.value = null
-  }
-}
-
-async function startBuilding(idea: SavedIdea) {
-  try {
-    await $fetch(`/api/saved-ideas/${idea.id}`, {
-      method: 'PATCH',
-      body: { status: 'building' }
-    })
-
-    const index = savedIdeas.value.findIndex(i => i.id === idea.id)
-    if (index !== -1) {
-      savedIdeas.value[index].status = 'building'
-    }
-
-    await router.push(`/coach/${idea.id}`)
-  } catch (error) {
-    console.error('Failed to start building:', error)
-    showToastMessage('Failed to start building')
-  }
-}
-
-function handleFlowGuidanceAction() {
-  const suggestion = flowGuidance.currentSuggestion.value
-  if (suggestion?.route) {
-    flowGuidance.hideSuggestion()
-    router.push(suggestion.route)
   }
 }
 
