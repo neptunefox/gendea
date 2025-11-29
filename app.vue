@@ -7,14 +7,13 @@
 
 <style>
 :root {
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
   color: #1f2937;
   background-color: #f9fafb;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01' on, 'ss02' on;
 }
 
 body {
