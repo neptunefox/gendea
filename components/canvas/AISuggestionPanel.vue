@@ -80,13 +80,12 @@ function handleApply() {
   left: 50%;
   transform: translateX(-50%);
   width: 320px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 117, 111, 0.3);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
   z-index: 50;
-  animation: slideUp 0.2s ease;
+  animation: slideUp 0.2s var(--ease-out);
 }
 
 @keyframes slideUp {
@@ -103,42 +102,42 @@ function handleApply() {
 .suggestion-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f0e5e0;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #40312b;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
 }
 
 .suggestion-icon {
-  color: #d4756f;
+  color: var(--color-primary);
 }
 
 .dismiss-btn {
   margin-left: auto;
-  padding: 0.25rem;
+  padding: var(--space-1);
   background: none;
   border: none;
-  color: #8b7a75;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.15s ease;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .dismiss-btn:hover {
-  background: rgba(212, 117, 111, 0.1);
-  color: #d4756f;
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
 }
 
 .suggestion-content {
-  padding: 0.75rem 1rem;
+  padding: var(--space-3) var(--space-4);
 }
 
 .suggestion-text {
-  margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
-  color: #40312b;
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -146,38 +145,38 @@ function handleApply() {
 .steps-info {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-1);
 }
 
 .cluster-item {
   display: flex;
   justify-content: space-between;
-  padding: 0.375rem 0.5rem;
-  background: rgba(212, 117, 111, 0.08);
-  border-radius: 4px;
-  font-size: 0.75rem;
+  padding: var(--space-2);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
 }
 
 .cluster-theme {
-  color: #40312b;
-  font-weight: 500;
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
 }
 
 .cluster-count {
-  color: #8b7a75;
+  color: var(--color-text-secondary);
 }
 
 .step-item {
-  padding: 0.375rem 0.5rem;
-  background: rgba(212, 117, 111, 0.08);
-  border-radius: 4px;
-  font-size: 0.75rem;
-  color: #40312b;
+  padding: var(--space-2);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text);
 }
 
 .suggestion-actions {
-  padding: 0.75rem 1rem;
-  border-top: 1px solid #f0e5e0;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
 }
 
 .action-btn {
@@ -185,23 +184,23 @@ function handleApply() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  padding: 0.625rem 1rem;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
   border: none;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+  background: var(--color-primary);
   color: white;
 }
 
 .action-btn.primary:hover:not(:disabled) {
-  box-shadow: 0 2px 8px rgba(212, 117, 111, 0.3);
+  background: var(--color-primary-hover);
 }
 
 .action-btn:disabled {
@@ -214,11 +213,7 @@ function handleApply() {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

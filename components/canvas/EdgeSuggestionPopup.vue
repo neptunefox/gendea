@@ -100,11 +100,11 @@ function handleDismiss() {
 .edge-suggestion-popup {
   position: fixed;
   z-index: 1000;
-  background: white;
-  border: 1px solid #f0e5e0;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  padding: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-3);
   min-width: 220px;
   transform: translate(-50%, -100%) translateY(-12px);
 }
@@ -112,11 +112,11 @@ function handleDismiss() {
 .suggestion-header {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #d4756f;
-  margin-bottom: 0.5rem;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -124,82 +124,82 @@ function handleDismiss() {
 .suggestion-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .suggested-type {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: var(--space-1);
 }
 
 .type-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #40312b;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
 }
 
 .suggested-label {
-  font-size: 0.75rem;
-  color: #8b7a75;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 
 .type-selector {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .type-btn {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 6px;
-  background: white;
-  font-size: 0.7rem;
-  color: #8b7a75;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .type-btn:hover {
-  border-color: #d4756f;
-  color: #d4756f;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .type-btn.active {
-  background: #d4756f;
-  border-color: #d4756f;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
 }
 
 .type-btn.suggested:not(.active) {
-  border-color: #d4756f;
-  color: #d4756f;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .label-input {
   width: 100%;
-  padding: 0.375rem 0.5rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  color: #40312b;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text);
 }
 
 .label-input:focus {
   outline: none;
-  border-color: #d4756f;
+  border-color: var(--color-primary);
 }
 
 .label-input::placeholder {
-  color: #b8a8a3;
+  color: var(--color-text-tertiary);
 }
 
 .suggestion-actions {
   display: flex;
-  gap: 0.375rem;
-  margin-top: 0.5rem;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .accept-btn {
@@ -207,37 +207,37 @@ function handleDismiss() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.375rem;
+  gap: var(--space-1);
+  padding: var(--space-2);
   border: none;
-  border-radius: 6px;
-  background: #d4756f;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
   color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .accept-btn:hover {
-  background: #c26660;
+  background: var(--color-primary-hover);
 }
 
 .dismiss-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 6px;
-  background: white;
-  color: #8b7a75;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .dismiss-btn:hover {
-  border-color: #c26660;
-  color: #c26660;
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 </style>

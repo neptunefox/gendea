@@ -160,13 +160,12 @@ function handleDelete() {
 .node-ai-toolbar {
   position: absolute;
   display: flex;
-  gap: 0.375rem;
-  padding: 0.375rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 117, 111, 0.2);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   z-index: 100;
   transform: translateX(-50%);
 }
@@ -174,21 +173,21 @@ function handleDelete() {
 .ai-btn {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
-  border: 1px solid #f0e5e0;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #40312b;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .ai-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  border-color: #d4756f;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
 }
 
@@ -198,23 +197,23 @@ function handleDelete() {
 }
 
 .ai-btn.loading {
-  background: rgba(212, 117, 111, 0.1);
+  background: var(--color-primary-subtle);
 }
 
 .toolbar-divider {
   width: 1px;
-  background: #f0e5e0;
-  margin: 0.25rem 0;
+  background: var(--color-border);
+  margin: var(--space-1) 0;
 }
 
 .delete-btn {
-  padding: 0.5rem;
+  padding: var(--space-2);
   justify-content: center;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c26660 0%, #a85550 100%);
-  border-color: #c26660;
+  background: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .spin {
@@ -222,11 +221,7 @@ function handleDelete() {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>
