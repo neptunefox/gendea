@@ -51,7 +51,7 @@
     - Remove or update references
     - _Requirements: 1.1, 1.2_
 
-- [ ] 3. Checkpoint - Ensure app builds and runs
+- [x] 3. Checkpoint - Ensure app builds and runs
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Phase 2: Simplify Spark Page and Idea Cards
