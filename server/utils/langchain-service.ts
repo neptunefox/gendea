@@ -97,6 +97,19 @@ class LangChainService {
   async generateStructured<T extends z.ZodType>(options: GenerateOptions<T>): Promise<z.infer<T>> {
     const { prompt, systemPrompt, schema, context = [] } = options
     const messages = this.buildMessages(prompt, systemPrompt, context)
+
+    if (this.config.provider === 'ollama') {
+      const ollamaModel = new ChatOllama({
+        baseUrl: this.config.baseURL,
+        model: this.config.model,
+        temperature: this.config.temperature,
+        format: 'json'
+      })
+      const response = await ollamaModel.invoke(messages)
+      const content = typeof response.content === 'string' ? response.content : ''
+      return schema.parse(JSON.parse(content))
+    }
+
     const structuredModel = this.model.withStructuredOutput(schema)
     return await structuredModel.invoke(messages)
   }
