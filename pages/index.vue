@@ -37,10 +37,7 @@
             v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
             :key="idea.id"
             class="idea-card"
-            :class="{
-              'cauldron-output': idea.isCauldronOutput,
-              dragging: isDraggingIdea === idea.id
-            }"
+            :class="{ dragging: isDraggingIdea === idea.id }"
             draggable="true"
             @dragstart="e => handleIdeaDragStart(e, idea)"
             @dragend="handleIdeaDragEnd"
@@ -59,6 +56,10 @@
             <div class="idea-actions">
               <button class="action-btn" @click="handleExploreIdea(idea.text)">
                 Generate more
+              </button>
+              <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
+                <HelpCircle :size="16" />
+                Ask Oracle
               </button>
             </div>
           </div>
@@ -173,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { Loader, Check, BookmarkPlus, CornerDownRight, Split } from 'lucide-vue-next'
+import { Loader, Check, BookmarkPlus, CornerDownRight, Split, HelpCircle } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -221,10 +222,7 @@ interface SparkRunRecord {
 interface SavedIdea {
   id: string
   text: string
-  status: 'exploring' | 'ready' | 'building' | 'done'
   createdAt: string
-  isCauldronOutput?: number
-  cauldronSessionId?: string
 }
 
 const STORAGE_KEY = 'spark-thread-journal'
@@ -491,11 +489,9 @@ onMounted(async () => {
 async function fetchSavedIdeas() {
   try {
     const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
-    savedIdeas.value = response.ideas.sort((a, b) => {
-      if (a.isCauldronOutput && !b.isCauldronOutput) return -1
-      if (!a.isCauldronOutput && b.isCauldronOutput) return 1
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    })
+    savedIdeas.value = response.ideas.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
   } catch (error) {
     console.error('Failed to fetch saved ideas:', error)
   }
@@ -504,6 +500,10 @@ async function fetchSavedIdeas() {
 function handleExploreIdea(text: string) {
   input.value = text
   handleGenerate(text)
+}
+
+function navigateToOracle(ideaId: string) {
+  router.push(`/oracle?idea=${ideaId}`)
 }
 
 async function resumeFromHistory(runId: string) {
@@ -707,9 +707,7 @@ watch(
   cursor: grab;
 }
 
-.idea-card.cauldron-output {
-  border-left: 3px solid var(--color-primary);
-}
+
 
 .idea-card:hover {
   box-shadow: var(--shadow-md);
@@ -747,45 +745,7 @@ watch(
   color: var(--color-primary);
 }
 
-.cauldron-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  background: var(--color-primary-subtle);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  color: var(--color-primary);
-  margin-bottom: var(--space-2);
-}
 
-.idea-status {
-  display: inline-block;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  text-transform: capitalize;
-  margin-bottom: var(--space-2);
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--color-text-secondary);
-}
-
-.idea-status[data-status='ready'] {
-  background: rgba(180, 83, 9, 0.1);
-  color: var(--color-warning);
-}
-
-.idea-status[data-status='building'] {
-  background: rgba(74, 124, 89, 0.1);
-  color: var(--color-success);
-}
-
-.idea-status[data-status='done'] {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--color-text-secondary);
-}
 
 .idea-text {
   margin: 0 0 var(--space-3) 0;
@@ -817,25 +777,10 @@ watch(
   border-color: var(--color-border-strong);
 }
 
-.action-btn.primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-}
-
-.action-btn.primary:hover {
-  background: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-}
-
-.action-btn.building {
-  background: var(--color-success);
-  border-color: var(--color-success);
-  color: white;
-}
-
-.action-btn.building:hover {
-  opacity: 0.9;
+.action-btn.oracle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 .collection-footer {

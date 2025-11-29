@@ -56,15 +56,15 @@
 
 ## Phase 2: Simplify Spark Page and Idea Cards
 
-- [ ] 4. Update saved idea cards
-  - [ ] 4.1 Remove building-related UI from idea cards
+- [x] 4. Update saved idea cards
+  - [x] 4.1 Remove building-related UI from idea cards
     - Remove "Start building" and "Continue building" buttons
     - Remove Cauldron badge/sparkle icon visual distinction
     - Remove testCommitment and testResult field displays
     - Remove northStar field display
     - Remove lastActiveView logic
     - _Requirements: 1.5, 7.1, 7.3, 7.4_
-  - [ ] 4.2 Add "Ask Oracle" action to saved idea cards
+  - [x] 4.2 Add "Ask Oracle" action to saved idea cards
     - Add button that navigates to `/oracle?idea={ideaId}`
     - Style as subtle action (appears on hover or always visible)
     - _Requirements: 7.2_
