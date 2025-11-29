@@ -2,18 +2,18 @@
 
 ## Phase 1: Remove Canvas and Coach Features
 
-- [ ] 1. Delete Canvas and Coach files
-  - [ ] 1.1 Delete Canvas pages and components
+- [x] 1. Delete Canvas and Coach files
+  - [x] 1.1 Delete Canvas pages and components
     - Delete `pages/canvas/[id].vue`
     - Delete `components/canvas/` directory and all contents
     - _Requirements: 1.1, 1.4_
-  - [ ] 1.2 Delete Coach pages and components
+  - [x] 1.2 Delete Coach pages and components
     - Delete `pages/coach/index.vue`
     - Delete `pages/coach/[id].vue`
     - Delete `components/coach/` directory and all contents
     - Delete `components/FlowGuidanceBanner.vue`
     - _Requirements: 1.2, 1.4_
-  - [ ] 1.3 Delete Canvas and Coach composables
+  - [x] 1.3 Delete Canvas and Coach composables
     - Delete `composables/useCanvas.ts`
     - Delete `composables/useCanvasAnimations.ts`
     - Delete `composables/useCanvasHistory.ts`
@@ -21,7 +21,7 @@
     - Delete `composables/useFlowGuidance.ts`
     - Delete `composables/useDragAndDrop.ts`
     - _Requirements: 1.1, 1.2_
-  - [ ] 1.4 Delete Canvas and Coach API routes
+  - [x] 1.4 Delete Canvas and Coach API routes
     - Delete `server/api/canvas/` directory and all contents
     - Delete `server/api/coach.post.ts`
     - Delete `server/api/coach-stream.post.ts`
@@ -34,7 +34,7 @@
     - Delete `server/api/ladder-steps.post.ts`
     - Delete `server/api/workflow/` directory
     - _Requirements: 1.1, 1.2_
-  - [ ] 1.5 Delete Canvas and Coach types and utilities
+  - [x] 1.5 Delete Canvas and Coach types and utilities
     - Delete `types/canvas.ts`
     - Delete `types/workflow.ts`
     - Delete `lib/workflow-machine.ts`
