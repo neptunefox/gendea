@@ -1,0 +1,54 @@
+# Implementation Plan
+
+- [ ] 1. Add mouse-based drag repositioning to FloatingIdea component
+  - [x] 1.1 Add repositioning state and drag offset tracking
+    - Add `isRepositioning` ref to track drag state
+    - Add `dragOffset` ref to store cursor-to-card offset
+    - _Requirements: 2.1, 2.2_
+  - [x] 1.2 Implement mouse event handlers for repositioning
+    - Add `handleMouseDown` to start drag and calculate offset
+    - Add `handleMouseMove` to update position during drag
+    - Add `handleMouseUp` to end drag and persist position
+    - Add global event listeners for mousemove/mouseup during drag
+    - _Requirements: 2.1, 2.2, 2.4_
+  - [x] 1.3 Add visual feedback styles for drag states
+    - Add grab cursor on hover
+    - Add grabbing cursor during drag
+    - Add scale and shadow effect during drag
+    - Elevate z-index during drag
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [x] 1.4 Pause drift animation during repositioning
+    - Add CSS class to disable animation when `isRepositioning` is true
+    - _Requirements: 2.3_
+
+- [ ] 2. Enhance position calculation with safe zone avoidance
+  - [x] 2.1 Extract position calculation to testable utility function
+    - Create `utils/floating-position.ts` with position generation logic
+    - Define safe zone interfaces and constants
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [x] 2.2 Implement safe zone collision detection
+    - Add `isInsideSafeZone` function for circle and rectangle zones
+    - Add `isPositionValid` function combining all safe zone checks
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [ ]* 2.3 Write property test for safe zone avoidance
+    - **Property 1: Safe Zone Avoidance**
+    - **Validates: Requirements 1.1, 1.2, 1.3**
+  - [x] 2.4 Implement card overlap detection
+    - Add `checkCardOverlap` function with 40px padding
+    - _Requirements: 1.4_
+  - [ ]* 2.5 Write property test for card spacing
+    - **Property 2: Card Spacing Maintained**
+    - **Validates: Requirements 1.4**
+
+- [ ] 3. Integrate position utility into FloatingIdea component
+  - [x] 3.1 Update FloatingIdea to use new position utility
+    - Import and use `generateSafePosition` from utility
+    - Pass viewport dimensions and existing positions
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [x] 3.2 Preserve cauldron drop functionality
+    - Ensure HTML5 dragstart still works for cauldron detection
+    - Test that dropping on cauldron adds ingredient
+    - _Requirements: 2.5_
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
