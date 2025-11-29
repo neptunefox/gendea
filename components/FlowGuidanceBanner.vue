@@ -47,12 +47,12 @@ function handleAction() {
 .flow-guidance-banner {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, rgba(255, 250, 245, 0.98) 0%, rgba(254, 245, 240, 0.98) 100%);
-  border: 1px solid rgba(212, 117, 111, 0.25);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(212, 117, 111, 0.15);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   backdrop-filter: blur(8px);
 }
 
@@ -62,45 +62,45 @@ function handleAction() {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, rgba(212, 117, 111, 0.15) 0%, rgba(212, 117, 111, 0.1) 100%);
-  border-radius: 8px;
-  color: #d4756f;
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .banner-message {
   flex: 1;
   margin: 0;
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.4;
 }
 
 .banner-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   flex-shrink: 0;
 }
 
 .action-btn {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.8125rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .action-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .dismiss-btn {
@@ -111,23 +111,23 @@ function handleAction() {
   height: 28px;
   background: transparent;
   border: none;
-  border-radius: 6px;
-  color: #b8a89d;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .dismiss-btn:hover {
-  background: rgba(212, 117, 111, 0.1);
-  color: #d4756f;
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
 }
 
 .slide-banner-enter-active {
-  transition: all 0.3s ease-out;
+  transition: all var(--duration-slow) var(--ease-out);
 }
 
 .slide-banner-leave-active {
-  transition: all 0.2s ease-in;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .slide-banner-enter-from {

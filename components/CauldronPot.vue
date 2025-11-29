@@ -272,9 +272,9 @@ defineExpose({
 }
 
 .hint-text {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #a85f59;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-primary);
   white-space: nowrap;
   padding-left: 4px;
 }
@@ -282,7 +282,8 @@ defineExpose({
 .hint-arrow {
   width: 100px;
   height: 60px;
-  color: #c9857f;
+  color: var(--color-primary);
+  opacity: 0.6;
   margin-top: -8px;
 }
 
@@ -467,8 +468,8 @@ defineExpose({
 }
 
 .ingredient-counter {
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   opacity: 0.9;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -479,7 +480,7 @@ defineExpose({
 }
 
 .streaming-text {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   line-height: 1.4;
   max-width: 240px;
   max-height: 60px;
@@ -520,10 +521,10 @@ defineExpose({
 }
 
 .ingredient-chip {
-  font-size: 0.6875rem;
-  padding: 0.125rem 0.5rem;
+  font-size: var(--text-xs);
+  padding: 0.125rem var(--space-2);
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   white-space: nowrap;
   max-width: 100px;
   overflow: hidden;
@@ -531,10 +532,10 @@ defineExpose({
 }
 
 .more-count {
-  font-size: 0.625rem;
-  padding: 0.125rem 0.375rem;
+  font-size: var(--text-xs);
+  padding: 0.125rem var(--space-1);
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   opacity: 0.9;
 }
 

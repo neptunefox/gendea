@@ -79,8 +79,8 @@ function getSteamStyle(index: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: var(--space-3);
+  padding: var(--space-4);
   z-index: 10;
 }
 
@@ -104,7 +104,7 @@ function getSteamStyle(index: number) {
   background: radial-gradient(
     circle,
     rgba(255, 255, 255, 0.6) 0%,
-    rgba(212, 117, 111, 0.2) 50%,
+    var(--color-primary-subtle) 50%,
     transparent 100%
   );
   border-radius: 50%;
@@ -132,15 +132,13 @@ function getSteamStyle(index: number) {
 
 .output-card {
   position: relative;
-  background: linear-gradient(135deg, #fef3f0 0%, #fce8e3 100%);
-  border: 2px solid #d4756f;
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
   max-width: 480px;
   width: 100%;
-  box-shadow:
-    0 8px 24px rgba(212, 117, 111, 0.2),
-    0 0 40px rgba(212, 117, 111, 0.1);
+  box-shadow: var(--shadow-xl);
   z-index: 2;
 }
 
@@ -150,71 +148,61 @@ function getSteamStyle(index: number) {
 }
 
 .output-title {
-  margin: 0 0 0.75rem 0;
-  color: #40312b;
-  font-size: 1.125rem;
-  font-weight: 700;
+  margin: 0 0 var(--space-3) 0;
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   text-align: center;
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .output-text {
-  color: #40312b;
-  font-size: 1rem;
+  color: var(--color-text);
+  font-size: var(--text-base);
   line-height: 1.6;
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 var(--space-5) 0;
   text-align: center;
 }
 
 .output-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .action-btn {
-  padding: 0.625rem 1.25rem;
+  padding: var(--space-2) var(--space-5);
   border: none;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-semibold);
   cursor: pointer;
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-  font-size: 0.875rem;
+  transition: all var(--duration-normal) var(--ease-out);
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-1);
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
+  background: var(--color-primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .action-btn.primary:hover {
-  background: linear-gradient(135deg, #c26660 0%, #b85850 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(212, 117, 111, 0.4);
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-lg);
 }
 
 .action-btn.secondary {
-  background: rgba(212, 117, 111, 0.08);
-  color: #d4756f;
-  border: 2px solid rgba(212, 117, 111, 0.25);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
 }
 
 .action-btn.secondary:hover {
-  background: rgba(212, 117, 111, 0.15);
-  border-color: #d4756f;
-  transform: translateY(-2px);
+  background: var(--color-primary-ring);
+  border-color: var(--color-primary);
 }
 
 .emerge-enter-active {
@@ -222,7 +210,7 @@ function getSteamStyle(index: number) {
 }
 
 .emerge-leave-active {
-  animation: fade-out 0.3s ease-out;
+  animation: fade-out var(--duration-slow) var(--ease-out);
 }
 
 @keyframes emerge {
@@ -253,19 +241,19 @@ function getSteamStyle(index: number) {
 
 @media (max-width: 768px) {
   .cauldron-output {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .output-card {
-    padding: 2rem 1.5rem;
+    padding: var(--space-8) var(--space-6);
   }
 
   .output-title {
-    font-size: 1.25rem;
+    font-size: var(--text-lg);
   }
 
   .output-text {
-    font-size: 1rem;
+    font-size: var(--text-base);
   }
 
   .output-actions {

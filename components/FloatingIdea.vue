@@ -292,21 +292,19 @@ onUnmounted(() => {
 .floating-idea {
   position: absolute;
   width: 200px;
-  padding: 0.875rem 1rem;
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
-  border: 2px solid #f0e5e0;
-  border-radius: 10px;
-  box-shadow:
-    0 2px 8px rgba(212, 117, 111, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.04);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   cursor: grab;
   user-select: none;
   pointer-events: auto;
   transition:
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    opacity 0.2s ease;
+    box-shadow var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out),
+    opacity var(--duration-normal) var(--ease-out);
 }
 
 .timer-ring {
@@ -315,12 +313,12 @@ onUnmounted(() => {
   right: 6px;
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   opacity: 0.85;
-  border: 1.5px solid rgba(212, 117, 111, 0.3);
+  border: 1.5px solid var(--color-primary-ring);
   transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+    opacity var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
 }
 
 .floating-idea:hover .timer-ring {
@@ -329,8 +327,8 @@ onUnmounted(() => {
 
 .floating-idea.urgent .timer-ring {
   opacity: 1;
-  border-color: #c9857f;
-  box-shadow: 0 0 6px rgba(201, 133, 127, 0.35);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary-ring);
   animation: pulse-urgent 1.2s ease-in-out infinite;
 }
 
@@ -338,11 +336,11 @@ onUnmounted(() => {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 6px rgba(201, 133, 127, 0.35);
+    box-shadow: 0 0 6px var(--color-primary-ring);
   }
   50% {
     transform: scale(1.15);
-    box-shadow: 0 0 8px rgba(201, 133, 127, 0.5);
+    box-shadow: 0 0 8px var(--color-primary-subtle);
   }
 }
 
@@ -350,44 +348,38 @@ onUnmounted(() => {
   opacity: 1;
   width: 14px;
   height: 14px;
-  border-color: rgba(126, 184, 201, 0.5);
-  box-shadow: 0 0 8px rgba(126, 184, 201, 0.6);
+  border-color: var(--color-info-subtle);
+  box-shadow: 0 0 8px var(--color-info-subtle);
   animation: pulse-frozen 2s ease-in-out infinite;
 }
 
 @keyframes pulse-frozen {
   0%,
   100% {
-    box-shadow: 0 0 8px rgba(126, 184, 201, 0.6);
+    box-shadow: 0 0 8px var(--color-info-subtle);
   }
   50% {
-    box-shadow: 0 0 12px rgba(126, 184, 201, 0.9);
+    box-shadow: 0 0 12px var(--color-info-subtle);
   }
 }
 
 .floating-idea:hover {
-  box-shadow:
-    0 4px 12px rgba(212, 117, 111, 0.15),
-    0 8px 24px rgba(0, 0, 0, 0.08);
-  border-color: #d4756f;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
   transform: translateY(-2px);
 }
 
 .floating-idea.dragging {
   cursor: grabbing;
   transform: scale(1.05);
-  box-shadow:
-    0 8px 24px rgba(212, 117, 111, 0.25),
-    0 12px 32px rgba(0, 0, 0, 0.15);
-  border-color: #d4756f;
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary);
 }
 
 .floating-idea.selected {
   width: 280px;
-  border-color: #d4756f;
-  box-shadow:
-    0 6px 20px rgba(212, 117, 111, 0.2),
-    0 10px 28px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-xl);
   transform: scale(1.02);
 }
 
@@ -417,9 +409,9 @@ onUnmounted(() => {
 }
 
 .idea-content {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   line-height: 1.45;
-  color: #40312b;
+  color: var(--color-text);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
