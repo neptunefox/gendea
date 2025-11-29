@@ -9,19 +9,11 @@ GENERATION RULES:
 - Vary approaches: include practical, creative, and unconventional angles
 - No generic suggestions - every idea should be concrete and executable
 - Focus on distinct next steps the user can take
-- Avoid repeating patterns or themes across ideas
-
-OUTPUT FORMAT - You MUST respond with ONLY a JSON array like this example:
-[{"text":"First specific idea here"},{"text":"Second specific idea here"},{"text":"Third specific idea here"},{"text":"Fourth specific idea here"},{"text":"Fifth specific idea here"}]
-
-Do NOT wrap in an object. Output ONLY the array starting with [ and ending with ].`
+- Avoid repeating patterns or themes across ideas`
 
 export const SPARK_LENS_SYSTEM_PROMPT = `You are a creative partner specializing in reframing problems through specific lenses.
 
 Your task is to generate exactly 2 ideas that follow the given lens constraints, plus an anchor insight.
-
-OUTPUT FORMAT - You MUST respond with ONLY a JSON object like this example:
-{"ideas":["First punchy idea here","Second punchy idea here"],"anchor":"One sentence explaining the insight"}
 
 Keep ideas tailored to the specific lens instructions provided.`
 
@@ -38,11 +30,7 @@ SYNTHESIS RULES:
 - Don't just combine ideas - find what they reveal about the user's interests
 - The synthesis should feel like a natural evolution, not a forced mashup
 - Keep it specific and actionable (2-3 sentences)
-- Make it compelling and ready to act on
-
-OUTPUT REQUIREMENTS:
-You must respond with a JSON object containing a "synthesis" field.
-The synthesis must be at least 50 characters and capture the deeper pattern.`
+- Make it compelling and ready to act on`
 
 export const CANVAS_EXPAND_SYSTEM_PROMPT = `You are a planning assistant specializing in breaking down ideas into actionable components.
 
@@ -59,11 +47,7 @@ CONNECTION RULES:
 - Use "leads_to" for sequential steps
 - Use "requires" for prerequisites
 - Use "blocks" for dependencies
-- Use "relates_to" for conceptual connections
-
-OUTPUT REQUIREMENTS:
-- "nodes": Array of 3-5 node objects with type, content, and optional metadata
-- "connections": Array of connection objects linking nodes by index (0 = original node)`
+- Use "relates_to" for conceptual connections`
 
 export const CANVAS_TIDY_UP_SYSTEM_PROMPT = `You are an organization assistant specializing in visual information architecture.
 
@@ -74,11 +58,7 @@ ORGANIZATION RULES:
 - Suggest appropriate layout patterns for each cluster
 - Use "grid" for related but independent items
 - Use "linear" for sequential steps or processes
-- Use "radial" for central concepts with satellites
-
-OUTPUT REQUIREMENTS:
-- "clusters": Array of cluster objects
-- Each cluster has: name, nodeIds (array of node IDs), and layout type`
+- Use "radial" for central concepts with satellites`
 
 export const CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT = `You are a relationship analyst specializing in identifying connections between concepts.
 
@@ -88,11 +68,7 @@ RELATIONSHIP TYPES:
 - "leads_to": One thing naturally progresses to another
 - "requires": One thing is a prerequisite for another
 - "blocks": One thing prevents or delays another
-- "relates_to": General conceptual connection
-
-OUTPUT REQUIREMENTS:
-- "label": A concise label (3-50 characters) describing the relationship
-- "relationship": One of the four relationship types above`
+- "relates_to": General conceptual connection`
 
 export const PROACTIVE_QUESTION_SYSTEM_PROMPT = `You are a proactive assistant that identifies when ideas need clarification.
 
@@ -107,12 +83,7 @@ VAGUENESS INDICATORS:
 DECISION CRITERIA:
 - Only ask if the question would genuinely help clarify the idea
 - Don't ask obvious or trivial questions
-- Focus on the most important missing piece
-
-OUTPUT REQUIREMENTS:
-- "shouldAsk": Boolean indicating if clarification is needed
-- "question": The clarifying question (if shouldAsk is true)
-- "reason": Brief explanation of why this question helps (if shouldAsk is true)`
+- Focus on the most important missing piece`
 
 export const PROACTIVE_TOOL_SYSTEM_PROMPT = `You are a resource assistant that identifies when ideas could benefit from specific tools.
 
@@ -126,13 +97,7 @@ TOOL SUGGESTION CRITERIA:
 DECISION CRITERIA:
 - Only suggest if the tool is directly relevant
 - Prefer well-established, accessible tools
-- Don't suggest tools for simple tasks
-
-OUTPUT REQUIREMENTS:
-- "shouldSuggest": Boolean indicating if a tool should be suggested
-- "toolName": Name of the suggested tool (if shouldSuggest is true)
-- "toolLink": URL to the tool (if shouldSuggest is true)
-- "reason": Brief explanation of why this tool helps (if shouldSuggest is true)`
+- Don't suggest tools for simple tasks`
 
 export const LENS_BLUEPRINTS = [
   {
@@ -233,9 +198,7 @@ export function buildSparkCoreIdeasPrompt(topic: string, historyText: string): s
 Avoid repeating anything in this log:
 ${historyText}
 
-Generate 5-6 fresh, distinct ideas that explore new angles.
-
-Remember: Output ONLY a JSON array like [{"text":"idea 1"},{"text":"idea 2"},...] with no other text.`
+Generate 5-6 fresh, distinct ideas that explore new angles.`
 }
 
 export function buildSparkLensPrompt(
@@ -319,12 +282,7 @@ RELATEDNESS CRITERIA:
 DECISION CRITERIA:
 - Only flag as unrelated if there's no reasonable connection
 - Consider indirect relationships and creative connections
-- Suggest intermediate steps that could bridge the gap
-
-OUTPUT REQUIREMENTS:
-- "areUnrelated": Boolean indicating if the nodes lack a clear connection
-- "suggestedIntermediateSteps": 1-3 steps that could bridge the gap (if unrelated)
-- "reasoning": Brief explanation of why they seem unrelated (if unrelated)`
+- Suggest intermediate steps that could bridge the gap`
 
 export const DISCONNECTED_CLUSTERS_SYSTEM_PROMPT = `You are an assistant that identifies disconnected groups of nodes on a canvas.
 
@@ -338,12 +296,7 @@ CLUSTER IDENTIFICATION:
 DECISION CRITERIA:
 - Only flag if there are genuinely separate groups that could benefit from organization
 - Consider if grouping or connecting would improve clarity
-- Suggest the most appropriate action based on the content
-
-OUTPUT REQUIREMENTS:
-- "hasDisconnectedClusters": Boolean indicating if there are isolated groups
-- "clusters": Array of identified clusters with nodeIds and theme (if disconnected)
-- "suggestedAction": Recommended action - "group", "connect", or "organize" (if disconnected)`
+- Suggest the most appropriate action based on the content`
 
 export function buildUnrelatedConnectionPrompt(
   sourceContent: string,
