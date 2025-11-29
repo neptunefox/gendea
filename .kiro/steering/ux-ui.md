@@ -1,80 +1,114 @@
 ## UX & UI
 
-### Core Principle: Memorable & Purposeful
+### Core Principle
 
-The app should feel like a place users are **building something**, not just using a tool. Every visit should show visible progress and momentum.
+The app helps users generate ideas. Every screen should make the next action obvious and the current state clear. Reduce friction, increase momentum.
 
-### Visual Weight & Hierarchy
+### Visual Weight
 
-- Reduce visual weight by minimizing layers, containers, and nesting. Flat structures feel lighter than deeply nested ones.
-- Question every wrapper element - if it only exists for styling, consider applying styles directly to the content.
-- Avoid redundant information displays. If data is visible elsewhere on the page, don't repeat it.
-- Remove metadata that explains the system rather than helping the user act.
+- Minimize layers, containers, and nesting - flat structures feel lighter
+- Question every wrapper element - if it only exists for styling, apply styles directly
+- Remove metadata that explains the system rather than helping the user act
+- If data is visible elsewhere on the page, don't repeat it
 
-### Component Patterns
+### Layout & Spacing
 
-- Follow familiar UI patterns: buttons inside inputs (like search bars), not separated below them.
-- Position action buttons where users expect them - inside or overlapping the input area, not as a separate row.
-- Use icons that clearly communicate intent. When in doubt, add a tooltip that appears on hover.
-- Avoid creating drawers/panels for content that's already accessible via navigation.
+- Use generous whitespace - cramped layouts feel anxious
+- Group related elements tightly, separate unrelated elements clearly
+- One primary action per screen - secondary actions should be visually quieter
+- Inputs and their submit buttons belong together, not in separate rows
 
-### Information Architecture
+### Typography
 
-- **Show progress first**: Momentum stats and saved collection should be the first thing users see
-- Don't duplicate navigation. If there's a nav link to a page, don't also add a button in the content area.
-- Show progress and context through the content itself, not through separate status displays.
-- Keep everything in one place when possible - avoid forcing navigation between related features.
+- Headings should be scannable - users skim before reading
+- Body text should be readable at a glance - short lines, adequate line-height
+- Labels only when the element isn't self-explanatory
+- Error messages should be specific and actionable
 
-### Interaction Design
+### Color & Contrast
 
-- **Make actions clear**: Button labels should describe exactly what will happen (e.g., "Generate more" not "Explore")
-- Group related controls tightly and pair each action with context so intent reads instantly.
-- Keep momentum visible by showing where someone is in the flow and what the next step is.
-- Proximity between output and action beats distant controls.
-- Limit simultaneous decisions on any view - gate options behind filters or tiers so the default state feels calm.
-- **Hover states should be functional**: Reduce lift/rotation on hover if it makes buttons hard to click (2px max lift).
+- Warm palette: coral/terracotta (#d4756f) primary, cream backgrounds (#FAFAF9)
+- Dark mode for Oracle only - inverted theme signals different thinking mode
+- Cauldron uses purple accent (#9575cd) for mystical identity
+- Success: forest green (#4A7C59), Error: muted red (#C26660)
+- Sufficient contrast for accessibility - don't sacrifice readability for aesthetics
 
-### Visual Personality
+### Visual Identity per Feature
 
-- **Warm color palette**: Use coral/terracotta (#d4756f) as primary, with peachy gradients and cream backgrounds
-- **Pin aesthetic**: Saved items should feel like physical pins with tacks, slight rotations, and shadows
-- **Unique hover behaviors**: Use nth-child to give each item a unique tilt direction based on position
-- **Subtle animations**: Cards should feel organic but not interfere with usability
+- **Spark**: Warm, bright, creative energy - the generative heart of the app
+- **Oracle**: Dark, contemplative, inverted - a different mode of thinking
+- **Cauldron**: Mystical, bubbling, playful - mixing and synthesis
+- **History**: Quiet, archival, simple - just retrieval
+
+### Animations & Transitions
+
+- Transitions should be fast (150-200ms) and purposeful
+- Use animations to show state change, not for decoration
+- Loading states should feel alive - subtle motion, not static spinners
+- Stagger animations when multiple items appear (50-100ms delay between)
+- Respect prefers-reduced-motion
+
+### Hover & Interactive States
+
+- Max 2px lift on hover - more feels jumpy and hard to click
+- Hover should preview the action, not just highlight
+- Clickable elements need visible affordance even before hover
+- Touch targets minimum 44px
+
+### Empty & Loading States
+
+- Empty states should guide: "Here's how to get started"
+- Loading should indicate progress when possible
+- Never show blank screens - skeleton or message always
+
+### Toasts & Feedback
+
+- Position: top-right, near where attention naturally goes
+- Auto-dismiss after 2-3 seconds
+- Light background with warm border
+- Success feedback should be brief; errors need more detail
 
 ### Navigation
 
-- **Minimal floating nav**: Top-right corner, transparent with blur, fades in on hover
-- **Icon-only links**: Keep it unobtrusive, let content be the focus
-- No heavy nav bars that take attention away from the main content
+- Minimal, icon-only sidebar on desktop
+- Bottom nav on mobile
+- Never duplicate navigation in content area
+- Current page should be visually indicated
 
-### Notifications
+### Forms & Inputs
 
-- **Top-right toasts**: Near the nav where eyes naturally go
-- **Light theme**: White background with warm border to match app aesthetic
-- **Auto-dismiss**: 2-3 seconds, don't require interaction
+- Inline validation where possible
+- Submit on Enter when there's a single input
+- Clear button inside inputs when content exists
+- Placeholder text should be example content, not instructions
 
-### Error Handling
+### Cards & Lists
 
-- **Never show static fallback content**: Let errors surface with clear messages
-- **Actionable error messages**: Tell users what went wrong and what to try
-- **No generic placeholders**: If generation fails, show the actual error, not dummy content
+- Cards should be scannable - key info visible without expanding
+- Actions on cards appear on hover or are always visible if primary
+- Avoid accordions unless content is genuinely optional
+- Lists should feel like collections, not admin tables
 
-### Content Restoration
+### Modals & Overlays
 
-- When resurfacing saved work, restore identifiers, timestamps, and contents automatically so users can continue without rebuilding context.
-- **Real-time updates**: When users save/delete items, update the UI immediately without page reload
+- Use sparingly - prefer inline expansion
+- Always have a clear close action
+- Click outside to dismiss for non-critical modals
+- Don't stack modals
 
-### Context Preservation
+### Responsive Behavior
 
-- **Branching preserves context**: When branching from an idea, pass full conversation history to AI
-- **Fresh starts are clean**: Regular generation from input should start with empty context
-- **Visual indicators**: Show when something is branched with icons and parent references
+- Mobile-first: design for smallest screen, enhance for larger
+- Touch targets must work with thumbs
+- Horizontal scrolling is never acceptable for primary content
+- Sidebar collapses to bottom nav on mobile
 
-### When Reviewing UI
+### Quality Checklist
 
-- Ask: "Does this make users feel like they're building a collection?"
-- Ask: "Is this information already visible elsewhere?"
-- Ask: "Does this container add value or just visual weight?"
-- Ask: "Would a first-time user understand this without the label?"
-- Ask: "Is this following a familiar pattern users know from other apps?"
-- Ask: "Does this create momentum or just look pretty?"
+Before shipping any UI:
+- Does a first-time user understand this without explanation?
+- Is the primary action obvious?
+- Does this screen have only one job?
+- Would this look intentional in a screenshot?
+- Are interactive elements clearly clickable?
+- Does the animation serve a purpose?
