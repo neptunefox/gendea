@@ -14,6 +14,10 @@
               <Save :size="18" />
               Save
             </button>
+            <button class="action-btn oracle" @click="$emit('askOracle')">
+              <HelpCircle :size="18" />
+              Ask Oracle
+            </button>
             <button class="action-btn secondary" @click="$emit('reset')">
               <RotateCcw :size="18" />
               Start fresh
@@ -26,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Save, RotateCcw } from 'lucide-vue-next'
+import { HelpCircle, Save, RotateCcw } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
 interface Props {
@@ -37,6 +41,7 @@ const props = defineProps<Props>()
 
 defineEmits<{
   save: []
+  askOracle: []
   reset: []
 }>()
 
@@ -187,6 +192,17 @@ function getSteamStyle(index: number) {
 .action-btn.primary:hover {
   background: var(--color-primary-hover);
   box-shadow: var(--shadow-lg);
+}
+
+.action-btn.oracle {
+  background: #292524;
+  color: #FAFAF9;
+  border: 1px solid #3f3a36;
+}
+
+.action-btn.oracle:hover {
+  background: #3f3a36;
+  border-color: #d4756f;
 }
 
 .action-btn.secondary {

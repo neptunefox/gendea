@@ -41,6 +41,7 @@
             v-if="output"
             :output="output"
             @save="handleSaveOutput"
+            @ask-oracle="handleAskOracle"
             @reset="handleReset"
           />
 
@@ -428,6 +429,29 @@ async function handleSaveOutput() {
   } catch (error) {
     console.error('Failed to save output:', error)
     showToastMessage('Failed to save')
+  }
+}
+
+async function handleAskOracle() {
+  if (!output.value || !currentSession.value) return
+
+  try {
+    const { idea } = await $fetch<{ idea: { id: string } }>('/api/saved-ideas', {
+      method: 'POST',
+      body: {
+        text: output.value,
+        source: 'cauldron',
+        status: 'exploring',
+        isCauldronOutput: true,
+        cauldronSessionId: currentSession.value.id
+      }
+    })
+
+    await handleReset()
+    await navigateTo(`/oracle?idea=${idea.id}`)
+  } catch (error) {
+    console.error('Failed to save and navigate to Oracle:', error)
+    showToastMessage('Failed to ask Oracle')
   }
 }
 

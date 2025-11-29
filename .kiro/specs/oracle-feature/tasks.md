@@ -71,8 +71,8 @@
 
 ## Phase 3: Update Cauldron with Oracle Integration
 
-- [ ] 5. Add Oracle integration to Cauldron output
-  - [ ] 5.1 Update CauldronOutput component
+- [x] 5. Add Oracle integration to Cauldron output
+  - [x] 5.1 Update CauldronOutput component
     - Add "Ask Oracle" button alongside existing "Save" button
     - Implement handler that saves idea then navigates to Oracle
     - _Requirements: 8.1, 8.2, 8.3_
