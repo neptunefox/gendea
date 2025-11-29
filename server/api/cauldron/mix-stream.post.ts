@@ -33,9 +33,7 @@ export default defineEventHandler(async event => {
     throw createError({ statusCode: 400, message: 'At least 3 ingredients required' })
   }
 
-  const ingredientsList = ingredients
-    .map((ing, idx) => `${idx + 1}. ${ing.content}`)
-    .join('\n')
+  const ingredientsList = ingredients.map((ing, idx) => `${idx + 1}. ${ing.content}`).join('\n')
 
   const prompt = `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling, actionable idea (2-3 sentences). Don't output JSON, just write the synthesis directly as plain text:
 

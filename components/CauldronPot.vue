@@ -14,14 +14,9 @@
     <div class="universe-interior">
       <div class="nebula-layer"></div>
       <div class="stars-layer">
-        <div
-          v-for="star in stars"
-          :key="star.id"
-          class="star"
-          :style="star.style"
-        ></div>
+        <div v-for="star in stars" :key="star.id" class="star" :style="star.style"></div>
       </div>
-      <div class="shooting-star" v-if="isMixing || isDragOver"></div>
+      <div v-if="isMixing || isDragOver" class="shooting-star"></div>
     </div>
 
     <div class="liquid-rim"></div>
@@ -29,8 +24,21 @@
     <div v-if="ingredients.length === 0" class="drop-hint">
       <span class="hint-text">drop ideas here</span>
       <svg class="hint-arrow" viewBox="0 0 100 60" fill="none">
-        <path d="M8 10 C30 8, 50 20, 70 40 C80 52, 88 55, 92 52" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
-        <path d="M85 58 L93 52 L86 46" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path
+          d="M8 10 C30 8, 50 20, 70 40 C80 52, 88 55, 92 52"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          fill="none"
+        />
+        <path
+          d="M85 58 L93 52 L86 46"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        />
       </svg>
     </div>
 
@@ -77,7 +85,6 @@
     <transition name="dissolve">
       <div v-if="showManualAddEffect" class="manual-add-particle"></div>
     </transition>
-
   </div>
 </template>
 
@@ -280,7 +287,8 @@ defineExpose({
 }
 
 @keyframes hint-bob {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -292,7 +300,6 @@ defineExpose({
 .cauldron-pot.has-ingredients .drop-hint {
   display: none;
 }
-
 
 .cauldron-pot.drag-over {
   transform: scale(1.03);
@@ -331,7 +338,7 @@ defineExpose({
 .nebula-layer {
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(ellipse at 30% 40%, rgba(147, 51, 234, 0.6) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 60%, rgba(236, 72, 153, 0.5) 0%, transparent 45%),
     radial-gradient(ellipse at 50% 30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
@@ -345,7 +352,8 @@ defineExpose({
 }
 
 @keyframes nebula-shift {
-  0%, 100% {
+  0%,
+  100% {
     filter: hue-rotate(0deg) brightness(1);
   }
   50% {
@@ -383,7 +391,8 @@ defineExpose({
 }
 
 @keyframes twinkle {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     transform: scale(1);
   }
@@ -401,7 +410,7 @@ defineExpose({
   border-radius: 50%;
   top: 30%;
   left: 20%;
-  box-shadow: 
+  box-shadow:
     0 0 6px 2px rgba(255, 255, 255, 0.8),
     -20px 0 15px 1px rgba(255, 255, 255, 0.4),
     -40px 0 20px 0px rgba(255, 255, 255, 0.2);
@@ -492,8 +501,14 @@ defineExpose({
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .ingredients-list {

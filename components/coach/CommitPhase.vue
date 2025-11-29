@@ -8,7 +8,9 @@
     <div v-if="isGenerating" class="generating-state">
       <div class="generating-header">
         <Loader :size="24" class="spin" />
-        <p>Crafting test ideas<span class="dots"><span>.</span><span>.</span><span>.</span></span></p>
+        <p>
+          Crafting test ideas<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+        </p>
       </div>
 
       <div class="streaming-tests">
@@ -25,7 +27,11 @@
           </div>
         </div>
 
-        <div v-for="n in (3 - streamingTests.length)" :key="'placeholder-' + n" class="test-placeholder">
+        <div
+          v-for="n in 3 - streamingTests.length"
+          :key="'placeholder-' + n"
+          class="test-placeholder"
+        >
           <div class="placeholder-number">{{ streamingTests.length + n }}</div>
           <div class="placeholder-lines">
             <div class="placeholder-line long"></div>
@@ -206,10 +212,10 @@ async function generateTests() {
 
 function updateStreamingTests(text: string) {
   const tests: TestSuggestion[] = []
-  
+
   const testMatches = text.matchAll(/"description"\s*:\s*"([^"]+)"/g)
   const signalMatches = [...text.matchAll(/"successSignal"\s*:\s*"([^"]+)"/g)]
-  
+
   let i = 0
   for (const match of testMatches) {
     tests.push({
@@ -218,14 +224,14 @@ function updateStreamingTests(text: string) {
     })
     i++
   }
-  
+
   streamingTests.value = tests.slice(0, 3)
 }
 
 function parseTestsFromStream(text: string) {
   const tests: TestSuggestion[] = []
   const jsonMatches = text.match(/\{[^{}]*"test"[^{}]*\{[^{}]*\}[^{}]*\}/g)
-  
+
   if (jsonMatches) {
     for (const match of jsonMatches) {
       try {
@@ -338,13 +344,25 @@ async function saveCommitment() {
   opacity: 0;
 }
 
-.dots span:nth-child(1) { animation-delay: 0s; }
-.dots span:nth-child(2) { animation-delay: 0.2s; }
-.dots span:nth-child(3) { animation-delay: 0.4s; }
+.dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes dotPulse {
-  0%, 60%, 100% { opacity: 0; }
-  30% { opacity: 1; }
+  0%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
 }
 
 .streaming-tests {
@@ -406,12 +424,20 @@ async function saveCommitment() {
   animation: shimmer 1.5s infinite;
 }
 
-.placeholder-line.long { width: 85%; }
-.placeholder-line.short { width: 55%; }
+.placeholder-line.long {
+  width: 85%;
+}
+.placeholder-line.short {
+  width: 55%;
+}
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .spin {

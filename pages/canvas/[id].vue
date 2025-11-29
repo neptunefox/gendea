@@ -267,11 +267,7 @@
               <Lightbulb :size="16" />
               <span>Saved Ideas</span>
             </div>
-            <button
-              class="panel-toggle"
-              title="Hide panel"
-              @click="isIdeasPanelCollapsed = true"
-            >
+            <button class="panel-toggle" title="Hide panel" @click="isIdeasPanelCollapsed = true">
               <ChevronRight :size="14" />
             </button>
           </div>

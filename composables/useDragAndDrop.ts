@@ -5,7 +5,6 @@ import { useCanvasAnimations } from './useCanvasAnimations'
 
 import type { CanvasNodeType } from '~/components/canvas/nodes'
 
-
 interface SavedIdeaDragData {
   id: string
   text: string
@@ -283,7 +282,11 @@ export function useDragAndDrop() {
       addNodes(createdNodes)
       markNodesStaggered(createdNodes.map(n => n.id))
       for (const node of createdNodes) {
-        onNodeAddedCallback?.(node.id, { type: node.type, position: node.position, data: node.data })
+        onNodeAddedCallback?.(node.id, {
+          type: node.type,
+          position: node.position,
+          data: node.data
+        })
       }
     }
 

@@ -1,4 +1,5 @@
 import { createError, setResponseHeader } from 'h3'
+
 import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async event => {
@@ -47,7 +48,11 @@ Generate 3 smallest honest tests to validate this idea. Output each test as a se
         controller.close()
       } catch (error) {
         console.error('Stream error:', error)
-        controller.enqueue(encoder.encode(`data: {"error":"${error instanceof Error ? error.message : 'Stream failed'}"}\n\n`))
+        controller.enqueue(
+          encoder.encode(
+            `data: {"error":"${error instanceof Error ? error.message : 'Stream failed'}"}\n\n`
+          )
+        )
         controller.close()
       }
     }
@@ -98,7 +103,9 @@ async function streamOllama(
       try {
         const chunk = JSON.parse(line)
         if (chunk.message?.content) {
-          controller.enqueue(encoder.encode(`data: {"token":"${escapeJson(chunk.message.content)}"}\n\n`))
+          controller.enqueue(
+            encoder.encode(`data: {"token":"${escapeJson(chunk.message.content)}"}\n\n`)
+          )
         }
       } catch {
         // Skip malformed lines
@@ -124,7 +131,7 @@ async function streamOpenRouter(
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
       'HTTP-Referer': 'http://localhost:3000',
       'X-Title': 'Idea Studio'

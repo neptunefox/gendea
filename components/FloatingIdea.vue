@@ -2,7 +2,13 @@
   <div
     ref="ideaRef"
     class="floating-idea"
-    :class="{ dragging: isDragging, dissolving: isDissolving, urgent: isUrgent, selected: isSelected, frozen: isFrozen }"
+    :class="{
+      dragging: isDragging,
+      dissolving: isDissolving,
+      urgent: isUrgent,
+      selected: isSelected,
+      frozen: isFrozen
+    }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
     @touchstart="handleTouchStart"
@@ -92,7 +98,9 @@ const positionStyle = computed(() => {
     left: `${leftPos}px`,
     top: `${position.value.y}px`,
     zIndex: computedZIndex.value,
-    transition: isDragging.value ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.2s ease'
+    transition: isDragging.value
+      ? 'none'
+      : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.2s ease'
   }
 })
 
@@ -190,25 +198,25 @@ function handleTouchEnd(event: TouchEvent) {
 
 function endDrag(clientX: number, clientY: number) {
   if (!isDragging.value) return
-  
+
   const wasClick = !hasDragged.value
-  
+
   if (ideaRef.value) {
     ideaRef.value.style.pointerEvents = 'none'
     ideaRef.value.style.visibility = 'hidden'
   }
-  
+
   const dropTarget = document.elementFromPoint(clientX, clientY)
   const cauldronPot = dropTarget?.closest('.cauldron-pot')
-  
+
   if (ideaRef.value) {
     ideaRef.value.style.pointerEvents = ''
     ideaRef.value.style.visibility = ''
   }
-  
+
   isDragging.value = false
   zIndex.value = 10 + props.index
-  
+
   if (cauldronPot) {
     emit('dropped', props.idea, { clientX, clientY })
   } else {
@@ -217,7 +225,7 @@ function endDrag(clientX: number, clientY: number) {
       emit('select', props.idea)
     }
   }
-  
+
   emit('dragEnd')
 }
 
@@ -258,9 +266,12 @@ defineExpose({
   resetTimer
 })
 
-watch(() => props.idea.id, () => {
-  resetTimer()
-})
+watch(
+  () => props.idea.id,
+  () => {
+    resetTimer()
+  }
+)
 
 onMounted(() => {
   updatePositionForViewport()
@@ -307,7 +318,9 @@ onUnmounted(() => {
   border-radius: 50%;
   opacity: 0.85;
   border: 1.5px solid rgba(212, 117, 111, 0.3);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .floating-idea:hover .timer-ring {
@@ -322,8 +335,15 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-urgent {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 6px rgba(201, 133, 127, 0.35); }
-  50% { transform: scale(1.15); box-shadow: 0 0 8px rgba(201, 133, 127, 0.5); }
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 6px rgba(201, 133, 127, 0.35);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 8px rgba(201, 133, 127, 0.5);
+  }
 }
 
 .timer-ring.frozen {
@@ -336,8 +356,13 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-frozen {
-  0%, 100% { box-shadow: 0 0 8px rgba(126, 184, 201, 0.6); }
-  50% { box-shadow: 0 0 12px rgba(126, 184, 201, 0.9); }
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(126, 184, 201, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(126, 184, 201, 0.9);
+  }
 }
 
 .floating-idea:hover {

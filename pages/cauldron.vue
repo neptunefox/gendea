@@ -73,7 +73,10 @@
             <Sparkles :size="14" />
             <span v-if="output">Drop ideas or type above to remix your result</span>
             <span v-else-if="isMixing">Keep adding ideas to refine</span>
-            <span v-else-if="ingredients.length > 0">{{ 3 - ingredients.length }} more {{ ingredients.length === 2 ? 'idea' : 'ideas' }} to start mixing</span>
+            <span v-else-if="ingredients.length > 0"
+              >{{ 3 - ingredients.length }} more
+              {{ ingredients.length === 2 ? 'idea' : 'ideas' }} to start mixing</span
+            >
             <span v-else>Drop or type ideas to begin</span>
           </p>
         </div>
@@ -148,10 +151,15 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
-const ideaRefs = ref<Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>>(new Map())
+const ideaRefs = ref<
+  Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>
+>(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
 
-function setIdeaRef(ideaId: string, el: { dissolve: () => void; resetTimer: (duration?: number) => void } | null) {
+function setIdeaRef(
+  ideaId: string,
+  el: { dissolve: () => void; resetTimer: (duration?: number) => void } | null
+) {
   if (el) {
     ideaRefs.value.set(ideaId, el)
   } else {
@@ -268,7 +276,10 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
     ideaRef.dissolve()
   }
 
-  if (cauldronPotRef.value && typeof cauldronPotRef.value.triggerManualAddAnimation === 'function') {
+  if (
+    cauldronPotRef.value &&
+    typeof cauldronPotRef.value.triggerManualAddAnimation === 'function'
+  ) {
     cauldronPotRef.value.triggerManualAddAnimation()
   }
 

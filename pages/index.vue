@@ -461,8 +461,6 @@ function scrollToInput() {
   inputSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
-
-
 function focusInput() {
   nextTick(() => {
     inputField.value?.focus()
