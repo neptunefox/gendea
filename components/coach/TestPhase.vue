@@ -128,39 +128,39 @@ async function reschedule() {
 
 <style scoped>
 .test-phase {
-  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
-  border: 1px solid #f0e5e0;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
 }
 
 .phase-header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 .phase-header h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .phase-subtitle {
-  font-size: 1.0625rem;
-  color: #8a7566;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .commitment-display {
   display: flex;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: white;
-  border: 2px solid #d4756f;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 16px rgba(212, 117, 111, 0.15);
+  gap: var(--space-6);
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-8);
+  box-shadow: var(--shadow-lg);
 }
 
 .commitment-icon {
@@ -173,61 +173,61 @@ async function reschedule() {
 }
 
 .commitment-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #d4756f;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 var(--space-2) 0;
 }
 
 .commitment-text {
-  font-size: 1.125rem;
-  color: #40312b;
-  margin: 0 0 1rem 0;
-  font-weight: 600;
+  font-size: var(--text-lg);
+  color: var(--color-text);
+  margin: 0 0 var(--space-4) 0;
+  font-weight: var(--weight-semibold);
 }
 
 .commitment-text strong {
-  color: #d4756f;
+  color: var(--color-primary);
 }
 
 .commitment-description {
-  font-size: 0.9375rem;
-  color: #40312b;
-  margin: 0 0 0.75rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-3) 0;
   line-height: 1.6;
 }
 
 .commitment-signal {
-  font-size: 0.875rem;
-  color: #8a7566;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .test-actions {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .primary-btn {
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+  transition: all var(--duration-normal) var(--ease-out);
+  box-shadow: var(--shadow-md);
   width: 100%;
 }
 
 .primary-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-lg);
 }
 
 .primary-btn:disabled {
@@ -237,27 +237,27 @@ async function reschedule() {
 }
 
 .primary-btn.large {
-  font-size: 1.125rem;
-  padding: 1.125rem 2rem;
+  font-size: var(--text-lg);
+  padding: var(--space-4) var(--space-8);
 }
 
 .ghost-btn {
-  padding: 0.875rem 1.25rem;
+  padding: var(--space-3) var(--space-5);
   background: transparent;
-  border: 1px solid rgba(212, 117, 111, 0.25);
-  border-radius: 10px;
-  color: #8a7566;
-  font-weight: 600;
-  font-size: 0.9375rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
   width: 100%;
 }
 
 .ghost-btn:hover {
-  background: rgba(255, 215, 189, 0.2);
-  border-color: rgba(212, 117, 111, 0.4);
-  color: #d4756f;
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .modal-overlay {
@@ -271,69 +271,69 @@ async function reschedule() {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: var(--space-4);
 }
 
 .modal-card {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-xl);
 }
 
 .modal-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .modal-hint {
-  font-size: 0.9375rem;
-  color: #8a7566;
-  margin: 0 0 1.5rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-6) 0;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #40312b;
-  margin-bottom: 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.875rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 10px;
-  font-size: 0.9375rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #d4756f;
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
 }
 
 .modal-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top: var(--space-6);
 }
 
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-slow) var(--ease-out);
 }
 
 .modal-enter-from,

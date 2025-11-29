@@ -295,48 +295,48 @@ async function saveCommitment() {
 
 <style scoped>
 .commit-phase {
-  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
-  border: 1px solid #f0e5e0;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
 }
 
 .phase-header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-8);
 }
 
 .phase-header h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .phase-subtitle {
-  font-size: 1.0625rem;
-  color: #8a7566;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .generating-state {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1rem 0;
+  gap: var(--space-6);
+  padding: var(--space-4) 0;
 }
 
 .generating-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  color: #8a7566;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
 }
 
 .generating-header p {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
 
 .dots span {
@@ -368,7 +368,7 @@ async function saveCommitment() {
 .streaming-tests {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .test-option.streaming {
@@ -387,11 +387,11 @@ async function saveCommitment() {
 .test-placeholder {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.4);
-  border: 2px dashed #e8ddd8;
-  border-radius: 12px;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-bg);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .placeholder-number {
@@ -401,26 +401,26 @@ async function saveCommitment() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8ddd8;
-  color: #b8a89d;
-  border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.875rem;
+  background: var(--color-border);
+  color: var(--color-text-tertiary);
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
 }
 
 .placeholder-lines {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 0.25rem;
+  gap: var(--space-2);
+  padding-top: var(--space-1);
 }
 
 .placeholder-line {
   height: 14px;
-  background: linear-gradient(90deg, #e8ddd8 25%, #f0e5e0 50%, #e8ddd8 75%);
+  background: linear-gradient(90deg, var(--color-border) 25%, var(--color-bg) 50%, var(--color-border) 75%);
   background-size: 200% 100%;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   animation: shimmer 1.5s infinite;
 }
 
@@ -456,52 +456,52 @@ async function saveCommitment() {
 .phase-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-8);
 }
 
 .test-suggestions h3,
 .commitment-form h3 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .section-hint {
-  font-size: 0.9375rem;
-  color: #b8a89d;
-  margin: 0 0 1rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--space-4) 0;
 }
 
 .suggestions-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .test-option {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: white;
-  border: 2px solid #f0e5e0;
-  border-radius: 12px;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
   text-align: left;
 }
 
 .test-option:hover {
-  border-color: #d4756f;
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .test-option.selected {
-  border-color: #d4756f;
-  background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
-  box-shadow: 0 4px 12px rgba(212, 117, 111, 0.2);
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  box-shadow: var(--shadow-md);
 }
 
 .test-number {
@@ -511,11 +511,11 @@ async function saveCommitment() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  background: var(--color-primary);
   color: white;
-  border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.875rem;
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
 }
 
 .test-content {
@@ -523,118 +523,118 @@ async function saveCommitment() {
 }
 
 .test-description {
-  font-size: 0.9375rem;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
   line-height: 1.5;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 
 .test-signal {
-  font-size: 0.875rem;
-  color: #8a7566;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .ghost-btn {
-  padding: 0.875rem 1.25rem;
+  padding: var(--space-3) var(--space-5);
   background: transparent;
-  border: 1px solid rgba(212, 117, 111, 0.25);
-  border-radius: 10px;
-  color: #8a7566;
-  font-weight: 600;
-  font-size: 0.9375rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
   width: 100%;
 }
 
 .ghost-btn:hover {
-  background: rgba(255, 215, 189, 0.2);
-  border-color: rgba(212, 117, 111, 0.4);
-  color: #d4756f;
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .commitment-form {
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  border: 1px solid rgba(212, 117, 111, 0.1);
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #40312b;
-  margin-bottom: 0.5rem;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.875rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 10px;
-  font-size: 0.9375rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #d4756f;
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
 }
 
 .commitment-preview {
-  padding: 1rem;
-  background: linear-gradient(135deg, #fff9f0 0%, #ffe8e0 100%);
-  border-radius: 10px;
-  margin: 1.5rem 0;
+  padding: var(--space-4);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-md);
+  margin: var(--space-6) 0;
 }
 
 .preview-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #d4756f;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 var(--space-2) 0;
 }
 
 .preview-text {
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   margin: 0;
   line-height: 1.6;
 }
 
 .preview-text strong {
-  color: #d4756f;
-  font-weight: 700;
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
 }
 
 .primary-btn {
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+  transition: all var(--duration-normal) var(--ease-out);
+  box-shadow: var(--shadow-md);
   width: 100%;
 }
 
 .primary-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-lg);
 }
 
 .primary-btn:disabled {
@@ -644,7 +644,7 @@ async function saveCommitment() {
 }
 
 .primary-btn.large {
-  font-size: 1.125rem;
-  padding: 1.125rem 2rem;
+  font-size: var(--text-lg);
+  padding: var(--space-4) var(--space-8);
 }
 </style>

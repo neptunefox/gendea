@@ -35,52 +35,52 @@ const earlyTest = ref('')
 
 <style scoped>
 .premortem-tool {
-  padding-top: 1rem;
+  padding-top: var(--space-4);
 }
 
 .tool-intro {
-  font-size: 0.9375rem;
-  color: #40312b;
-  margin: 0 0 1rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-4) 0;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 
 .tool-prompt {
-  font-size: 0.875rem;
-  color: #8a7566;
-  margin: 1rem 0 0.5rem 0;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin: var(--space-4) 0 var(--space-2) 0;
+  font-weight: var(--weight-semibold);
 }
 
 textarea,
 input[type='text'] {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #f0e5e0;
-  border-radius: 8px;
-  font-size: 0.875rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
   font-family: inherit;
   resize: vertical;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 textarea:focus,
 input[type='text']:focus {
   outline: none;
-  border-color: #d4756f;
-  box-shadow: 0 0 0 2px rgba(212, 117, 111, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-subtle);
 }
 
 .tool-footer {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(212, 117, 111, 0.1);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .tool-research {
-  font-size: 0.8125rem;
-  color: #b8a89d;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
   margin: 0;
   line-height: 1.5;
   font-style: italic;

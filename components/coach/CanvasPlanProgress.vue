@@ -84,90 +84,90 @@ function truncateText(text: string, maxLength: number): string {
 
 <style scoped>
 .canvas-plan-progress {
-  background: linear-gradient(135deg, #f5f0ff 0%, #efe8ff 100%);
-  border: 1px solid rgba(147, 112, 219, 0.2);
-  border-radius: 12px;
-  padding: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
 }
 
 .progress-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #7c5cbf;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-cauldron);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .progress-bar-container {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .progress-bar {
   flex: 1;
   height: 6px;
-  background: rgba(147, 112, 219, 0.2);
-  border-radius: 3px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #9370db, #7c5cbf);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  background: var(--color-cauldron);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-out);
 }
 
 .progress-text {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #7c5cbf;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-cauldron);
   white-space: nowrap;
 }
 
 .goals-section {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .goal-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  color: #40312b;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text);
 }
 
 .goal-item svg {
-  color: #d4756f;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 
 .tasks-preview {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
 }
 
 .task-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  color: #40312b;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text);
 }
 
 .task-item.completed {
-  color: #8a7566;
+  color: var(--color-text-secondary);
 }
 
 .task-item.completed span {
@@ -175,35 +175,35 @@ function truncateText(text: string, maxLength: number): string {
 }
 
 .task-icon {
-  color: #b8a8a3;
+  color: var(--color-text-tertiary);
   flex-shrink: 0;
 }
 
 .task-icon.completed {
-  color: #8bc34a;
+  color: var(--color-success);
 }
 
 .more-tasks {
-  font-size: 0.75rem;
-  color: #8a7566;
-  margin: 0.25rem 0 0 1.5rem;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin: var(--space-1) 0 0 var(--space-6);
 }
 
 .view-canvas-btn {
   width: 100%;
-  padding: 0.625rem;
+  padding: var(--space-2);
   background: transparent;
-  border: 1px solid rgba(147, 112, 219, 0.3);
-  border-radius: 8px;
-  color: #7c5cbf;
-  font-weight: 600;
-  font-size: 0.8125rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-cauldron);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .view-canvas-btn:hover {
-  background: rgba(147, 112, 219, 0.1);
-  border-color: #7c5cbf;
+  background: var(--color-primary-subtle);
+  border-color: var(--color-cauldron);
 }
 </style>

@@ -76,24 +76,24 @@ async function loadBaseRates() {
 
 <style scoped>
 .reference-class-tool {
-  padding-top: 1rem;
+  padding-top: var(--space-4);
 }
 
 .tool-intro {
-  font-size: 0.9375rem;
-  color: #40312b;
-  margin: 0 0 1rem 0;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin: 0 0 var(--space-4) 0;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: var(--weight-medium);
 }
 
 .tool-loading {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  color: #8a7566;
-  font-size: 0.875rem;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
 }
 
 .spin {
@@ -112,56 +112,56 @@ async function loadBaseRates() {
 .base-rates {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .rate-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
 }
 
 .rate-label {
-  font-size: 0.875rem;
-  color: #8a7566;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .rate-value {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #40312b;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
 }
 
 .load-btn {
   width: 100%;
-  padding: 0.75rem;
-  background: rgba(212, 117, 111, 0.1);
-  border: 1px solid rgba(212, 117, 111, 0.25);
-  border-radius: 8px;
-  color: #d4756f;
-  font-weight: 600;
-  font-size: 0.875rem;
+  padding: var(--space-3);
+  background: var(--color-primary-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .load-btn:hover {
-  background: rgba(212, 117, 111, 0.15);
-  border-color: rgba(212, 117, 111, 0.4);
+  background: var(--color-primary-ring);
+  border-color: var(--color-primary);
 }
 
 .tool-footer {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(212, 117, 111, 0.1);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .tool-research {
-  font-size: 0.8125rem;
-  color: #b8a89d;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
   margin: 0;
   line-height: 1.5;
   font-style: italic;
