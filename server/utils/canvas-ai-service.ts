@@ -1,13 +1,11 @@
 import {
   CANVAS_EXPAND_SYSTEM_PROMPT,
-  CANVAS_TIDY_UP_SYSTEM_PROMPT,
   CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
   PROACTIVE_QUESTION_SYSTEM_PROMPT,
   PROACTIVE_TOOL_SYSTEM_PROMPT,
   UNRELATED_CONNECTION_SYSTEM_PROMPT,
   DISCONNECTED_CLUSTERS_SYSTEM_PROMPT,
   buildCanvasExpandPrompt,
-  buildCanvasTidyUpPrompt,
   buildCanvasConnectionLabelPrompt,
   buildProactiveQuestionPrompt,
   buildProactiveToolPrompt,
@@ -16,7 +14,6 @@ import {
 } from './langchain-prompts'
 import {
   CanvasExpandSchema,
-  CanvasTidyUpSchema,
   CanvasConnectionLabelSchema,
   ProactiveQuestionSchema,
   ProactiveToolSchema,
@@ -28,7 +25,6 @@ import {
   type DisconnectedClusters
 } from './langchain-schemas'
 import { useLangChainService } from './langchain-service'
-import type { CanvasNodeData } from './langchain-types'
 
 export interface ExpandResult {
   nodes: Array<{
@@ -45,14 +41,6 @@ export interface ExpandResult {
     sourceIndex: number
     targetIndex: number
     relationship: 'leads_to' | 'requires' | 'blocks' | 'relates_to'
-  }>
-}
-
-export interface TidyUpResult {
-  clusters: Array<{
-    name: string
-    nodeIds: string[]
-    layout: 'grid' | 'linear' | 'radial'
   }>
 }
 
@@ -74,21 +62,6 @@ export async function expandNode(nodeContent: string, nodeType: string): Promise
     })),
     connections: result.connections
   }
-}
-
-export async function tidyUpNodes(nodes: CanvasNodeData[]): Promise<TidyUpResult> {
-  const langChain = useLangChainService()
-  const prompt = buildCanvasTidyUpPrompt(
-    nodes.map(n => ({ id: n.id, type: n.type, content: n.content }))
-  )
-
-  const result = await langChain.generateStructured<typeof CanvasTidyUpSchema>({
-    prompt,
-    systemPrompt: CANVAS_TIDY_UP_SYSTEM_PROMPT,
-    schema: CanvasTidyUpSchema
-  })
-
-  return { clusters: result.clusters }
 }
 
 export async function suggestConnectionLabel(

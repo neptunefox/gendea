@@ -91,13 +91,6 @@ export const CanvasClusterSchema = z.object({
     )
 })
 
-export const CanvasTidyUpSchema = z.object({
-  clusters: z
-    .array(CanvasClusterSchema)
-    .min(1)
-    .describe('Organized clusters grouping related nodes by theme, sequence, or dependency')
-})
-
 export const CanvasConnectionLabelSchema = z.object({
   label: z.string().min(3).max(50).describe('Concise label describing the connection (3-50 chars)'),
   relationship: z
@@ -147,7 +140,6 @@ export type CanvasNode = z.infer<typeof CanvasNodeSchema>
 export type CanvasConnection = z.infer<typeof CanvasConnectionSchema>
 export type CanvasExpand = z.infer<typeof CanvasExpandSchema>
 export type CanvasCluster = z.infer<typeof CanvasClusterSchema>
-export type CanvasTidyUp = z.infer<typeof CanvasTidyUpSchema>
 export type CanvasConnectionLabel = z.infer<typeof CanvasConnectionLabelSchema>
 export type ProactiveQuestion = z.infer<typeof ProactiveQuestionSchema>
 export type ProactiveTool = z.infer<typeof ProactiveToolSchema>

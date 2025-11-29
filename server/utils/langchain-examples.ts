@@ -3,7 +3,6 @@ import {
   SPARK_LENS_SYSTEM_PROMPT,
   CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
   CANVAS_EXPAND_SYSTEM_PROMPT,
-  CANVAS_TIDY_UP_SYSTEM_PROMPT,
   CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT,
   PROACTIVE_QUESTION_SYSTEM_PROMPT,
   PROACTIVE_TOOL_SYSTEM_PROMPT,
@@ -11,7 +10,6 @@ import {
   buildSparkLensPrompt,
   buildCauldronSynthesisPrompt,
   buildCanvasExpandPrompt,
-  buildCanvasTidyUpPrompt,
   buildCanvasConnectionLabelPrompt,
   buildProactiveQuestionPrompt,
   buildProactiveToolPrompt,
@@ -22,7 +20,6 @@ import {
   SparkLensSchema,
   CauldronOutputSchema,
   CanvasExpandSchema,
-  CanvasTidyUpSchema,
   CanvasConnectionLabelSchema,
   ProactiveQuestionSchema,
   ProactiveToolSchema
@@ -84,20 +81,6 @@ export async function generateCanvasExpand(nodeContent: string, nodeType: string
     prompt: buildCanvasExpandPrompt(nodeContent, nodeType),
     systemPrompt: CANVAS_EXPAND_SYSTEM_PROMPT,
     schema: CanvasExpandSchema
-  })
-
-  return result
-}
-
-export async function generateCanvasTidyUp(
-  nodes: Array<{ id: string; type: string; content: string }>
-) {
-  const langchain = useLangChainService()
-
-  const result = await langchain.generateStructured({
-    prompt: buildCanvasTidyUpPrompt(nodes),
-    systemPrompt: CANVAS_TIDY_UP_SYSTEM_PROMPT,
-    schema: CanvasTidyUpSchema
   })
 
   return result

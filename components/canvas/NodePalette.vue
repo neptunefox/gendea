@@ -32,7 +32,6 @@
 <script setup lang="ts">
 import {
   StickyNote,
-  Square,
   Type,
   HelpCircle,
   Wrench,
@@ -83,13 +82,7 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
     icon: Wrench,
     color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
   },
-  { type: 'text-block', label: 'Text', icon: Type, color: '#f5f5f5' },
-  {
-    type: 'shape',
-    label: 'Shape',
-    icon: Square,
-    color: 'linear-gradient(135deg, #d4756f 0%, #e8a5a0 100%)'
-  }
+  { type: 'text-block', label: 'Text', icon: Type, color: '#f5f5f5' }
 ]
 </script>
 

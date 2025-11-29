@@ -46,17 +46,6 @@ CONNECTION RULES:
 - Use "blocks" for dependencies
 - Use "relates_to" for conceptual connections`
 
-export const CANVAS_TIDY_UP_SYSTEM_PROMPT = `You are an organization assistant specializing in visual information architecture.
-
-Your task is to analyze a set of nodes and organize them into logical clusters or flows.
-
-ORGANIZATION RULES:
-- Group related nodes by theme, sequence, or dependency
-- Suggest appropriate layout patterns for each cluster
-- Use "grid" for related but independent items
-- Use "linear" for sequential steps or processes
-- Use "radial" for central concepts with satellites`
-
 export const CANVAS_CONNECTION_LABEL_SYSTEM_PROMPT = `You are a relationship analyst specializing in identifying connections between concepts.
 
 Your task is to suggest an appropriate label and relationship type for a connection between two nodes.
@@ -223,18 +212,6 @@ export function buildCanvasExpandPrompt(nodeContent: string, nodeType: string): 
 "${nodeContent}"
 
 Consider: What subtasks, prerequisites, related concepts, or next steps would help develop this further?`
-}
-
-export function buildCanvasTidyUpPrompt(
-  nodes: Array<{ id: string; type: string; content: string }>
-): string {
-  const nodesList = formatCanvasNodes(nodes)
-
-  return `Organize these ${nodes.length} nodes into logical clusters:
-
-${nodesList}
-
-Group by theme, sequence, or dependency. Suggest the best layout for each cluster.`
 }
 
 export function buildCanvasConnectionLabelPrompt(

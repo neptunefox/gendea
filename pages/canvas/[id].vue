@@ -88,9 +88,6 @@
         <template #node-sticky-note="nodeProps">
           <StickyNoteNode v-bind="nodeProps" />
         </template>
-        <template #node-shape="nodeProps">
-          <ShapeNode v-bind="nodeProps" />
-        </template>
         <template #node-text-block="nodeProps">
           <TextBlockNode v-bind="nodeProps" />
         </template>
@@ -115,19 +112,6 @@
         </template>
       </VueFlow>
 
-      <div v-if="selectedNodes.length > 1" class="selection-toolbar">
-        <button
-          class="ai-tidy-btn"
-          :disabled="isTidying"
-          title="AI organize nodes"
-          @click="handleTidyUp"
-        >
-          <Loader2 v-if="isTidying" :size="18" class="spin" />
-          <Wand2 v-else :size="18" />
-          <span>Tidy Up</span>
-        </button>
-      </div>
-
       <NodeAIToolbar
         v-if="singleSelectedNode"
         :selected-node="singleSelectedNode"
@@ -138,14 +122,6 @@
         @delete-node="handleDeleteNode"
       />
 
-      <AISuggestionPanel
-        v-if="currentSuggestion"
-        :suggestion="currentSuggestion"
-        :project-id="projectId"
-        :is-applying="isTidying"
-        @dismiss="dismissSuggestion"
-        @apply="applySuggestion"
-      />
 
       <NodePalette />
 
@@ -312,7 +288,6 @@ import {
   ChevronRight,
   Lightbulb,
   Sparkles,
-  Wand2,
   Loader2,
   FlaskConical,
   AlertTriangle,
@@ -323,14 +298,12 @@ import {
 } from 'lucide-vue-next'
 import { ref, computed, onMounted, onUnmounted, provide, watch, reactive } from 'vue'
 
-import AISuggestionPanel from '~/components/canvas/AISuggestionPanel.vue'
 import ConflictResolutionModal from '~/components/canvas/ConflictResolutionModal.vue'
 import EdgeSuggestionPopup from '~/components/canvas/EdgeSuggestionPopup.vue'
 import NodeAIToolbar from '~/components/canvas/NodeAIToolbar.vue'
 import NodePalette from '~/components/canvas/NodePalette.vue'
 import {
   StickyNoteNode,
-  ShapeNode,
   TextBlockNode,
   InputNode,
   ToolNode,
@@ -537,20 +510,7 @@ const singleSelectedNode = computed(() => {
   }
 })
 
-interface Suggestion {
-  type: 'clusters' | 'intermediate' | 'incomplete'
-  message: string
-  action?: string
-  actionLabel?: string
-  clusters?: Array<{ nodeIds: string[]; theme: string }>
-  steps?: string[]
-  nodeId?: string
-}
-
-const currentSuggestion = ref<Suggestion | null>(null)
-const isTidying = ref(false)
 const isDeleting = ref(false)
-const dismissedSuggestions = ref<Set<string>>(new Set())
 
 interface EdgeSuggestion {
   edgeId: string
@@ -560,6 +520,7 @@ interface EdgeSuggestion {
 }
 const edgeSuggestion = ref<EdgeSuggestion | null>(null)
 const isLoadingEdgeSuggestion = ref(false)
+let edgeSuggestionTimeout: NodeJS.Timeout | null = null
 
 let pendingViewport: Viewport | null = null
 let paneReady = false
@@ -665,6 +626,10 @@ async function fetchEdgeSuggestion(
   sourceNode: any,
   targetNode: any
 ) {
+  if (edgeSuggestionTimeout) {
+    clearTimeout(edgeSuggestionTimeout)
+  }
+
   isLoadingEdgeSuggestion.value = true
   try {
     const result = await $fetch('/api/canvas/ai/suggest-label', {
@@ -683,12 +648,16 @@ async function fetchEdgeSuggestion(
       ? canvasRect.top + (midY * viewport.value.zoom + viewport.value.y)
       : midY
 
-    edgeSuggestion.value = {
+    const suggestion = {
       edgeId,
       suggestedType: result.relationship as EdgeRelationshipType,
       suggestedLabel: result.label,
       position: { x: screenX, y: screenY }
     }
+
+    edgeSuggestionTimeout = setTimeout(() => {
+      edgeSuggestion.value = suggestion
+    }, 1500)
   } catch (error) {
     console.error('Failed to get edge suggestion:', error)
   } finally {
@@ -731,6 +700,10 @@ async function handleEdgeSuggestionAccept(
 }
 
 function handleEdgeSuggestionDismiss() {
+  if (edgeSuggestionTimeout) {
+    clearTimeout(edgeSuggestionTimeout)
+    edgeSuggestionTimeout = null
+  }
   edgeSuggestion.value = null
 }
 
@@ -1056,111 +1029,9 @@ async function handleRedo() {
   }
 }
 
-async function handleTidyUp() {
-  if (isTidying.value) return
-  isTidying.value = true
-
-  try {
-    const nodeIds = selectedNodes.value.map(n => n.id)
-    const result = await $fetch('/api/canvas/ai/tidy-up', {
-      method: 'POST',
-      body: {
-        projectId: projectId.value,
-        nodeIds
-      }
-    })
-
-    if (result.updatedPositions) {
-      for (const [nodeId, position] of Object.entries(result.updatedPositions)) {
-        updateNode(nodeId, { position: position as { x: number; y: number } })
-      }
-    }
-  } catch (error) {
-    console.error('Failed to tidy up nodes:', error)
-  } finally {
-    isTidying.value = false
-  }
-}
-
-function dismissSuggestion() {
-  if (currentSuggestion.value) {
-    const key = `${currentSuggestion.value.type}-${currentSuggestion.value.nodeId || 'global'}`
-    dismissedSuggestions.value.add(key)
-
-    if (currentSuggestion.value.nodeId) {
-      $fetch('/api/canvas/ai/dismiss-suggestion', {
-        method: 'POST',
-        body: {
-          nodeId: currentSuggestion.value.nodeId,
-          suggestionType: currentSuggestion.value.type
-        }
-      }).catch(console.error)
-    }
-  }
-  currentSuggestion.value = null
-}
-
-async function applySuggestion(action: string) {
-  if (!currentSuggestion.value) return
-
-  if (action === 'tidy' && currentSuggestion.value.clusters) {
-    isTidying.value = true
-    try {
-      const result = await $fetch('/api/canvas/ai/tidy-up', {
-        method: 'POST',
-        body: { projectId: projectId.value }
-      })
-
-      if (result.updatedPositions) {
-        for (const [nodeId, position] of Object.entries(result.updatedPositions)) {
-          updateNode(nodeId, { position: position as { x: number; y: number } })
-        }
-      }
-    } catch (error) {
-      console.error('Failed to apply suggestion:', error)
-    } finally {
-      isTidying.value = false
-    }
-  }
-
-  currentSuggestion.value = null
-}
-
-async function checkForDisconnectedClusters() {
-  const nodes = elements.value.filter((e: any) => !e.source)
-  if (nodes.length < 4) return
-
-  const suggestionKey = 'clusters-global'
-  if (dismissedSuggestions.value.has(suggestionKey)) return
-
-  try {
-    const result = await $fetch('/api/canvas/ai/detect-clusters', {
-      method: 'POST',
-      body: { projectId: projectId.value }
-    })
-
-    if (result.hasDisconnectedClusters && result.clusters && result.clusters.length > 1) {
-      currentSuggestion.value = {
-        type: 'clusters',
-        message: `Found ${result.clusters.length} disconnected groups of nodes. Would you like to organize them?`,
-        action: 'tidy',
-        actionLabel: 'Organize Canvas',
-        clusters: result.clusters
-      }
-    }
-  } catch (error) {
-    console.error('Failed to check for clusters:', error)
-  }
-}
-
-let clusterCheckTimeout: NodeJS.Timeout | null = null
-
 watch(
   () => elements.value.length,
   () => {
-    if (clusterCheckTimeout) clearTimeout(clusterCheckTimeout)
-    clusterCheckTimeout = setTimeout(checkForDisconnectedClusters, 5000)
-
     const taskNodes = elements.value.filter((e: any) => !e.source && e.type === 'task')
     if (taskNodes.length >= 3) {
       flowGuidance.showSuggestion(flowGuidance.suggestions.canvasToCoach)
@@ -1266,8 +1137,8 @@ onUnmounted(() => {
   if (viewportSaveTimeout) {
     clearTimeout(viewportSaveTimeout)
   }
-  if (clusterCheckTimeout) {
-    clearTimeout(clusterCheckTimeout)
+  if (edgeSuggestionTimeout) {
+    clearTimeout(edgeSuggestionTimeout)
   }
 })
 </script>
@@ -1518,48 +1389,6 @@ kbd {
   color: #40312b;
 }
 
-.selection-toolbar {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 117, 111, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  z-index: 20;
-}
-
-.ai-tidy-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  background: linear-gradient(135deg, #fffdf6 0%, #fff9f0 100%);
-  color: #40312b;
-  border: 1px solid #f0e5e0;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ai-tidy-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #d4756f 0%, #c26660 100%);
-  border-color: #d4756f;
-  color: white;
-}
-
-.ai-tidy-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .spin {
   animation: spin 1s linear infinite;
 }
@@ -1777,16 +1606,6 @@ kbd {
     padding: 0.5rem;
   }
 
-  .selection-toolbar {
-    bottom: 1rem;
-    padding: 0.375rem;
-  }
-
-  .ai-tidy-btn {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-
   .workflow-state-indicator {
     bottom: 4rem;
     right: 1rem;
@@ -1804,13 +1623,6 @@ kbd {
 
   .ideas-panel {
     display: none;
-  }
-
-  .selection-toolbar {
-    left: 1rem;
-    right: 1rem;
-    transform: none;
-    justify-content: center;
   }
 }
 
