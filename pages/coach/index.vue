@@ -129,7 +129,7 @@ onMounted(() => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: var(--space-8);
 }
 
 .dashboard-header {
@@ -137,15 +137,15 @@ onMounted(() => {
 }
 
 .dashboard-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #40312b;
-  margin: 0 0 0.5rem 0;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .subtitle {
-  font-size: 1.125rem;
-  color: #8a7566;
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -154,9 +154,9 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 4rem 2rem;
-  color: #8a7566;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-secondary);
 }
 
 .spin {
@@ -164,12 +164,8 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .empty-state {
@@ -177,12 +173,12 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  padding: 4rem 2rem;
+  gap: var(--space-5);
+  padding: var(--space-12) var(--space-6);
   text-align: center;
-  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
-  border-radius: 16px;
-  border: 1px solid #f0e5e0;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
 }
 
 .empty-icon {
@@ -191,99 +187,96 @@ onMounted(() => {
 }
 
 .empty-state h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #40312b;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
   margin: 0;
 }
 
 .empty-state p {
-  font-size: 1rem;
-  color: #8a7566;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
   max-width: 400px;
   margin: 0;
   line-height: 1.6;
 }
 
 .primary-btn {
-  padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border-radius: var(--radius-lg);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 113, 118, 0.25);
+  transition: background var(--duration-fast) var(--ease-out);
   text-decoration: none;
   display: inline-block;
 }
 
 .primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(246, 113, 118, 0.35);
+  background: var(--color-primary-hover);
 }
 
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: var(--space-5);
 }
 
 .project-card {
-  background: linear-gradient(135deg, #fefaf5 0%, #fef5f0 100%);
-  border: 1px solid #f0e5e0;
-  border-radius: 16px;
-  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(212, 117, 111, 0.15);
-  border-color: #d4756f;
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
 }
 
 .project-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .project-header h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #40312b;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
   margin: 0;
   line-height: 1.4;
   flex: 1;
 }
 
 .project-badge {
-  background: linear-gradient(135deg, #ff9ad8, #f67176);
+  background: var(--color-primary);
   color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   white-space: nowrap;
 }
 
 .project-status {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 10px;
-  border: 1px solid rgba(212, 117, 111, 0.1);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .status-icon {
@@ -295,15 +288,15 @@ onMounted(() => {
 }
 
 .status-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #40312b;
-  margin: 0 0 0.25rem 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
 }
 
 .status-detail {
-  font-size: 0.875rem;
-  color: #8a7566;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
@@ -311,19 +304,19 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(212, 117, 111, 0.1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
 }
 
 .project-date {
-  font-size: 0.8125rem;
-  color: #b8a89d;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
 }
 
 .project-arrow {
-  font-size: 1.25rem;
-  color: #d4756f;
-  transition: transform 0.2s ease;
+  font-size: var(--text-xl);
+  color: var(--color-primary);
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .project-card:hover .project-arrow {
@@ -332,11 +325,11 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .coach-dashboard {
-    padding: 1.5rem 1rem 3rem;
+    padding: var(--space-5) var(--space-4) var(--space-8);
   }
 
   .dashboard-header h1 {
-    font-size: 2rem;
+    font-size: var(--text-2xl);
   }
 
   .projects-grid {
