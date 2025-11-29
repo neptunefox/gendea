@@ -100,16 +100,17 @@ async function setColor(color: string) {
 .sticky-note-node {
   min-width: 180px;
   min-height: 120px;
-  padding: 0.75rem;
-  border-radius: 2px;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  transform: rotate(-1deg);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
-  will-change: transform;
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+  will-change: transform, opacity;
+}
+
+.sticky-note-node:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .sticky-note-node.node-appearing {
@@ -125,45 +126,22 @@ async function setColor(color: string) {
 }
 
 @keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: rotate(-1deg) scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-1deg) scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nodeDelete {
-  from {
-    opacity: 1;
-    transform: rotate(-1deg) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: rotate(-1deg) scale(0.8);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 @keyframes nodeStagger {
-  from {
-    opacity: 0;
-    transform: rotate(-1deg) translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-1deg) translateY(0) scale(1);
-  }
-}
-
-.sticky-note-node:hover {
-  transform: rotate(0deg) scale(1.02);
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .sticky-note-node.selected {
-  outline: 2px solid #d4756f;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -173,8 +151,8 @@ async function setColor(color: string) {
 }
 
 .sticky-text {
-  font-size: 0.875rem;
-  color: #40312b;
+  font-size: var(--text-sm);
+  color: var(--color-text);
   line-height: 1.4;
   word-wrap: break-word;
   cursor: text;
@@ -185,8 +163,8 @@ async function setColor(color: string) {
   min-height: 80px;
   border: none;
   background: transparent;
-  font-size: 0.875rem;
-  color: #40312b;
+  font-size: var(--text-sm);
+  color: var(--color-text);
   line-height: 1.4;
   resize: none;
   font-family: inherit;
@@ -197,9 +175,9 @@ async function setColor(color: string) {
 }
 
 .sticky-footer {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .sticky-note-node:hover .sticky-footer {
@@ -208,16 +186,16 @@ async function setColor(color: string) {
 
 .color-picker {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--space-1);
 }
 
 .color-btn {
   width: 16px;
   height: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .color-btn:hover {
@@ -225,51 +203,33 @@ async function setColor(color: string) {
 }
 
 .color-btn.active {
-  outline: 2px solid #40312b;
+  outline: 2px solid var(--color-text);
   outline-offset: 1px;
 }
 
 .sticky-note-node.workflow-testing-highlight {
-  box-shadow:
-    0 0 0 3px rgba(33, 150, 243, 0.3),
-    2px 2px 8px rgba(0, 0, 0, 0.15);
-  animation: testingPulse 2s ease-in-out infinite;
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
 }
 
 .sticky-note-node.workflow-blocked {
-  box-shadow:
-    0 0 0 2px rgba(194, 102, 96, 0.4),
-    2px 2px 8px rgba(0, 0, 0, 0.15);
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
 }
 
 .sticky-note-node.workflow-incomplete {
-  box-shadow:
-    0 0 0 2px rgba(255, 152, 0, 0.3),
-    2px 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes testingPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(33, 150, 243, 0.3),
-      2px 2px 8px rgba(0, 0, 0, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(33, 150, 243, 0.15),
-      2px 2px 12px rgba(0, 0, 0, 0.2);
-  }
+  outline: 2px solid var(--color-warning);
+  outline-offset: 2px;
 }
 
 .handle {
   width: 8px !important;
   height: 8px !important;
-  background: #ffa000 !important;
-  border: 2px solid white !important;
+  background: var(--color-text-tertiary) !important;
+  border: 2px solid var(--color-surface) !important;
   border-radius: 50% !important;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: crosshair;
 }
 
@@ -290,14 +250,13 @@ async function setColor(color: string) {
 
 .handle:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 0 3px rgba(255, 160, 0, 0.25);
+  background: var(--color-primary) !important;
 }
 
 :deep(.vue-flow__handle-connecting),
 :deep(.vue-flow__handle-valid) {
   opacity: 1 !important;
-  background: #66bb6a !important;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  background: var(--color-success) !important;
   transform: scale(1.2) !important;
 }
 </style>

@@ -19,8 +19,8 @@
           @dragstart="e => onDragStart(e, item.type)"
           @dragend="onDragEnd"
         >
-          <div class="item-icon" :style="{ background: item.color }">
-            <component :is="item.icon" :size="18" />
+          <div class="item-icon" :style="{ '--accent': item.accent }">
+            <component :is="item.icon" :size="16" />
           </div>
           <span class="item-label">{{ item.label }}</span>
         </div>
@@ -50,39 +50,14 @@ const { onDragStart, onDragEnd } = useDragAndDrop()
 
 const isCollapsed = ref(false)
 
-const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: string }[] = [
-  { type: 'sticky-note', label: 'Sticky Note', icon: StickyNote, color: '#fff9c4' },
-  {
-    type: 'idea',
-    label: 'Idea',
-    icon: Lightbulb,
-    color: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
-  },
-  {
-    type: 'task',
-    label: 'Task',
-    icon: CheckSquare,
-    color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
-  },
-  {
-    type: 'goal',
-    label: 'Goal',
-    icon: Target,
-    color: 'linear-gradient(135deg, #d4756f 0%, #c26660 100%)'
-  },
-  {
-    type: 'input',
-    label: 'Question',
-    icon: HelpCircle,
-    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-  },
-  {
-    type: 'tool',
-    label: 'Tool',
-    icon: Wrench,
-    color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
-  },
-  { type: 'text-block', label: 'Text', icon: Type, color: '#f5f5f5' }
+const paletteItems: { type: CanvasNodeType; label: string; icon: any; accent: string }[] = [
+  { type: 'sticky-note', label: 'Sticky Note', icon: StickyNote, accent: '#ffa000' },
+  { type: 'idea', label: 'Idea', icon: Lightbulb, accent: 'var(--color-primary)' },
+  { type: 'task', label: 'Task', icon: CheckSquare, accent: 'var(--color-text-tertiary)' },
+  { type: 'goal', label: 'Goal', icon: Target, accent: 'var(--color-success)' },
+  { type: 'input', label: 'Question', icon: HelpCircle, accent: 'var(--color-primary)' },
+  { type: 'tool', label: 'Tool', icon: Wrench, accent: '#64b5f6' },
+  { type: 'text-block', label: 'Text', icon: Type, accent: 'var(--color-text-tertiary)' }
 ]
 </script>
 
@@ -90,15 +65,20 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
 .node-palette {
   position: fixed;
   top: 50%;
-  left: 1rem;
+  left: calc(var(--nav-width) + 1rem);
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 117, 111, 0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   z-index: 10;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+@media (max-width: 768px) {
+  .node-palette {
+    left: 1rem;
+  }
 }
 
 .node-palette.collapsed {
@@ -112,46 +92,46 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
   transform: translateY(-50%);
   width: 24px;
   height: 24px;
-  background: white;
-  border: 1px solid rgba(212, 117, 111, 0.2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #8b7a75;
-  transition: all 0.2s ease;
+  color: var(--color-text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .toggle-btn:hover {
-  background: #d4756f;
+  background: var(--color-primary);
   color: white;
-  border-color: #d4756f;
+  border-color: var(--color-primary);
 }
 
 .palette-content {
-  padding: 0.75rem;
+  padding: var(--space-3);
 }
 
 .palette-items {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-1);
 }
 
 .palette-item {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 0.625rem;
-  border-radius: 8px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   cursor: grab;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   user-select: none;
 }
 
 .palette-item:hover {
-  background: rgba(212, 117, 111, 0.08);
+  background: var(--color-primary-subtle);
 }
 
 .palette-item:active {
@@ -160,20 +140,23 @@ const paletteItems: { type: CanvasNodeType; label: string; icon: any; color: str
 }
 
 .item-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #40312b;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
 .item-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #40312b;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
   white-space: nowrap;
 }
 </style>

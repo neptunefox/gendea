@@ -86,17 +86,17 @@ async function saveText() {
 .text-block-node {
   min-width: 200px;
   max-width: 400px;
-  background: white;
-  border: 1px solid #f0e5e0;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.15s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
   will-change: transform, opacity;
 }
 
 .text-block-node:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
 }
 
 .text-block-node.node-appearing {
@@ -112,52 +112,34 @@ async function saveText() {
 }
 
 @keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nodeDelete {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 @keyframes nodeStagger {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .text-block-node.selected {
-  outline: 2px solid #d4756f;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 .text-content {
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.6;
   cursor: text;
 }
 
 .text-content :deep(strong) {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .text-content :deep(em) {
@@ -165,63 +147,45 @@ async function saveText() {
 }
 
 .placeholder {
-  color: #b8a8a3;
+  color: var(--color-text-tertiary);
   font-style: italic;
 }
 
 .text-editor {
   min-height: 40px;
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.6;
   outline: none;
-  border: 1px dashed #d4756f;
-  border-radius: 4px;
-  padding: 0.25rem;
-  margin: -0.25rem;
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1);
+  margin: calc(var(--space-1) * -1);
 }
 
 .text-block-node.workflow-testing-highlight {
-  border-color: #2196f3;
-  box-shadow:
-    0 0 0 3px rgba(33, 150, 243, 0.2),
-    0 4px 12px rgba(33, 150, 243, 0.15);
-  animation: testingPulse 2s ease-in-out infinite;
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
 }
 
 .text-block-node.workflow-blocked {
-  border-color: #c26660;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
-  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
 }
 
 .text-block-node.workflow-incomplete {
-  border-color: #ff9800;
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
-}
-
-@keyframes testingPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(33, 150, 243, 0.2),
-      0 4px 12px rgba(33, 150, 243, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(33, 150, 243, 0.1),
-      0 4px 16px rgba(33, 150, 243, 0.25);
-  }
+  outline: 2px solid var(--color-warning);
+  outline-offset: 2px;
 }
 
 .handle {
   width: 8px !important;
   height: 8px !important;
-  background: #b8a8a3 !important;
-  border: 2px solid white !important;
+  background: var(--color-text-tertiary) !important;
+  border: 2px solid var(--color-surface) !important;
   border-radius: 50% !important;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: crosshair;
 }
 
@@ -242,14 +206,13 @@ async function saveText() {
 
 .handle:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 0 3px rgba(184, 168, 163, 0.25);
+  background: var(--color-primary) !important;
 }
 
 :deep(.vue-flow__handle-connecting),
 :deep(.vue-flow__handle-valid) {
   opacity: 1 !important;
-  background: #66bb6a !important;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  background: var(--color-success) !important;
   transform: scale(1.2) !important;
 }
 </style>

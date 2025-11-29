@@ -54,22 +54,21 @@ const workflowClass = computed(
 
 <style scoped>
 .idea-node {
+  --node-accent: var(--color-primary);
   min-width: 200px;
   max-width: 280px;
-  background: linear-gradient(135deg, #fffde7 0%, #fff9c4 100%);
-  border: 2px solid #ffd54f;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(255, 213, 79, 0.2);
-  transition:
-    box-shadow 0.15s ease,
-    transform 0.15s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--node-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
   will-change: transform, opacity;
 }
 
 .idea-node:hover {
-  box-shadow: 0 4px 16px rgba(255, 213, 79, 0.3);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .idea-node.node-appearing {
@@ -85,150 +84,102 @@ const workflowClass = computed(
 }
 
 @keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nodeDelete {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 @keyframes nodeStagger {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .idea-node.selected {
-  outline: 2px solid #ffd54f;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 .idea-node.cauldron {
-  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-  border-color: #ba68c8;
-  box-shadow: 0 2px 8px rgba(186, 104, 200, 0.2);
-}
-
-.idea-node.cauldron:hover {
-  box-shadow: 0 4px 16px rgba(186, 104, 200, 0.3);
+  --node-accent: #9c27b0;
 }
 
 .idea-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-3);
 }
 
 .idea-icon {
-  color: #ffa000;
-}
-
-.idea-node.cauldron .idea-icon {
-  color: #ba68c8;
+  color: var(--node-accent);
 }
 
 .cauldron-badge {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  background: rgba(186, 104, 200, 0.2);
-  border-radius: 999px;
-  font-size: 0.6875rem;
-  font-weight: 600;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(156, 39, 176, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
   color: #9c27b0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .idea-text {
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.5;
 }
 
 .idea-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.75rem;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .tag {
-  padding: 0.25rem 0.5rem;
-  background: rgba(255, 160, 0, 0.15);
-  border-radius: 4px;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  color: #f57c00;
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-primary);
 }
 
 .idea-node.cauldron .tag {
-  background: rgba(186, 104, 200, 0.15);
+  background: rgba(156, 39, 176, 0.1);
   color: #9c27b0;
 }
 
 .idea-node.workflow-testing-highlight {
-  border-color: #2196f3;
-  box-shadow:
-    0 0 0 3px rgba(33, 150, 243, 0.2),
-    0 4px 12px rgba(33, 150, 243, 0.15);
-  animation: testingPulse 2s ease-in-out infinite;
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
 }
 
 .idea-node.workflow-blocked {
-  border-color: #c26660;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
-  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
 }
 
 .idea-node.workflow-incomplete {
-  border-color: #ff9800;
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
-}
-
-@keyframes testingPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(33, 150, 243, 0.2),
-      0 4px 12px rgba(33, 150, 243, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(33, 150, 243, 0.1),
-      0 4px 16px rgba(33, 150, 243, 0.25);
-  }
+  outline: 2px solid var(--color-warning);
+  outline-offset: 2px;
 }
 
 .handle {
   width: 8px !important;
   height: 8px !important;
-  background: #ffd54f !important;
-  border: 2px solid white !important;
+  background: var(--color-text-tertiary) !important;
+  border: 2px solid var(--color-surface) !important;
   border-radius: 50% !important;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: crosshair;
 }
 
@@ -243,28 +194,19 @@ const workflowClass = computed(
   border-radius: 50%;
 }
 
-.idea-node.cauldron .handle {
-  background: #ba68c8 !important;
-}
-
 .idea-node:hover .handle {
   opacity: 1;
 }
 
 .handle:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.25);
-}
-
-.idea-node.cauldron .handle:hover {
-  box-shadow: 0 0 0 3px rgba(186, 104, 200, 0.25);
+  background: var(--color-primary) !important;
 }
 
 :deep(.vue-flow__handle-connecting),
 :deep(.vue-flow__handle-valid) {
   opacity: 1 !important;
-  background: #66bb6a !important;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  background: var(--color-success) !important;
   transform: scale(1.2) !important;
 }
 </style>

@@ -80,22 +80,21 @@ function formatDate(dateStr: string): string {
 
 <style scoped>
 .task-node {
+  --node-accent: var(--color-text-tertiary);
   min-width: 200px;
   max-width: 280px;
-  background: white;
-  border: 2px solid #f0e5e0;
-  border-radius: 10px;
-  padding: 0.875rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition:
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--node-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
   will-change: transform, opacity;
 }
 
 .task-node:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border-color: #d4756f;
+  box-shadow: var(--shadow-md);
 }
 
 .task-node.node-appearing {
@@ -111,52 +110,33 @@ function formatDate(dateStr: string): string {
 }
 
 @keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nodeDelete {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 @keyframes nodeStagger {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .task-node.selected {
-  outline: 2px solid #d4756f;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 .task-node.completed {
-  background: #f8fef5;
-  border-color: #c8e6c9;
+  --node-accent: var(--color-success);
 }
 
 .task-content {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .checkbox {
@@ -168,124 +148,86 @@ function formatDate(dateStr: string): string {
 }
 
 .check-icon {
-  color: #b8a8a3;
-  transition: color 0.2s ease;
+  color: var(--color-text-tertiary);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .check-icon.completed {
-  color: #8bc34a;
+  color: var(--color-success);
 }
 
 .checkbox:hover .check-icon:not(.completed) {
-  color: #d4756f;
+  color: var(--color-primary);
 }
 
 .task-text {
-  font-size: 0.9375rem;
-  color: #40312b;
+  font-size: var(--text-base);
+  color: var(--color-text);
   line-height: 1.4;
 }
 
 .task-text.line-through {
   text-decoration: line-through;
-  color: #b8a8a3;
+  color: var(--color-text-tertiary);
 }
 
 .task-due {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f0e5e0;
-  font-size: 0.75rem;
-  color: #8b7a75;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
 .task-node.coach-origin {
   border-style: dashed;
-  border-color: #d4756f;
-  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 100%);
+  border-left-color: var(--color-primary);
 }
 
 .coach-indicator {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  margin-bottom: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  background: rgba(212, 117, 111, 0.1);
-  border-radius: 4px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #d4756f;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-primary);
 }
 
 .task-node.workflow-testing-highlight {
-  border-color: #2196f3;
-  box-shadow:
-    0 0 0 3px rgba(33, 150, 243, 0.2),
-    0 4px 12px rgba(33, 150, 243, 0.15);
-  animation: testingPulse 2s ease-in-out infinite;
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
 }
 
 .task-node.workflow-blocked {
-  border-color: #c26660;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
-  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
 }
 
 .task-node.workflow-incomplete {
-  border-color: #ff9800;
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+  outline: 2px solid var(--color-warning);
+  outline-offset: 2px;
 }
 
 .task-node.workflow-completed {
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-}
-
-.task-node.workflow-completed::after {
-  content: '✓';
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 20px;
-  height: 20px;
-  background: #4caf50;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-@keyframes testingPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(33, 150, 243, 0.2),
-      0 4px 12px rgba(33, 150, 243, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(33, 150, 243, 0.1),
-      0 4px 16px rgba(33, 150, 243, 0.25);
-  }
+  outline: 2px solid var(--color-success);
+  outline-offset: 2px;
 }
 
 .handle {
   width: 8px !important;
   height: 8px !important;
-  background: #d4756f !important;
-  border: 2px solid white !important;
+  background: var(--color-text-tertiary) !important;
+  border: 2px solid var(--color-surface) !important;
   border-radius: 50% !important;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: crosshair;
 }
 
@@ -300,28 +242,19 @@ function formatDate(dateStr: string): string {
   border-radius: 50%;
 }
 
-.task-node.completed .handle {
-  background: #8bc34a !important;
-}
-
 .task-node:hover .handle {
   opacity: 1;
 }
 
 .handle:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 0 3px rgba(212, 117, 111, 0.25);
-}
-
-.task-node.completed .handle:hover {
-  box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.25);
+  background: var(--color-primary) !important;
 }
 
 :deep(.vue-flow__handle-connecting),
 :deep(.vue-flow__handle-valid) {
   opacity: 1 !important;
-  background: #66bb6a !important;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  background: var(--color-success) !important;
   transform: scale(1.2) !important;
 }
 </style>

@@ -73,18 +73,20 @@ async function markAchieved() {
 
 <style scoped>
 .goal-node {
+  --node-accent: var(--color-success);
   min-width: 220px;
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  border: 2px solid #66bb6a;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(102, 187, 106, 0.2);
-  transition: box-shadow 0.15s ease;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--node-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out);
   will-change: transform, opacity;
 }
 
 .goal-node:hover {
-  box-shadow: 0 4px 16px rgba(102, 187, 106, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .goal-node.node-appearing {
@@ -100,87 +102,60 @@ async function markAchieved() {
 }
 
 @keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes nodeDelete {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 @keyframes nodeStagger {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .goal-node.selected {
-  outline: 2px solid #66bb6a;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
 .goal-node.achieved {
-  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-  border-color: #ffc107;
+  --node-accent: #f59e0b;
 }
 
 .goal-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .goal-icon {
-  color: #43a047;
-}
-
-.goal-node.achieved .goal-icon {
-  color: #ffc107;
+  color: var(--node-accent);
 }
 
 .goal-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #43a047;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--node-accent);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex: 1;
 }
 
-.goal-node.achieved .goal-label {
-  color: #f57c00;
-}
-
 .achieve-btn {
-  padding: 0.375rem;
-  background: white;
-  border: 1px solid #66bb6a;
-  border-radius: 6px;
-  color: #66bb6a;
+  padding: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   opacity: 0;
 }
 
@@ -189,7 +164,8 @@ async function markAchieved() {
 }
 
 .achieve-btn:hover {
-  background: #66bb6a;
+  background: var(--color-success);
+  border-color: var(--color-success);
   color: white;
 }
 
@@ -197,121 +173,82 @@ async function markAchieved() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem;
-  background: rgba(212, 117, 111, 0.15);
-  border-radius: 4px;
-  color: #d4756f;
+  padding: var(--space-1);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
 }
 
 .goal-node.coach-origin {
   border-style: dashed;
-  border-color: #d4756f;
-  background: linear-gradient(135deg, #fff5f0 0%, #e8f5e9 100%);
+  border-left-color: var(--color-primary);
 }
 
-.goal-node.coach-origin .goal-icon {
-  color: #d4756f;
-}
-
+.goal-node.coach-origin .goal-icon,
 .goal-node.coach-origin .goal-label {
-  color: #d4756f;
+  color: var(--color-primary);
 }
 
 .goal-text {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #40312b;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
   line-height: 1.4;
 }
 
 .goal-metric {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(102, 187, 106, 0.3);
-  font-size: 0.8125rem;
-  color: #43a047;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .achieved-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  margin-top: 0.75rem;
-  padding: 0.5rem;
-  background: rgba(255, 193, 7, 0.2);
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #f57c00;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-2);
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: #f59e0b;
 }
 
 .goal-node.workflow-testing-highlight {
-  border-color: #2196f3;
-  box-shadow:
-    0 0 0 3px rgba(33, 150, 243, 0.2),
-    0 4px 12px rgba(33, 150, 243, 0.15);
-  animation: testingPulse 2s ease-in-out infinite;
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
 }
 
 .goal-node.workflow-blocked {
-  border-color: #c26660;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
-  box-shadow: 0 0 0 2px rgba(194, 102, 96, 0.3);
+  outline: 2px solid var(--color-error);
+  outline-offset: 2px;
 }
 
 .goal-node.workflow-incomplete {
-  border-color: #ff9800;
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+  outline: 2px solid var(--color-warning);
+  outline-offset: 2px;
 }
 
 .goal-node.workflow-completed {
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-}
-
-.goal-node.workflow-completed::after {
-  content: '✓';
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 20px;
-  height: 20px;
-  background: #4caf50;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-@keyframes testingPulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 3px rgba(33, 150, 243, 0.2),
-      0 4px 12px rgba(33, 150, 243, 0.15);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(33, 150, 243, 0.1),
-      0 4px 16px rgba(33, 150, 243, 0.25);
-  }
+  outline: 2px solid var(--color-success);
+  outline-offset: 2px;
 }
 
 .handle {
   width: 8px !important;
   height: 8px !important;
-  background: #66bb6a !important;
-  border: 2px solid white !important;
+  background: var(--color-text-tertiary) !important;
+  border: 2px solid var(--color-surface) !important;
   border-radius: 50% !important;
   opacity: 0;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   cursor: crosshair;
 }
 
@@ -326,28 +263,19 @@ async function markAchieved() {
   border-radius: 50%;
 }
 
-.goal-node.achieved .handle {
-  background: #ffc107 !important;
-}
-
 .goal-node:hover .handle {
   opacity: 1;
 }
 
 .handle:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.25);
-}
-
-.goal-node.achieved .handle:hover {
-  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25);
+  background: var(--color-primary) !important;
 }
 
 :deep(.vue-flow__handle-connecting),
 :deep(.vue-flow__handle-valid) {
   opacity: 1 !important;
-  background: #66bb6a !important;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.3) !important;
+  background: var(--color-success) !important;
   transform: scale(1.2) !important;
 }
 </style>
