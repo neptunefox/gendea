@@ -1,6 +1,7 @@
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import type { BaseMessage } from '@langchain/core/messages'
 import { AIMessage, HumanMessage, SystemMessage } from '@langchain/core/messages'
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
 import { ChatOllama } from '@langchain/ollama'
 import { ChatOpenAI } from '@langchain/openai'
 import type { z } from 'zod'
@@ -8,7 +9,7 @@ import type { z } from 'zod'
 import { useRuntimeConfig } from '#imports'
 
 interface LangChainConfig {
-  provider: 'ollama' | 'openrouter'
+  provider: 'ollama' | 'openrouter' | 'gemini'
   model: string
   baseURL?: string
   apiKey?: string
@@ -39,7 +40,8 @@ class LangChainService {
     this.config = {
       provider: (config?.provider || runtimeConfig.llmProvider || 'ollama') as
         | 'ollama'
-        | 'openrouter',
+        | 'openrouter'
+        | 'gemini',
       model: config?.model || runtimeConfig.llmModel || 'gemma3:4b',
       baseURL: config?.baseURL || runtimeConfig.llmBaseUrl || 'http://localhost:11434',
       apiKey: config?.apiKey || runtimeConfig.llmApiKey,
@@ -74,6 +76,18 @@ class LangChainService {
             'X-Title': 'Idea Studio'
           }
         }
+      })
+    }
+
+    if (this.config.provider === 'gemini') {
+      if (!this.config.apiKey) {
+        throw new Error('Google API key not configured')
+      }
+
+      return new ChatGoogleGenerativeAI({
+        apiKey: this.config.apiKey,
+        model: this.config.model,
+        temperature: this.config.temperature
       })
     }
 
