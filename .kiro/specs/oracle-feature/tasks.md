@@ -106,8 +106,8 @@
     - **Property 2: Oracle responses contain only questions**
     - **Validates: Requirements 3.1, 3.2**
 
-- [ ] 9. Create Oracle API endpoints
-  - [ ] 9.1 Create POST /api/oracle/session.post.ts
+- [x] 9. Create Oracle API endpoints
+  - [x] 9.1 Create POST /api/oracle/session.post.ts
     - Accept optional ideaId in request body
     - Create session with visitorId from request
     - Return sessionId and initial context if idea provided
@@ -115,11 +115,11 @@
   - [ ]* 9.2 Write property test for session creation
     - **Property 1: Session creation persists required fields**
     - **Validates: Requirements 2.2, 2.4, 2.5**
-  - [ ] 9.3 Create GET /api/oracle/session/[id].get.ts
+  - [x] 9.3 Create GET /api/oracle/session/[id].get.ts
     - Return session details with all messages
     - Include idea text if session has associated idea
     - _Requirements: 2.5_
-  - [ ] 9.4 Create POST /api/oracle/message.post.ts
+  - [x] 9.4 Create POST /api/oracle/message.post.ts
     - Accept sessionId and message in request body
     - Persist user message
     - Generate Oracle response using oracle-service
@@ -129,10 +129,10 @@
   - [ ]* 9.5 Write property test for message persistence
     - **Property 3: Message persistence includes all required fields**
     - **Validates: Requirements 3.4**
-  - [ ] 9.6 Create POST /api/oracle/message-stream.post.ts
+  - [x] 9.6 Create POST /api/oracle/message-stream.post.ts
     - Same as message.post but with SSE streaming response
     - _Requirements: 3.1_
-  - [ ] 9.7 Create POST /api/oracle/spark.post.ts
+  - [x] 9.7 Create POST /api/oracle/spark.post.ts
     - Accept messageId in request body
     - Update message with sparkedAt timestamp
     - Return success response
