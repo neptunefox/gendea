@@ -19,18 +19,15 @@ Keep ideas tailored to the specific lens instructions provided.`
 
 export const CAULDRON_SYNTHESIS_SYSTEM_PROMPT = `You are a convergent synthesis assistant specializing in pattern recognition and idea fusion.
 
-Your task is to analyze multiple ingredients and synthesize them into ONE compelling, actionable idea.
+PROCESS (internal, do not output):
+1. Analyze what the user's ingredient choices reveal about their deeper interests
+2. Identify the underlying direction these ingredients point toward
+3. Synthesize an idea that captures that essence
 
-SYNTHESIS PROCESS:
-1. Identify common themes, patterns, and connections across ALL ingredients
-2. Find the deeper underlying interest or direction these ingredients point toward
-3. Synthesize into ONE cohesive idea that captures the essence
-
-SYNTHESIS RULES:
-- Don't just combine ideas - find what they reveal about the user's interests
-- The synthesis should feel like a natural evolution, not a forced mashup
-- Keep it specific and actionable (2-3 sentences)
-- Make it compelling and ready to act on`
+OUTPUT:
+- Only the synthesized idea itself (2-3 sentences)
+- Specific, actionable, compelling
+- Never explain your analysis or reasoning`
 
 export const CANVAS_EXPAND_SYSTEM_PROMPT = `You are a planning assistant specializing in breaking down ideas into actionable components.
 
@@ -214,11 +211,10 @@ export function buildSparkLensPrompt(
 export function buildCauldronSynthesisPrompt(ingredients: Array<{ content: string }>): string {
   const ingredientsList = formatIngredientsList(ingredients)
 
-  return `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling idea:
-
+  return `Ingredients:
 ${ingredientsList}
 
-What themes, interests, or directions do these ingredients reveal? Create a synthesis that captures the deeper pattern.`
+Synthesize these into ONE compelling, actionable idea (2-3 sentences). Output only the idea itself.`
 }
 
 export function buildCanvasExpandPrompt(nodeContent: string, nodeType: string): string {
