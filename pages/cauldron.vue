@@ -557,7 +557,7 @@ onMounted(async () => {
 <style scoped>
 .cauldron-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
+  background: var(--color-bg);
   padding: 0;
   position: relative;
   overflow-x: hidden;

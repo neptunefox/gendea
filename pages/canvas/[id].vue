@@ -1146,10 +1146,18 @@ onUnmounted(() => {
 <style scoped>
 .canvas-page {
   height: 100vh;
-  width: 100vw;
+  width: calc(100vw - var(--nav-width));
   position: fixed;
   top: 0;
-  left: 0;
+  left: var(--nav-width);
+}
+
+@media (max-width: 768px) {
+  .canvas-page {
+    width: 100vw;
+    left: 0;
+    height: calc(100vh - 64px);
+  }
 }
 
 .canvas-flow-banner {
@@ -1643,7 +1651,7 @@ kbd {
 @import '@vue-flow/controls/dist/style.css';
 
 .vue-flow {
-  background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
+  background: var(--color-bg);
 }
 
 .vue-flow__controls {

@@ -11,7 +11,7 @@
 
 <style scoped>
 .settings-page {
-  padding: 6rem 2rem 2rem;
+  padding: var(--space-8) var(--space-8);
   max-width: 800px;
   margin: 0 auto;
 }

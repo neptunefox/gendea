@@ -1,16 +1,69 @@
 <template>
-  <div>
+  <div class="app-layout">
     <AppNav />
-    <NuxtPage />
+    <main class="app-main">
+      <NuxtPage />
+    </main>
   </div>
 </template>
 
 <style>
 :root {
+  --color-bg: #FAFAF9;
+  --color-surface: #FFFFFF;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-border-strong: rgba(0, 0, 0, 0.1);
+  --color-text: #1C1917;
+  --color-text-secondary: rgba(28, 25, 23, 0.6);
+  --color-text-tertiary: rgba(28, 25, 23, 0.4);
+
+  --color-primary: #D4756F;
+  --color-primary-hover: #C26660;
+  --color-primary-subtle: rgba(212, 117, 111, 0.1);
+  --color-primary-ring: rgba(212, 117, 111, 0.2);
+
+  --color-success: #4A7C59;
+  --color-warning: #B45309;
+  --color-error: #C26660;
+
+  --text-xl: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-base: 0.9375rem;
+  --text-sm: 0.8125rem;
+  --text-xs: 0.6875rem;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --nav-width: 56px;
+
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
   font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
-  color: #1f2937;
-  background-color: #f9fafb;
+  color: var(--color-text);
+  background-color: var(--color-bg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   font-feature-settings: 'ss01' on, 'ss02' on;
@@ -27,6 +80,16 @@ body {
   box-sizing: border-box;
 }
 
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: var(--nav-width);
+}
+
 button,
 .button,
 [role='button'] {
@@ -35,32 +98,14 @@ button,
   touch-action: manipulation;
 }
 
-.view-transition {
-  animation: viewFadeIn 0.3s ease-out;
-}
-
-@keyframes viewFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@media (max-width: 768px) {
+  :root {
+    --nav-width: 0px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.cta-bottom-right {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 100;
-}
-
-@media (max-width: 640px) {
-  .cta-bottom-right {
-    bottom: 1rem;
-    right: 1rem;
+  .app-main {
+    margin-left: 0;
+    padding-bottom: 72px;
   }
 }
 </style>

@@ -359,8 +359,8 @@ onUnmounted(() => {
 <style scoped>
 .coach-workspace {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f0 0%, #fef8f5 100%);
-  padding: 6rem 1.5rem 4rem;
+  background: var(--color-bg);
+  padding: var(--space-8) var(--space-6);
 }
 
 .banner-wrapper {
