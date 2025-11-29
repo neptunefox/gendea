@@ -22,50 +22,49 @@
       </div>
 
       <section v-if="savedIdeas.length > 0" class="ideas-collection">
-        <div class="collection-header">
+        <button class="collection-header" @click="ideasCollapsed = !ideasCollapsed">
           <h2 class="collection-title">Your ideas</h2>
-          <button
-            v-if="savedIdeas.length > 6"
-            class="expand-btn"
-            @click="showAllIdeas = !showAllIdeas"
-          >
-            {{ showAllIdeas ? 'Show less' : `View all ${savedIdeas.length}` }}
-          </button>
-        </div>
-        <transition-group name="idea-list" tag="div" class="ideas-grid">
-          <div
-            v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
-            :key="idea.id"
-            class="idea-card"
-            :class="{ dragging: isDraggingIdea === idea.id }"
-            draggable="true"
-            @dragstart="e => handleIdeaDragStart(e, idea)"
-            @dragend="handleIdeaDragEnd"
-          >
-            <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M12 4L4 12M4 4l8 8"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-            <p class="idea-text">{{ idea.text }}</p>
-            <div class="idea-actions">
-              <button class="action-btn" @click="handleExploreIdea(idea.text)">
-                Generate more
+          <span class="collection-count">{{ savedIdeas.length }}</span>
+          <ChevronDown :size="18" class="collapse-icon" :class="{ collapsed: ideasCollapsed }" />
+        </button>
+        <div v-show="!ideasCollapsed" class="collection-content">
+          <transition-group name="idea-list" tag="div" class="ideas-grid">
+            <div
+              v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
+              :key="idea.id"
+              class="idea-card"
+              :class="{ dragging: isDraggingIdea === idea.id }"
+              draggable="true"
+              @dragstart="e => handleIdeaDragStart(e, idea)"
+              @dragend="handleIdeaDragEnd"
+            >
+              <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M12 4L4 12M4 4l8 8"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </button>
-              <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
-                <HelpCircle :size="16" />
-                Ask Oracle
-              </button>
+              <p class="idea-text">{{ idea.text }}</p>
+              <div class="idea-actions">
+                <button class="action-btn" @click="handleExploreIdea(idea.text)">
+                  Generate more
+                </button>
+                <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
+                  <HelpCircle :size="16" />
+                  Ask Oracle
+                </button>
+              </div>
             </div>
+          </transition-group>
+          <div v-if="savedIdeas.length > 6" class="collection-footer">
+            <button class="expand-btn" @click="showAllIdeas = !showAllIdeas">
+              {{ showAllIdeas ? 'Show less' : `View all ${savedIdeas.length}` }}
+            </button>
           </div>
-        </transition-group>
-        <div v-if="showAllIdeas && savedIdeas.length > 6" class="collection-footer">
-          <button class="expand-btn" @click="showAllIdeas = false">Show less</button>
         </div>
       </section>
 
@@ -81,7 +80,7 @@
             <button class="selection-btn secondary" @click="clearSelection">Clear</button>
           </div>
         </div>
-        <div v-if="isGenerating" class="loading-card">
+        <div v-if="isGenerating" ref="loadingCard" class="loading-card">
           <Loader :size="28" class="spin" />
           <p>Generating ideas...</p>
         </div>
@@ -174,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-import { Loader, Check, BookmarkPlus, CornerDownRight, Split, HelpCircle } from 'lucide-vue-next'
+import { Loader, Check, BookmarkPlus, CornerDownRight, Split, HelpCircle, ChevronDown } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -236,9 +235,11 @@ const toastMessage = ref('')
 const lastPrompt = ref('')
 const resumingRunId = ref<string | null>(null)
 const showAllIdeas = ref(false)
+const ideasCollapsed = ref(false)
 const selectedIdeas = ref<Map<string, { text: string; entry: JournalEntry }>>(new Map())
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
+const loadingCard = ref<HTMLElement | null>(null)
 
 const INPUT_HEIGHT_LIMIT = 100
 
@@ -304,6 +305,9 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
   if (!topic || isGenerating.value) return
 
   isGenerating.value = true
+
+  await nextTick()
+  loadingCard.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
   try {
     const response = await $fetch<{
@@ -664,8 +668,18 @@ watch(
 
 .collection-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.collection-header:hover .collapse-icon {
+  color: var(--color-text-secondary);
 }
 
 .collection-title {
@@ -673,6 +687,28 @@ watch(
   font-weight: var(--weight-semibold);
   color: var(--color-text);
   margin: 0;
+}
+
+.collection-count {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--weight-normal);
+}
+
+.collapse-icon {
+  margin-left: auto;
+  color: var(--color-text-tertiary);
+  transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.collection-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .expand-btn {
@@ -702,15 +738,14 @@ watch(
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  transition: box-shadow var(--duration-fast) var(--ease-out);
+  padding-top: var(--space-3);
+  transition: all var(--duration-fast) var(--ease-out);
   position: relative;
   cursor: grab;
 }
 
-
-
 .idea-card:hover {
-  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-strong);
 }
 
 .idea-card.dragging {
@@ -720,10 +755,10 @@ watch(
 
 .unpin-btn {
   position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: 28px;
-  height: 28px;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 24px;
+  height: 24px;
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
@@ -741,14 +776,15 @@ watch(
 }
 
 .unpin-btn:hover {
-  background: var(--color-primary-subtle);
-  color: var(--color-primary);
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }
 
 
 
 .idea-text {
   margin: 0 0 var(--space-3) 0;
+  padding-right: var(--space-6);
   color: var(--color-text);
   line-height: 1.5;
   font-size: var(--text-base);
@@ -757,15 +793,21 @@ watch(
 .idea-actions {
   display: flex;
   gap: var(--space-2);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.idea-card:hover .idea-actions {
+  opacity: 1;
 }
 
 .action-btn {
   flex: 1;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: transparent;
+  color: var(--color-text-secondary);
   font-weight: var(--weight-medium);
   font-size: var(--text-sm);
   cursor: pointer;
@@ -773,13 +815,14 @@ watch(
 }
 
 .action-btn:hover {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: var(--color-border-strong);
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
 }
 
 .action-btn.oracle-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-1);
 }
 
@@ -1047,8 +1090,7 @@ watch(
 .toast {
   position: fixed;
   top: var(--space-6);
-  left: 50%;
-  transform: translateX(-50%);
+  right: var(--space-6);
   background: var(--color-surface);
   color: var(--color-text);
   padding: var(--space-3) var(--space-4);
@@ -1073,7 +1115,7 @@ watch(
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(-10px);
+  transform: translateY(-10px);
 }
 
 .floating-input-btn {

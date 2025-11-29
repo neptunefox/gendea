@@ -1,8 +1,7 @@
 <template>
   <div class="oracle-page">
     <div v-if="isLoading" class="loading-state">
-      <Loader :size="32" class="spin" />
-      <p>Starting Oracle...</p>
+      <div class="loading-pulse" />
     </div>
 
     <div v-else-if="error" class="error-state">
@@ -11,29 +10,22 @@
     </div>
 
     <template v-else>
-      <div class="oracle-header" v-if="ideaContext">
-        <p class="idea-context">{{ ideaContext }}</p>
-      </div>
-
       <OracleChat
         v-if="sessionId"
         :session-id="sessionId"
         :initial-idea-text="ideaContext"
-        @spark="handleSpark"
       />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Loader } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import OracleChat from '~/components/OracleChat.vue'
 
 const route = useRoute()
-const router = useRouter()
 
 const sessionId = ref<string | null>(null)
 const ideaContext = ref<string | null>(null)
@@ -45,7 +37,7 @@ const VISITOR_ID = 'default-visitor'
 async function createSession(ideaId?: string) {
   isLoading.value = true
   error.value = null
-  
+
   try {
     const response = await $fetch<{ sessionId: string; ideaText?: string }>('/api/oracle/session', {
       method: 'POST',
@@ -70,13 +62,6 @@ function retry() {
   createSession(ideaId)
 }
 
-function handleSpark(question: string) {
-  router.push({
-    path: '/',
-    query: { prefill: question }
-  })
-}
-
 onMounted(async () => {
   const ideaId = route.query.idea as string | undefined
   await createSession(ideaId)
@@ -86,8 +71,8 @@ onMounted(async () => {
 <style scoped>
 .oracle-page {
   min-height: 100vh;
-  background: #1C1917;
-  color: #FAFAF9;
+  background: #1a1816;
+  color: #e8e4e0;
   display: flex;
   flex-direction: column;
 }
@@ -95,44 +80,27 @@ onMounted(async () => {
 .loading-state {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
-  color: #A8A29E;
 }
 
-.loading-state p {
-  margin: 0;
-  font-size: var(--text-sm);
+.loading-pulse {
+  width: 8px;
+  height: 8px;
+  background: #6b6560;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
   }
-}
-
-.oracle-header {
-  padding: var(--space-6) var(--space-6) 0;
-  max-width: 640px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.idea-context {
-  margin: 0;
-  padding: var(--space-4);
-  background: #292524;
-  border-radius: var(--radius-lg);
-  color: #A8A29E;
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  border-left: 3px solid #d4756f;
+  50% {
+    opacity: 0.8;
+    transform: scale(1.5);
+  }
 }
 
 .error-state {
@@ -141,34 +109,30 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
-  color: #A8A29E;
+  gap: var(--space-6);
+  color: #6b6560;
   text-align: center;
-  padding: var(--space-6);
+  padding: var(--space-8);
 }
 
 .error-state p {
   margin: 0;
+  font-size: var(--text-base);
 }
 
 .retry-btn {
-  padding: var(--space-2) var(--space-4);
-  background: #d4756f;
-  color: white;
-  border: none;
+  padding: var(--space-3) var(--space-5);
+  background: transparent;
+  color: #e8e4e0;
+  border: 1px solid #3d3835;
   border-radius: var(--radius-md);
   font-weight: var(--weight-medium);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .retry-btn:hover {
-  background: #C26660;
-}
-
-@media (max-width: 768px) {
-  .oracle-header {
-    padding: var(--space-4) var(--space-4) 0;
-  }
+  border-color: #6b6560;
+  background: rgba(255, 255, 255, 0.03);
 }
 </style>
