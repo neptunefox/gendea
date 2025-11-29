@@ -79,12 +79,13 @@
 
 ## Phase 4: Database Schema for Oracle
 
-- [ ] 6. Create Oracle database tables
-  - [ ] 6.1 Add Oracle schema to db/schema.ts
+- [x] 6. Create Oracle database tables
+  - [x] 6.1 Add Oracle schema to db/schema.ts
     - Add oracleSessions table with id, visitorId, ideaId, createdAt, updatedAt
     - Add oracleMessages table with id, sessionId, role, content, createdAt, sparkedAt
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
-  - [ ] 6.2 Create database migration script
+
+  - [x] 6.2 Create database migration script
     - Create migration file in scripts/migrations/
     - Include CREATE TABLE statements for oracle_sessions and oracle_messages
     - _Requirements: 10.1, 10.2_

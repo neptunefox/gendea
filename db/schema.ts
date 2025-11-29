@@ -254,3 +254,23 @@ export const canvasState = pgTable('canvas_state', {
   version: integer('version').notNull().default(1),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 })
+
+
+export const oracleSessions = pgTable('oracle_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  visitorId: text('visitor_id').notNull(),
+  ideaId: uuid('idea_id').references(() => savedIdeas.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+})
+
+export const oracleMessages = pgTable('oracle_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sessionId: uuid('session_id')
+    .notNull()
+    .references(() => oracleSessions.id),
+  role: text('role', { enum: ['user', 'oracle'] }).notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  sparkedAt: timestamp('sparked_at')
+})
