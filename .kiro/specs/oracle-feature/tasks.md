@@ -146,8 +146,9 @@
 
 ## Phase 6: Implement Oracle Frontend
 
-- [ ] 11. Create Oracle types
-  - [ ] 11.1 Create types/oracle.ts
+- [x] 11. Create Oracle types
+
+  - [x] 11.1 Create types/oracle.ts
     - Define OracleSession interface
     - Define OracleMessage interface
     - _Requirements: 10.1, 10.2_
