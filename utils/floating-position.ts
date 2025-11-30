@@ -92,8 +92,8 @@ export function generateArcPosition(
 
   const angleRad = (angle * Math.PI) / 180
   const x = centerX + arcRadius * Math.sin(angleRad) - cardWidth / 2
-  const baseY = cauldronTopY - 120
-  const arcOffset = Math.abs(angle) * 2.2
+  const baseY = cauldronTopY - 200
+  const arcOffset = Math.abs(angle) * 1.5
   const y = baseY + arcOffset - cardHeight / 2
 
   const tangentRotation = calculateArcTangentRotation(angle)
