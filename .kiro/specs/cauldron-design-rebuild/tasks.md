@@ -30,8 +30,8 @@
     - **Property 4: Responsive Arc Recalculation**
     - **Validates: Requirements 1.4**
 
-- [ ] 3. Implement parchment card styling
-  - [ ] 3.1 Add parchment CSS styles to `FloatingIdea.vue`
+- [x] 3. Implement parchment card styling
+  - [x] 3.1 Add parchment CSS styles to `FloatingIdea.vue`
     - Add CSS variables for parchment colors
     - Create yellowed background gradient
     - Implement torn-edge effect using CSS clip-path

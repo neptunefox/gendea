@@ -303,55 +303,85 @@ onUnmounted(() => {
 
 <style scoped>
 .floating-idea {
+  --parchment-bg: #f4e4bc;
+  --parchment-bg-dark: #e8d4a8;
+  --parchment-border: #c9b896;
+  --parchment-text: #3d3225;
+  --parchment-shadow: rgba(61, 50, 37, 0.3);
+
   position: absolute;
   width: 220px;
   padding: var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: 
+    linear-gradient(135deg, 
+      var(--parchment-bg) 0%, 
+      var(--parchment-bg-dark) 50%, 
+      var(--parchment-bg) 100%
+    );
+  border: none;
+  box-shadow: 
+    0 2px 8px var(--parchment-shadow),
+    inset 0 0 20px rgba(201, 184, 150, 0.3);
   cursor: grab;
   user-select: none;
   pointer-events: auto;
-  opacity: 0.7;
+  opacity: 0.85;
+  clip-path: polygon(
+    0% 2%, 3% 0%, 8% 1%, 15% 0%, 22% 2%, 30% 0%, 38% 1%, 45% 0%, 52% 2%, 60% 0%, 68% 1%, 75% 0%, 82% 2%, 90% 0%, 95% 1%, 100% 0%,
+    100% 3%, 99% 10%, 100% 18%, 99% 25%, 100% 33%, 99% 40%, 100% 48%, 99% 55%, 100% 63%, 99% 70%, 100% 78%, 99% 85%, 100% 92%, 99% 100%,
+    97% 100%, 90% 99%, 82% 100%, 75% 98%, 68% 100%, 60% 99%, 52% 100%, 45% 98%, 38% 100%, 30% 99%, 22% 100%, 15% 98%, 8% 100%, 3% 99%, 0% 100%,
+    0% 97%, 1% 90%, 0% 82%, 1% 75%, 0% 68%, 1% 60%, 0% 52%, 1% 45%, 0% 38%, 1% 30%, 0% 22%, 1% 15%, 0% 8%, 1% 3%
+  );
   transition:
     box-shadow var(--duration-normal) var(--ease-out),
-    border-color var(--duration-normal) var(--ease-out),
     transform var(--duration-normal) var(--ease-out),
     opacity var(--duration-normal) var(--ease-out);
 }
 
+.floating-idea::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
 .timer-ring {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   width: 8px;
   height: 8px;
   border-radius: var(--radius-full);
   z-index: 2;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .floating-idea:hover:not(.dragging) {
   opacity: 1;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  border-color: var(--color-border-strong);
+  box-shadow: 
+    0 6px 20px var(--parchment-shadow),
+    inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
 .floating-idea.dragging {
   cursor: grabbing;
   opacity: 1;
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    0 0 12px var(--color-glow-amber);
-  border-color: var(--color-primary);
+    0 12px 32px var(--parchment-shadow),
+    0 0 16px var(--color-glow-purple),
+    inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
 .floating-idea.selected {
   width: 260px;
   opacity: 1;
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 6px 20px var(--parchment-shadow),
+    0 0 8px var(--color-glow-amber),
+    inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
 .floating-idea.selected .idea-content {
@@ -380,14 +410,18 @@ onUnmounted(() => {
 }
 
 .idea-content {
+  position: relative;
+  font-family: 'Satoshi', Georgia, serif;
   font-size: var(--text-sm);
-  line-height: 1.5;
-  color: var(--color-text-secondary);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--parchment-text);
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
   padding-right: var(--space-3);
+  letter-spacing: 0.01em;
 }
 </style>
