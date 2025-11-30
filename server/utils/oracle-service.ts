@@ -31,9 +31,9 @@ export const OracleResponseSchema = z.object({
 export type OracleResponse = z.infer<typeof OracleResponseSchema>
 
 const FALLBACK_QUESTIONS = [
-  "What would change if you approached this from the opposite direction?",
+  'What would change if you approached this from the opposite direction?',
   "What's the smallest version of this that would still matter to you?",
-  "Who else has faced something similar, and what did they try?"
+  'Who else has faced something similar, and what did they try?'
 ]
 
 export interface OracleContext {

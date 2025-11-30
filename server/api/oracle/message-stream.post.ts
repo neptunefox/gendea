@@ -41,13 +41,11 @@ export default defineEventHandler(async event => {
     })
   }
 
-  await db
-    .insert(oracleMessages)
-    .values({
-      sessionId,
-      role: 'user',
-      content: message
-    })
+  await db.insert(oracleMessages).values({
+    sessionId,
+    role: 'user',
+    content: message
+  })
 
   const existingMessages = await db
     .select()
@@ -56,7 +54,7 @@ export default defineEventHandler(async event => {
     .orderBy(oracleMessages.createdAt)
 
   const conversationHistory = existingMessages.map(m => ({
-    role: m.role === 'user' ? 'user' as const : 'assistant' as const,
+    role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
     content: m.content
   }))
 
@@ -102,11 +100,14 @@ export default defineEventHandler(async event => {
           .set({ updatedAt: new Date() })
           .where(eq(oracleSessions.id, sessionId))
 
-        controller.enqueue(`data: ${JSON.stringify({ done: true, messageId: oracleMessage.id, question: fullText })}\n\n`)
+        controller.enqueue(
+          `data: ${JSON.stringify({ done: true, messageId: oracleMessage.id, question: fullText })}\n\n`
+        )
         controller.close()
       } catch (error) {
-        const fallbackQuestion = "What would change if you approached this from the opposite direction?"
-        
+        const fallbackQuestion =
+          'What would change if you approached this from the opposite direction?'
+
         const [oracleMessage] = await db
           .insert(oracleMessages)
           .values({
@@ -116,7 +117,9 @@ export default defineEventHandler(async event => {
           })
           .returning()
 
-        controller.enqueue(`data: ${JSON.stringify({ done: true, messageId: oracleMessage.id, question: fallbackQuestion })}\n\n`)
+        controller.enqueue(
+          `data: ${JSON.stringify({ done: true, messageId: oracleMessage.id, question: fallbackQuestion })}\n\n`
+        )
         controller.close()
       }
     }

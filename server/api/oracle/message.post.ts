@@ -2,7 +2,11 @@ import { eq } from 'drizzle-orm'
 
 import { oracleSessions, oracleMessages, savedIdeas } from '../../../db/schema'
 import { db } from '../../db'
-import { generateOracleResponse, formatOracleResponse, type OracleContext } from '../../utils/oracle-service'
+import {
+  generateOracleResponse,
+  formatOracleResponse,
+  type OracleContext
+} from '../../utils/oracle-service'
 import { validateRequired, validateUUID } from '../../utils/validation'
 
 export default defineEventHandler(async event => {

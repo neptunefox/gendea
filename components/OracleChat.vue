@@ -28,7 +28,7 @@
         v-model="inputText"
         class="message-input"
         rows="1"
-        placeholder="What's on your mind?"
+        placeholder="Ask a question to explore this idea deeper..."
         @keydown.enter.exact.prevent="handleSend"
       />
       <button
@@ -38,7 +38,13 @@
         @click="handleSend"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 3v10M8 3l4 4M8 3L4 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M8 3v10M8 3l4 4M8 3L4 7"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
@@ -189,26 +195,38 @@ onMounted(async () => {
 
 .context-intro {
   text-align: center;
-  padding: var(--space-8) 0;
-  margin-bottom: var(--space-6);
-  border-bottom: 1px solid var(--color-border-strong);
+  padding: var(--space-8) var(--space-4);
+  margin-bottom: var(--space-8);
+  position: relative;
+}
+
+.context-intro::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(126, 184, 201, 0.3), transparent);
 }
 
 .context-label {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-3);
   font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   color: var(--color-text-tertiary);
 }
 
 .context-text {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--text-lg);
+  font-size: 1.25rem;
   color: var(--color-text-secondary);
   line-height: 1.5;
   font-weight: 400;
+  font-style: italic;
 }
 
 .messages-list {
@@ -220,33 +238,36 @@ onMounted(async () => {
 .thinking-indicator {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  padding: var(--space-6) 0;
+  gap: 8px;
+  padding: var(--space-8) 0;
 }
 
 .thinking-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   background: var(--color-oracle);
   border-radius: 50%;
-  animation: think 1.4s ease-in-out infinite;
-  box-shadow: 0 0 8px var(--color-glow-teal);
+  animation: oracleThink 2s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--color-glow-teal);
 }
 
 .thinking-dot:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.3s;
 }
 
 .thinking-dot:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0.6s;
 }
 
-@keyframes think {
-  0%, 80%, 100% {
-    opacity: 0.3;
+@keyframes oracleThink {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
   }
-  40% {
+  50% {
     opacity: 1;
+    transform: scale(1.4);
   }
 }
 
@@ -264,10 +285,10 @@ onMounted(async () => {
 .input-area::before {
   content: '';
   position: absolute;
-  top: -40px;
+  top: -60px;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 60px;
   background: linear-gradient(transparent, var(--color-bg));
   pointer-events: none;
 }
@@ -287,16 +308,18 @@ onMounted(async () => {
   overflow-y: hidden;
   outline: none;
   padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-border-strong);
-  transition: border-color var(--duration-normal) var(--ease-out);
+  border-bottom: 1px solid rgba(126, 184, 201, 0.2);
+  transition: all 0.4s var(--ease-out);
 }
 
 .message-input:focus {
   border-color: var(--color-oracle);
+  box-shadow: 0 4px 20px rgba(126, 184, 201, 0.1);
 }
 
 .message-input::placeholder {
   color: var(--color-text-tertiary);
+  font-style: italic;
 }
 
 .send-btn {
@@ -308,12 +331,11 @@ onMounted(async () => {
   border: none;
   background: transparent;
   color: var(--color-text-tertiary);
-  border-radius: var(--radius-md);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: all 0.3s var(--ease-out);
 }
 
 .send-btn.ready {
@@ -322,6 +344,7 @@ onMounted(async () => {
 
 .send-btn:hover:not(:disabled) {
   color: var(--color-text);
+  transform: translateY(-2px);
 }
 
 .send-btn:disabled {
