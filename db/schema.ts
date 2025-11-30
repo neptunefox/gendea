@@ -76,3 +76,15 @@ export const oracleMessages = pgTable('oracle_messages', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   sparkedAt: timestamp('sparked_at')
 })
+
+export const tarotReadings = pgTable('tarot_readings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  visitorId: text('visitor_id').notNull(),
+  date: text('date').notNull(),
+  cardOptions: jsonb('card_options').$type<string[]>().notNull(),
+  chosenCard: text('chosen_card'),
+  interpretation: text('interpretation'),
+  sparkPrompt: text('spark_prompt'),
+  usedAsInput: integer('used_as_input').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
