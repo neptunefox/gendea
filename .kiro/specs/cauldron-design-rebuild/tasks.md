@@ -39,8 +39,8 @@
     - Add subtle paper texture overlay
     - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 4. Implement particle dissolution system
-  - [ ] 4.1 Create `composables/useParticles.ts` composable
+- [x] 4. Implement particle dissolution system
+  - [x] 4.1 Create `composables/useParticles.ts` composable
     - Implement `Particle` interface and state management
     - Create `spawnDissolutionParticles()` function
     - Implement `updateParticles()` with animation frame loop
