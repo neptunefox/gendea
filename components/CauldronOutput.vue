@@ -138,7 +138,9 @@ function getSteamStyle(index: number) {
   padding: var(--space-6);
   max-width: 480px;
   width: 100%;
-  box-shadow: 0 0 30px var(--color-glow-purple), var(--shadow-xl);
+  box-shadow:
+    0 0 30px var(--color-glow-purple),
+    var(--shadow-xl);
   z-index: 2;
 }
 

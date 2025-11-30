@@ -1,5 +1,13 @@
 <template>
   <div class="cauldron-page" @click="handleBackgroundClick">
+    <FlowGuidanceBanner
+      :visible="showGuidance && !output && ingredients.length === 0"
+      message="Combine scattered ideas to find unexpected connections"
+      hint="Drop or type 3+ ideas. The cauldron will blend them into something new."
+      variant="cauldron"
+      @dismiss="dismissGuidance"
+    />
+
     <div class="cauldron-layout">
       <div v-if="isLoading" class="loading-state">
         <Loader :size="32" class="spin" />
@@ -96,6 +104,7 @@ import { ref, onMounted, watch } from 'vue'
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 
 interface FloatingIdea {
   id: string
@@ -140,6 +149,9 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
+const showGuidance = ref(true)
+
+const GUIDANCE_DISMISSED_KEY = 'cauldron-guidance-dismissed'
 const ideaRefs = ref<
   Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>
 >(new Map())
@@ -470,6 +482,22 @@ function triggerRemixHintPulse() {
   }, 600)
 }
 
+function dismissGuidance() {
+  showGuidance.value = false
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(GUIDANCE_DISMISSED_KEY, 'true')
+  }
+}
+
+function checkGuidanceDismissed() {
+  if (typeof window !== 'undefined') {
+    const dismissed = window.localStorage.getItem(GUIDANCE_DISMISSED_KEY)
+    if (dismissed) {
+      showGuidance.value = false
+    }
+  }
+}
+
 async function streamMix(sessionId: string, isRemix = false) {
   isMixing.value = true
   streamingText.value = ''
@@ -526,6 +554,7 @@ watch(
 )
 
 onMounted(async () => {
+  checkGuidanceDismissed()
   await loadSession()
   await loadFloatingIdeas()
 })
@@ -544,11 +573,15 @@ onMounted(async () => {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse 50% 50% at 50% 60%, rgba(149, 117, 205, 0.04) 0%, transparent 50%);
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 60%,
+    rgba(149, 117, 205, 0.04) 0%,
+    transparent 50%
+  );
   pointer-events: none;
 }
 
-.cauldron-page > .flow-guidance-banner {
+.cauldron-page > :deep(.flow-guidance-banner) {
   position: fixed;
   top: var(--space-4);
   left: 50%;
@@ -582,8 +615,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .floating-ideas-container {
@@ -729,9 +766,18 @@ onMounted(async () => {
 }
 
 @keyframes remix-pulse {
-  0% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-  100% { opacity: 0.7; transform: scale(1); }
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
 }
 
 .reset-btn {

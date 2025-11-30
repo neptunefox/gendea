@@ -81,10 +81,11 @@
 
   --nav-width: 56px;
 
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 450ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mystical: cubic-bezier(0.4, 0, 0.2, 1);
 
   --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-heading: 'Cinzel', Georgia, serif;
@@ -95,7 +96,9 @@
   background-color: var(--color-bg);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'ss01' on, 'ss02' on;
+  font-feature-settings:
+    'ss01' on,
+    'ss02' on;
 }
 
 body {
@@ -103,6 +106,16 @@ body {
   font-family: inherit;
   color: inherit;
   background-color: inherit;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 * {
