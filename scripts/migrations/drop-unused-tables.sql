@@ -2,6 +2,8 @@
 DROP TABLE IF EXISTS canvas_edges CASCADE;
 DROP TABLE IF EXISTS canvas_nodes CASCADE;
 DROP TABLE IF EXISTS canvas_state CASCADE;
+DROP TABLE IF EXISTS canvas_groups CASCADE;
+DROP TABLE IF EXISTS canvases CASCADE;
 
 -- Drop unused workflow/coach tables
 DROP TABLE IF EXISTS nodes CASCADE;

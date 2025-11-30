@@ -1,5 +1,22 @@
 <template>
   <div class="spark-page">
+    <div v-if="showDemo" class="demo-overlay" @click="dismissDemo">
+      <div class="demo-container" @click.stop>
+        <div class="demo-header">
+          <p class="demo-label">Example</p>
+          <p class="demo-prompt">{{ DEMO_ENTRY.prompt }}</p>
+        </div>
+        <div class="demo-ideas">
+          <div v-for="(idea, index) in DEMO_ENTRY.coreIdeas" :key="index" class="demo-idea">
+            <p>{{ idea.text }}</p>
+          </div>
+        </div>
+        <button class="demo-cta" @click="dismissDemo">
+          Try your own
+        </button>
+      </div>
+    </div>
+
     <div class="spark-layout">
       <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
         <textarea
@@ -225,6 +242,22 @@ interface SavedIdea {
 }
 
 const STORAGE_KEY = 'spark-thread-journal'
+const DEMO_DISMISSED_KEY = 'spark-demo-dismissed'
+
+const DEMO_ENTRY: JournalEntry = {
+  id: 'demo',
+  prompt: 'A morning routine app that actually sticks',
+  timestamp: Date.now(),
+  coreIdeas: [
+    { text: 'Start with just one habit — the keystone — and let users unlock more only after a 7-day streak.' },
+    { text: 'Replace reminders with a "morning score" that decays if you skip, gamifying consistency without nagging.' },
+    { text: 'Partner mode: two friends see each other\'s streaks and can "nudge" once per day.' },
+    { text: 'Build it as an Apple Watch complication that shows a single emoji reflecting your week.' },
+    { text: 'Anti-feature: no stats dashboard. Just today, yesterday, and a binary "on track" or "rebuild."' }
+  ],
+  lenses: [],
+  nudges: []
+}
 
 const input = ref('')
 const entries = ref<JournalEntry[]>([])
@@ -240,6 +273,7 @@ const selectedIdeas = ref<Map<string, { text: string; entry: JournalEntry }>>(ne
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
 const loadingCard = ref<HTMLElement | null>(null)
+const showDemo = ref(false)
 
 const INPUT_HEIGHT_LIMIT = 100
 
@@ -483,9 +517,27 @@ function restoreThread() {
   }
 }
 
+function checkShowDemo() {
+  if (typeof window === 'undefined') return
+  const dismissed = window.localStorage.getItem(DEMO_DISMISSED_KEY)
+  if (dismissed) return
+  if (entries.value.length === 0 && savedIdeas.value.length === 0) {
+    showDemo.value = true
+  }
+}
+
+function dismissDemo() {
+  showDemo.value = false
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(DEMO_DISMISSED_KEY, 'true')
+  }
+  nextTick(() => inputField.value?.focus())
+}
+
 onMounted(async () => {
   restoreThread()
-  fetchSavedIdeas()
+  await fetchSavedIdeas()
+  checkShowDemo()
   await nextTick()
   adjustInputHeight()
 })
@@ -1198,6 +1250,109 @@ watch(
 
   .floating-input-btn {
     bottom: 80px;
+  }
+}
+
+.demo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: var(--space-4);
+  backdrop-filter: blur(2px);
+}
+
+.demo-container {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  max-width: 560px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.demo-header {
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.demo-label {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  font-weight: var(--weight-medium);
+}
+
+.demo-prompt {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.demo-ideas {
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.demo-idea {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.demo-idea p {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.demo-cta {
+  display: block;
+  width: calc(100% - var(--space-6) * 2);
+  margin: var(--space-2) var(--space-6) var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.demo-cta:hover {
+  background: var(--color-primary-hover);
+}
+
+@media (max-width: 640px) {
+  .demo-container {
+    max-height: 90vh;
+  }
+
+  .demo-header {
+    padding: var(--space-5) var(--space-4) var(--space-3);
+  }
+
+  .demo-ideas {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .demo-cta {
+    width: calc(100% - var(--space-4) * 2);
+    margin: var(--space-2) var(--space-4) var(--space-4);
   }
 }
 </style>

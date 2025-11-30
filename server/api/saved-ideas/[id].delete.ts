@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 
-import { savedIdeas } from '../../../db/schema'
+import { savedIdeas, oracleSessions } from '../../../db/schema'
 import { db } from '../../db'
 
 export default defineEventHandler(async event => {
@@ -13,6 +13,7 @@ export default defineEventHandler(async event => {
     })
   }
 
+  await db.update(oracleSessions).set({ ideaId: null }).where(eq(oracleSessions.ideaId, id))
   await db.delete(savedIdeas).where(eq(savedIdeas.id, id))
 
   return { success: true }
