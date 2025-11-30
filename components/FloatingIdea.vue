@@ -88,8 +88,8 @@ const computedZIndex = computed(() => {
   return zIndex.value
 })
 
-const SELECTED_WIDTH = 280
-const DEFAULT_WIDTH = 200
+const SELECTED_WIDTH = 200
+const DEFAULT_WIDTH = 160
 
 const positionStyle = computed(() => {
   let leftPos = position.value.x
@@ -293,17 +293,16 @@ onUnmounted(() => {
 <style scoped>
 .floating-idea {
   position: absolute;
-  width: 200px;
-  padding: var(--space-4);
-  background: linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-raised) 100%);
-  border: 1px solid var(--color-border-strong);
+  width: 160px;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(232, 228, 224, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   cursor: grab;
   user-select: none;
   pointer-events: auto;
+  opacity: 0.7;
   transition:
     box-shadow var(--duration-normal) var(--ease-out),
     border-color var(--duration-normal) var(--ease-out),
@@ -311,50 +310,39 @@ onUnmounted(() => {
     opacity var(--duration-normal) var(--ease-out);
 }
 
-.floating-idea::before {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-md) - 2px);
-  pointer-events: none;
-  opacity: 0.4;
-}
-
 .timer-ring {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 12px;
-  height: 12px;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
   border-radius: var(--radius-full);
   z-index: 2;
+  opacity: 0.6;
 }
 
 .floating-idea:hover {
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.4),
-    0 0 15px var(--color-glow-amber);
-  border-color: var(--color-primary);
-  transform: translateY(-3px);
+  opacity: 1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
 }
 
 .floating-idea.dragging {
   cursor: grabbing;
-  transform: scale(1.05) rotate(2deg);
+  opacity: 1;
+  transform: scale(1.02) rotate(1deg);
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.5),
-    0 0 20px var(--color-glow-amber);
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 12px var(--color-glow-amber);
   border-color: var(--color-primary);
 }
 
 .floating-idea.selected {
-  width: 280px;
+  width: 200px;
+  opacity: 1;
   border-color: var(--color-primary);
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.4),
-    0 0 20px var(--color-glow-amber);
-  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .floating-idea.selected .idea-content {
@@ -383,14 +371,14 @@ onUnmounted(() => {
 }
 
 .idea-content {
-  font-size: var(--text-sm);
-  line-height: 1.45;
-  color: var(--color-text);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
-  padding-right: var(--space-4);
+  padding-right: var(--space-3);
 }
 </style>

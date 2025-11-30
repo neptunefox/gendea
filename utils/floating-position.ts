@@ -24,10 +24,10 @@ export interface SideLayoutConfig {
 }
 
 export const DEFAULT_SIDE_CONFIG: SideLayoutConfig = {
-  cardWidth: 200,
-  cardHeight: 90,
-  verticalGap: 16,
-  horizontalOffset: 280,
+  cardWidth: 160,
+  cardHeight: 70,
+  verticalGap: 12,
+  horizontalOffset: 320,
   cardsPerSide: 3
 }
 

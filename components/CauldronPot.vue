@@ -242,15 +242,15 @@ defineExpose({
 
 <style scoped>
 .cauldron-pot {
-  width: 280px;
-  height: 140px;
+  width: 320px;
+  height: 160px;
   background: linear-gradient(180deg, #5a4a6a 0%, #3d3050 60%, #2a2040 100%);
   border-radius: 50% / 30% 30% 70% 70%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 12px 28px rgba(149, 117, 205, 0.3),
+    0 16px 40px rgba(149, 117, 205, 0.35),
     inset 0 -20px 30px rgba(0, 0, 0, 0.3),
     inset 0 8px 12px rgba(255, 255, 255, 0.05);
   position: relative;
@@ -670,8 +670,8 @@ defineExpose({
 
 @media (max-width: 768px) {
   .cauldron-pot {
-    width: 240px;
-    height: 120px;
+    width: 280px;
+    height: 140px;
   }
 
   .ingredient-counter {
