@@ -9,7 +9,9 @@ const SparkIdeaSchema = z.object({
   text: z.string().min(10)
 })
 
-const SparkIdeasArraySchema = z.array(SparkIdeaSchema).min(3).max(6)
+const SparkIdeasWrapperSchema = z.object({
+  ideas: z.array(SparkIdeaSchema).min(3).max(6)
+})
 
 const LensOutputSchema = z.object({
   ideas: z.array(z.string().min(5)).min(1).max(2),
@@ -145,7 +147,7 @@ Rules:
 - No generic suggestions
 - Focus on concrete next steps
 
-Output format: [{"text":"idea 1"},{"text":"idea 2"},{"text":"idea 3"},{"text":"idea 4"},{"text":"idea 5"}]`
+Output format: {"ideas":[{"text":"idea 1"},{"text":"idea 2"},{"text":"idea 3"},{"text":"idea 4"},{"text":"idea 5"}]}`
 
   const historyText = history
     .map((entry, i) => `Run ${i + 1}: ${entry.prompt} -> ${entry.ideas?.join(' · ') || 'n/a'}`)
@@ -154,16 +156,16 @@ Output format: [{"text":"idea 1"},{"text":"idea 2"},{"text":"idea 3"},{"text":"i
   const prompt = `Topic: "${input}"
 Avoid repeating: ${historyText || 'No prior runs.'}
 
-Generate 5-6 fresh ideas as a JSON array.`
+Generate 5-6 fresh ideas as JSON.`
 
   try {
     const result = await langchain.generateStructured({
       prompt,
       systemPrompt,
-      schema: SparkIdeasArraySchema
+      schema: SparkIdeasWrapperSchema
     })
 
-    const filtered = result
+    const filtered = result.ideas
       .filter(item => item.text && item.text.length >= 10)
       .filter(item => !seenIdeas.has(normalizeIdea(item.text)))
 
