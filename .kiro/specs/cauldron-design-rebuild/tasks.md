@@ -51,8 +51,8 @@
     - **Property 6: Particle Drift Direction**
     - **Validates: Requirements 3.3**
 
-- [ ] 5. Integrate dissolution animation into FloatingIdea
-  - [ ] 5.1 Update `FloatingIdea.vue` with dissolution effects
+- [x] 5. Integrate dissolution animation into FloatingIdea
+  - [x] 5.1 Update `FloatingIdea.vue` with dissolution effects
     - Add lift effect (scale + shadow) on drag toward cauldron
     - Add purple glow effect before dissolve
     - Integrate particle system on dissolution

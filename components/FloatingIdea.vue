@@ -7,7 +7,8 @@
       dissolving: isDissolving,
       urgent: isUrgent,
       selected: isSelected,
-      frozen: isFrozen
+      frozen: isFrozen,
+      'near-cauldron': isNearCauldron
     }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
@@ -54,11 +55,13 @@ const emit = defineEmits<{
   expired: [idea: FloatingIdea]
   select: [idea: FloatingIdea]
   throw: [idea: FloatingIdea]
+  dissolveStart: [idea: FloatingIdea, position: { x: number; y: number }]
 }>()
 
 const ideaRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const isDissolving = ref(false)
+const isNearCauldron = ref(false)
 const position = ref({ x: 0, y: 0 })
 const arcPosition = ref<ArcPosition | null>(null)
 const originalPosition = ref({ x: 0, y: 0 })
@@ -67,6 +70,7 @@ const dragOffset = ref({ x: 0, y: 0 })
 const hasDragged = ref(false)
 const dragStartPos = ref({ x: 0, y: 0 })
 const DRAG_THRESHOLD = 5
+const CAULDRON_PROXIMITY_THRESHOLD = 150
 
 const timeRemaining = ref(props.duration)
 const URGENT_THRESHOLD = 5000
@@ -93,17 +97,30 @@ const computedZIndex = computed(() => {
 
 const positionStyle = computed(() => {
   const rotation = isDragging.value ? 0 : (arcPosition.value?.rotation ?? 0)
-  const scale = arcPosition.value?.scale ?? 1
+  const baseScale = arcPosition.value?.scale ?? 1
+  
+  let scale = baseScale
+  let transform = ''
+  
+  if (isDragging.value) {
+    if (isNearCauldron.value) {
+      scale = 1.08
+      transform = `scale(${scale}) rotate(2deg)`
+    } else {
+      scale = 1.02
+      transform = `scale(${scale}) rotate(1deg)`
+    }
+  } else {
+    transform = `rotate(${rotation}deg) scale(${scale})`
+  }
   
   return {
     left: `${position.value.x}px`,
     top: `${position.value.y}px`,
     zIndex: computedZIndex.value,
-    transform: isDragging.value 
-      ? 'scale(1.02) rotate(1deg)' 
-      : `rotate(${rotation}deg) scale(${scale})`,
+    transform,
     transition: isDragging.value
-      ? 'none'
+      ? 'transform 0.15s ease-out, box-shadow 0.15s ease-out'
       : 'transform 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.3s ease, top 0.3s ease'
   }
 })
@@ -185,6 +202,13 @@ function updatePosition(clientX: number, clientY: number) {
     x: clientX - dragOffset.value.x,
     y: clientY - dragOffset.value.y
   }
+  
+  if (props.cauldronCenter) {
+    const distX = clientX - props.cauldronCenter.x
+    const distY = clientY - props.cauldronCenter.y
+    const distance = Math.sqrt(distX * distX + distY * distY)
+    isNearCauldron.value = distance < CAULDRON_PROXIMITY_THRESHOLD
+  }
 }
 
 function handleMouseUp(event: MouseEvent) {
@@ -219,6 +243,7 @@ function endDrag(clientX: number, clientY: number) {
   }
 
   isDragging.value = false
+  isNearCauldron.value = false
   zIndex.value = 10 + props.index
 
   if (cauldronPot) {
@@ -240,6 +265,13 @@ function handleDoubleClick(event: MouseEvent) {
 }
 
 function dissolve() {
+  if (ideaRef.value) {
+    const rect = ideaRef.value.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    emit('dissolveStart', props.idea, { x: centerX, y: centerY })
+  }
+  
   isDissolving.value = true
   setTimeout(() => {
     emit('dissolved', props.idea)
@@ -370,8 +402,17 @@ onUnmounted(() => {
   cursor: grabbing;
   opacity: 1;
   box-shadow:
-    0 12px 32px var(--parchment-shadow),
-    0 0 16px var(--color-glow-purple),
+    0 8px 24px var(--parchment-shadow),
+    inset 0 0 20px rgba(201, 184, 150, 0.4);
+}
+
+.floating-idea.near-cauldron {
+  cursor: grabbing;
+  opacity: 1;
+  box-shadow:
+    0 16px 40px var(--parchment-shadow),
+    0 0 24px rgba(149, 117, 205, 0.6),
+    0 0 48px rgba(149, 117, 205, 0.3),
     inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
@@ -398,14 +439,33 @@ onUnmounted(() => {
   0% {
     opacity: 1;
     transform: scale(1);
+    box-shadow:
+      0 6px 20px var(--parchment-shadow),
+      0 0 32px rgba(149, 117, 205, 0.8),
+      0 0 64px rgba(149, 117, 205, 0.5),
+      inset 0 0 20px rgba(201, 184, 150, 0.4);
   }
-  50% {
+  30% {
+    opacity: 0.9;
+    transform: scale(1.05) translateY(-10px);
+    box-shadow:
+      0 12px 32px var(--parchment-shadow),
+      0 0 48px rgba(149, 117, 205, 1),
+      0 0 80px rgba(149, 117, 205, 0.7),
+      inset 0 0 20px rgba(201, 184, 150, 0.4);
+  }
+  60% {
     opacity: 0.5;
-    transform: scale(0.8) translateY(-20px);
+    transform: scale(0.7) translateY(-25px);
+    box-shadow:
+      0 8px 24px var(--parchment-shadow),
+      0 0 24px rgba(149, 117, 205, 0.6),
+      0 0 48px rgba(149, 117, 205, 0.3);
   }
   100% {
     opacity: 0;
-    transform: scale(0.3) translateY(-40px);
+    transform: scale(0.2) translateY(-40px);
+    box-shadow: none;
   }
 }
 

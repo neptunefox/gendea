@@ -15,7 +15,7 @@
       </div>
 
       <template v-else>
-        <div class="floating-ideas-container" :class="{ 'is-dragging': !!draggedIdea }">
+        <div class="floating-ideas-container" :class="{ 'is-dragging': !!draggedIdea, 'has-dissolving': hasDissolving }">
           <TransitionGroup name="idea-fade">
             <FloatingIdea
               v-for="(idea, index) in displayedIdeas"
@@ -26,8 +26,10 @@
               :total-cards="displayedIdeas.length"
               :duration="15000"
               :is-selected="selectedIdeaId === idea.id"
+              :cauldron-center="cauldronCenter"
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
+              @dissolve-start="handleDissolveStart"
               @dissolved="handleIdeaDissolved"
               @dropped="handleIdeaDropped"
               @expired="handleIdeaExpired"
@@ -35,6 +37,22 @@
               @throw="handleIdeaThrow"
             />
           </TransitionGroup>
+        </div>
+
+        <div class="particles-container">
+          <div
+            v-for="particle in particles"
+            :key="particle.id"
+            class="particle"
+            :style="{
+              left: `${particle.x}px`,
+              top: `${particle.y}px`,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              backgroundColor: particle.color,
+              opacity: particle.opacity
+            }"
+          />
         </div>
 
         <div class="cauldron-center">
@@ -100,12 +118,13 @@
 
 <script setup lang="ts">
 import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import { useParticles } from '~/composables/useParticles'
 
 interface FloatingIdea {
   id: string
@@ -151,12 +170,23 @@ const toastMessage = ref('')
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 const showGuidance = ref(true)
+const hasDissolving = ref(false)
 
 const GUIDANCE_DISMISSED_KEY = 'cauldron-guidance-dismissed'
 const ideaRefs = ref<
   Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>
 >(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
+
+const { particles, spawnDissolutionParticles } = useParticles()
+
+const cauldronCenter = computed(() => {
+  if (typeof window === 'undefined') return { x: 0, y: 0 }
+  return {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2
+  }
+})
 
 function setIdeaRef(
   ideaId: string,
@@ -337,6 +367,20 @@ async function handleDrop(_event: DragEvent) {
   } finally {
     draggedIdea.value = null
   }
+}
+
+function handleDissolveStart(_idea: FloatingIdea, position: { x: number; y: number }) {
+  hasDissolving.value = true
+  spawnDissolutionParticles(
+    position.x,
+    position.y,
+    cauldronCenter.value.x,
+    cauldronCenter.value.y,
+    25
+  )
+  setTimeout(() => {
+    hasDissolving.value = false
+  }, 700)
 }
 
 function handleIdeaDissolved(idea: FloatingIdea) {
@@ -636,6 +680,28 @@ onMounted(async () => {
 
 .floating-ideas-container.is-dragging {
   z-index: 100;
+}
+
+.floating-ideas-container.has-dissolving {
+  z-index: 500;
+}
+
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 6px currentColor;
+  transform: translate(-50%, -50%);
 }
 
 .idea-fade-enter-active {
