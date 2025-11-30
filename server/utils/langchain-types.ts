@@ -29,27 +29,6 @@ export interface CauldronIngredient {
   order: number
 }
 
-export interface CanvasNodeData {
-  id: string
-  type: string
-  content: string
-  position?: { x: number; y: number }
-  metadata?: {
-    color?: string
-    icon?: string
-    link?: string
-    completed?: boolean
-  }
-}
-
-export interface CanvasEdgeData {
-  id: string
-  sourceId: string
-  targetId: string
-  label?: string
-  relationship?: 'leads_to' | 'requires' | 'blocks' | 'relates_to'
-}
-
 export interface ContextMessage {
   role: 'user' | 'assistant'
   content: string

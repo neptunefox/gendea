@@ -1,4 +1,0 @@
--- Add version columns for optimistic locking
-ALTER TABLE canvas_nodes ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
-ALTER TABLE canvas_edges ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
-ALTER TABLE canvas_state ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1;
