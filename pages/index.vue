@@ -2,33 +2,48 @@
   <div class="spark-page">
     <div v-if="showDemo" class="demo-overlay" @click="dismissDemo">
       <div class="demo-ambient"></div>
-      <div class="demo-container" @click.stop>
-        <p class="demo-label">Example</p>
-        <p class="demo-prompt">{{ DEMO_ENTRY.prompt }}</p>
-        <div class="demo-ideas">
-          <div
-            v-for="(idea, index) in DEMO_ENTRY.coreIdeas"
-            :key="index"
-            class="demo-idea"
-            :style="{ animationDelay: `${0.3 + index * 0.15}s` }"
-          >
-            <p>{{ idea.text }}</p>
+      <div class="grimoire-container" @click.stop>
+        <div class="grimoire-spine"></div>
+        <div class="grimoire-page">
+          <div class="page-texture"></div>
+          <p class="grimoire-whisper">Turn one idea into many</p>
+          <p class="grimoire-subtitle">AI-powered problem exploration</p>
+          <div class="grimoire-divider">
+            <span class="divider-line"></span>
+            <span class="divider-symbol">✦</span>
+            <span class="divider-line"></span>
           </div>
+          <p class="demo-label">Example</p>
+          <p class="demo-prompt">"{{ DEMO_ENTRY.prompt }}"</p>
+          <p class="demo-result-label">generates ideas like:</p>
+          <div class="demo-ideas">
+            <div
+              v-for="(idea, index) in DEMO_ENTRY.coreIdeas"
+              :key="index"
+              class="demo-idea"
+              :style="{ animationDelay: `${0.6 + index * 0.12}s` }"
+            >
+              <span class="card-numeral">{{ ['I', 'II', 'III', 'IV', 'V'][index] }}</span>
+              <p>{{ idea.text }}</p>
+            </div>
+          </div>
+          <button class="demo-cta" @click="dismissDemo">Try it yourself</button>
         </div>
-        <button class="demo-cta" @click="dismissDemo">
-          Try your own
-        </button>
       </div>
     </div>
 
     <div class="spark-layout">
+      <div class="spark-header">
+        <DailyTarot @use-prompt="handleTarotPrompt" />
+        <p class="spark-tagline">Describe a problem or idea — get multiple angles to explore</p>
+      </div>
       <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
         <textarea
           ref="inputField"
           v-model="input"
           class="spark-input"
           rows="1"
-          placeholder="What do you want to explore?"
+          placeholder="What problem are you trying to solve?"
           @keydown.enter.exact.prevent="handleGenerate()"
         />
         <button
@@ -41,6 +56,16 @@
           <span v-else>Generate</span>
         </button>
       </div>
+
+      <FlowGuidanceBanner
+        :visible="showCauldronNudge && savedIdeas.length >= 5"
+        message="You have several ideas saved. Ready to combine them?"
+        hint="The Cauldron blends ideas together to find unexpected connections."
+        variant="cauldron"
+        action-link="/cauldron"
+        action-label="Try the Cauldron"
+        @dismiss="dismissCauldronNudge"
+      />
 
       <section v-if="savedIdeas.length > 0" class="ideas-collection">
         <button class="collection-header" @click="ideasCollapsed = !ideasCollapsed">
@@ -59,6 +84,10 @@
               @dragstart="e => handleIdeaDragStart(e, idea)"
               @dragend="handleIdeaDragEnd"
             >
+              <span class="tarot-corner top-left" />
+              <span class="tarot-corner top-right" />
+              <span class="tarot-corner bottom-left" />
+              <span class="tarot-corner bottom-right" />
               <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path
@@ -76,7 +105,7 @@
                 </button>
                 <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
                   <HelpCircle :size="16" />
-                  Ask Oracle
+                  Go deeper
                 </button>
               </div>
             </div>
@@ -194,9 +223,20 @@
 </template>
 
 <script setup lang="ts">
-import { Loader, Check, BookmarkPlus, CornerDownRight, Split, HelpCircle, ChevronDown } from 'lucide-vue-next'
+import {
+  Loader,
+  Check,
+  BookmarkPlus,
+  CornerDownRight,
+  Split,
+  HelpCircle,
+  ChevronDown
+} from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+
+import DailyTarot from '~/components/DailyTarot.vue'
+import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 
 interface SparkIdea {
   text: string
@@ -253,11 +293,19 @@ const DEMO_ENTRY: JournalEntry = {
   prompt: 'A morning routine app that actually sticks',
   timestamp: Date.now(),
   coreIdeas: [
-    { text: 'Start with just one habit — the keystone — and let users unlock more only after a 7-day streak.' },
-    { text: 'Replace reminders with a "morning score" that decays if you skip, gamifying consistency without nagging.' },
+    {
+      text: 'Start with just one habit — the keystone — and let users unlock more only after a 7-day streak.'
+    },
+    {
+      text: 'Replace reminders with a "morning score" that decays if you skip, gamifying consistency without nagging.'
+    },
     { text: 'Partner mode: two friends see each other\'s streaks and can "nudge" once per day.' },
-    { text: 'Build it as an Apple Watch complication that shows a single emoji reflecting your week.' },
-    { text: 'Anti-feature: no stats dashboard. Just today, yesterday, and a binary "on track" or "rebuild."' }
+    {
+      text: 'Build it as an Apple Watch complication that shows a single emoji reflecting your week.'
+    },
+    {
+      text: 'Anti-feature: no stats dashboard. Just today, yesterday, and a binary "on track" or "rebuild."'
+    }
   ],
   lenses: [],
   nudges: []
@@ -278,6 +326,9 @@ const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
 const loadingCard = ref<HTMLElement | null>(null)
 const showDemo = ref(false)
+const showCauldronNudge = ref(false)
+
+const CAULDRON_NUDGE_KEY = 'spark-cauldron-nudge-dismissed'
 
 const INPUT_HEIGHT_LIMIT = 100
 
@@ -538,10 +589,27 @@ function dismissDemo() {
   nextTick(() => inputField.value?.focus())
 }
 
+function dismissCauldronNudge() {
+  showCauldronNudge.value = false
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(CAULDRON_NUDGE_KEY, 'true')
+  }
+}
+
+function checkCauldronNudge() {
+  if (typeof window === 'undefined') return
+  const dismissed = window.localStorage.getItem(CAULDRON_NUDGE_KEY)
+  if (dismissed) return
+  if (savedIdeas.value.length >= 5) {
+    showCauldronNudge.value = true
+  }
+}
+
 onMounted(async () => {
   restoreThread()
   await fetchSavedIdeas()
   checkShowDemo()
+  checkCauldronNudge()
   await nextTick()
   adjustInputHeight()
 })
@@ -564,6 +632,14 @@ function handleExploreIdea(text: string) {
 
 function navigateToOracle(ideaId: string) {
   router.push(`/oracle?idea=${ideaId}`)
+}
+
+function handleTarotPrompt(prompt: string) {
+  input.value = prompt
+  nextTick(() => {
+    inputField.value?.focus()
+    inputField.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  })
 }
 
 async function resumeFromHistory(runId: string) {
@@ -644,8 +720,28 @@ watch(
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212, 165, 116, 0.06) 0%, transparent 50%);
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(212, 165, 116, 0.06) 0%,
+    transparent 50%
+  );
   pointer-events: none;
+}
+
+.spark-header {
+  text-align: center;
+  margin-bottom: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.spark-tagline {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.01em;
 }
 
 .spark-layout {
@@ -669,7 +765,8 @@ watch(
   border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-4);
   cursor: text;
-  transition: border-color var(--duration-fast) var(--ease-out),
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
 }
 
@@ -748,8 +845,10 @@ watch(
 }
 
 .collection-title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--color-text);
   margin: 0;
 }
@@ -763,7 +862,9 @@ watch(
 .collapse-icon {
   margin-left: auto;
   color: var(--color-text-tertiary);
-  transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
 .collapse-icon.collapsed {
@@ -794,111 +895,148 @@ watch(
 
 .ideas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-6);
 }
 
 .idea-card {
-  background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-surface-raised) 100%);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
-  padding-top: var(--space-4);
-  transition: all var(--duration-normal) var(--ease-out);
+  background: linear-gradient(180deg, rgba(42, 36, 32, 0.95) 0%, rgba(26, 22, 20, 0.98) 100%);
+  border: 2px solid rgba(212, 165, 116, 0.3);
+  border-radius: 4px;
+  padding: var(--space-6);
+  padding-top: var(--space-8);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
   cursor: grab;
-  min-height: 180px;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(232, 228, 224, 0.05);
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 0 60px rgba(212, 165, 116, 0.03);
 }
 
 .idea-card::before {
   content: '';
   position: absolute;
-  inset: 6px;
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-md) - 2px);
+  inset: 8px;
+  border: 1px solid rgba(212, 165, 116, 0.2);
   pointer-events: none;
-  opacity: 0.5;
 }
 
 .idea-card::after {
-  content: '';
+  content: '✦';
   position: absolute;
-  top: 10px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
-  width: 30px;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: 1px;
-  opacity: 0.6;
+  font-size: 10px;
+  color: var(--color-primary);
+  opacity: 0.7;
+  letter-spacing: 0.5em;
+}
+
+.idea-card .tarot-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: rgba(212, 165, 116, 0.25);
+  border-style: solid;
+  border-width: 0;
+}
+
+.idea-card .tarot-corner.top-left {
+  top: 16px;
+  left: 16px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.idea-card .tarot-corner.top-right {
+  top: 16px;
+  right: 16px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+
+.idea-card .tarot-corner.bottom-left {
+  bottom: 16px;
+  left: 16px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+.idea-card .tarot-corner.bottom-right {
+  bottom: 16px;
+  right: 16px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
 }
 
 .idea-card:hover {
   border-color: var(--color-primary);
   box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.4),
-    0 0 20px var(--color-glow-amber),
-    inset 0 1px 0 rgba(232, 228, 224, 0.08);
-  transform: translateY(-4px);
+    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(212, 165, 116, 0.15),
+    inset 0 0 80px rgba(212, 165, 116, 0.05);
+  transform: translateY(-8px);
 }
 
 .idea-card.dragging {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: grabbing;
-  transform: rotate(2deg) scale(1.02);
+  transform: rotate(3deg) scale(1.03);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 30px rgba(212, 165, 116, 0.2);
 }
 
 .unpin-btn {
   position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  width: 24px;
-  height: 24px;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
   border: none;
   background: transparent;
-  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  transition: all var(--duration-fast) var(--ease-out);
+  transition: all 0.3s var(--ease-out);
   color: var(--color-text-tertiary);
+  z-index: 10;
 }
 
 .idea-card:hover .unpin-btn {
-  opacity: 1;
+  opacity: 0.6;
 }
 
 .unpin-btn:hover {
-  background: var(--color-error-bg);
+  opacity: 1;
   color: var(--color-error);
+  transform: scale(1.1);
 }
 
-
-
 .idea-text {
-  margin: var(--space-4) 0 var(--space-3) 0;
-  padding-right: var(--space-4);
+  margin: var(--space-2) 0 var(--space-4) 0;
+  padding: 0 var(--space-2);
   color: var(--color-text);
-  line-height: 1.6;
+  line-height: 1.7;
   font-size: var(--text-sm);
   flex: 1;
+  text-align: center;
 }
 
 .idea-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-2);
   opacity: 0;
-  transition: opacity var(--duration-fast) var(--ease-out);
+  transition: opacity 0.3s var(--ease-out);
   margin-top: auto;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
 }
 
 .idea-card:hover .idea-actions {
@@ -906,20 +1044,21 @@ watch(
 }
 
 .action-btn {
-  flex: 1;
   padding: var(--space-2) var(--space-3);
-  border: none;
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(212, 165, 116, 0.25);
   background: transparent;
   color: var(--color-text-secondary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-sm);
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
+  transition: all 0.3s var(--ease-out);
 }
 
 .action-btn:hover {
-  background: var(--color-primary-subtle);
+  background: rgba(212, 165, 116, 0.1);
+  border-color: rgba(212, 165, 116, 0.5);
   color: var(--color-primary);
 }
 
@@ -927,7 +1066,14 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  border-color: rgba(126, 184, 201, 0.25);
+}
+
+.action-btn.oracle-btn:hover {
+  background: rgba(126, 184, 201, 0.1);
+  border-color: rgba(126, 184, 201, 0.5);
+  color: var(--color-oracle);
 }
 
 .collection-footer {
@@ -951,8 +1097,10 @@ watch(
 }
 
 .section-title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--color-text);
   margin: 0;
 }
@@ -1108,50 +1256,62 @@ watch(
 
 .idea-deck {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--space-4);
 }
 
 .idea-pill {
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   padding: var(--space-5);
-  background: linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-raised) 100%);
-  border: 1px solid var(--color-border-strong);
+  padding-top: var(--space-6);
+  background: linear-gradient(180deg, rgba(42, 36, 32, 0.9) 0%, rgba(26, 22, 20, 0.95) 100%);
+  border: 1.5px solid rgba(212, 165, 116, 0.25);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: all var(--duration-slow) var(--ease-out);
   position: relative;
   cursor: pointer;
-  min-height: 160px;
+  min-height: 180px;
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(232, 228, 224, 0.04);
+    0 6px 24px rgba(0, 0, 0, 0.4),
+    inset 0 0 40px rgba(212, 165, 116, 0.02);
 }
 
 .idea-pill::before {
   content: '';
   position: absolute;
-  inset: 5px;
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-md) - 2px);
+  inset: 6px;
+  border: 1px solid rgba(212, 165, 116, 0.15);
   pointer-events: none;
-  opacity: 0.4;
+}
+
+.idea-pill::after {
+  content: '◆';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  color: var(--color-primary);
+  opacity: 0.5;
 }
 
 .idea-pill.selected {
   border-color: var(--color-primary);
-  background: linear-gradient(160deg, var(--color-primary-subtle) 0%, var(--color-surface-raised) 100%);
+  background: linear-gradient(180deg, rgba(212, 165, 116, 0.1) 0%, rgba(26, 22, 20, 0.95) 100%);
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.3),
-    0 0 15px var(--color-glow-amber);
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(212, 165, 116, 0.2),
+    inset 0 0 60px rgba(212, 165, 116, 0.05);
 }
 
 .idea-pill:hover {
+  border-color: rgba(212, 165, 116, 0.5);
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.35),
-    0 0 12px var(--color-glow-amber);
-  transform: translateY(-2px);
+    0 10px 36px rgba(0, 0, 0, 0.45),
+    0 0 20px rgba(212, 165, 116, 0.1);
+  transform: translateY(-4px);
 }
 
 .pill-checkbox {
@@ -1190,28 +1350,26 @@ watch(
   display: flex;
   gap: var(--space-2);
   margin-top: auto;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-3);
 }
 
 .icon-action-btn {
   background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(212, 165, 116, 0.2);
   padding: var(--space-2);
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
   cursor: pointer;
   min-width: 36px;
   min-height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--duration-fast) var(--ease-out);
+  transition: all 0.3s var(--ease-out);
 }
 
 .icon-action-btn:hover {
-  background: var(--color-primary-subtle);
-  border-color: var(--color-primary);
+  background: rgba(212, 165, 116, 0.1);
+  border-color: rgba(212, 165, 116, 0.4);
   color: var(--color-primary);
 }
 
@@ -1332,132 +1490,261 @@ watch(
 .demo-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(26, 24, 22, 0.85) 0%, rgba(26, 24, 22, 0.98) 100%);
+  background: rgba(10, 8, 6, 0.97);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
   padding: var(--space-4);
-  animation: demoFadeIn 0.5s var(--ease-out);
+  animation: overlayReveal 1.2s var(--ease-out);
+}
+
+@keyframes overlayReveal {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .demo-ambient {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% 50%, var(--color-glow-amber) 0%, transparent 50%),
-    radial-gradient(circle at 30% 70%, var(--color-glow-purple) 0%, transparent 40%);
-  opacity: 0.3;
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(212, 165, 116, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(149, 117, 205, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(126, 184, 201, 0.04) 0%, transparent 35%);
+  opacity: 1;
   pointer-events: none;
-  animation: ambientPulse 8s ease-in-out infinite;
+  animation: ambientBreath 6s ease-in-out infinite;
 }
 
-@keyframes ambientPulse {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 0.4; }
+@keyframes ambientBreath {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
-@keyframes demoFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.demo-container {
+.grimoire-container {
   position: relative;
-  max-width: 600px;
+  display: flex;
+  animation: grimoireOpen 1s var(--ease-out) 0.3s both;
+}
+
+@keyframes grimoireOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) rotateX(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotateX(0);
+  }
+}
+
+.grimoire-spine {
+  width: 20px;
+  background: linear-gradient(
+    90deg,
+    rgba(60, 45, 35, 1) 0%,
+    rgba(80, 60, 45, 1) 30%,
+    rgba(50, 38, 28, 1) 70%,
+    rgba(40, 30, 22, 1) 100%
+  );
+  border-radius: 4px 0 0 4px;
+  box-shadow:
+    inset -4px 0 8px rgba(0, 0, 0, 0.4),
+    2px 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.grimoire-page {
+  position: relative;
+  max-width: 580px;
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  padding: var(--space-8);
+  padding: var(--space-8) var(--space-8);
   text-align: center;
-  animation: demoSlideUp 0.6s var(--ease-out);
+  background: linear-gradient(
+    135deg,
+    rgba(35, 30, 25, 0.98) 0%,
+    rgba(28, 24, 20, 0.99) 50%,
+    rgba(32, 27, 22, 0.98) 100%
+  );
+  border: 2px solid rgba(212, 165, 116, 0.25);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    inset 0 0 100px rgba(212, 165, 116, 0.03);
 }
 
-@keyframes demoSlideUp {
-  from {
+.page-texture {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.grimoire-whisper {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 400;
+  color: var(--color-text);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  animation: whisperReveal 1.5s var(--ease-out) 0.8s both;
+  text-shadow: 0 0 60px rgba(212, 165, 116, 0.3);
+}
+
+.grimoire-subtitle {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.05em;
+  animation: whisperReveal 1.5s var(--ease-out) 1s both;
+}
+
+@keyframes whisperReveal {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-10px);
+    filter: blur(4px);
   }
-  to {
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.grimoire-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  animation: dividerReveal 1s var(--ease-out) 1.2s both;
+}
+
+@keyframes dividerReveal {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.divider-line {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.4), transparent);
+}
+
+.divider-symbol {
+  color: var(--color-primary);
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.demo-label {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-text-tertiary);
+  font-weight: var(--weight-medium);
+  animation: labelReveal 0.8s var(--ease-out) 1.4s both;
+}
+
+@keyframes labelReveal {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.demo-prompt {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--color-text);
+  line-height: 1.4;
+  animation: promptReveal 0.8s var(--ease-out) 1.5s both;
+}
+
+.demo-result-label {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  animation: promptReveal 0.8s var(--ease-out) 1.6s both;
+}
+
+@keyframes promptReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.demo-label {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-text-tertiary);
-  font-weight: var(--weight-medium);
-}
-
-.demo-prompt {
-  margin: 0 0 var(--space-6);
-  font-family: var(--font-heading);
-  font-size: 1.75rem;
-  font-weight: 500;
-  color: var(--color-text);
-  line-height: 1.3;
-  text-shadow: 0 0 40px var(--color-glow-amber);
-}
-
 .demo-ideas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   text-align: left;
   margin-bottom: var(--space-6);
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .demo-idea {
-  padding: var(--space-5);
-  background: linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-raised) 100%);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-strong);
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(180deg, rgba(42, 36, 32, 0.7) 0%, rgba(26, 22, 20, 0.8) 100%);
+  border: 1px solid rgba(212, 165, 116, 0.15);
+  border-radius: 4px;
   opacity: 0;
-  animation: ideaReveal 0.6s var(--ease-out) forwards;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(232, 228, 224, 0.04);
+  animation: cardDeal 0.5s var(--ease-out) forwards;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   position: relative;
-  min-height: 120px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
-.demo-idea::before {
-  content: '';
-  position: absolute;
-  inset: 5px;
-  border: 1px solid var(--color-border);
-  border-radius: calc(var(--radius-md) - 2px);
-  pointer-events: none;
-  opacity: 0.4;
+.card-numeral {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  color: var(--color-primary);
+  opacity: 0.6;
+  flex-shrink: 0;
+  min-width: 20px;
 }
 
-.demo-idea::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: 1px;
-  opacity: 0.5;
-}
-
-@keyframes ideaReveal {
-  from {
+@keyframes cardDeal {
+  0% {
     opacity: 0;
-    transform: translateY(15px) scale(0.95);
+    transform: translateX(-20px) rotate(-2deg);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(0) rotate(0);
   }
 }
 
@@ -1466,50 +1753,77 @@ watch(
   font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--color-text);
-  padding-top: var(--space-2);
 }
 
 .demo-cta {
   display: inline-block;
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-4) var(--space-8);
   background: transparent;
   color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(212, 165, 116, 0.4);
+  border-radius: 4px;
   font-family: var(--font-heading);
   font-size: var(--text-base);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-weight: 400;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: all 0.4s var(--ease-out);
+  animation: ctaReveal 0.8s var(--ease-out) 1.8s both;
+}
+
+@keyframes ctaReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .demo-cta:hover {
-  background: var(--color-primary);
-  color: var(--color-bg);
-  box-shadow: 0 0 20px var(--color-glow-amber);
+  background: rgba(212, 165, 116, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 30px rgba(212, 165, 116, 0.2);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 640px) {
-  .demo-container {
-    max-height: 90vh;
+  .grimoire-spine {
+    display: none;
+  }
+
+  .grimoire-page {
+    border-radius: 4px;
+    border-left: 2px solid rgba(212, 165, 116, 0.25);
     padding: var(--space-6);
   }
 
+  .grimoire-whisper {
+    font-size: 1.75rem;
+  }
+
   .demo-prompt {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .demo-overlay,
-  .demo-container,
+  .grimoire-container,
+  .grimoire-whisper,
+  .grimoire-divider,
   .demo-idea,
+  .demo-cta,
   .demo-ambient {
     animation: none;
   }
 
-  .demo-idea {
+  .demo-idea,
+  .grimoire-whisper,
+  .grimoire-divider,
+  .demo-cta {
     opacity: 1;
   }
 }
