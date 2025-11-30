@@ -481,7 +481,7 @@ defineExpose({
 
 .streaming-text {
   font-size: var(--text-xs);
-  line-height: 1.4;
+  line-height: 1.5;
   max-width: 240px;
   max-height: 60px;
   overflow: hidden;

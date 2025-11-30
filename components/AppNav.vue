@@ -109,11 +109,10 @@ import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
 }
 
 .nav-label {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: var(--weight-medium);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  opacity: 0.7;
 }
 
 .nav-link::before {
@@ -211,11 +210,10 @@ import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
   }
 
   .app-nav-mobile .nav-label {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: var(--weight-medium);
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    opacity: 0.7;
   }
 
   .app-nav-mobile .nav-link::before {

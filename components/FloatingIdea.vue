@@ -372,7 +372,7 @@ onUnmounted(() => {
 
 .idea-content {
   font-size: var(--text-xs);
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   overflow: hidden;
   display: -webkit-box;

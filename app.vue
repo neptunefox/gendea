@@ -15,7 +15,7 @@
 
   --color-text: #e8e4e0;
   --color-text-secondary: rgba(232, 228, 224, 0.7);
-  --color-text-tertiary: #7a7570;
+  --color-text-tertiary: #9a9590;
 
   --color-primary: #d4a574;
   --color-primary-hover: #e0b585;
@@ -52,9 +52,9 @@
 
   --text-xl: 1.5rem;
   --text-lg: 1.125rem;
-  --text-base: 0.9375rem;
-  --text-sm: 0.8125rem;
-  --text-xs: 0.6875rem;
+  --text-base: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
 
   --weight-normal: 400;
   --weight-medium: 500;
@@ -91,7 +91,7 @@
   --font-heading: 'Cinzel', Georgia, serif;
 
   font-family: var(--font-body);
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-bg);
   text-rendering: optimizeLegibility;
