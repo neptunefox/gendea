@@ -1,7 +1,7 @@
 # Implementation Plan
 
-- [ ] 1. Update arc position calculation system
-  - [ ] 1.1 Refactor `utils/floating-position.ts` to implement arc layout algorithm
+- [-] 1. Update arc position calculation system
+  - [x] 1.1 Refactor `utils/floating-position.ts` to implement arc layout algorithm
     - Add `ArcLayoutConfig` and `ArcPosition` interfaces
     - Implement `generateArcPosition()` function using trigonometry for arc placement
     - Implement `calculateArcTangentRotation()` for card rotation along arc

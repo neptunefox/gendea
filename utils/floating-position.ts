@@ -31,6 +31,79 @@ export const DEFAULT_SIDE_CONFIG: SideLayoutConfig = {
   cardsPerSide: 3
 }
 
+export interface ArcLayoutConfig {
+  arcRadius: number
+  arcStartAngle: number
+  arcEndAngle: number
+  maxCards: number
+  cardWidth: number
+  cardHeight: number
+}
+
+export interface ArcPosition {
+  x: number
+  y: number
+  rotation: number
+  scale: number
+}
+
+export const DEFAULT_ARC_CONFIG: ArcLayoutConfig = {
+  arcRadius: 280,
+  arcStartAngle: -70,
+  arcEndAngle: 70,
+  maxCards: 5,
+  cardWidth: 200,
+  cardHeight: 100
+}
+
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 9999) * 10000
+  return x - Math.floor(x)
+}
+
+export function calculateArcTangentRotation(angle: number): number {
+  return angle * 0.1
+}
+
+export function generateArcPosition(
+  viewport: ViewportDimensions,
+  cardIndex: number,
+  totalCards: number,
+  config: Partial<ArcLayoutConfig> = {}
+): ArcPosition {
+  const { arcRadius, arcStartAngle, arcEndAngle, maxCards, cardWidth, cardHeight } = {
+    ...DEFAULT_ARC_CONFIG,
+    ...config
+  }
+
+  const displayedCards = Math.min(totalCards, maxCards)
+  const centerX = viewport.width / 2
+  const cauldronY = viewport.height * 0.65
+  const arcCenterY = cauldronY - arcRadius * 0.3
+
+  let angle: number
+  if (displayedCards === 1) {
+    angle = 0
+  } else {
+    const usedSpan = ((displayedCards - 1) / (maxCards - 1)) * (arcEndAngle - arcStartAngle)
+    const startAngle = -usedSpan / 2
+    const step = usedSpan / (displayedCards - 1)
+    angle = startAngle + cardIndex * step
+  }
+
+  const angleRad = (angle * Math.PI) / 180
+  const x = centerX + arcRadius * Math.sin(angleRad) - cardWidth / 2
+  const y = arcCenterY - arcRadius * Math.cos(angleRad) - cardHeight / 2
+
+  const tangentRotation = calculateArcTangentRotation(angle)
+  const randomOffset = (seededRandom(cardIndex + 1) - 0.5) * 10
+  const rotation = tangentRotation + randomOffset
+
+  const scale = 1 - Math.abs(angle) * 0.001
+
+  return { x, y, rotation, scale }
+}
+
 export function generateShelfPosition(
   viewport: ViewportDimensions,
   cardIndex: number,
