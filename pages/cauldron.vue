@@ -23,6 +23,7 @@
               :ref="(el: any) => setIdeaRef(idea.id, el)"
               :idea="idea"
               :index="index"
+              :total-cards="displayedIdeas.length"
               :duration="15000"
               :is-selected="selectedIdeaId === idea.id"
               @drag-start="handleIdeaDragStart"
@@ -222,7 +223,7 @@ async function loadFloatingIdeas() {
 }
 
 function initializeDisplayedIdeas() {
-  const displayCount = Math.min(6, floatingIdeas.value.length)
+  const displayCount = Math.min(5, floatingIdeas.value.length)
   const shuffled = [...floatingIdeas.value].sort(() => Math.random() - 0.5)
   displayedIdeas.value = shuffled.slice(0, displayCount)
   displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))

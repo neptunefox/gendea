@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
-import { generateShelfPosition } from '~/utils/floating-position'
+import { generateArcPosition, type ArcPosition } from '~/utils/floating-position'
 
 interface FloatingIdea {
   id: string
@@ -35,13 +35,16 @@ interface FloatingIdea {
 interface Props {
   idea: FloatingIdea
   index: number
+  totalCards: number
   duration?: number
   isSelected?: boolean
+  cauldronCenter?: { x: number; y: number }
 }
 
 const props = withDefaults(defineProps<Props>(), {
   duration: 15000,
-  isSelected: false
+  isSelected: false,
+  cauldronCenter: undefined
 })
 const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
@@ -57,6 +60,7 @@ const ideaRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const isDissolving = ref(false)
 const position = ref({ x: 0, y: 0 })
+const arcPosition = ref<ArcPosition | null>(null)
 const originalPosition = ref({ x: 0, y: 0 })
 const zIndex = ref(10 + props.index)
 const dragOffset = ref({ x: 0, y: 0 })
@@ -81,28 +85,26 @@ const timerRingStyle = computed(() => {
 })
 
 const isSelected = computed(() => props.isSelected)
-const isLeftSide = computed(() => props.index < 3)
 const computedZIndex = computed(() => {
   if (isDragging.value) return 200
   if (props.isSelected) return 100
   return zIndex.value
 })
 
-const SELECTED_WIDTH = 260
-const DEFAULT_WIDTH = 220
-
 const positionStyle = computed(() => {
-  let leftPos = position.value.x
-  if (props.isSelected && isLeftSide.value) {
-    leftPos = position.value.x - (SELECTED_WIDTH - DEFAULT_WIDTH)
-  }
+  const rotation = isDragging.value ? 0 : (arcPosition.value?.rotation ?? 0)
+  const scale = arcPosition.value?.scale ?? 1
+  
   return {
-    left: `${leftPos}px`,
+    left: `${position.value.x}px`,
     top: `${position.value.y}px`,
     zIndex: computedZIndex.value,
+    transform: isDragging.value 
+      ? 'scale(1.02) rotate(1deg)' 
+      : `rotate(${rotation}deg) scale(${scale})`,
     transition: isDragging.value
       ? 'none'
-      : 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.2s ease'
+      : 'transform 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.3s ease, top 0.3s ease'
   }
 })
 
@@ -254,7 +256,9 @@ function cleanup() {
 function updatePositionForViewport() {
   if (isDragging.value) return
   const viewport = { width: window.innerWidth, height: window.innerHeight }
-  position.value = generateShelfPosition(viewport, props.index)
+  const arc = generateArcPosition(viewport, props.index, props.totalCards)
+  arcPosition.value = arc
+  position.value = { x: arc.x, y: arc.y }
   originalPosition.value = { ...position.value }
 }
 
@@ -272,6 +276,13 @@ watch(
   () => props.idea.id,
   () => {
     resetTimer()
+  }
+)
+
+watch(
+  () => props.totalCards,
+  () => {
+    updatePositionForViewport()
   }
 )
 
@@ -321,17 +332,15 @@ onUnmounted(() => {
   opacity: 0.6;
 }
 
-.floating-idea:hover {
+.floating-idea:hover:not(.dragging) {
   opacity: 1;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   border-color: var(--color-border-strong);
-  transform: translateY(-2px);
 }
 
 .floating-idea.dragging {
   cursor: grabbing;
   opacity: 1;
-  transform: scale(1.02) rotate(1deg);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.4),
     0 0 12px var(--color-glow-amber);

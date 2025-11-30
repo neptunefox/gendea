@@ -20,8 +20,8 @@
     - **Property 5: Rotation Bounds**
     - **Validates: Requirements 2.4**
 
-- [ ] 2. Update FloatingIdea component for arc positioning
-  - [ ] 2.1 Modify `FloatingIdea.vue` to use new arc position system
+- [x] 2. Update FloatingIdea component for arc positioning
+  - [x] 2.1 Modify `FloatingIdea.vue` to use new arc position system
     - Add `totalCards` and `cauldronCenter` props
     - Update `positionStyle` computed to include rotation from arc calculation
     - Update `updatePositionForViewport()` to call `generateArcPosition()`

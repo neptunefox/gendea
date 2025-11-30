@@ -22,17 +22,16 @@
     <div class="liquid-rim"></div>
 
     <div v-if="ingredients.length === 0" class="drop-hint">
-      <span class="hint-text">drop ideas here</span>
-      <svg class="hint-arrow" viewBox="0 0 100 60" fill="none">
+      <svg class="hint-arrow" viewBox="0 0 60 80" fill="none">
         <path
-          d="M8 10 C30 8, 50 20, 70 40 C80 52, 88 55, 92 52"
+          d="M30 8 C30 25, 30 40, 30 55"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           fill="none"
         />
         <path
-          d="M85 58 L93 52 L86 46"
+          d="M22 48 L30 58 L38 48"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
@@ -40,6 +39,7 @@
           fill="none"
         />
       </svg>
+      <span class="hint-text">drop ideas here</span>
     </div>
 
     <div class="pot-body">
@@ -262,29 +262,30 @@ defineExpose({
 
 .drop-hint {
   position: absolute;
-  top: -55px;
-  left: -115px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  gap: 4px;
   pointer-events: none;
-  animation: hint-bob 3s ease-in-out infinite;
+  z-index: 10;
 }
 
 .hint-text {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-primary);
+  color: rgba(255, 255, 255, 0.7);
   white-space: nowrap;
-  padding-left: 4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .hint-arrow {
-  width: 100px;
-  height: 60px;
-  color: var(--color-primary);
-  opacity: 0.6;
-  margin-top: -8px;
+  width: 30px;
+  height: 40px;
+  color: rgba(255, 255, 255, 0.5);
+  animation: hint-bob 2s ease-in-out infinite;
 }
 
 @keyframes hint-bob {
@@ -293,7 +294,7 @@ defineExpose({
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(4px);
   }
 }
 
