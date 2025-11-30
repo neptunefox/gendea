@@ -24,10 +24,10 @@ export interface SideLayoutConfig {
 }
 
 export const DEFAULT_SIDE_CONFIG: SideLayoutConfig = {
-  cardWidth: 160,
-  cardHeight: 70,
-  verticalGap: 12,
-  horizontalOffset: 320,
+  cardWidth: 220,
+  cardHeight: 90,
+  verticalGap: 16,
+  horizontalOffset: 300,
   cardsPerSide: 3
 }
 
@@ -41,14 +41,17 @@ export function generateShelfPosition(
     ...config
   }
 
-  const centerX = viewport.width / 2
+  const sidebarOffset = 30
+  const centerX = viewport.width / 2 - sidebarOffset
   const centerY = viewport.height / 2
 
   const isLeftSide = cardIndex < cardsPerSide
   const positionOnSide = isLeftSide ? cardIndex : cardIndex - cardsPerSide
 
   const totalHeight = cardsPerSide * cardHeight + (cardsPerSide - 1) * verticalGap
-  const startY = centerY - totalHeight / 2
+  const inputFieldOffset = 100
+  const bottomY = centerY + inputFieldOffset
+  const startY = bottomY - totalHeight
   const y = startY + positionOnSide * (cardHeight + verticalGap)
 
   let x: number

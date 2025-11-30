@@ -88,8 +88,8 @@ const computedZIndex = computed(() => {
   return zIndex.value
 })
 
-const SELECTED_WIDTH = 200
-const DEFAULT_WIDTH = 160
+const SELECTED_WIDTH = 260
+const DEFAULT_WIDTH = 220
 
 const positionStyle = computed(() => {
   let leftPos = position.value.x
@@ -293,8 +293,8 @@ onUnmounted(() => {
 <style scoped>
 .floating-idea {
   position: absolute;
-  width: 160px;
-  padding: var(--space-3);
+  width: 220px;
+  padding: var(--space-4);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -339,7 +339,7 @@ onUnmounted(() => {
 }
 
 .floating-idea.selected {
-  width: 200px;
+  width: 260px;
   opacity: 1;
   border-color: var(--color-primary);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -371,13 +371,13 @@ onUnmounted(() => {
 }
 
 .idea-content {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--color-text-secondary);
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   padding-right: var(--space-3);
 }
