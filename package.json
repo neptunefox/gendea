@@ -7,7 +7,10 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "db:migrate": "bun run scripts/migrate.ts"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@langchain/community": "^1.0.4",
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
+    "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.44.7",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",

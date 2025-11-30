@@ -1,36 +1,43 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: ['db/schema.ts', 'scripts/migrate.ts']
+fileMatchPattern: ['db/schema.ts', 'drizzle/**']
 ---
 
-## Database Migrations
+## Database Migrations (Drizzle Kit)
 
-### When Schema Changes
+### Workflow
 
-After modifying `db/schema.ts`, always run the migration script:
+After modifying `db/schema.ts`:
 
 ```bash
-bun run db:migrate
+bun run db:generate    # Generate migration SQL from schema changes
+bun run db:migrate     # Apply migrations to database
 ```
 
-### Migration Rules
+For rapid prototyping (dev only):
 
-- Run migrations immediately after schema changes - don't wait for user to ask
-- Migrations use Drizzle ORM with PostgreSQL
-- Schema file is at `db/schema.ts`, migration script at `scripts/migrate.ts`
-- Never modify the database directly - always update schema and run migrations
-- Check for migration errors and report them clearly
+```bash
+bun run db:push        # Push schema directly without migration files
+```
+
+### Commands Reference
+
+- `db:generate` - Generate migration files from schema changes
+- `db:migrate` - Run pending migrations
+- `db:push` - Push schema directly (dev only, no migration file)
+- `db:studio` - Open Drizzle Studio to browse/edit data
 
 ### Schema Conventions
 
 - Use `uuid` for primary keys with `.defaultRandom()`
-- Use `timestamp` fields with `.defaultNow()` for `createdAt` and `updatedAt`
-- Use `jsonb` for complex data structures with proper TypeScript types via `.$type<>()`
+- Use `timestamp` fields with `.defaultNow()` for `createdAt`
+- Use `jsonb` for complex data structures with `.$type<>()`
 - Use `text` with enum constraints for state/status fields
-- Use `integer` for boolean flags (0/1) instead of boolean type
+- Use `integer` for boolean flags (0/1)
 - Always include `.notNull()` unless field is explicitly optional
 
-### After Migration
+### Migration Files
 
-- Verify migration completed successfully
-- Report any schema changes that might affect existing API endpoints or components
+- Generated migrations go in `drizzle/` directory
+- Never edit migration files after they've been applied
+- Migration journal tracks what's been run in `drizzle/meta/`
