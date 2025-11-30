@@ -39,6 +39,15 @@
           </TransitionGroup>
         </div>
 
+        <button
+          v-if="hiddenIdeasCount > 0"
+          class="show-more-btn"
+          @click="cycleNextIdea"
+        >
+          <Layers :size="16" />
+          <span>{{ hiddenIdeasCount }} more</span>
+        </button>
+
         <div class="particles-container">
           <div
             v-for="particle in particles"
@@ -117,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
+import { Check, Layers, Loader, Plus, Sparkles } from 'lucide-vue-next'
 import { ref, onMounted, watch, computed } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
@@ -180,12 +189,18 @@ const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(nul
 
 const { particles, spawnDissolutionParticles } = useParticles()
 
+const MAX_DISPLAYED_IDEAS = 5
+
 const cauldronCenter = computed(() => {
   if (typeof window === 'undefined') return { x: 0, y: 0 }
   return {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2
   }
+})
+
+const hiddenIdeasCount = computed(() => {
+  return Math.max(0, floatingIdeas.value.length - displayedIdeas.value.length)
 })
 
 function setIdeaRef(
@@ -253,10 +268,23 @@ async function loadFloatingIdeas() {
 }
 
 function initializeDisplayedIdeas() {
-  const displayCount = Math.min(5, floatingIdeas.value.length)
+  const displayCount = Math.min(MAX_DISPLAYED_IDEAS, floatingIdeas.value.length)
   const shuffled = [...floatingIdeas.value].sort(() => Math.random() - 0.5)
   displayedIdeas.value = shuffled.slice(0, displayCount)
   displayedIdeas.value.forEach(idea => recentlyDisplayedIds.value.add(idea.id))
+}
+
+function cycleNextIdea() {
+  const nextIdea = getNextIdea()
+  if (!nextIdea) return
+
+  if (displayedIdeas.value.length > 0) {
+    const oldestIndex = 0
+    const oldIdea = displayedIdeas.value[oldestIndex]
+    recentlyDisplayedIds.value.delete(oldIdea.id)
+    recentlyDisplayedIds.value.add(nextIdea.id)
+    displayedIdeas.value.splice(oldestIndex, 1, nextIdea)
+  }
 }
 
 function getNextIdea(): FloatingIdea | null {
@@ -847,6 +875,32 @@ onMounted(async () => {
   }
 }
 
+.show-more-btn {
+  position: fixed;
+  bottom: var(--space-6);
+  left: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-md);
+  z-index: 30;
+}
+
+.show-more-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
 .reset-btn {
   position: fixed;
   bottom: var(--space-6);
@@ -899,6 +953,11 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .cauldron-page {
     padding: var(--space-4);
+  }
+
+  .show-more-btn {
+    bottom: var(--space-4);
+    left: var(--space-4);
   }
 
   .reset-btn {

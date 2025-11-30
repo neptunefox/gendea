@@ -59,8 +59,8 @@
     - Emit `dissolveStart` event for particle spawning
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 6. Update cauldron page layout and idea management
-  - [ ] 6.1 Modify `pages/cauldron.vue` for new layout
+- [x] 6. Update cauldron page layout and idea management
+  - [x] 6.1 Modify `pages/cauldron.vue` for new layout
     - Limit displayed ideas to maximum of 5
     - Pass `totalCards` and `cauldronCenter` to FloatingIdea components
     - Add "show more ideas" button/gesture when more than 5 available
