@@ -7,6 +7,7 @@ This feature adds visual indicators to the cauldron page that communicate to use
 ## Architecture
 
 The feature extends existing components with minimal changes:
+
 - **CauldronPot.vue**: Add hint text during mixing state
 - **cauldron.vue (page)**: Add remix hint when output exists, replace manual input with remix-aware version
 
@@ -51,22 +52,23 @@ Add a remix hint section that appears when output exists:
 ## Data Models
 
 No new data models required. The feature uses existing state:
+
 - `isMixing: boolean` - Controls mixing hint visibility
 - `output: string | null` - Controls remix hint visibility
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Mixing hint visibility matches mixing state
 
-*For any* CauldronPot component instance, when `isMixing` prop is true, the mixing hint element should be present in the rendered output; when `isMixing` is false, the mixing hint element should not be present.
+_For any_ CauldronPot component instance, when `isMixing` prop is true, the mixing hint element should be present in the rendered output; when `isMixing` is false, the mixing hint element should not be present.
 
 **Validates: Requirements 1.1**
 
 ### Property 2: Remix hint visibility matches output state
 
-*For any* cauldron page state, when `output` is a non-null string, the remix hint section should be visible; when `output` is null, the remix hint section should not be visible.
+_For any_ cauldron page state, when `output` is a non-null string, the remix hint section should be visible; when `output` is null, the remix hint section should not be visible.
 
 **Validates: Requirements 2.1**
 

@@ -50,6 +50,7 @@ The Oracle creates a contemplative, dark-themed conversational experience that s
 ### Removal Scope
 
 Files and directories to delete:
+
 - `pages/canvas/[id].vue`
 - `pages/coach/index.vue`
 - `pages/coach/[id].vue`
@@ -83,17 +84,20 @@ Files and directories to delete:
 ### Oracle Page (`pages/oracle.vue`)
 
 The main Oracle page handles:
+
 - Session creation on mount (or loading existing session from query param)
 - Message display with proper alignment (user left, oracle right)
 - Input handling at bottom of viewport
 - Dark theme styling
 
 Query parameters:
+
 - `idea` - Optional saved idea ID to start conversation with context
 
 ### OracleChat Component
 
 Props:
+
 ```typescript
 interface OracleChatProps {
   sessionId: string
@@ -102,6 +106,7 @@ interface OracleChatProps {
 ```
 
 Emits:
+
 ```typescript
 interface OracleChatEmits {
   (e: 'spark', question: string): void
@@ -111,6 +116,7 @@ interface OracleChatEmits {
 ### OracleMessage Component
 
 Props:
+
 ```typescript
 interface OracleMessageProps {
   role: 'user' | 'oracle'
@@ -184,7 +190,9 @@ export const oracleSessions = pgTable('oracle_sessions', {
 
 export const oracleMessages = pgTable('oracle_messages', {
   id: uuid('id').primaryKey().defaultRandom(),
-  sessionId: uuid('session_id').notNull().references(() => oracleSessions.id),
+  sessionId: uuid('session_id')
+    .notNull()
+    .references(() => oracleSessions.id),
   role: text('role', { enum: ['user', 'oracle'] }).notNull(),
   content: text('content').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -215,45 +223,43 @@ export interface OracleMessage {
 }
 ```
 
-
-
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Session creation persists required fields
 
-*For any* Oracle session creation request (with or without an idea ID), the persisted session SHALL contain a valid UUID, visitor ID, timestamps, and if an idea ID was provided, that idea reference.
+_For any_ Oracle session creation request (with or without an idea ID), the persisted session SHALL contain a valid UUID, visitor ID, timestamps, and if an idea ID was provided, that idea reference.
 
 **Validates: Requirements 2.2, 2.4, 2.5**
 
 ### Property 2: Oracle responses contain only questions
 
-*For any* user message sent to the Oracle, the response SHALL contain exactly one or two sentences, and each sentence SHALL end with a question mark.
+_For any_ user message sent to the Oracle, the response SHALL contain exactly one or two sentences, and each sentence SHALL end with a question mark.
 
 **Validates: Requirements 3.1, 3.2**
 
 ### Property 3: Message persistence includes all required fields
 
-*For any* message (user or oracle) added to a conversation, the persisted message SHALL contain a valid UUID, session reference, role, content, and creation timestamp.
+_For any_ message (user or oracle) added to a conversation, the persisted message SHALL contain a valid UUID, session reference, role, content, and creation timestamp.
 
 **Validates: Requirements 3.4**
 
 ### Property 4: Oracle questions are non-empty and self-contained
 
-*For any* Oracle response, each question SHALL be at least 10 characters long and SHALL not reference external context that would make it unusable as a standalone Spark prompt.
+_For any_ Oracle response, each question SHALL be at least 10 characters long and SHALL not reference external context that would make it unusable as a standalone Spark prompt.
 
 **Validates: Requirements 4.4**
 
 ### Property 5: Spark action records timestamp
 
-*For any* Oracle message that is sparked, the sparked_at timestamp SHALL be set to a non-null value after the spark action completes.
+_For any_ Oracle message that is sparked, the sparked_at timestamp SHALL be set to a non-null value after the spark action completes.
 
 **Validates: Requirements 5.3**
 
 ### Property 6: Message role is constrained to valid values
 
-*For any* Oracle message in the database, the role field SHALL be either "user" or "oracle" and no other value.
+_For any_ Oracle message in the database, the role field SHALL be either "user" or "oracle" and no other value.
 
 **Validates: Requirements 10.3**
 
@@ -271,6 +277,7 @@ interface ErrorResponse {
 ```
 
 Error scenarios:
+
 - 400: Invalid request body (missing sessionId, empty message)
 - 404: Session not found
 - 500: LLM service failure (with fallback behavior)
@@ -281,15 +288,16 @@ If the LangChain service fails to generate a response, the Oracle service return
 
 ```typescript
 const FALLBACK_QUESTIONS = [
-  "What would change if you approached this from the opposite direction?",
+  'What would change if you approached this from the opposite direction?',
   "What's the smallest version of this that would still matter to you?",
-  "Who else has faced something similar, and what did they try?"
+  'Who else has faced something similar, and what did they try?'
 ]
 ```
 
 ### Session Recovery
 
 If a session ID in the URL is invalid or expired:
+
 1. Display a brief message: "Starting a fresh conversation"
 2. Create a new session automatically
 3. Continue without disruption
@@ -301,6 +309,7 @@ If a session ID in the URL is invalid or expired:
 The project will use **fast-check** for property-based testing in TypeScript/JavaScript.
 
 Each property-based test MUST:
+
 - Run a minimum of 100 iterations
 - Be tagged with a comment referencing the correctness property: `**Feature: oracle-feature, Property {number}: {property_text}**`
 - Test the property across randomly generated valid inputs
@@ -308,6 +317,7 @@ Each property-based test MUST:
 ### Unit Tests
 
 Unit tests cover:
+
 - Oracle service prompt construction
 - API request/response validation
 - Database operations (session and message CRUD)
@@ -362,13 +372,13 @@ const OracleResponseSchema = z.object({
 ### Color Palette (Dark Theme)
 
 ```css
---oracle-bg: #1C1917;           /* Dark warm background */
---oracle-bg-elevated: #292524;   /* Slightly lighter for cards */
---oracle-text: #FAFAF9;          /* Light cream text */
---oracle-text-secondary: #A8A29E; /* Muted text */
---oracle-accent: #d4756f;        /* Coral accent for actions */
---oracle-user-bg: #292524;       /* User message background */
---oracle-oracle-bg: #3f3a36;     /* Oracle message background */
+--oracle-bg: #1c1917; /* Dark warm background */
+--oracle-bg-elevated: #292524; /* Slightly lighter for cards */
+--oracle-text: #fafaf9; /* Light cream text */
+--oracle-text-secondary: #a8a29e; /* Muted text */
+--oracle-accent: #d4756f; /* Coral accent for actions */
+--oracle-user-bg: #292524; /* User message background */
+--oracle-oracle-bg: #3f3a36; /* Oracle message background */
 ```
 
 ### Layout
@@ -421,6 +431,7 @@ const OracleResponseSchema = z.object({
 ```
 
 Icons from lucide-vue-next:
+
 - Spark: `Lightbulb`
 - Oracle: `HelpCircle`
 - Cauldron: `FlaskConical`

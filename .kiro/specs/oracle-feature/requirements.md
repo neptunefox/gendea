@@ -5,14 +5,17 @@
 This specification defines the Oracle feature for Gendea and the removal of Canvas and Coach features. Gendea is an idea generation app being simplified to focus on its core value: generating ideas.
 
 **Features to keep:**
+
 - **Spark**: Divergent ideation - generates multiple ideas from a prompt
 - **Cauldron**: Convergent synthesis - mixes ideas into one focused concept
 - **History**: Resume past exploration threads
 
 **New feature:**
+
 - **Oracle**: Socratic dialogue - a conversational interface that asks reframing questions, never gives answers
 
 **Features to remove:**
+
 - **Canvas**: Visual node-based planning
 - **Coach**: Guided execution framework
 

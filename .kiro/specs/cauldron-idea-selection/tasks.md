@@ -21,20 +21,20 @@
     - Pause timer when isSelected becomes true
     - Resume timer from paused value when isSelected becomes false
     - _Requirements: 1.2, 1.5, 2.3_
-  - [ ]* 2.3 Write property test for timer pause on selection
+  - [ ]\* 2.3 Write property test for timer pause on selection
     - **Property 2: Timer Pause on Selection**
     - **Validates: Requirements 1.2**
-  - [ ]* 2.4 Write property test for timer resume on deselection
+  - [ ]\* 2.4 Write property test for timer resume on deselection
     - **Property 3: Timer Resume on Deselection**
     - **Validates: Requirements 1.5, 2.3**
 
   - [x] 2.5 Add selected state visual styling
-
     - Add `selected` CSS class with coral border, elevated shadow
     - Remove line-clamp when selected to show full text
     - Set higher z-index when selected
     - _Requirements: 1.3, 3.1, 3.2, 3.3_
-  - [ ]* 2.6 Write property test for z-index elevation
+
+  - [ ]\* 2.6 Write property test for z-index elevation
     - **Property 4: Selection State Z-Index Elevation**
     - **Validates: Requirements 3.3**
 
@@ -43,7 +43,7 @@
     - Verify selecting new idea deselects previous
     - Clean up selectedIdeaId if referenced idea expires/dissolves
     - _Requirements: 1.4_
-  - [ ]* 3.2 Write property test for single selection invariant
+  - [ ]\* 3.2 Write property test for single selection invariant
     - **Property 1: Single Selection Invariant**
     - **Validates: Requirements 1.4**
 

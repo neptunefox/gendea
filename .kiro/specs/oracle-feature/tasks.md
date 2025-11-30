@@ -102,7 +102,7 @@
     - Add Zod schema for response validation
     - Implement fallback questions for LLM failures
     - _Requirements: 3.1, 3.2, 4.1, 4.2, 4.3, 4.4_
-  - [ ]* 8.2 Write property test for Oracle response format
+  - [ ]\* 8.2 Write property test for Oracle response format
     - **Property 2: Oracle responses contain only questions**
     - **Validates: Requirements 3.1, 3.2**
 
@@ -112,7 +112,7 @@
     - Create session with visitorId from request
     - Return sessionId and initial context if idea provided
     - _Requirements: 2.1, 2.2, 2.4_
-  - [ ]* 9.2 Write property test for session creation
+  - [ ]\* 9.2 Write property test for session creation
     - **Property 1: Session creation persists required fields**
     - **Validates: Requirements 2.2, 2.4, 2.5**
   - [x] 9.3 Create GET /api/oracle/session/[id].get.ts
@@ -126,7 +126,7 @@
     - Persist Oracle response
     - Return the Oracle question
     - _Requirements: 3.1, 3.4_
-  - [ ]* 9.5 Write property test for message persistence
+  - [ ]\* 9.5 Write property test for message persistence
     - **Property 3: Message persistence includes all required fields**
     - **Validates: Requirements 3.4**
   - [x] 9.6 Create POST /api/oracle/message-stream.post.ts
@@ -137,7 +137,7 @@
     - Update message with sparkedAt timestamp
     - Return success response
     - _Requirements: 5.3_
-  - [ ]* 9.8 Write property test for spark timestamp
+  - [ ]\* 9.8 Write property test for spark timestamp
     - **Property 5: Spark action records timestamp**
     - **Validates: Requirements 5.3**
 
@@ -189,10 +189,10 @@
 
 ## Phase 7: Property-Based Tests (Optional)
 
-- [ ]* 16. Additional property tests
-  - [ ]* 16.1 Write property test for question quality
+- [ ]\* 16. Additional property tests
+  - [ ]\* 16.1 Write property test for question quality
     - **Property 4: Oracle questions are non-empty and self-contained**
     - **Validates: Requirements 4.4**
-  - [ ]* 16.2 Write property test for role constraint
+  - [ ]\* 16.2 Write property test for role constraint
     - **Property 6: Message role is constrained to valid values**
     - **Validates: Requirements 10.3**

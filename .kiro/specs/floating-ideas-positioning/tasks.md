@@ -30,13 +30,13 @@
     - Add `isInsideSafeZone` function for circle and rectangle zones
     - Add `isPositionValid` function combining all safe zone checks
     - _Requirements: 1.1, 1.2, 1.3_
-  - [ ]* 2.3 Write property test for safe zone avoidance
+  - [ ]\* 2.3 Write property test for safe zone avoidance
     - **Property 1: Safe Zone Avoidance**
     - **Validates: Requirements 1.1, 1.2, 1.3**
   - [x] 2.4 Implement card overlap detection
     - Add `checkCardOverlap` function with 40px padding
     - _Requirements: 1.4_
-  - [ ]* 2.5 Write property test for card spacing
+  - [ ]\* 2.5 Write property test for card spacing
     - **Property 2: Card Spacing Maintained**
     - **Validates: Requirements 1.4**
 

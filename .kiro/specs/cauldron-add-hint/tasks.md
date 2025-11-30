@@ -10,7 +10,7 @@
     - Add CSS transition for smooth fade-in/fade-out
     - Position to not obstruct drag-and-drop
     - _Requirements: 1.2, 1.3, 3.1, 3.2, 3.3_
-  - [ ]* 1.3 Write property test for mixing hint visibility
+  - [ ]\* 1.3 Write property test for mixing hint visibility
     - **Property 1: Mixing hint visibility matches mixing state**
     - **Validates: Requirements 1.1**
 
@@ -27,7 +27,7 @@
   - [x] 2.3 Add highlight animation when idea is added
     - Brief pulse animation on hint when new ingredient added after output exists
     - _Requirements: 2.3_
-  - [ ]* 2.4 Write property test for remix hint visibility
+  - [ ]\* 2.4 Write property test for remix hint visibility
     - **Property 2: Remix hint visibility matches output state**
     - **Validates: Requirements 2.1**
 

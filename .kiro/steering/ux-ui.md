@@ -106,6 +106,7 @@ The app helps users generate ideas. Every screen should make the next action obv
 ### Quality Checklist
 
 Before shipping any UI:
+
 - Does a first-time user understand this without explanation?
 - Is the primary action obvious?
 - Does this screen have only one job?
