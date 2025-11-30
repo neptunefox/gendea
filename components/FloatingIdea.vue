@@ -8,7 +8,8 @@
       urgent: isUrgent,
       selected: isSelected,
       frozen: isFrozen,
-      'near-cauldron': isNearCauldron
+      'near-cauldron': isNearCauldron,
+      'ambient-float': !isDragging && !isDissolving
     }"
     :style="positionStyle"
     @mousedown="handleMouseDown"
@@ -114,11 +115,16 @@ const positionStyle = computed(() => {
     transform = `rotate(${rotation}deg) scale(${scale})`
   }
   
+  const bobDuration = 2.5 + (props.index * 0.3)
+  const bobDelay = props.index * 0.4
+  
   return {
     left: `${position.value.x}px`,
     top: `${position.value.y}px`,
     zIndex: computedZIndex.value,
     transform,
+    '--bob-duration': `${bobDuration}s`,
+    '--bob-delay': `${bobDelay}s`,
     transition: isDragging.value
       ? 'transform 0.15s ease-out, box-shadow 0.15s ease-out'
       : 'transform 0.3s ease, box-shadow 0.2s ease, border-color 0.2s ease, width 0.2s ease, left 0.3s ease, top 0.3s ease'
@@ -483,5 +489,25 @@ onUnmounted(() => {
   -webkit-box-orient: vertical;
   padding-right: var(--space-3);
   letter-spacing: 0.01em;
+}
+
+.floating-idea.ambient-float {
+  animation: ambient-bob var(--bob-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--bob-delay, 0s);
+}
+
+@keyframes ambient-bob {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-idea.ambient-float {
+    animation: none;
+  }
 }
 </style>

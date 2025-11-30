@@ -71,8 +71,8 @@
     - **Property 7: Maximum Display Count**
     - **Validates: Requirements 5.1**
 
-- [ ] 7. Add ambient floating animation
-  - [ ] 7.1 Implement subtle hover animation for arc cards
+- [x] 7. Add ambient floating animation
+  - [x] 7.1 Implement subtle hover animation for arc cards
     - Add gentle bobbing animation to cards in arc
     - Ensure animation respects `prefers-reduced-motion`
     - _Requirements: 4.3_
