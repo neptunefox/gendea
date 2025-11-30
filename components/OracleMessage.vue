@@ -43,14 +43,15 @@ defineProps<Props>()
 }
 
 .oracle-message.user .message-content {
-  color: #7a7570;
+  color: var(--color-text-tertiary);
   font-size: var(--text-base);
 }
 
 .oracle-message.oracle .message-content {
-  color: #e8e4e0;
+  color: var(--color-text);
   font-size: var(--text-lg);
   font-weight: var(--weight-medium);
+  text-shadow: 0 0 30px var(--color-glow-teal);
 }
 
 @media (max-width: 768px) {

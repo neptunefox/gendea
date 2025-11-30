@@ -1,6 +1,6 @@
 <template>
   <div class="oracle-chat">
-    <div class="messages-container" ref="messagesContainer">
+    <div ref="messagesContainer" class="messages-container">
       <div v-if="initialIdeaText && messages.length === 0" class="context-intro">
         <p class="context-label">You're exploring</p>
         <p class="context-text">{{ initialIdeaText }}</p>
@@ -191,7 +191,7 @@ onMounted(async () => {
   text-align: center;
   padding: var(--space-8) 0;
   margin-bottom: var(--space-6);
-  border-bottom: 1px solid #2d2926;
+  border-bottom: 1px solid var(--color-border-strong);
 }
 
 .context-label {
@@ -199,15 +199,16 @@ onMounted(async () => {
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #5c5754;
+  color: var(--color-text-tertiary);
 }
 
 .context-text {
   margin: 0;
+  font-family: var(--font-heading);
   font-size: var(--text-lg);
-  color: #a8a29e;
+  color: var(--color-text-secondary);
   line-height: 1.5;
-  font-style: italic;
+  font-weight: 400;
 }
 
 .messages-list {
@@ -226,9 +227,10 @@ onMounted(async () => {
 .thinking-dot {
   width: 4px;
   height: 4px;
-  background: #5c5754;
+  background: var(--color-oracle);
   border-radius: 50%;
   animation: think 1.4s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--color-glow-teal);
 }
 
 .thinking-dot:nth-child(2) {
@@ -254,7 +256,7 @@ onMounted(async () => {
   left: var(--nav-width);
   right: 0;
   padding: var(--space-5) var(--space-6);
-  background: #1a1816;
+  background: var(--color-bg);
   display: flex;
   justify-content: center;
 }
@@ -266,7 +268,7 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 40px;
-  background: linear-gradient(transparent, #1a1816);
+  background: linear-gradient(transparent, var(--color-bg));
   pointer-events: none;
 }
 
@@ -275,7 +277,7 @@ onMounted(async () => {
   max-width: 520px;
   border: none;
   background: transparent;
-  color: #e8e4e0;
+  color: var(--color-text);
   font-size: var(--text-base);
   font-family: inherit;
   resize: none;
@@ -285,16 +287,16 @@ onMounted(async () => {
   overflow-y: hidden;
   outline: none;
   padding: var(--space-3) 0;
-  border-bottom: 1px solid #2d2926;
+  border-bottom: 1px solid var(--color-border-strong);
   transition: border-color var(--duration-normal) var(--ease-out);
 }
 
 .message-input:focus {
-  border-color: #5c5754;
+  border-color: var(--color-oracle);
 }
 
 .message-input::placeholder {
-  color: #5c5754;
+  color: var(--color-text-tertiary);
 }
 
 .send-btn {
@@ -305,7 +307,7 @@ onMounted(async () => {
   height: 36px;
   border: none;
   background: transparent;
-  color: #3d3835;
+  color: var(--color-text-tertiary);
   border-radius: var(--radius-md);
   cursor: pointer;
   display: flex;
@@ -315,11 +317,11 @@ onMounted(async () => {
 }
 
 .send-btn.ready {
-  color: #e8e4e0;
+  color: var(--color-oracle);
 }
 
 .send-btn:hover:not(:disabled) {
-  color: #e8e4e0;
+  color: var(--color-text);
 }
 
 .send-btn:disabled {

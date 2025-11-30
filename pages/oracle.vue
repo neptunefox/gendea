@@ -71,10 +71,19 @@ onMounted(async () => {
 <style scoped>
 .oracle-page {
   min-height: 100vh;
-  background: #1a1816;
-  color: #e8e4e0;
+  background: var(--color-bg);
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.oracle-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(126, 184, 201, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .loading-state {
@@ -87,9 +96,10 @@ onMounted(async () => {
 .loading-pulse {
   width: 8px;
   height: 8px;
-  background: #6b6560;
+  background: var(--color-text-tertiary);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px var(--color-glow-teal);
 }
 
 @keyframes pulse {
@@ -110,7 +120,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: var(--space-6);
-  color: #6b6560;
+  color: var(--color-text-tertiary);
   text-align: center;
   padding: var(--space-8);
 }
@@ -123,8 +133,8 @@ onMounted(async () => {
 .retry-btn {
   padding: var(--space-3) var(--space-5);
   background: transparent;
-  color: #e8e4e0;
-  border: 1px solid #3d3835;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   font-weight: var(--weight-medium);
   cursor: pointer;
@@ -132,7 +142,7 @@ onMounted(async () => {
 }
 
 .retry-btn:hover {
-  border-color: #6b6560;
-  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--color-oracle);
+  background: rgba(126, 184, 201, 0.1);
 }
 </style>

@@ -540,6 +540,14 @@ onMounted(async () => {
   overflow-x: hidden;
 }
 
+.cauldron-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 50% at 50% 60%, rgba(149, 117, 205, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
 .cauldron-page > .flow-guidance-banner {
   position: fixed;
   top: var(--space-4);

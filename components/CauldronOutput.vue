@@ -103,8 +103,8 @@ function getSteamStyle(index: number) {
   height: 30px;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.6) 0%,
-    var(--color-primary-subtle) 50%,
+    rgba(149, 117, 205, 0.6) 0%,
+    var(--color-glow-purple) 50%,
     transparent 100%
   );
   border-radius: 50%;
@@ -133,12 +133,12 @@ function getSteamStyle(index: number) {
 .output-card {
   position: relative;
   background: var(--color-surface);
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-cauldron);
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   max-width: 480px;
   width: 100%;
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 0 30px var(--color-glow-purple), var(--shadow-xl);
   z-index: 2;
 }
 
@@ -149,9 +149,10 @@ function getSteamStyle(index: number) {
 
 .output-title {
   margin: 0 0 var(--space-3) 0;
-  color: var(--color-primary);
+  color: var(--color-cauldron);
+  font-family: var(--font-heading);
   font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
+  font-weight: 500;
   text-align: center;
 }
 
@@ -195,14 +196,15 @@ function getSteamStyle(index: number) {
 }
 
 .action-btn.oracle {
-  background: #292524;
-  color: #FAFAF9;
-  border: 1px solid #3f3a36;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
 }
 
 .action-btn.oracle:hover {
-  background: #3f3a36;
-  border-color: #d4756f;
+  background: var(--color-oracle-subtle);
+  border-color: var(--color-oracle);
+  color: var(--color-oracle);
 }
 
 .action-btn.secondary {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { useLangChainService } from './langchain-service'
 
 const ORACLE_SYSTEM_PROMPT = `You are the Oracle - a Socratic guide who ONLY asks questions, never gives answers.

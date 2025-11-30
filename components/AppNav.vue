@@ -76,6 +76,7 @@ import { Lightbulb, HelpCircle, FlaskConical, Clock } from 'lucide-vue-next'
 .logo-icon {
   width: 24px;
   height: 24px;
+  filter: drop-shadow(0 0 6px var(--color-glow-amber));
 }
 
 .nav-links {
@@ -97,13 +98,14 @@ import { Lightbulb, HelpCircle, FlaskConical, Clock } from 'lucide-vue-next'
 }
 
 .nav-link:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--color-hover-bg);
   color: var(--color-text-secondary);
 }
 
 .nav-link.router-link-active {
   background: var(--color-primary-subtle);
   color: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-glow-amber);
 }
 
 .app-nav-mobile {
@@ -143,13 +145,14 @@ import { Lightbulb, HelpCircle, FlaskConical, Clock } from 'lucide-vue-next'
   }
 
   .app-nav-mobile .nav-link:hover {
-    background: rgba(0, 0, 0, 0.04);
+    background: var(--color-hover-bg);
     color: var(--color-text-secondary);
   }
 
   .app-nav-mobile .nav-link.router-link-active {
     background: var(--color-primary-subtle);
     color: var(--color-primary);
+    box-shadow: 0 0 12px var(--color-glow-amber);
   }
 }
 </style>

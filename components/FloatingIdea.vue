@@ -71,12 +71,14 @@ let timerInterval: NodeJS.Timeout | null = null
 const isUrgent = computed(() => timeRemaining.value <= URGENT_THRESHOLD)
 const timerProgress = computed(() => timeRemaining.value / props.duration)
 const isFrozen = computed(() => props.isSelected || isDragging.value)
-const timerRingStyle = computed(() => ({
-  background: `conic-gradient(
-    ${isFrozen.value ? '#7eb8c9' : isUrgent.value ? '#d4756f' : '#e8ddd8'} ${timerProgress.value * 360}deg,
-    transparent ${timerProgress.value * 360}deg
-  )`
-}))
+const timerRingStyle = computed(() => {
+  const activeColor = isFrozen.value ? '#7eb8c9' : isUrgent.value ? '#c27a74' : '#d4a574'
+  const bgColor = '#242120'
+  const deg = timerProgress.value * 360
+  return {
+    background: `conic-gradient(${activeColor} ${deg}deg, ${bgColor} ${deg}deg)`
+  }
+})
 
 const isSelected = computed(() => props.isSelected)
 const isLeftSide = computed(() => props.index < 3)
@@ -292,11 +294,13 @@ onUnmounted(() => {
 .floating-idea {
   position: absolute;
   width: 200px;
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-  border: 2px solid var(--color-border);
+  padding: var(--space-4);
+  background: linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-raised) 100%);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(232, 228, 224, 0.04);
   cursor: grab;
   user-select: none;
   pointer-events: auto;
@@ -307,79 +311,49 @@ onUnmounted(() => {
     opacity var(--duration-normal) var(--ease-out);
 }
 
+.floating-idea::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-md) - 2px);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
 .timer-ring {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 10px;
+  right: 10px;
   width: 12px;
   height: 12px;
   border-radius: var(--radius-full);
-  opacity: 0.85;
-  border: 1.5px solid var(--color-primary-ring);
-  transition:
-    opacity var(--duration-normal) var(--ease-out),
-    transform var(--duration-normal) var(--ease-out);
-}
-
-.floating-idea:hover .timer-ring {
-  opacity: 1;
-}
-
-.floating-idea.urgent .timer-ring {
-  opacity: 1;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 6px var(--color-primary-ring);
-  animation: pulse-urgent 1.2s ease-in-out infinite;
-}
-
-@keyframes pulse-urgent {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 6px var(--color-primary-ring);
-  }
-  50% {
-    transform: scale(1.15);
-    box-shadow: 0 0 8px var(--color-primary-subtle);
-  }
-}
-
-.timer-ring.frozen {
-  opacity: 1;
-  width: 14px;
-  height: 14px;
-  border-color: var(--color-info-subtle);
-  box-shadow: 0 0 8px var(--color-info-subtle);
-  animation: pulse-frozen 2s ease-in-out infinite;
-}
-
-@keyframes pulse-frozen {
-  0%,
-  100% {
-    box-shadow: 0 0 8px var(--color-info-subtle);
-  }
-  50% {
-    box-shadow: 0 0 12px var(--color-info-subtle);
-  }
+  z-index: 2;
 }
 
 .floating-idea:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--color-glow-amber);
   border-color: var(--color-primary);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .floating-idea.dragging {
   cursor: grabbing;
-  transform: scale(1.05);
-  box-shadow: var(--shadow-xl);
+  transform: scale(1.05) rotate(2deg);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 20px var(--color-glow-amber);
   border-color: var(--color-primary);
 }
 
 .floating-idea.selected {
   width: 280px;
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-xl);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.4),
+    0 0 20px var(--color-glow-amber);
   transform: scale(1.02);
 }
 
@@ -417,5 +391,6 @@ onUnmounted(() => {
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
+  padding-right: var(--space-4);
 }
 </style>

@@ -244,15 +244,15 @@ defineExpose({
 .cauldron-pot {
   width: 280px;
   height: 140px;
-  background: linear-gradient(180deg, #c9625c 0%, #9e4540 60%, #7a3530 100%);
+  background: linear-gradient(180deg, #5a4a6a 0%, #3d3050 60%, #2a2040 100%);
   border-radius: 50% / 30% 30% 70% 70%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 12px 28px rgba(122, 53, 48, 0.4),
-    inset 0 -20px 30px rgba(0, 0, 0, 0.2),
-    inset 0 8px 12px rgba(255, 255, 255, 0.1);
+    0 12px 28px rgba(149, 117, 205, 0.3),
+    inset 0 -20px 30px rgba(0, 0, 0, 0.3),
+    inset 0 8px 12px rgba(255, 255, 255, 0.05);
   position: relative;
   transition:
     transform 0.3s ease,
@@ -305,10 +305,10 @@ defineExpose({
 .cauldron-pot.drag-over {
   transform: scale(1.03);
   box-shadow:
-    0 16px 36px rgba(122, 53, 48, 0.5),
-    inset 0 -20px 30px rgba(0, 0, 0, 0.2),
-    inset 0 8px 12px rgba(255, 255, 255, 0.1),
-    0 0 0 4px rgba(212, 117, 111, 0.25);
+    0 16px 36px rgba(149, 117, 205, 0.4),
+    inset 0 -20px 30px rgba(0, 0, 0, 0.3),
+    inset 0 8px 12px rgba(255, 255, 255, 0.05),
+    0 0 0 4px var(--color-glow-purple);
 }
 
 .cauldron-pot.mixing {
