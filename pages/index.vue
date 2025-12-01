@@ -76,23 +76,15 @@
         </button>
         <div v-show="!ideasCollapsed" class="collection-content">
           <div class="ideas-grid-wrapper">
-            <ConstellationLines
-              :card-refs="ideaCardRefs"
-              :visible="!ideasCollapsed && savedIdeas.length >= 2"
-              :highlighted-card-index="hoveredCardIndex"
-            />
-            <transition-group name="idea-list" tag="div" class="ideas-grid" @after-enter="updateCardRefs" @after-leave="updateCardRefs">
+            <transition-group name="idea-list" tag="div" class="ideas-grid">
               <div
                 v-for="(idea, index) in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
                 :key="idea.id"
-                ref="ideaCardElements"
                 class="idea-card"
                 :class="{ dragging: isDraggingIdea === idea.id }"
                 draggable="true"
                 @dragstart="e => handleIdeaDragStart(e, idea)"
                 @dragend="handleIdeaDragEnd"
-                @mouseenter="hoveredCardIndex = index"
-                @mouseleave="hoveredCardIndex = null"
               >
               <span class="tarot-corner top-left" />
               <span class="tarot-corner top-right" />
@@ -248,7 +240,6 @@ import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import ConstellationLines from '~/components/ConstellationLines.vue'
 
 interface SparkIdea {
   text: string
@@ -349,15 +340,6 @@ const route = useRoute()
 
 const isDraggingIdea = ref<string | null>(null)
 const generationCount = ref(0)
-const ideaCardRefs = ref<HTMLElement[]>([])
-const hoveredCardIndex = ref<number | null>(null)
-const ideaCardElements = ref<HTMLElement[]>([])
-
-function updateCardRefs() {
-  nextTick(() => {
-    ideaCardRefs.value = [...ideaCardElements.value].filter(Boolean)
-  })
-}
 
 const canGenerate = computed(() => input.value.trim().length > 0)
 const historyPayload = computed(() =>
@@ -633,22 +615,7 @@ onMounted(async () => {
   checkCauldronNudge()
   await nextTick()
   adjustInputHeight()
-  updateCardRefs()
 })
-
-watch(
-  () => savedIdeas.value.length,
-  () => {
-    nextTick(() => updateCardRefs())
-  }
-)
-
-watch(
-  () => showAllIdeas.value,
-  () => {
-    nextTick(() => updateCardRefs())
-  }
-)
 
 async function fetchSavedIdeas() {
   try {
