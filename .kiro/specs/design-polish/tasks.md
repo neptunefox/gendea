@@ -40,22 +40,22 @@
     - Use `useRoute` to determine current feature
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 4. Implement Constellation Lines system
-  - [ ] 4.1 Create ConstellationLines component
+- [x] 4. Implement Constellation Lines system
+  - [x] 4.1 Create ConstellationLines component
     - Create `components/ConstellationLines.vue`
     - Accept `cardRefs` and `visible` props
     - Calculate line positions from card bounding rects
     - Render SVG lines with gradient strokes
     - _Requirements: 2.1_
-  - [ ] 4.2 Implement line position updates
+  - [x] 4.2 Implement line position updates
     - Use ResizeObserver to track card position changes
     - Recalculate on window resize
     - _Requirements: 2.3_
-  - [ ] 4.3 Add hover highlighting
+  - [x] 4.3 Add hover highlighting
     - Accept `highlightedCardIndex` prop
     - Increase opacity of connected lines on hover
     - _Requirements: 2.2_
-  - [ ] 4.4 Integrate ConstellationLines into Spark page
+  - [x] 4.4 Integrate ConstellationLines into Spark page
     - Add to `pages/index.vue` ideas-grid section
     - Pass card refs and collapsed state
     - Hide when grid is collapsed
