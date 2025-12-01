@@ -73,12 +73,12 @@
     - Skip animation when reduced motion is enabled
     - _Requirements: 3.1, 3.4_
 
-- [ ] 6. Implement Cauldron Crystallization Effect
-  - [ ] 6.1 Create crystallization animation
+- [x] 6. Implement Cauldron Crystallization Effect
+  - [x] 6.1 Create crystallization animation
     - Add shimmer keyframes to CauldronOutput component
     - Trigger on output finalization (400ms duration)
     - _Requirements: 4.1, 4.2_
-  - [ ] 6.2 Add sparkle particles on crystallization
+  - [x] 6.2 Add sparkle particles on crystallization
     - Extend useParticles composable with `spawnSparkles` function
     - Emit 8-12 particles from output area
     - Skip particles when reduced motion is enabled

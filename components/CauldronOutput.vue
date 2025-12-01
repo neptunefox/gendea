@@ -5,10 +5,10 @@
         <div v-for="i in 6" :key="i" class="steam" :style="getSteamStyle(i)"></div>
       </div>
 
-      <div class="output-card">
+      <div class="output-card" :class="{ crystallizing: isCrystallizing }">
         <div class="card-content">
           <h3 class="output-title">Your synthesized idea</h3>
-          <p class="output-text">{{ output }}</p>
+          <p class="output-text" :class="{ 'shimmer-text': isCrystallizing }">{{ output }}</p>
           <div class="output-actions">
             <button class="action-btn primary" @click="$emit('save')">
               <Save :size="18" />
@@ -32,20 +32,27 @@
 <script setup lang="ts">
 import { HelpCircle, Save, RotateCcw } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
+import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface Props {
   output: string | null
+  isFinalized?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isFinalized: true
+})
 
-defineEmits<{
+const emit = defineEmits<{
   save: []
   askOracle: []
   reset: []
+  crystallized: []
 }>()
 
 const show = ref(false)
+const isCrystallizing = ref(false)
+const reducedMotion = useReducedMotion()
 
 watch(
   () => props.output,
@@ -54,13 +61,22 @@ watch(
       show.value = true
     } else {
       show.value = false
+      isCrystallizing.value = false
     }
   },
   { immediate: true }
 )
 
 function handleEmergenceComplete() {
-  // Animation complete
+  if (!reducedMotion.value) {
+    isCrystallizing.value = true
+    setTimeout(() => {
+      isCrystallizing.value = false
+      emit('crystallized')
+    }, 400)
+  } else {
+    emit('crystallized')
+  }
 }
 
 function getSteamStyle(index: number) {
@@ -251,6 +267,69 @@ function getSteamStyle(index: number) {
   }
   to {
     opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes crystallize-glow {
+  0% {
+    box-shadow:
+      0 0 30px var(--color-glow-purple),
+      var(--shadow-xl);
+  }
+  50% {
+    box-shadow:
+      0 0 50px var(--color-glow-purple),
+      0 0 80px rgba(149, 117, 205, 0.4),
+      var(--shadow-xl);
+  }
+  100% {
+    box-shadow:
+      0 0 30px var(--color-glow-purple),
+      var(--shadow-xl);
+  }
+}
+
+.output-card.crystallizing {
+  animation: crystallize-glow 400ms ease-out;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--color-text) 0%,
+    var(--color-text) 40%,
+    rgba(149, 117, 205, 0.8) 50%,
+    var(--color-text) 60%,
+    var(--color-text) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 400ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .output-card.crystallizing {
+    animation: none;
+  }
+  
+  .shimmer-text {
+    animation: none;
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    -webkit-text-fill-color: unset;
+    color: var(--color-text);
   }
 }
 

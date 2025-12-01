@@ -68,10 +68,12 @@
 
           <CauldronOutput
             v-if="output"
+            ref="cauldronOutputRef"
             :output="output"
             @save="handleSaveOutput"
             @ask-oracle="handleAskOracle"
             @reset="handleReset"
+            @crystallized="handleCrystallized"
           />
 
           <div class="manual-input-wrapper">
@@ -127,6 +129,7 @@ import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useParticles } from '~/composables/useParticles'
+import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
 
 interface FloatingIdea {
@@ -180,9 +183,11 @@ const ideaRefs = ref<
   Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>
 >(new Map())
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
+const cauldronOutputRef = ref<HTMLElement | null>(null)
 
-const { particles, spawnDissolutionParticles } = useParticles()
+const { particles, spawnDissolutionParticles, spawnSparkles } = useParticles()
 const { play: playSound, stop: stopSound } = useSound()
+const reducedMotion = useReducedMotion()
 
 const MAX_DISPLAYED_IDEAS = 5
 
@@ -531,6 +536,27 @@ function triggerRemixHintPulse() {
   setTimeout(() => {
     remixHintPulse.value = false
   }, 600)
+}
+
+function handleCrystallized() {
+  if (reducedMotion.value) return
+  
+  if (cauldronOutputRef.value) {
+    const rect = cauldronOutputRef.value.getBoundingClientRect()
+    spawnSparkles(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+      rect.width * 0.8,
+      rect.height * 0.6
+    )
+  } else {
+    spawnSparkles(
+      cauldronCenter.value.x,
+      cauldronCenter.value.y - 50,
+      300,
+      150
+    )
+  }
 }
 
 function dismissGuidance() {

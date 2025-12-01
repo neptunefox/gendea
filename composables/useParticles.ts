@@ -19,12 +19,19 @@ export interface UseParticlesReturn {
     targetY: number,
     count?: number
   ) => void
+  spawnSparkles: (
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number
+  ) => void
   updateParticles: () => void
   clearParticles: () => void
 }
 
 const MAX_PARTICLES = 50
 const PARTICLE_COLORS = ['#9575cd', '#b39ddb', '#7e57c2', '#d1c4e9', '#ede7f6']
+const SPARKLE_COLORS = ['#ffd700', '#fff8dc', '#fffacd', '#f0e68c', '#e6e6fa', '#dda0dd']
 
 let particleIdCounter = 0
 
@@ -119,6 +126,52 @@ export function useParticles(): UseParticlesReturn {
     animationFrameId = requestAnimationFrame(loop)
   }
 
+  function spawnSparkles(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number
+  ): void {
+    const count = 8 + Math.floor(Math.random() * 5)
+    const newParticles: Particle[] = []
+
+    for (let i = 0; i < count; i++) {
+      const startX = centerX + (Math.random() - 0.5) * width
+      const startY = centerY + (Math.random() - 0.5) * height
+      
+      const angle = Math.random() * Math.PI * 2
+      const distance = 50 + Math.random() * 100
+      const targetX = startX + Math.cos(angle) * distance
+      const targetY = startY + Math.sin(angle) * distance - 30
+
+      newParticles.push({
+        id: particleIdCounter++,
+        x: startX,
+        y: startY,
+        targetX,
+        targetY,
+        size: 4 + Math.random() * 6,
+        opacity: 0.9 + Math.random() * 0.1,
+        color: SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)],
+        velocity: {
+          x: (Math.random() - 0.5) * 3,
+          y: -1 - Math.random() * 2
+        }
+      })
+    }
+
+    const combined = [...particles.value, ...newParticles]
+    if (combined.length > MAX_PARTICLES) {
+      particles.value = combined.slice(-MAX_PARTICLES)
+    } else {
+      particles.value = combined
+    }
+
+    if (!animationFrameId) {
+      startAnimationLoop()
+    }
+  }
+
   function clearParticles(): void {
     particles.value = []
     if (animationFrameId) {
@@ -134,6 +187,7 @@ export function useParticles(): UseParticlesReturn {
   return {
     particles,
     spawnDissolutionParticles,
+    spawnSparkles,
     updateParticles,
     clearParticles
   }
