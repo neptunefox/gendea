@@ -180,7 +180,11 @@
                 v-for="(idea, ideaIndex) in entry.coreIdeas"
                 :key="`${entry.id}-core-${ideaIndex}`"
                 class="idea-pill"
-                :class="{ selected: selectedIdeas.has(`${entry.id}-${ideaIndex}`) }"
+                :class="{
+                  selected: selectedIdeas.has(`${entry.id}-${ideaIndex}`),
+                  'card-deal-animate': shouldAnimateCard(entry.id)
+                }"
+                :style="getCardDealDelay(entry.id, ideaIndex) ? { animationDelay: getCardDealDelay(entry.id, ideaIndex) } : undefined"
                 @click="toggleIdeaSelection(`${entry.id}-${ideaIndex}`, idea.text, entry)"
               >
                 <div class="pill-checkbox">
@@ -240,6 +244,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface SparkIdea {
   text: string
@@ -337,9 +342,11 @@ const INPUT_HEIGHT_LIMIT = 100
 
 const router = useRouter()
 const route = useRoute()
+const prefersReducedMotion = useReducedMotion()
 
 const isDraggingIdea = ref<string | null>(null)
 const generationCount = ref(0)
+const latestEntryId = ref<string | null>(null)
 
 const canGenerate = computed(() => input.value.trim().length > 0)
 const historyPayload = computed(() =>
@@ -351,6 +358,16 @@ const historyPayload = computed(() =>
     ]
   }))
 )
+
+function getCardDealDelay(entryId: string, index: number): string | undefined {
+  if (prefersReducedMotion.value) return undefined
+  if (entryId !== latestEntryId.value) return undefined
+  return `${index * 80}ms`
+}
+
+function shouldAnimateCard(entryId: string): boolean {
+  return !prefersReducedMotion.value && entryId === latestEntryId.value
+}
 
 function toggleIdeaSelection(key: string, text: string, entry: JournalEntry) {
   if (selectedIdeas.value.has(key)) {
@@ -426,6 +443,7 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
       parentPrompt: parentEntry?.prompt
     }
 
+    latestEntryId.value = entry.id
     entries.value = [entry, ...entries.value].slice(0, 6)
     lastPrompt.value = topic
 
@@ -1816,6 +1834,25 @@ watch(
   }
 }
 
+@keyframes card-deal {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-3deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.02) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.idea-pill.card-deal-animate {
+  animation: card-deal 0.4s var(--ease-out) backwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .demo-overlay,
   .grimoire-container,
@@ -1831,6 +1868,11 @@ watch(
   .grimoire-whisper,
   .grimoire-divider,
   .demo-cta {
+    opacity: 1;
+  }
+
+  .idea-pill.card-deal-animate {
+    animation: none;
     opacity: 1;
   }
 }

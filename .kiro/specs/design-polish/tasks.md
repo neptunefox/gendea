@@ -62,12 +62,12 @@
     - _Requirements: 2.1, 2.4_
 
 - [ ] 5. Implement Card Dealing Animation
-  - [ ] 5.1 Create card dealing CSS animation
+  - [x] 5.1 Create card dealing CSS animation
     - Add `@keyframes card-deal` to index.vue styles
     - Include rotation (±3deg settling to 0) and scale (0.8 to 1.0)
     - Add staggered delay calculation based on index
     - _Requirements: 3.1, 3.2, 3.3_
-  - [ ] 5.2 Apply animation to idea pills
+  - [x] 5.2 Apply animation to idea pills
     - Add animation class to idea-pill elements in journal-entry
     - Calculate delay as `index * 80ms`
     - Skip animation when reduced motion is enabled
