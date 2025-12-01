@@ -1,0 +1,185 @@
+# Implementation Plan
+
+- [ ] 1. Create accessibility composable and CSS foundation
+  - [ ] 1.1 Create `useReducedMotion` composable
+    - Create `composables/useReducedMotion.ts`
+    - Return reactive boolean for `prefers-reduced-motion` media query
+    - Listen for changes and update reactively
+    - _Requirements: 1.5, 3.4, 4.4, 6.4, 9.3_
+  - [ ] 1.2 Add global CSS variables for animation durations
+    - Add `--duration-rune-drift`, `--duration-pendulum`, `--duration-seal` to app.vue
+    - Add reduced-motion media query that sets durations to 0
+    - _Requirements: 1.5, 3.4_
+
+- [ ] 2. Implement Background Runes system
+  - [ ] 2.1 Create BackgroundRunes component
+    - Create `components/BackgroundRunes.vue`
+    - Accept `variant` prop for symbol set selection
+    - Render 12 symbols with random positions
+    - Implement CSS drift animation (20-40s duration)
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [ ] 2.2 Implement rune recycling logic
+    - Use IntersectionObserver to detect off-screen runes
+    - Reposition to opposite edge when exiting viewport
+    - _Requirements: 1.4_
+  - [ ] 2.3 Add BackgroundRunes to each page
+    - Add to `pages/index.vue` with variant="spark"
+    - Add to `pages/cauldron.vue` with variant="cauldron"
+    - Add to `pages/oracle.vue` with variant="oracle"
+    - _Requirements: 1.1, 1.2, 1.3_
+
+- [ ] 3. Implement Vignette Overlay system
+  - [ ] 3.1 Create VignetteOverlay component
+    - Create `components/VignetteOverlay.vue`
+    - Accept `color` prop (amber/purple/teal)
+    - Render fixed-position radial gradients at corners
+    - Implement 300ms color transition
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [ ] 3.2 Add VignetteOverlay to app layout
+    - Add to `app.vue` with route-based color switching
+    - Use `useRoute` to determine current feature
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+
+- [ ] 4. Implement Constellation Lines system
+  - [ ] 4.1 Create ConstellationLines component
+    - Create `components/ConstellationLines.vue`
+    - Accept `cardRefs` and `visible` props
+    - Calculate line positions from card bounding rects
+    - Render SVG lines with gradient strokes
+    - _Requirements: 2.1_
+  - [ ] 4.2 Implement line position updates
+    - Use ResizeObserver to track card position changes
+    - Recalculate on window resize
+    - _Requirements: 2.3_
+  - [ ] 4.3 Add hover highlighting
+    - Accept `highlightedCardIndex` prop
+    - Increase opacity of connected lines on hover
+    - _Requirements: 2.2_
+  - [ ] 4.4 Integrate ConstellationLines into Spark page
+    - Add to `pages/index.vue` ideas-grid section
+    - Pass card refs and collapsed state
+    - Hide when grid is collapsed
+    - _Requirements: 2.1, 2.4_
+
+- [ ] 5. Implement Card Dealing Animation
+  - [ ] 5.1 Create card dealing CSS animation
+    - Add `@keyframes card-deal` to index.vue styles
+    - Include rotation (±3deg settling to 0) and scale (0.8 to 1.0)
+    - Add staggered delay calculation based on index
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [ ] 5.2 Apply animation to idea pills
+    - Add animation class to idea-pill elements in journal-entry
+    - Calculate delay as `index * 80ms`
+    - Skip animation when reduced motion is enabled
+    - _Requirements: 3.1, 3.4_
+
+- [ ] 6. Implement Cauldron Crystallization Effect
+  - [ ] 6.1 Create crystallization animation
+    - Add shimmer keyframes to CauldronOutput component
+    - Trigger on output finalization (400ms duration)
+    - _Requirements: 4.1, 4.2_
+  - [ ] 6.2 Add sparkle particles on crystallization
+    - Extend useParticles composable with `spawnSparkles` function
+    - Emit 8-12 particles from output area
+    - Skip particles when reduced motion is enabled
+    - _Requirements: 4.3, 4.4_
+
+- [ ] 7. Implement Ghost Ingredients for empty Cauldron
+  - [ ] 7.1 Create GhostIngredients component
+    - Create `components/GhostIngredients.vue`
+    - Render 2-3 semi-transparent floating shapes
+    - Add CSS bobbing animation
+    - _Requirements: 11.1, 11.2_
+  - [ ] 7.2 Integrate into CauldronPot
+    - Show when `ingredients.length === 0`
+    - Fade out over 300ms when ingredient is added
+    - _Requirements: 11.1, 11.3_
+
+- [ ] 8. Implement Oracle Pendulum Indicator
+  - [ ] 8.1 Create OraclePendulum component
+    - Create `components/OraclePendulum.vue`
+    - Implement pendulum swing animation (2s ease-in-out)
+    - Add glow trail via animated box-shadow
+    - _Requirements: 8.1, 8.2, 8.3_
+  - [ ] 8.2 Replace thinking dots in OracleChat
+    - Replace `.thinking-indicator` with OraclePendulum
+    - Show when `isLoading` is true
+    - _Requirements: 8.1_
+
+- [ ] 9. Implement Enhanced Hover Effects
+  - [ ] 9.1 Add cauldron hover star speed increase
+    - Modify CauldronPot to detect hover state
+    - Reduce twinkle animation duration by 50% on hover
+    - _Requirements: 6.1_
+  - [ ] 9.2 Add idea card inner glow on hover
+    - Add `box-shadow` inset glow to `.idea-card:hover`
+    - Use feature accent color
+    - _Requirements: 6.2_
+  - [ ] 9.3 Add navigation particle trail on hover
+    - Create subtle particle effect for nav links
+    - Skip when reduced motion is enabled
+    - _Requirements: 6.3, 6.4_
+
+- [ ] 10. Implement Toast Enhancements
+  - [ ] 10.1 Create SealAnimation component
+    - Create `components/SealAnimation.vue`
+    - Implement stamp-down animation (600ms)
+    - Accept color prop for feature-specific styling
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [ ] 10.2 Add smoke dissipation to toast dismiss
+    - Extend toast transition with upward drift
+    - Emit 3-5 smoke particles on dismiss
+    - Skip particles when reduced motion is enabled
+    - _Requirements: 9.1, 9.2, 9.3_
+  - [ ] 10.3 Integrate seal animation into save toasts
+    - Show seal animation when toast message contains "Saved"
+    - Pass current feature color to SealAnimation
+    - _Requirements: 7.1, 7.3_
+
+- [ ] 11. Implement Sound System
+  - [ ] 11.1 Create useSound composable
+    - Create `composables/useSound.ts`
+    - Load sound preferences from localStorage on init
+    - Provide `play`, `stop`, `toggle` functions
+    - Handle audio loading errors gracefully
+    - _Requirements: 10.1, 10.5_
+  - [ ] 11.2 Add sound assets to public folder
+    - Add `public/sounds/chime.mp3` (save sound)
+    - Add `public/sounds/bubble.mp3` (mixing loop)
+    - Add `public/sounds/crystal.mp3` (crystallization)
+    - _Requirements: 10.2, 10.3, 10.4_
+  - [ ] 11.3 Create SoundToggle component
+    - Create `components/SoundToggle.vue`
+    - Show speaker icon with on/off state
+    - Toggle sound preference on click
+    - _Requirements: 10.6_
+  - [ ] 11.4 Add SoundToggle to navigation
+    - Add to AppNav component
+    - Position below main nav links
+    - _Requirements: 10.6_
+  - [ ] 11.5 Integrate sounds into features
+    - Play chime on successful idea save
+    - Play bubble loop when cauldron is mixing
+    - Play crystal sound on output crystallization
+    - _Requirements: 10.2, 10.3, 10.4_
+
+- [ ] 12. Implement Typography Refinements
+  - [ ] 12.1 Update navigation label typography
+    - Increase letter-spacing to 0.05em on `.nav-label`
+    - _Requirements: 12.1_
+  - [ ] 12.2 Add grimoire text embossing
+    - Add text-shadow to `.grimoire-whisper` and related classes
+    - _Requirements: 12.2_
+  - [ ] 12.3 Add Oracle message glow
+    - Add subtle teal text-shadow to Oracle message content
+    - _Requirements: 12.3_
+
+- [ ] 13. Final Polish and Integration
+  - [ ] 13.1 Review all animations for consistency
+    - Verify timing curves match across components
+    - Ensure all animations respect reduced motion
+    - _Requirements: 1.5, 3.4, 4.4, 6.4, 9.3_
+  - [ ] 13.2 Performance optimization
+    - Add `will-change` hints where beneficial
+    - Ensure cleanup in all component unmount hooks
+    - Test on lower-end devices
