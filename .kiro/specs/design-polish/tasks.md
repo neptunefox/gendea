@@ -1,12 +1,12 @@
 # Implementation Plan
 
 - [ ] 1. Create accessibility composable and CSS foundation
-  - [ ] 1.1 Create `useReducedMotion` composable
+  - [x] 1.1 Create `useReducedMotion` composable
     - Create `composables/useReducedMotion.ts`
     - Return reactive boolean for `prefers-reduced-motion` media query
     - Listen for changes and update reactively
     - _Requirements: 1.5, 3.4, 4.4, 6.4, 9.3_
-  - [ ] 1.2 Add global CSS variables for animation durations
+  - [x] 1.2 Add global CSS variables for animation durations
     - Add `--duration-rune-drift`, `--duration-pendulum`, `--duration-seal` to app.vue
     - Add reduced-motion media query that sets durations to 0
     - _Requirements: 1.5, 3.4_

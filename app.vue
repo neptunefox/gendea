@@ -84,6 +84,9 @@
   --duration-fast: 200ms;
   --duration-normal: 300ms;
   --duration-slow: 450ms;
+  --duration-rune-drift: 30s;
+  --duration-pendulum: 2s;
+  --duration-seal: 600ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-mystical: cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -148,6 +151,14 @@ button,
   .app-main {
     margin-left: 0;
     padding-bottom: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-rune-drift: 0s;
+    --duration-pendulum: 0s;
+    --duration-seal: 0s;
   }
 }
 </style>
