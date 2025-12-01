@@ -245,6 +245,7 @@ import { useRouter, useRoute } from 'vue-router'
 import DailyTarot from '~/components/DailyTarot.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useReducedMotion } from '~/composables/useReducedMotion'
+import { useSound } from '~/composables/useSound'
 
 interface SparkIdea {
   text: string
@@ -343,6 +344,7 @@ const INPUT_HEIGHT_LIMIT = 100
 const router = useRouter()
 const route = useRoute()
 const prefersReducedMotion = useReducedMotion()
+const { play: playSound } = useSound()
 
 const isDraggingIdea = ref<string | null>(null)
 const generationCount = ref(0)
@@ -476,6 +478,7 @@ async function handleSaveIdea(text: string) {
     })
 
     savedIdeas.value = [response.idea, ...savedIdeas.value]
+    playSound('chime')
     showToastMessage('Saved to your collection')
   } catch (error) {
     console.error('Failed to save idea:', error)

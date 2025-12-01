@@ -136,24 +136,24 @@
     - Pass current feature color to SealAnimation
     - _Requirements: 7.1, 7.3_
 
-- [ ] 11. Implement Sound System
-  - [ ] 11.1 Create useSound composable
+- [-] 11. Implement Sound System
+  - [x] 11.1 Create useSound composable
     - Create `composables/useSound.ts`
     - Load sound preferences from localStorage on init
     - Provide `play`, `stop`, `toggle` functions
     - Handle audio loading errors gracefully
     - _Requirements: 10.1, 10.5_
-  - [ ] 11.2 Add sound assets to public folder
+  - [x] 11.2 Add sound assets to public folder
     - Add `public/sounds/chime.mp3` (save sound)
     - Add `public/sounds/bubble.mp3` (mixing loop)
     - Add `public/sounds/crystal.mp3` (crystallization)
     - _Requirements: 10.2, 10.3, 10.4_
-  - [ ] 11.3 Create SoundToggle component
+  - [x] 11.3 Create SoundToggle component
     - Create `components/SoundToggle.vue`
     - Show speaker icon with on/off state
     - Toggle sound preference on click
     - _Requirements: 10.6_
-  - [ ] 11.4 Add SoundToggle to navigation
+  - [x] 11.4 Add SoundToggle to navigation
     - Add to AppNav component
     - Position below main nav links
     - _Requirements: 10.6_

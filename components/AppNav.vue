@@ -22,6 +22,10 @@
         <span class="nav-label">History</span>
       </NuxtLink>
     </div>
+
+    <div class="nav-footer">
+      <SoundToggle />
+    </div>
   </nav>
 
   <nav class="app-nav-mobile">
@@ -41,11 +45,13 @@
       <Scroll :size="20" />
       <span class="nav-label">History</span>
     </NuxtLink>
+    <SoundToggle class="mobile-sound-toggle" />
   </nav>
 </template>
 
 <script setup lang="ts">
 import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
+import SoundToggle from '~/components/SoundToggle.vue'
 </script>
 
 <style scoped>
@@ -92,6 +98,14 @@ import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+.nav-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: var(--space-4);
 }
 
 .nav-link {
@@ -262,6 +276,11 @@ import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
   .app-nav-mobile .nav-link.history.router-link-active::before {
     border-color: rgba(232, 228, 224, 0.15);
     box-shadow: 0 0 15px rgba(232, 228, 224, 0.1);
+  }
+
+  .app-nav-mobile .mobile-sound-toggle {
+    width: 44px;
+    height: 44px;
   }
 }
 </style>

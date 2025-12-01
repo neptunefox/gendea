@@ -127,6 +127,7 @@ import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import { useParticles } from '~/composables/useParticles'
+import { useSound } from '~/composables/useSound'
 
 interface FloatingIdea {
   id: string
@@ -181,6 +182,7 @@ const ideaRefs = ref<
 const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
 
 const { particles, spawnDissolutionParticles } = useParticles()
+const { play: playSound, stop: stopSound } = useSound()
 
 const MAX_DISPLAYED_IDEAS = 5
 
@@ -550,6 +552,7 @@ function checkGuidanceDismissed() {
 async function streamMix(sessionId: string, isRemix = false) {
   isMixing.value = true
   streamingText.value = ''
+  playSound('bubble')
 
   try {
     const response = await fetch('/api/cauldron/mix-stream', {
@@ -573,14 +576,18 @@ async function streamMix(sessionId: string, isRemix = false) {
         }
         if (data.done) {
           output.value = data.output
+          stopSound('bubble')
+          playSound('crystal')
         }
         if (data.error) {
+          stopSound('bubble')
           showToastMessage('Failed to mix ideas')
         }
       }
     }
   } catch (error) {
     console.error('Failed to mix:', error)
+    stopSound('bubble')
     showToastMessage('Failed to mix ideas')
   } finally {
     isMixing.value = false
