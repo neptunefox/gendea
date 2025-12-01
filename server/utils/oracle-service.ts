@@ -18,12 +18,7 @@ Question types to vary between:
 - Explore constraints: "What if this limitation is actually useful?"
 - Get specific: "If you could only help one person with this, who?"
 
-The user should leave the conversation with a new way of seeing their challenge, not a solution handed to them.
-
-IMPORTANT: You must respond with valid JSON in this exact format:
-{"questions": ["Your first question here?", "Your optional second question here?"]}
-
-Only include 1-2 questions in the array. Do not include any text outside the JSON object.`
+The user should leave the conversation with a new way of seeing their challenge, not a solution handed to them.`
 
 export const OracleResponseSchema = z.object({
   questions: z

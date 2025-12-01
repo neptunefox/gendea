@@ -5,8 +5,15 @@ import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
 import { ChatOllama } from '@langchain/ollama'
 import { ChatOpenAI } from '@langchain/openai'
 import type { z } from 'zod'
+import { toJSONSchema } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
+
+function toOllamaSchema(zodSchema: z.ZodType): Record<string, unknown> {
+  const fullSchema = toJSONSchema(zodSchema) as Record<string, unknown>
+  const { $schema, ...cleanSchema } = fullSchema
+  return cleanSchema
+}
 
 interface LangChainConfig {
   provider: 'ollama' | 'openrouter' | 'gemini'
@@ -103,23 +110,15 @@ class LangChainService {
         baseUrl: this.config.baseURL,
         model: this.config.model,
         temperature: this.config.temperature,
-        format: 'json'
+        format: toOllamaSchema(schema)
       })
       const response = await ollamaModel.invoke(messages)
       const content = typeof response.content === 'string' ? response.content : ''
       return schema.parse(JSON.parse(content))
     }
 
-    const response = await this.model.invoke(messages)
-    const content = typeof response.content === 'string' ? response.content : ''
-
-    const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      const jsonStr = jsonMatch[1] || jsonMatch[0]
-      return schema.parse(JSON.parse(jsonStr))
-    }
-
-    throw new Error(`Could not extract JSON from response: ${content.substring(0, 200)}`)
+    const structuredModel = this.model.withStructuredOutput(schema)
+    return await structuredModel.invoke(messages)
   }
 
   private buildMessages(
