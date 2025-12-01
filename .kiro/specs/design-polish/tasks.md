@@ -84,13 +84,13 @@
     - Skip particles when reduced motion is enabled
     - _Requirements: 4.3, 4.4_
 
-- [ ] 7. Implement Ghost Ingredients for empty Cauldron
-  - [ ] 7.1 Create GhostIngredients component
+- [x] 7. Implement Ghost Ingredients for empty Cauldron
+  - [x] 7.1 Create GhostIngredients component
     - Create `components/GhostIngredients.vue`
     - Render 2-3 semi-transparent floating shapes
     - Add CSS bobbing animation
     - _Requirements: 11.1, 11.2_
-  - [ ] 7.2 Integrate into CauldronPot
+  - [x] 7.2 Integrate into CauldronPot
     - Show when `ingredients.length === 0`
     - Fade out over 300ms when ingredient is added
     - _Requirements: 11.1, 11.3_

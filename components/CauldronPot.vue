@@ -21,6 +21,8 @@
 
     <div class="liquid-rim"></div>
 
+    <GhostIngredients :visible="ingredients.length === 0 && !isDragOver" />
+
     <div v-if="ingredients.length === 0" class="drop-hint">
       <svg class="hint-arrow" viewBox="0 0 60 80" fill="none">
         <path
