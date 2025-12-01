@@ -820,7 +820,7 @@ watch(
 
 .spark-input-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-3);
   width: 100%;
   max-width: 640px;
@@ -849,11 +849,16 @@ watch(
   background: transparent;
   font-family: inherit;
   min-height: 24px;
-  max-height: 120px;
+  max-height: 200px;
   line-height: 1.5;
-  overflow-y: hidden;
+  overflow-y: auto;
   outline: none;
   color: var(--color-text);
+  scrollbar-width: none;
+}
+
+.spark-input::-webkit-scrollbar {
+  display: none;
 }
 
 .spark-input::placeholder {
@@ -862,6 +867,7 @@ watch(
 
 .generate-btn {
   flex-shrink: 0;
+  align-self: flex-end;
   padding: var(--space-2) var(--space-4);
   background: var(--color-primary);
   color: white;
