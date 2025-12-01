@@ -11,18 +11,18 @@
     - Add reduced-motion media query that sets durations to 0
     - _Requirements: 1.5, 3.4_
 
-- [ ] 2. Implement Background Runes system
-  - [ ] 2.1 Create BackgroundRunes component
+- [x] 2. Implement Background Runes system
+  - [x] 2.1 Create BackgroundRunes component
     - Create `components/BackgroundRunes.vue`
     - Accept `variant` prop for symbol set selection
     - Render 12 symbols with random positions
     - Implement CSS drift animation (20-40s duration)
     - _Requirements: 1.1, 1.2, 1.3_
-  - [ ] 2.2 Implement rune recycling logic
+  - [x] 2.2 Implement rune recycling logic
     - Use IntersectionObserver to detect off-screen runes
     - Reposition to opposite edge when exiting viewport
     - _Requirements: 1.4_
-  - [ ] 2.3 Add BackgroundRunes to each page
+  - [x] 2.3 Add BackgroundRunes to each page
     - Add to `pages/index.vue` with variant="spark"
     - Add to `pages/cauldron.vue` with variant="cauldron"
     - Add to `pages/oracle.vue` with variant="oracle"

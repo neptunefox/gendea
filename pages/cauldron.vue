@@ -1,5 +1,6 @@
 <template>
   <div class="cauldron-page" @click="handleBackgroundClick">
+    <BackgroundRunes variant="cauldron" />
     <FlowGuidanceBanner
       :visible="showGuidance && !output && ingredients.length === 0"
       message="Combine scattered ideas to find unexpected connections"

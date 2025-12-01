@@ -1,5 +1,6 @@
 <template>
   <div class="spark-page">
+    <BackgroundRunes variant="spark" />
     <div v-if="showDemo" class="demo-overlay" @click="dismissDemo">
       <div class="demo-ambient"></div>
       <div class="grimoire-container" @click.stop>

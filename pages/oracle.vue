@@ -1,5 +1,6 @@
 <template>
   <div class="oracle-page">
+    <BackgroundRunes variant="oracle" />
     <FlowGuidanceBanner
       :visible="showGuidance && !ideaContext && sessionId !== null"
       message="Get unstuck by exploring your ideas through questions"
