@@ -110,8 +110,16 @@ class LangChainService {
       return schema.parse(JSON.parse(content))
     }
 
-    const structuredModel = this.model.withStructuredOutput(schema)
-    return await structuredModel.invoke(messages)
+    const response = await this.model.invoke(messages)
+    const content = typeof response.content === 'string' ? response.content : ''
+
+    const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const jsonStr = jsonMatch[1] || jsonMatch[0]
+      return schema.parse(JSON.parse(jsonStr))
+    }
+
+    throw new Error(`Could not extract JSON from response: ${content.substring(0, 200)}`)
   }
 
   private buildMessages(
