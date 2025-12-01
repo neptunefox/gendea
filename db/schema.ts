@@ -1,13 +1,25 @@
-import { pgTable, text, timestamp, integer, jsonb, uuid } from 'drizzle-orm/pg-core'
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
 
-export const savedIdeas = pgTable('saved_ideas', {
-  id: uuid('id').primaryKey().defaultRandom(),
+const uuid = () =>
+  text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID())
+
+const timestamp = (name: string) => integer(name, { mode: 'timestamp' })
+
+const jsonText = <T>(name: string) => text(name, { mode: 'json' }).$type<T>()
+
+export const savedIdeas = sqliteTable('saved_ideas', {
+  id: uuid(),
   text: text('text').notNull(),
   source: text('source', { enum: ['user', 'ai', 'cauldron'] }).notNull(),
-  tags: jsonb('tags').$type<string[]>().default([]),
+  tags: jsonText<string[]>('tags').default([]),
   isCauldronOutput: integer('is_cauldron_output').notNull().default(0),
-  cauldronSessionId: uuid('cauldron_session_id'),
-  createdAt: timestamp('created_at').notNull().defaultNow()
+  cauldronSessionId: text('cauldron_session_id'),
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })
 
 export type SparkRunIdea = { text: string }
@@ -27,64 +39,78 @@ export type SparkRunNudge = {
   researchCue: string
 }
 
-export const sparkRuns = pgTable('spark_runs', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const sparkRuns = sqliteTable('spark_runs', {
+  id: uuid(),
   prompt: text('prompt').notNull(),
-  coreIdeas: jsonb('core_ideas').$type<SparkRunIdea[]>().notNull(),
-  lenses: jsonb('lenses').$type<SparkRunLens[]>().notNull(),
-  nudges: jsonb('nudges').$type<SparkRunNudge[]>().notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow()
+  coreIdeas: jsonText<SparkRunIdea[]>('core_ideas').notNull(),
+  lenses: jsonText<SparkRunLens[]>('lenses').notNull(),
+  nudges: jsonText<SparkRunNudge[]>('nudges').notNull(),
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })
 
-export const cauldronSessions = pgTable('cauldron_sessions', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const cauldronSessions = sqliteTable('cauldron_sessions', {
+  id: uuid(),
   userId: text('user_id').notNull(),
-  ingredientIds: jsonb('ingredient_ids').$type<string[]>().notNull().default([]),
-  outputIdeaId: uuid('output_idea_id'),
+  ingredientIds: jsonText<string[]>('ingredient_ids').notNull().default([]),
+  outputIdeaId: text('output_idea_id'),
   outputText: text('output_text'),
-  patterns: jsonb('patterns').$type<Record<string, unknown>>(),
-  createdAt: timestamp('created_at').notNull().defaultNow()
+  patterns: jsonText<Record<string, unknown>>('patterns'),
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })
 
-export const cauldronIngredients = pgTable('cauldron_ingredients', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  sessionId: uuid('session_id')
+export const cauldronIngredients = sqliteTable('cauldron_ingredients', {
+  id: uuid(),
+  sessionId: text('session_id')
     .notNull()
     .references(() => cauldronSessions.id),
   sourceType: text('source_type', { enum: ['saved', 'spark', 'user'] }).notNull(),
   sourceId: text('source_id'),
   content: text('content').notNull(),
   order: integer('order').notNull(),
-  addedAt: timestamp('added_at').notNull().defaultNow()
+  addedAt: timestamp('added_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })
 
-export const oracleSessions = pgTable('oracle_sessions', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const oracleSessions = sqliteTable('oracle_sessions', {
+  id: uuid(),
   visitorId: text('visitor_id').notNull(),
-  ideaId: uuid('idea_id').references(() => savedIdeas.id),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow()
+  ideaId: text('idea_id').references(() => savedIdeas.id),
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })
 
-export const oracleMessages = pgTable('oracle_messages', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  sessionId: uuid('session_id')
+export const oracleMessages = sqliteTable('oracle_messages', {
+  id: uuid(),
+  sessionId: text('session_id')
     .notNull()
     .references(() => oracleSessions.id),
   role: text('role', { enum: ['user', 'oracle'] }).notNull(),
   content: text('content').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`),
   sparkedAt: timestamp('sparked_at')
 })
 
-export const tarotReadings = pgTable('tarot_readings', {
-  id: uuid('id').primaryKey().defaultRandom(),
+export const tarotReadings = sqliteTable('tarot_readings', {
+  id: uuid(),
   visitorId: text('visitor_id').notNull(),
   date: text('date').notNull(),
-  cardOptions: jsonb('card_options').$type<string[]>().notNull(),
+  cardOptions: jsonText<string[]>('card_options').notNull(),
   chosenCard: text('chosen_card'),
   interpretation: text('interpretation'),
   sparkPrompt: text('spark_prompt'),
   usedAsInput: integer('used_as_input').notNull().default(0),
-  createdAt: timestamp('created_at').notNull().defaultNow()
+  createdAt: timestamp('created_at')
+    .notNull()
+    .default(sql`(unixepoch())`)
 })

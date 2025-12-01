@@ -1,36 +1,71 @@
 # Gendea
 
-Creative workbench that keeps ideation, saved sparks, experiments, and build lessons in one loop.
+A creative workbench with a mystical interface. Capture ideas, combine them, refine your thinking.
 
-## What it does
+## Features
 
-- **Spark tab** — parallel AI “lanes” suggest constrained experiments, anti-pattern riffs, and smallest honest tests with pinboard saves.
-- **Pinboard & History** — every saved idea keeps its status, UUID, and full contents so you can resume or branch from past runs instantly.
-- **Build view** — tracks North Star, constraints, plans, and test evidence with XState-powered workflow transitions.
-- **Research nudges** — incubation timers, novelty shuffles, and plan cues based on cognitive psychology.
+**Spark** — Enter a problem, get multiple angles back. Save what resonates.
 
-## Tech
+**Cauldron** — Blend three ideas together. See what emerges.
 
-- Nuxt 4 + Vue 3, Vite, and Lucide
-- PostgreSQL with Drizzle ORM
-- XState for workflow state and Nitro server routes
-- Bun for tooling
+**Oracle** — A conversation to go deeper. It asks the questions.
 
-## Quick start
+**Tarot** — Draw a card when you're stuck.
+
+## Setup
+
+### 1. Install Bun
+
+**macOS / Linux:**
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**Windows:**
+```powershell
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+### 2. Clone and install
 
 ```bash
+git clone https://github.com/iamnbutler/gendea.git
+cd gendea
 bun install
-cp .env.example .env   # add DATABASE_URL + LLM key
+```
+
+### 3. Configure
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API key:
+
+```
+LLM_PROVIDER=gemini
+LLM_MODEL=gemini-2.5-flash
+LLM_API_KEY=your-key-here
+```
+
+**Get a free API key:**
+- [Google AI Studio](https://aistudio.google.com/apikey) (recommended)
+- [OpenRouter](https://openrouter.ai/keys)
+- Or use [Ollama](https://ollama.com) locally (no key needed)
+
+### 4. Run
+
+```bash
 bun run db:migrate
 bun run dev
 ```
 
-## Scripts
+Open [localhost:3000](http://localhost:3000)
 
-```bash
-bun run format && bun run lint:fix   # formatting + linting
-```
+## Tech
+
+Nuxt 4 · Vue 3 · SQLite · Drizzle · LangChain
 
 ## License
 
-AGPL-3.0 - see [LICENSE](LICENSE) file for details
+AGPL-3.0
