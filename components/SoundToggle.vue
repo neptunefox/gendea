@@ -1,13 +1,20 @@
 <template>
-  <button
-    class="sound-toggle"
-    :class="{ enabled: enabled }"
-    :title="enabled ? 'Sound on' : 'Sound off'"
-    @click="toggle"
-  >
-    <Volume2 v-if="enabled" :size="16" />
-    <VolumeX v-else :size="16" />
-  </button>
+  <ClientOnly>
+    <button
+      class="sound-toggle"
+      :class="{ enabled: enabled }"
+      :title="enabled ? 'Sound on' : 'Sound off'"
+      @click="toggle"
+    >
+      <Volume2 v-if="enabled" :size="16" />
+      <VolumeX v-else :size="16" />
+    </button>
+    <template #fallback>
+      <button class="sound-toggle" title="Sound off">
+        <VolumeX :size="16" />
+      </button>
+    </template>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

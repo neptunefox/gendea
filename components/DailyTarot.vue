@@ -52,44 +52,38 @@
             </div>
           </div>
 
-          <div v-else-if="phase === 'generating'" class="generating-phase">
-            <div class="card-spread single">
-              <div class="tarot-card generating">
-                <div class="card-inner">
-                  <div class="card-back">
-                    <div class="back-border"></div>
-                    <div class="back-pattern"></div>
-                    <div class="back-sigil">✦</div>
-                    <div class="glow-overlay"></div>
+          <div v-else-if="phase === 'revealing' || phase === 'revealed'" class="revealing-phase">
+            <div class="cards-outcome">
+              <div class="unchosen-cards">
+                <div
+                  v-for="(card, index) in unchosenCards"
+                  :key="card.id"
+                  class="unchosen-card"
+                  :style="{ '--unchosen-index': index }"
+                >
+                  <span class="unchosen-numeral">{{ card.numeral }}</span>
+                  <span class="unchosen-name">{{ card.name }}</span>
+                </div>
+              </div>
+
+              <div class="chosen-card-container">
+                <div class="chosen-card" :class="{ complete: phase === 'revealed' }">
+                  <div class="card-face">
+                    <span class="card-numeral-large">{{ chosenCard?.numeral }}</span>
+                    <h2 class="card-name">{{ chosenCard?.name }}</h2>
+                    <p class="card-archetype">{{ chosenCard?.archetype }}</p>
+
+                    <div class="interpretation-container" :class="{ visible: phase === 'revealed' }">
+                      <div class="card-divider">
+                        <span class="divider-line"></span>
+                        <span class="divider-symbol">◆</span>
+                        <span class="divider-line"></span>
+                      </div>
+                      <p class="card-interpretation">{{ interpretation }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <p class="generating-text">Channeling insight...</p>
-          </div>
-
-          <div v-else-if="phase === 'revealed'" class="revealed-phase">
-            <div class="revealed-card">
-              <div class="card-face">
-                <span class="card-numeral-large">{{ chosenCard?.numeral }}</span>
-                <h2 class="card-name">{{ chosenCard?.name }}</h2>
-                <p class="card-archetype">{{ chosenCard?.archetype }}</p>
-                <div class="card-divider">
-                  <span class="divider-line"></span>
-                  <span class="divider-symbol">◆</span>
-                  <span class="divider-line"></span>
-                </div>
-                <p class="card-interpretation">{{ interpretation }}</p>
-              </div>
-            </div>
-
-            <div class="spark-prompt-section">
-              <p class="prompt-label">Today's spark</p>
-              <p class="prompt-text">{{ sparkPrompt }}</p>
-              <button class="use-prompt-btn" @click="useAsInput">
-                Use this spark
-                <ArrowRight :size="16" />
-              </button>
             </div>
           </div>
         </div>
@@ -100,7 +94,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { X, ArrowRight } from 'lucide-vue-next'
+import { X } from 'lucide-vue-next'
 
 interface TarotCard {
   id: string
@@ -112,21 +106,19 @@ interface TarotCard {
   creativePrompt: string
 }
 
-const emit = defineEmits<{
-  usePrompt: [prompt: string]
-}>()
-
 const isOpen = ref(false)
-const phase = ref<'choosing' | 'generating' | 'revealed'>('choosing')
+const phase = ref<'choosing' | 'revealing' | 'revealed'>('choosing')
 const cardOptions = ref<TarotCard[]>([])
 const chosenCard = ref<TarotCard | null>(null)
 const interpretation = ref('')
-const sparkPrompt = ref('')
 const readingId = ref<string | null>(null)
 const hoveringCard = ref<string | null>(null)
 const selectingCard = ref<string | null>(null)
 
 const hasReading = computed(() => !!chosenCard.value)
+const unchosenCards = computed(() =>
+  cardOptions.value.filter((card) => card.id !== chosenCard.value?.id)
+)
 
 function getVisitorId(): string {
   if (typeof window === 'undefined') return 'anonymous'
@@ -158,7 +150,6 @@ async function fetchReading() {
     if (response.status === 'complete' && response.chosenCard) {
       chosenCard.value = response.chosenCard
       interpretation.value = response.interpretation || ''
-      sparkPrompt.value = response.sparkPrompt || ''
       phase.value = 'revealed'
     }
   } catch (error) {
@@ -181,7 +172,13 @@ async function selectCard(cardId: string) {
   if (phase.value !== 'choosing' || !readingId.value) return
 
   selectingCard.value = cardId
-  phase.value = 'generating'
+
+  const selectedCard = cardOptions.value.find((c) => c.id === cardId)
+  if (selectedCard) {
+    chosenCard.value = selectedCard
+  }
+
+  phase.value = 'revealing'
 
   try {
     const response = await $fetch<{
@@ -199,19 +196,14 @@ async function selectCard(cardId: string) {
 
     chosenCard.value = response.card
     interpretation.value = response.interpretation
-    sparkPrompt.value = response.sparkPrompt
     phase.value = 'revealed'
   } catch (error) {
     console.error('Failed to choose card:', error)
     phase.value = 'choosing'
+    chosenCard.value = null
   } finally {
     selectingCard.value = null
   }
-}
-
-function useAsInput() {
-  emit('usePrompt', sparkPrompt.value)
-  closeReading()
 }
 
 onMounted(() => {
@@ -386,10 +378,6 @@ onMounted(() => {
   perspective: 1000px;
 }
 
-.card-spread.single {
-  justify-content: center;
-}
-
 .tarot-card {
   width: 140px;
   height: 200px;
@@ -473,69 +461,41 @@ onMounted(() => {
   z-index: 1;
 }
 
-.tarot-card.generating .card-back {
-  overflow: hidden;
-}
-
-.tarot-card.generating .card-back::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(212, 165, 116, 0.4) 45%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(212, 165, 116, 0.4) 55%,
-    transparent 60%
-  );
-  transform: translateX(-100%);
-  animation: shimmer 2s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.glow-overlay {
-  display: none;
-}
-
-.generating-text {
-  text-align: center;
-  margin-top: var(--space-6);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  animation: textFade 2s ease-in-out infinite;
-}
-
-@keyframes textFade {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.revealed-phase {
+.revealing-phase {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-6);
-  animation: revealFade 0.8s var(--ease-out);
+  animation: revealFade 0.5s var(--ease-out);
 }
 
 @keyframes revealFade {
   from {
     opacity: 0;
-    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cards-outcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.unchosen-cards {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  opacity: 0;
+  animation: unchosenReveal 0.8s var(--ease-out) 0.6s forwards;
+}
+
+@keyframes unchosenReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -543,8 +503,53 @@ onMounted(() => {
   }
 }
 
-.revealed-card {
-  width: 260px;
+.unchosen-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  opacity: 0.4;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.unchosen-card:hover {
+  opacity: 0.6;
+}
+
+.unchosen-numeral {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.05em;
+}
+
+.unchosen-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.chosen-card-container {
+  display: flex;
+  justify-content: center;
+}
+
+.chosen-card {
+  width: 280px;
+  animation: chosenCardReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center bottom;
+}
+
+@keyframes chosenCardReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .card-face {
@@ -555,22 +560,31 @@ onMounted(() => {
   text-align: center;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(212, 165, 116, 0.15);
+    0 0 40px rgba(212, 165, 116, 0.1);
+  transition: box-shadow 0.6s var(--ease-out);
+}
+
+.chosen-card.complete .card-face {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(212, 165, 116, 0.2);
 }
 
 .card-numeral-large {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: 1.75rem;
   color: var(--color-primary);
-  opacity: 0.7;
+  opacity: 0.6;
+  letter-spacing: 0.1em;
 }
 
 .card-name {
   margin: var(--space-2) 0;
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 400;
   color: var(--color-text);
+  letter-spacing: 0.02em;
 }
 
 .card-archetype {
@@ -580,12 +594,47 @@ onMounted(() => {
   font-style: italic;
 }
 
+.interpretation-container {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.6s var(--ease-out);
+}
+
+.interpretation-container.visible {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.interpretation-container > * {
+  overflow: hidden;
+}
+
 .card-divider {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  margin: var(--space-4) 0;
+  margin: var(--space-5) 0 var(--space-4);
+  opacity: 0;
+  animation: none;
+}
+
+.interpretation-container.visible .card-divider {
+  animation: dividerReveal 0.5s var(--ease-out) 0.1s forwards;
+}
+
+@keyframes dividerReveal {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
 
 .card-divider .divider-line {
@@ -603,54 +652,25 @@ onMounted(() => {
 .card-interpretation {
   margin: 0;
   font-size: var(--text-sm);
-  line-height: 1.7;
+  line-height: 1.8;
   color: var(--color-text-secondary);
+  opacity: 0;
+  animation: none;
 }
 
-.spark-prompt-section {
-  width: 100%;
-  padding: var(--space-5);
-  background: rgba(212, 165, 116, 0.05);
-  border: 1px solid rgba(212, 165, 116, 0.2);
-  border-radius: var(--radius-md);
-  text-align: center;
+.interpretation-container.visible .card-interpretation {
+  animation: interpretationReveal 0.8s var(--ease-out) 0.2s forwards;
 }
 
-.prompt-label {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-text-tertiary);
-}
-
-.prompt-text {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-base);
-  color: var(--color-text);
-  line-height: 1.6;
-}
-
-.use-prompt-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  background: transparent;
-  border: 1.5px solid rgba(212, 165, 116, 0.4);
-  border-radius: var(--radius-md);
-  color: var(--color-primary);
-  font-family: var(--font-heading);
-  font-size: var(--text-sm);
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  transition: all 0.3s var(--ease-out);
-}
-
-.use-prompt-btn:hover {
-  background: rgba(212, 165, 116, 0.1);
-  border-color: var(--color-primary);
-  box-shadow: 0 0 20px rgba(212, 165, 116, 0.2);
+@keyframes interpretationReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .tarot-modal-enter-active {
@@ -693,27 +713,54 @@ onMounted(() => {
     height: 135px;
   }
 
-  .revealed-card {
-    width: 160px;
+  .chosen-card {
+    width: 220px;
   }
 
   .card-face {
     padding: var(--space-4);
   }
+
+  .card-name {
+    font-size: 1.25rem;
+  }
+
+  .unchosen-cards {
+    gap: var(--space-4);
+  }
+
+  .unchosen-name {
+    font-size: var(--text-xs);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tarot-card,
-  .tarot-card.generating .card-back,
-  .tarot-card.generating .back-sigil,
-  .glow-overlay,
-  .generating-text,
-  .revealed-phase {
+  .revealing-phase,
+  .unchosen-cards,
+  .chosen-card,
+  .interpretation-container,
+  .card-divider,
+  .card-interpretation {
     animation: none;
+  }
+
+  .interpretation-container {
+    opacity: 1;
+    grid-template-rows: 1fr;
+  }
+
+  .interpretation-container .card-divider,
+  .interpretation-container .card-interpretation {
+    opacity: 1;
   }
 
   .tarot-card.hovering {
     transform: scale(1.02);
+  }
+
+  .unchosen-cards {
+    opacity: 1;
   }
 }
 </style>
