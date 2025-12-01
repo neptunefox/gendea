@@ -28,14 +28,14 @@
     - Add to `pages/oracle.vue` with variant="oracle"
     - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 3. Implement Vignette Overlay system
-  - [ ] 3.1 Create VignetteOverlay component
+- [x] 3. Implement Vignette Overlay system
+  - [x] 3.1 Create VignetteOverlay component
     - Create `components/VignetteOverlay.vue`
     - Accept `color` prop (amber/purple/teal)
     - Render fixed-position radial gradients at corners
     - Implement 300ms color transition
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
-  - [ ] 3.2 Add VignetteOverlay to app layout
+  - [x] 3.2 Add VignetteOverlay to app layout
     - Add to `app.vue` with route-based color switching
     - Use `useRoute` to determine current feature
     - _Requirements: 5.1, 5.2, 5.3, 5.4_

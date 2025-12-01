@@ -1,5 +1,17 @@
+<script setup lang="ts">
+const route = useRoute()
+
+const vignetteColor = computed(() => {
+  const path = route.path
+  if (path.startsWith('/cauldron')) return 'purple'
+  if (path.startsWith('/oracle')) return 'teal'
+  return 'amber'
+})
+</script>
+
 <template>
   <div class="app-layout">
+    <VignetteOverlay :color="vignetteColor" />
     <AppNav />
     <main class="app-main">
       <NuxtPage />
