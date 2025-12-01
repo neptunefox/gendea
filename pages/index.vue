@@ -1692,7 +1692,10 @@ watch(
   line-height: 1.2;
   letter-spacing: 0.02em;
   animation: whisperReveal 1.5s var(--ease-out) 0.8s both;
-  text-shadow: 0 0 60px rgba(212, 165, 116, 0.3);
+  text-shadow:
+    0 0 60px rgba(212, 165, 116, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .grimoire-subtitle {
@@ -1701,6 +1704,9 @@ watch(
   color: var(--color-text-tertiary);
   letter-spacing: 0.05em;
   animation: whisperReveal 1.5s var(--ease-out) 1s both;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 @keyframes whisperReveal {

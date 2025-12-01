@@ -194,7 +194,7 @@ onUnmounted(() => {
 .nav-label {
   font-size: 10px;
   font-weight: var(--weight-medium);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -295,7 +295,7 @@ onUnmounted(() => {
   .app-nav-mobile .nav-label {
     font-size: 10px;
     font-weight: var(--weight-medium);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 

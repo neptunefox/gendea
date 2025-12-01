@@ -163,14 +163,14 @@
     - Play crystal sound on output crystallization
     - _Requirements: 10.2, 10.3, 10.4_
 
-- [ ] 12. Implement Typography Refinements
-  - [ ] 12.1 Update navigation label typography
+- [x] 12. Implement Typography Refinements
+  - [x] 12.1 Update navigation label typography
     - Increase letter-spacing to 0.05em on `.nav-label`
     - _Requirements: 12.1_
-  - [ ] 12.2 Add grimoire text embossing
+  - [x] 12.2 Add grimoire text embossing
     - Add text-shadow to `.grimoire-whisper` and related classes
     - _Requirements: 12.2_
-  - [ ] 12.3 Add Oracle message glow
+  - [x] 12.3 Add Oracle message glow
     - Add subtle teal text-shadow to Oracle message content
     - _Requirements: 12.3_
 
