@@ -6,7 +6,8 @@
       'manual-add': showManualAddEffect,
       mixing: isMixing,
       'has-ingredients': ingredients.length > 0,
-      'is-hovered': isHovered
+      'is-hovered': isHovered,
+      'reduced-motion': reducedMotion
     }"
     @drop="handleDrop"
     @dragover.prevent="handleDragOver"
@@ -94,7 +95,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onUnmounted } from 'vue'
+import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface CauldronIngredient {
   id: string
@@ -128,6 +130,7 @@ const emit = defineEmits<{
 const isDragOver = ref(false)
 const showManualAddEffect = ref(false)
 const isHovered = ref(false)
+const reducedMotion = useReducedMotion()
 const activeBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 const mixingBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 let bubbleIdCounter = 0
@@ -240,6 +243,13 @@ watch(
     }
   }
 )
+
+onUnmounted(() => {
+  if (mixingBubbleInterval) {
+    clearInterval(mixingBubbleInterval)
+    mixingBubbleInterval = null
+  }
+})
 
 defineExpose({
   triggerManualAddAnimation
@@ -381,6 +391,7 @@ defineExpose({
   box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.6);
   animation: twinkle var(--duration, 2s) ease-in-out infinite;
   animation-duration: inherit;
+  will-change: opacity, transform;
 }
 
 .star:nth-child(3n) {
@@ -688,5 +699,33 @@ defineExpose({
   .ingredient-counter {
     font-size: 0.875rem;
   }
+}
+
+.cauldron-pot.reduced-motion .star {
+  animation: none;
+  opacity: 0.7;
+}
+
+.cauldron-pot.reduced-motion .nebula-layer {
+  animation: none;
+}
+
+.cauldron-pot.reduced-motion .shooting-star {
+  display: none;
+}
+
+.cauldron-pot.reduced-motion .bubble,
+.cauldron-pot.reduced-motion .mixing-bubble {
+  animation: none;
+  opacity: 0;
+}
+
+.cauldron-pot.reduced-motion .glow-effect {
+  animation: none;
+  opacity: 0.6;
+}
+
+.cauldron-pot.reduced-motion.mixing {
+  animation: none;
 }
 </style>

@@ -494,6 +494,7 @@ onUnmounted(() => {
 .floating-idea.ambient-float {
   animation: ambient-bob var(--bob-duration, 3s) ease-in-out infinite;
   animation-delay: var(--bob-delay, 0s);
+  will-change: translate;
 }
 
 @keyframes ambient-bob {

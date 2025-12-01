@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" class="seal-animation" :style="{ '--seal-color': color }">
+  <div v-if="visible" class="seal-animation" :class="{ 'reduced-motion': reducedMotion }" :style="{ '--seal-color': color }">
     <div class="seal-stamp">
       <svg viewBox="0 0 48 48" class="seal-icon">
         <circle cx="24" cy="24" r="20" fill="currentColor" />
@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { useReducedMotion } from '~/composables/useReducedMotion'
 
 const props = withDefaults(defineProps<{
   color?: string
@@ -28,13 +29,15 @@ const emit = defineEmits<{
 }>()
 
 const visible = ref(false)
+const reducedMotion = useReducedMotion()
 
 function triggerAnimation() {
   visible.value = true
+  const duration = reducedMotion.value ? 200 : 600
   setTimeout(() => {
     visible.value = false
     emit('complete')
-  }, 600)
+  }, duration)
 }
 
 watch(() => props.active, (newVal) => {
@@ -63,7 +66,7 @@ onMounted(() => {
   width: 32px;
   height: 32px;
   color: var(--seal-color);
-  animation: stamp-down 600ms var(--ease-out) forwards;
+  animation: stamp-down var(--duration-seal, 600ms) var(--ease-out) forwards;
 }
 
 .seal-icon {
@@ -91,6 +94,19 @@ onMounted(() => {
   }
   100% {
     transform: scale(1.0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.seal-animation.reduced-motion .seal-stamp {
+  animation: stamp-fade 200ms var(--ease-out) forwards;
+}
+
+@keyframes stamp-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
     opacity: 1;
   }
 }

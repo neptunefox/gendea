@@ -36,10 +36,11 @@ const reducedMotion = useReducedMotion()
   );
   transform-origin: top center;
   position: relative;
+  will-change: transform;
 }
 
 .active .pendulum-arm {
-  animation: pendulumSwing 2s ease-in-out infinite;
+  animation: pendulumSwing var(--duration-pendulum, 2s) ease-in-out infinite;
 }
 
 .pendulum-bob {
@@ -57,7 +58,7 @@ const reducedMotion = useReducedMotion()
 }
 
 .active .pendulum-bob {
-  animation: pendulumGlow 2s ease-in-out infinite;
+  animation: pendulumGlow var(--duration-pendulum, 2s) ease-in-out infinite;
 }
 
 .reduced .pendulum-arm {
@@ -65,7 +66,7 @@ const reducedMotion = useReducedMotion()
 }
 
 .reduced .pendulum-bob {
-  animation: pendulumPulse 2s ease-in-out infinite;
+  animation: pendulumPulse var(--duration-pendulum, 2s) ease-in-out infinite;
 }
 
 @keyframes pendulumSwing {

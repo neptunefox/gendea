@@ -72,6 +72,7 @@ const ghosts = computed(() => [
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
   animation: ghost-bob 3s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .ghost-shape.no-motion {
