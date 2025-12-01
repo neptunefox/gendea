@@ -95,13 +95,13 @@
     - Fade out over 300ms when ingredient is added
     - _Requirements: 11.1, 11.3_
 
-- [ ] 8. Implement Oracle Pendulum Indicator
-  - [ ] 8.1 Create OraclePendulum component
+- [x] 8. Implement Oracle Pendulum Indicator
+  - [x] 8.1 Create OraclePendulum component
     - Create `components/OraclePendulum.vue`
     - Implement pendulum swing animation (2s ease-in-out)
     - Add glow trail via animated box-shadow
     - _Requirements: 8.1, 8.2, 8.3_
-  - [ ] 8.2 Replace thinking dots in OracleChat
+  - [x] 8.2 Replace thinking dots in OracleChat
     - Replace `.thinking-indicator` with OraclePendulum
     - Show when `isLoading` is true
     - _Requirements: 8.1_

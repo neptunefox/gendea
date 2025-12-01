@@ -14,11 +14,7 @@
           :content="message.content"
         />
 
-        <div v-if="isLoading" class="thinking-indicator">
-          <span class="thinking-dot" />
-          <span class="thinking-dot" />
-          <span class="thinking-dot" />
-        </div>
+        <OraclePendulum v-if="isLoading" :active="isLoading" />
       </div>
     </div>
 
@@ -55,6 +51,7 @@
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
 import OracleMessage from '~/components/OracleMessage.vue'
+import OraclePendulum from '~/components/OraclePendulum.vue'
 import type { OracleMessage as OracleMessageType } from '~/types/oracle'
 
 interface Props {
@@ -233,42 +230,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-}
-
-.thinking-indicator {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: var(--space-8) 0;
-}
-
-.thinking-dot {
-  width: 5px;
-  height: 5px;
-  background: var(--color-oracle);
-  border-radius: 50%;
-  animation: oracleThink 2s ease-in-out infinite;
-  box-shadow: 0 0 12px var(--color-glow-teal);
-}
-
-.thinking-dot:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.thinking-dot:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes oracleThink {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.4);
-  }
 }
 
 .input-area {
