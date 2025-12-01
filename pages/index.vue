@@ -214,12 +214,33 @@
       </section>
     </div>
 
-    <transition name="toast">
-      <div v-if="showToast" class="toast">
+    <transition name="toast" @before-leave="handleToastLeave">
+      <div v-if="showToast" ref="toastRef" class="toast">
         <Check :size="20" />
         {{ toastMessage }}
+        <SealAnimation
+          :color="'#d4a574'"
+          :active="showSealAnimation"
+          @complete="showSealAnimation = false"
+        />
       </div>
     </transition>
+
+    <div class="particle-layer">
+      <div
+        v-for="particle in particles"
+        :key="particle.id"
+        class="particle smoke-particle"
+        :style="{
+          left: `${particle.x}px`,
+          top: `${particle.y}px`,
+          width: `${particle.size}px`,
+          height: `${particle.size}px`,
+          opacity: particle.opacity,
+          backgroundColor: particle.color
+        }"
+      />
+    </div>
 
     <button v-if="savedIdeas.length > 6" class="floating-input-btn" @click="scrollToInput">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -244,8 +265,10 @@ import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import SealAnimation from '~/components/SealAnimation.vue'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
+import { useParticles } from '~/composables/useParticles'
 
 interface SparkIdea {
   text: string
@@ -336,6 +359,8 @@ const inputField = ref<HTMLTextAreaElement | null>(null)
 const loadingCard = ref<HTMLElement | null>(null)
 const showDemo = ref(false)
 const showCauldronNudge = ref(false)
+const toastRef = ref<HTMLElement | null>(null)
+const showSealAnimation = ref(false)
 
 const CAULDRON_NUDGE_KEY = 'spark-cauldron-nudge-dismissed'
 
@@ -345,6 +370,7 @@ const router = useRouter()
 const route = useRoute()
 const prefersReducedMotion = useReducedMotion()
 const { play: playSound } = useSound()
+const { particles, spawnSmokeParticles } = useParticles()
 
 const isDraggingIdea = ref<string | null>(null)
 const generationCount = ref(0)
@@ -569,9 +595,24 @@ function formatFull(timestamp: number) {
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
+  
+  if (message.toLowerCase().includes('saved')) {
+    showSealAnimation.value = true
+  }
+  
   setTimeout(() => {
     showToast.value = false
   }, 2200)
+}
+
+function handleToastLeave() {
+  if (prefersReducedMotion.value) return
+  if (!toastRef.value) return
+  
+  const rect = toastRef.value.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  spawnSmokeParticles(centerX, centerY)
 }
 
 function togglePromptExpansion(entryId: string) {
@@ -1422,15 +1463,36 @@ watch(
   color: var(--color-success);
 }
 
-.toast-enter-active,
-.toast-leave-active {
+.toast-enter-active {
   transition: all var(--duration-normal) var(--ease-out);
 }
 
-.toast-enter-from,
-.toast-leave-to {
+.toast-leave-active {
+  transition: all 400ms var(--ease-out);
+}
+
+.toast-enter-from {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+}
+
+.smoke-particle {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 .floating-input-btn {

@@ -111,12 +111,33 @@
       </template>
     </div>
 
-    <transition name="toast">
-      <div v-if="showToast" class="toast">
+    <transition name="toast" @before-leave="handleToastLeave">
+      <div v-if="showToast" ref="toastRef" class="toast">
         <Check :size="20" />
         {{ toastMessage }}
+        <SealAnimation
+          :color="'#9575cd'"
+          :active="showSealAnimation"
+          @complete="showSealAnimation = false"
+        />
       </div>
     </transition>
+
+    <div class="particle-layer">
+      <div
+        v-for="particle in smokeParticles"
+        :key="particle.id"
+        class="particle smoke-particle"
+        :style="{
+          left: `${particle.x}px`,
+          top: `${particle.y}px`,
+          width: `${particle.size}px`,
+          height: `${particle.size}px`,
+          opacity: particle.opacity,
+          backgroundColor: particle.color
+        }"
+      />
+    </div>
   </div>
 </template>
 
@@ -128,6 +149,7 @@ import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
+import SealAnimation from '~/components/SealAnimation.vue'
 import { useParticles } from '~/composables/useParticles'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
@@ -173,6 +195,8 @@ const manualInput = ref('')
 const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
+const toastRef = ref<HTMLElement | null>(null)
+const showSealAnimation = ref(false)
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 const showGuidance = ref(true)
@@ -186,6 +210,7 @@ const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(nul
 const cauldronOutputRef = ref<HTMLElement | null>(null)
 
 const { particles, spawnDissolutionParticles, spawnSparkles } = useParticles()
+const { particles: smokeParticles, spawnSmokeParticles } = useParticles()
 const { play: playSound, stop: stopSound } = useSound()
 const reducedMotion = useReducedMotion()
 
@@ -526,9 +551,24 @@ async function handleAskOracle() {
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
+  
+  if (message.toLowerCase().includes('saved')) {
+    showSealAnimation.value = true
+  }
+  
   setTimeout(() => {
     showToast.value = false
   }, 2200)
+}
+
+function handleToastLeave() {
+  if (reducedMotion.value) return
+  if (!toastRef.value) return
+  
+  const rect = toastRef.value.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  spawnSmokeParticles(centerX, centerY)
 }
 
 function triggerRemixHintPulse() {
@@ -922,15 +962,36 @@ onMounted(async () => {
   font-weight: var(--weight-semibold);
 }
 
-.toast-enter-active,
-.toast-leave-active {
+.toast-enter-active {
   transition: all var(--duration-normal) var(--ease-out);
 }
 
-.toast-enter-from,
-.toast-leave-to {
+.toast-leave-active {
+  transition: all 400ms var(--ease-out);
+}
+
+.toast-enter-from {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1100;
+}
+
+.smoke-particle {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

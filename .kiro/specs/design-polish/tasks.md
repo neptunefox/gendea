@@ -120,18 +120,18 @@
     - Skip when reduced motion is enabled
     - _Requirements: 6.3, 6.4_
 
-- [ ] 10. Implement Toast Enhancements
-  - [ ] 10.1 Create SealAnimation component
+- [x] 10. Implement Toast Enhancements
+  - [x] 10.1 Create SealAnimation component
     - Create `components/SealAnimation.vue`
     - Implement stamp-down animation (600ms)
     - Accept color prop for feature-specific styling
     - _Requirements: 7.1, 7.2, 7.3_
-  - [ ] 10.2 Add smoke dissipation to toast dismiss
+  - [x] 10.2 Add smoke dissipation to toast dismiss
     - Extend toast transition with upward drift
     - Emit 3-5 smoke particles on dismiss
     - Skip particles when reduced motion is enabled
     - _Requirements: 9.1, 9.2, 9.3_
-  - [ ] 10.3 Integrate seal animation into save toasts
+  - [x] 10.3 Integrate seal animation into save toasts
     - Show seal animation when toast message contains "Saved"
     - Pass current feature color to SealAnimation
     - _Requirements: 7.1, 7.3_

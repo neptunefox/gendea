@@ -25,6 +25,11 @@ export interface UseParticlesReturn {
     width: number,
     height: number
   ) => void
+  spawnSmokeParticles: (
+    sourceX: number,
+    sourceY: number,
+    count?: number
+  ) => void
   updateParticles: () => void
   clearParticles: () => void
 }
@@ -32,6 +37,7 @@ export interface UseParticlesReturn {
 const MAX_PARTICLES = 50
 const PARTICLE_COLORS = ['#9575cd', '#b39ddb', '#7e57c2', '#d1c4e9', '#ede7f6']
 const SPARKLE_COLORS = ['#ffd700', '#fff8dc', '#fffacd', '#f0e68c', '#e6e6fa', '#dda0dd']
+const SMOKE_COLORS = ['#a0a0a0', '#b8b8b8', '#c8c8c8', '#d0d0d0', '#e0e0e0']
 
 let particleIdCounter = 0
 
@@ -172,6 +178,50 @@ export function useParticles(): UseParticlesReturn {
     }
   }
 
+  function spawnSmokeParticles(
+    sourceX: number,
+    sourceY: number,
+    count: number = 4
+  ): void {
+    const particleCount = 3 + Math.floor(Math.random() * 3)
+    const actualCount = Math.min(Math.max(particleCount, 3), 5)
+    const newParticles: Particle[] = []
+
+    for (let i = 0; i < actualCount; i++) {
+      const startX = sourceX + (Math.random() - 0.5) * 40
+      const startY = sourceY
+      
+      const targetX = startX + (Math.random() - 0.5) * 60
+      const targetY = startY - 80 - Math.random() * 40
+
+      newParticles.push({
+        id: particleIdCounter++,
+        x: startX,
+        y: startY,
+        targetX,
+        targetY,
+        size: 8 + Math.random() * 8,
+        opacity: 0.4 + Math.random() * 0.2,
+        color: SMOKE_COLORS[Math.floor(Math.random() * SMOKE_COLORS.length)],
+        velocity: {
+          x: (Math.random() - 0.5) * 1.5,
+          y: -2 - Math.random() * 1.5
+        }
+      })
+    }
+
+    const combined = [...particles.value, ...newParticles]
+    if (combined.length > MAX_PARTICLES) {
+      particles.value = combined.slice(-MAX_PARTICLES)
+    } else {
+      particles.value = combined
+    }
+
+    if (!animationFrameId) {
+      startAnimationLoop()
+    }
+  }
+
   function clearParticles(): void {
     particles.value = []
     if (animationFrameId) {
@@ -188,6 +238,7 @@ export function useParticles(): UseParticlesReturn {
     particles,
     spawnDissolutionParticles,
     spawnSparkles,
+    spawnSmokeParticles,
     updateParticles,
     clearParticles
   }
