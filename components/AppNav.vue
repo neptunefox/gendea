@@ -5,19 +5,19 @@
     </NuxtLink>
 
     <div class="nav-links">
-      <NuxtLink to="/" class="nav-link" title="Spark — Generate ideas">
+      <NuxtLink to="/" class="nav-link" title="Spark — Generate ideas" @mouseenter="handleNavHover($event, 'spark')">
         <Flame :size="18" />
         <span class="nav-label">Spark</span>
       </NuxtLink>
-      <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Combine ideas">
+      <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Combine ideas" @mouseenter="handleNavHover($event, 'cauldron')">
         <FlaskRound :size="18" />
         <span class="nav-label">Combine</span>
       </NuxtLink>
-      <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Get unstuck">
+      <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Get unstuck" @mouseenter="handleNavHover($event, 'oracle')">
         <Eye :size="18" />
         <span class="nav-label">Refine</span>
       </NuxtLink>
-      <NuxtLink to="/history" class="nav-link history" title="History — Past explorations">
+      <NuxtLink to="/history" class="nav-link history" title="History — Past explorations" @mouseenter="handleNavHover($event, 'history')">
         <Scroll :size="18" />
         <span class="nav-label">History</span>
       </NuxtLink>
@@ -26,6 +26,24 @@
     <div class="nav-footer">
       <SoundToggle />
     </div>
+
+    <Teleport to="body">
+      <div class="nav-particles-container">
+        <div
+          v-for="particle in navParticles"
+          :key="particle.id"
+          class="nav-particle"
+          :style="{
+            left: `${particle.x}px`,
+            top: `${particle.y}px`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            backgroundColor: particle.color,
+            opacity: particle.opacity
+          }"
+        />
+      </div>
+    </Teleport>
   </nav>
 
   <nav class="app-nav-mobile">
@@ -50,8 +68,59 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onUnmounted } from 'vue'
 import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
 import SoundToggle from '~/components/SoundToggle.vue'
+import { useReducedMotion } from '~/composables/useReducedMotion'
+
+interface NavParticle {
+  id: number
+  x: number
+  y: number
+  size: number
+  opacity: number
+  color: string
+}
+
+const prefersReducedMotion = useReducedMotion()
+const navParticles = ref<NavParticle[]>([])
+let particleIdCounter = 0
+let cleanupTimeout: ReturnType<typeof setTimeout> | null = null
+
+function handleNavHover(event: MouseEvent, variant: 'spark' | 'cauldron' | 'oracle' | 'history') {
+  if (prefersReducedMotion.value) return
+  
+  const target = event.currentTarget as HTMLElement
+  const rect = target.getBoundingClientRect()
+  
+  const colors: Record<string, string> = {
+    spark: 'rgba(212, 165, 116, 0.6)',
+    cauldron: 'rgba(149, 117, 205, 0.6)',
+    oracle: 'rgba(126, 184, 201, 0.6)',
+    history: 'rgba(232, 228, 224, 0.4)'
+  }
+  
+  const count = 3
+  for (let i = 0; i < count; i++) {
+    navParticles.value.push({
+      id: particleIdCounter++,
+      x: rect.left + rect.width / 2 + (Math.random() - 0.5) * 20,
+      y: rect.top + rect.height / 2 + (Math.random() - 0.5) * 10,
+      size: 3 + Math.random() * 3,
+      opacity: 0.6 + Math.random() * 0.4,
+      color: colors[variant]
+    })
+  }
+  
+  if (cleanupTimeout) clearTimeout(cleanupTimeout)
+  cleanupTimeout = setTimeout(() => {
+    navParticles.value = []
+  }, 800)
+}
+
+onUnmounted(() => {
+  if (cleanupTimeout) clearTimeout(cleanupTimeout)
+})
 </script>
 
 <style scoped>
@@ -281,6 +350,37 @@ import SoundToggle from '~/components/SoundToggle.vue'
   .app-nav-mobile .mobile-sound-toggle {
     width: 44px;
     height: 44px;
+  }
+}
+
+.nav-particles-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+}
+
+.nav-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: nav-particle-float 0.8s ease-out forwards;
+}
+
+@keyframes nav-particle-float {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% - 20px)) scale(0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-particle {
+    display: none;
   }
 }
 </style>

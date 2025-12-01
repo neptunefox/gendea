@@ -5,11 +5,14 @@
       'drag-over': isDragOver,
       'manual-add': showManualAddEffect,
       mixing: isMixing,
-      'has-ingredients': ingredients.length > 0
+      'has-ingredients': ingredients.length > 0,
+      'is-hovered': isHovered
     }"
     @drop="handleDrop"
     @dragover.prevent="handleDragOver"
     @dragleave="handleDragLeave"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
   >
     <div class="universe-interior">
       <div class="nebula-layer"></div>
@@ -124,6 +127,7 @@ const emit = defineEmits<{
 
 const isDragOver = ref(false)
 const showManualAddEffect = ref(false)
+const isHovered = ref(false)
 const activeBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 const mixingBubbles = ref<Array<{ id: number; style: Record<string, string> }>>([])
 let bubbleIdCounter = 0
@@ -404,6 +408,10 @@ defineExpose({
     opacity: 1;
     transform: scale(1.3);
   }
+}
+
+.cauldron-pot.is-hovered .star {
+  animation-duration: 0.5s !important;
 }
 
 .shooting-star {

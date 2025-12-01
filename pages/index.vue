@@ -1006,7 +1006,8 @@ watch(
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.6),
     0 0 40px rgba(212, 165, 116, 0.15),
-    inset 0 0 80px rgba(212, 165, 116, 0.05);
+    inset 0 0 80px rgba(212, 165, 116, 0.05),
+    inset 0 0 20px rgba(212, 165, 116, 0.12);
   transform: translateY(-8px);
 }
 

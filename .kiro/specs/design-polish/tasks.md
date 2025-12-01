@@ -106,16 +106,16 @@
     - Show when `isLoading` is true
     - _Requirements: 8.1_
 
-- [ ] 9. Implement Enhanced Hover Effects
-  - [ ] 9.1 Add cauldron hover star speed increase
+- [x] 9. Implement Enhanced Hover Effects
+  - [x] 9.1 Add cauldron hover star speed increase
     - Modify CauldronPot to detect hover state
     - Reduce twinkle animation duration by 50% on hover
     - _Requirements: 6.1_
-  - [ ] 9.2 Add idea card inner glow on hover
+  - [x] 9.2 Add idea card inner glow on hover
     - Add `box-shadow` inset glow to `.idea-card:hover`
     - Use feature accent color
     - _Requirements: 6.2_
-  - [ ] 9.3 Add navigation particle trail on hover
+  - [x] 9.3 Add navigation particle trail on hover
     - Create subtle particle effect for nav links
     - Skip when reduced motion is enabled
     - _Requirements: 6.3, 6.4_
