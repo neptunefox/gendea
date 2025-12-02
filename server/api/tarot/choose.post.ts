@@ -5,19 +5,13 @@ import { z } from 'zod'
 import { tarotReadings, savedIdeas, sparkRuns } from '../../../db/schema'
 import { getCardById } from '../../data/tarot-deck'
 import { db } from '../../db'
+import { TAROT_SYSTEM_PROMPT } from '../../utils/langchain-prompts'
 import { useLangChainService } from '../../utils/langchain-service'
 
 const TarotInterpretationSchema = z.object({
   interpretation: z.string().min(20),
   sparkPrompt: z.string().min(10)
 })
-
-const TAROT_SYSTEM_PROMPT = `You are a mystical guide offering daily creative insight through tarot.
-
-Your role is to connect the card's archetypal meaning to the user's creative journey.
-Be evocative but grounded. Focus on creative direction, not fortune-telling.
-
-Output JSON: {"interpretation":"2-3 poetic sentences connecting card to their work","sparkPrompt":"one actionable prompt for today"}`
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

@@ -7,6 +7,8 @@ import { ChatOpenAI } from '@langchain/openai'
 import type { z } from 'zod'
 import { toJSONSchema } from 'zod'
 
+import { BASE_SYSTEM_PROMPT } from './langchain-prompts'
+
 import { useRuntimeConfig } from '#imports'
 
 function toOllamaSchema(zodSchema: z.ZodType): Record<string, unknown> {
@@ -132,9 +134,11 @@ class LangChainService {
   ): BaseMessage[] {
     const msgs: BaseMessage[] = []
 
-    if (systemPrompt) {
-      msgs.push(new SystemMessage(systemPrompt))
-    }
+    const fullSystemPrompt = systemPrompt
+      ? `${BASE_SYSTEM_PROMPT}\n\n${systemPrompt}`
+      : BASE_SYSTEM_PROMPT
+
+    msgs.push(new SystemMessage(fullSystemPrompt))
 
     context.forEach(msg => {
       if (msg.role === 'user') {
