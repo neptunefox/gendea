@@ -1,44 +1,109 @@
 <template>
-  <div v-if="!hasDrawnToday" class="daily-tarot">
-    <div v-if="isLoading" class="tarot-loading">
-      <div class="loading-dot"></div>
+  <div class="daily-tarot">
+    <div v-if="lockedLens" class="locked-lens">
+      <div class="lens-info">
+        <span class="lens-icon">✦</span>
+        <span class="lens-name">{{ lockedLens.name }}</span>
+      </div>
+      <button type="button" class="unlock-btn" title="Unlock lens" @click="unlockLens">
+        <X :size="14" />
+      </button>
     </div>
 
-    <div v-else-if="!revealedCard && cardOptions.length > 0" class="card-selection">
-      <div class="card-spread" :class="{ fading: selectingCard }">
-        <button
-          v-for="(card, index) in cardOptions"
-          :key="card.id"
-          class="pick-card"
-          :class="{ selected: selectingCard === card.id, 'not-selected': selectingCard && selectingCard !== card.id }"
-          :style="{ '--card-index': index }"
-          :disabled="!!selectingCard"
-          @click="selectCard(card.id)"
-        >
-          <span class="card-sigil">✦</span>
-        </button>
+    <template v-else-if="!hasDrawnToday">
+      <div v-if="isLoading" class="tarot-loading">
+        <div class="loading-dot"></div>
       </div>
-      <p v-if="!selectingCard" class="draw-hint">Draw today's lens</p>
-      <div v-else class="card-revealing">
-        <p class="card-title">{{ selectedCardData?.name }}</p>
-        <div class="reveal-dots">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
+
+      <div v-else-if="!revealedCard && cardOptions.length > 0" class="card-selection">
+        <div class="card-spread" :class="{ fading: selectingCard, 'show-labels': selectingCard }">
+          <div
+            v-for="(card, index) in cardOptions"
+            :key="card.id"
+            class="card-slot"
+            :class="{
+              selected: selectingCard === card.id,
+              'not-selected': selectingCard && selectingCard !== card.id
+            }"
+            :style="{ '--card-index': index }"
+          >
+            <button
+              type="button"
+              class="pick-card"
+              :class="{
+                selected: selectingCard === card.id,
+                'not-selected': selectingCard && selectingCard !== card.id
+              }"
+              :disabled="!!selectingCard"
+              @click="selectCard(card.id)"
+            >
+              <span class="card-sigil">✦</span>
+            </button>
+            <span v-if="selectingCard && selectingCard !== card.id" class="card-label">{{
+              card.name
+            }}</span>
+          </div>
+        </div>
+        <p v-if="!selectingCard" class="draw-hint">Draw today's lens</p>
+        <div v-else class="card-revealing">
+          <p class="card-title">{{ selectedCardData?.name }}</p>
+          <div class="reveal-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div v-else-if="revealedCard" class="card-revealed">
-      <p class="card-name">{{ revealedCard.name }}</p>
-      <p class="card-meaning">{{ revealedCard.meaning }}</p>
-      <button class="use-lens-btn" @click="confirmCard">Explore through this lens</button>
-    </div>
+      <div v-else-if="revealedCard" class="card-revealed">
+        <div class="card-spread revealed-spread">
+          <div
+            v-for="(card, index) in cardOptions"
+            :key="card.id"
+            class="revealed-card-slot"
+            :class="{ chosen: card.id === revealedCard.id, unchosen: card.id !== revealedCard.id }"
+            :style="{ '--card-index': index }"
+          >
+            <div
+              class="pick-card"
+              :class="{
+                chosen: card.id === revealedCard.id,
+                unchosen: card.id !== revealedCard.id
+              }"
+            >
+              <span class="card-sigil">✦</span>
+            </div>
+            <span class="card-label">{{ card.name }}</span>
+          </div>
+        </div>
+        <p class="card-name">{{ revealedCard.name }}</p>
+        <p class="card-meaning">{{ revealedCard.meaning }}</p>
+        <div class="lens-actions">
+          <button
+            type="button"
+            class="use-lens-btn"
+            :class="{ used: hasUsedOnce }"
+            :disabled="hasUsedOnce"
+            @click="useOnce"
+          >
+            {{ hasUsedOnce ? 'Used' : 'Use once' }}
+          </button>
+          <button type="button" class="lock-lens-btn" @click="lockLens">
+            <Lock :size="12" />
+            Lock lens
+          </button>
+        </div>
+        <p class="next-draw">Next draw in {{ timeUntilNextDraw }}</p>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Lock, X } from 'lucide-vue-next'
 import { ref, computed, onMounted } from 'vue'
+
+import { useSound } from '~/composables/useSound'
 
 interface TarotCard {
   id: string
@@ -50,9 +115,26 @@ interface TarotCard {
   creativePrompt: string
 }
 
+interface LockedLens {
+  name: string
+  meaning: string
+}
+
+interface Props {
+  lockedLens?: LockedLens | null
+}
+
+withDefaults(defineProps<Props>(), {
+  lockedLens: null
+})
+
 const emit = defineEmits<{
   'card-selected': [card: TarotCard]
+  'lens-locked': [lens: LockedLens]
+  'lens-unlocked': []
 }>()
+
+const { play: playSound } = useSound()
 
 const cardOptions = ref<TarotCard[]>([])
 const readingId = ref<string | null>(null)
@@ -60,10 +142,25 @@ const selectingCard = ref<string | null>(null)
 const revealedCard = ref<TarotCard | null>(null)
 const isLoading = ref(true)
 const hasDrawnToday = ref(false)
+const hasUsedOnce = ref(false)
 
 const selectedCardData = computed(() => {
   if (!selectingCard.value) return null
   return cardOptions.value.find(c => c.id === selectingCard.value) || null
+})
+
+const timeUntilNextDraw = computed(() => {
+  const now = new Date()
+  const tomorrow = new Date(now)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  tomorrow.setHours(0, 0, 0, 0)
+  const diff = tomorrow.getTime() - now.getTime()
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`
+  }
+  return `${minutes}m`
 })
 
 function getVisitorId(): string {
@@ -76,12 +173,30 @@ function getVisitorId(): string {
   return id
 }
 
+const USED_ONCE_KEY = 'tarot-used-once'
+
+function getUsedOnceState(): boolean {
+  if (typeof window === 'undefined') return false
+  const stored = localStorage.getItem(USED_ONCE_KEY)
+  if (!stored) return false
+  const { date, used } = JSON.parse(stored)
+  const today = new Date().toISOString().split('T')[0]
+  return date === today && used
+}
+
+function setUsedOnceState() {
+  if (typeof window === 'undefined') return
+  const today = new Date().toISOString().split('T')[0]
+  localStorage.setItem(USED_ONCE_KEY, JSON.stringify({ date: today, used: true }))
+}
+
 async function fetchReading() {
   try {
     const visitorId = getVisitorId()
     const response = await $fetch<{
       status: 'pending' | 'complete'
       cardOptions: TarotCard[]
+      chosenCard: TarotCard | null
       readingId: string
     }>('/api/tarot/reading', {
       query: { visitorId }
@@ -90,8 +205,10 @@ async function fetchReading() {
     if (response.status === 'pending') {
       readingId.value = response.readingId
       cardOptions.value = response.cardOptions
-    } else {
-      hasDrawnToday.value = true
+    } else if (response.chosenCard) {
+      cardOptions.value = response.cardOptions
+      revealedCard.value = response.chosenCard
+      hasUsedOnce.value = getUsedOnceState()
     }
   } catch (error) {
     console.error('Failed to fetch tarot reading:', error)
@@ -106,6 +223,7 @@ async function selectCard(cardId: string) {
   const card = cardOptions.value.find(c => c.id === cardId)
   if (!card) return
 
+  playSound('cardFlip')
   selectingCard.value = cardId
 
   try {
@@ -126,10 +244,22 @@ async function selectCard(cardId: string) {
   }
 }
 
-function confirmCard() {
-  if (revealedCard.value) {
+function useOnce() {
+  if (revealedCard.value && !hasUsedOnce.value) {
+    hasUsedOnce.value = true
+    setUsedOnceState()
     emit('card-selected', revealedCard.value)
   }
+}
+
+function lockLens() {
+  if (revealedCard.value) {
+    emit('lens-locked', { name: revealedCard.value.name, meaning: revealedCard.value.meaning })
+  }
+}
+
+function unlockLens() {
+  emit('lens-unlocked')
 }
 
 onMounted(() => {
@@ -140,6 +270,68 @@ onMounted(() => {
 <style scoped>
 .daily-tarot {
   width: 100%;
+  margin-bottom: var(--space-3);
+}
+
+.locked-lens {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: hsla(200, 70%, 72%, 0.08);
+  border: 1px solid hsla(200, 70%, 72%, 0.2);
+  border-radius: var(--radius-md);
+  animation: lensAppear 0.3s var(--ease-out);
+}
+
+@keyframes lensAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lens-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.lens-icon {
+  font-size: 10px;
+  color: var(--color-oracle);
+  opacity: 0.7;
+}
+
+.lens-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  color: var(--color-oracle);
+  letter-spacing: 0.02em;
+}
+
+.unlock-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s var(--ease-out);
+}
+
+.unlock-btn:hover {
+  color: var(--color-text);
+  background: hsla(200, 70%, 72%, 0.1);
 }
 
 .tarot-loading {
@@ -174,6 +366,25 @@ onMounted(() => {
 .card-spread {
   display: flex;
   gap: var(--space-3);
+}
+
+.card-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-slot.not-selected {
+  opacity: 0.5;
+}
+
+.card-slot.not-selected .card-label {
+  color: var(--color-text-tertiary);
+}
+
+.card-slot.selected .card-label {
+  color: var(--color-oracle);
 }
 
 .pick-card {
@@ -220,6 +431,59 @@ onMounted(() => {
 
 .pick-card:disabled {
   cursor: default;
+}
+
+.revealed-spread {
+  margin-bottom: var(--space-3);
+}
+
+.revealed-spread .pick-card {
+  cursor: default;
+  animation: none;
+}
+
+.revealed-card-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.revealed-card-slot.chosen .card-label {
+  color: var(--color-oracle);
+}
+
+.revealed-card-slot.unchosen .pick-card {
+  opacity: 0.5;
+}
+
+.card-label {
+  font-size: 9px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  max-width: 60px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.revealed-card-slot.unchosen .card-label {
+  color: var(--color-text-tertiary);
+}
+
+.pick-card.chosen {
+  border-color: var(--color-oracle);
+  box-shadow: 0 0 12px var(--color-glow-oracle);
+}
+
+.pick-card.unchosen {
+  border-style: dashed;
+}
+
+.next-draw {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.02em;
 }
 
 .card-sigil {
@@ -289,9 +553,10 @@ onMounted(() => {
 .card-revealing .card-title {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
   color: var(--color-oracle);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px var(--color-glow-oracle);
 }
 
 .card-revealed {
@@ -305,9 +570,10 @@ onMounted(() => {
 .card-name {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
   color: var(--color-oracle);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px var(--color-glow-oracle);
 }
 
 .card-meaning {
@@ -317,8 +583,14 @@ onMounted(() => {
   line-height: 1.5;
 }
 
-.use-lens-btn {
+.lens-actions {
+  display: flex;
+  gap: var(--space-2);
   margin-top: var(--space-1);
+}
+
+.use-lens-btn,
+.lock-lens-btn {
   padding: var(--space-2) var(--space-3);
   background: transparent;
   border: 1px solid hsla(200, 70%, 72%, 0.3);
@@ -327,11 +599,26 @@ onMounted(() => {
   font-size: var(--text-xs);
   cursor: pointer;
   transition: all 0.2s var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
-.use-lens-btn:hover {
+.use-lens-btn:hover:not(:disabled),
+.lock-lens-btn:hover {
   background: hsla(200, 70%, 72%, 0.1);
   border-color: hsla(200, 70%, 72%, 0.5);
+}
+
+.use-lens-btn.used {
+  opacity: 0.5;
+  cursor: default;
+  border-style: dashed;
+}
+
+.lock-lens-btn {
+  border-color: hsla(200, 70%, 72%, 0.5);
+  background: hsla(200, 70%, 72%, 0.08);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -339,7 +626,8 @@ onMounted(() => {
   .loading-dot,
   .reveal-dots .dot,
   .card-revealing,
-  .card-revealed {
+  .card-revealed,
+  .locked-lens {
     animation: none;
   }
 

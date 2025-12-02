@@ -202,6 +202,7 @@ const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 const showGuidance = ref(true)
 const hasDissolving = ref(false)
+const pendingDrops = ref<Set<string>>(new Set())
 
 const GUIDANCE_DISMISSED_KEY = 'cauldron-guidance-dismissed'
 const ideaRefs = ref<
@@ -339,6 +340,9 @@ function handleIdeaDragEnd() {
 
 async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; clientY: number }) {
   if (!currentSession.value) return
+  if (pendingDrops.value.has(idea.id)) return
+
+  pendingDrops.value.add(idea.id)
 
   const ideaRef = ideaRefs.value.get(idea.id)
   if (ideaRef && typeof ideaRef.dissolve === 'function') {
@@ -351,6 +355,8 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
   ) {
     cauldronPotRef.value.triggerManualAddAnimation()
   }
+
+  playSound('splash')
 
   try {
     await $fetch('/api/cauldron/add-ingredient', {
@@ -368,6 +374,8 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
   } catch (error) {
     console.error('Failed to add ingredient:', error)
     showToastMessage('Failed to add idea')
+  } finally {
+    pendingDrops.value.delete(idea.id)
   }
 }
 
@@ -377,13 +385,19 @@ async function handleIdeaThrow(idea: FloatingIdea) {
 
 async function handleDrop(_event: DragEvent) {
   if (!draggedIdea.value || !currentSession.value) return
+  if (pendingDrops.value.has(draggedIdea.value.id)) return
 
   const droppedIdea = draggedIdea.value
+  pendingDrops.value.add(droppedIdea.id)
+  draggedIdea.value = null
+
   const ideaRef = ideaRefs.value.get(droppedIdea.id)
 
   if (ideaRef && typeof ideaRef.dissolve === 'function') {
     ideaRef.dissolve()
   }
+
+  playSound('splash')
 
   try {
     await $fetch('/api/cauldron/add-ingredient', {
@@ -402,7 +416,7 @@ async function handleDrop(_event: DragEvent) {
     console.error('Failed to add ingredient:', error)
     showToastMessage('Failed to add idea')
   } finally {
-    draggedIdea.value = null
+    pendingDrops.value.delete(droppedIdea.id)
   }
 }
 
@@ -463,6 +477,8 @@ async function handleManualSubmit() {
   ) {
     cauldronPotRef.value.triggerManualAddAnimation()
   }
+
+  playSound('splash')
 
   try {
     await $fetch('/api/cauldron/add-ingredient', {

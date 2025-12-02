@@ -40,8 +40,8 @@ const currentColor = computed(() => colorMap[props.color])
 
 .vignette-corner {
   position: absolute;
-  width: 40%;
-  height: 40%;
+  width: 50%;
+  height: 50%;
   transition: background 300ms var(--ease-mystical);
 }
 
@@ -50,7 +50,7 @@ const currentColor = computed(() => colorMap[props.color])
   left: 0;
   background: radial-gradient(
     ellipse at top left,
-    color-mix(in srgb, var(--vignette-color) 8%, transparent) 0%,
+    color-mix(in srgb, var(--vignette-color) 18%, transparent) 0%,
     transparent 70%
   );
 }
@@ -60,7 +60,7 @@ const currentColor = computed(() => colorMap[props.color])
   right: 0;
   background: radial-gradient(
     ellipse at top right,
-    color-mix(in srgb, var(--vignette-color) 8%, transparent) 0%,
+    color-mix(in srgb, var(--vignette-color) 18%, transparent) 0%,
     transparent 70%
   );
 }
@@ -70,7 +70,7 @@ const currentColor = computed(() => colorMap[props.color])
   left: 0;
   background: radial-gradient(
     ellipse at bottom left,
-    color-mix(in srgb, var(--vignette-color) 8%, transparent) 0%,
+    color-mix(in srgb, var(--vignette-color) 18%, transparent) 0%,
     transparent 70%
   );
 }
@@ -80,7 +80,7 @@ const currentColor = computed(() => colorMap[props.color])
   right: 0;
   background: radial-gradient(
     ellipse at bottom right,
-    color-mix(in srgb, var(--vignette-color) 8%, transparent) 0%,
+    color-mix(in srgb, var(--vignette-color) 18%, transparent) 0%,
     transparent 70%
   );
 }

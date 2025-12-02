@@ -63,7 +63,9 @@ class LangChainService {
       return new ChatOllama({
         baseUrl: this.config.baseURL,
         model: this.config.model,
-        temperature: this.config.temperature
+        temperature: this.config.temperature,
+        numCtx: 4096,
+        keepAlive: '5m'
       })
     }
 
@@ -110,7 +112,9 @@ class LangChainService {
         baseUrl: this.config.baseURL,
         model: this.config.model,
         temperature: this.config.temperature,
-        format: toOllamaSchema(schema)
+        format: toOllamaSchema(schema),
+        numCtx: 4096,
+        keepAlive: '5m'
       })
       const response = await ollamaModel.invoke(messages)
       const content = typeof response.content === 'string' ? response.content : ''

@@ -52,6 +52,7 @@ import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
 import OracleMessage from '~/components/OracleMessage.vue'
 import OraclePendulum from '~/components/OraclePendulum.vue'
+import { useSound } from '~/composables/useSound'
 import type { OracleMessage as OracleMessageType } from '~/types/oracle'
 
 interface Props {
@@ -72,6 +73,8 @@ const inputText = ref('')
 const isLoading = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
+
+const { play: playSound } = useSound()
 
 const canSend = computed(() => inputText.value.trim().length > 0)
 
@@ -128,6 +131,8 @@ async function handleSend() {
       role: 'oracle',
       content: response.question
     })
+
+    playSound('whisper')
 
     await nextTick()
     scrollToBottom()

@@ -3,31 +3,46 @@
     <BackgroundRunes variant="spark" />
 
     <div class="spark-layout">
-      <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
-        <div class="input-inner">
-          <DailyTarot v-if="!input.trim() && !isGenerating" @card-selected="handleTarotCard" />
+      <div class="spark-input-section">
+        <ClientOnly>
+          <DailyTarot
+            :locked-lens="lockedLens"
+            @card-selected="handleTarotCard"
+            @lens-locked="handleLensLocked"
+            @lens-unlocked="handleLensUnlocked"
+          />
+        </ClientOnly>
+
+        <div
+          ref="inputSection"
+          class="spark-input-wrapper"
+          :class="{ 'input-empty': !input.trim() && !isGenerating, 'has-lens': !!lockedLens }"
+          @click="focusInput"
+        >
           <textarea
             ref="inputField"
             v-model="input"
             class="spark-input"
             rows="1"
-            placeholder="What do you want to explore?"
+            :placeholder="
+              lockedLens ? `Explore through ${lockedLens.name}...` : 'What do you want to explore?'
+            "
             @keydown.enter.exact.prevent="handleGenerate()"
           />
+          <button
+            class="generate-btn"
+            type="button"
+            :disabled="!canGenerate || isGenerating"
+            @click.stop="handleGenerate()"
+          >
+            <span v-if="isGenerating" class="btn-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </span>
+            <span v-else>Diverge</span>
+          </button>
         </div>
-        <button
-          class="generate-btn"
-          type="button"
-          :disabled="!canGenerate || isGenerating"
-          @click.stop="handleGenerate()"
-        >
-          <span v-if="isGenerating" class="btn-dots">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-          </span>
-          <span v-else>Diverge</span>
-        </button>
       </div>
 
       <section v-if="entries.length > 0 || isGenerating" class="session-list">
@@ -43,15 +58,18 @@
         </div>
 
         <div v-if="isGenerating" ref="loadingCard" class="loading-card">
-          <div class="loading-dots">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
+          <div class="spark-kindling">
+            <span class="kindle-core"></span>
+            <span class="kindle-glow"></span>
           </div>
-          <p class="loading-text">Summoning ideas</p>
+          <p v-if="activeLens || lockedLens" class="loading-lens">
+            <span class="lens-label">Through the lens of</span>
+            <span class="lens-name">{{ (activeLens || lockedLens)?.name }}</span>
+          </p>
+          <p v-else class="loading-text">Kindling sparks</p>
         </div>
 
-        <div v-else class="session-feed">
+        <div class="session-feed">
           <article
             v-for="(entry, entryIndex) in entries"
             v-show="!showStarredOnly || getSessionStarredCount(entry) > 0"
@@ -189,6 +207,7 @@ interface SparkRunRecord {
 const STORAGE_KEY = 'spark-thread-journal'
 const STARRED_KEY = 'spark-starred-ideas'
 const COLLAPSED_KEY = 'spark-collapsed-sessions'
+const LOCKED_LENS_KEY = 'spark-locked-lens'
 
 const input = ref('')
 const entries = ref<JournalEntry[]>([])
@@ -199,6 +218,8 @@ const isGenerating = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const lastPrompt = ref('')
+const activeLens = ref<{ name: string; meaning: string } | null>(null)
+const lockedLens = ref<{ name: string; meaning: string } | null>(null)
 const resumingRunId = ref<string | null>(null)
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
@@ -358,6 +379,8 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
   await nextTick()
   loadingCard.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
+  const currentLens = activeLens.value || lockedLens.value
+
   try {
     const response = await $fetch<{
       coreIdeas: SparkIdea[]
@@ -369,7 +392,8 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
         input: topic,
         history: parentEntry ? historyPayload.value : [],
         isBranch: !!parentEntry,
-        parentPrompt: parentEntry?.prompt
+        parentPrompt: parentEntry?.prompt,
+        lens: currentLens ? { name: currentLens.name, meaning: currentLens.meaning } : undefined
       }
     })
 
@@ -383,9 +407,11 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
       parentPrompt: parentEntry?.prompt
     }
 
+    playSound('arrive')
     latestEntryId.value = entry.id
     entries.value = [entry, ...entries.value].slice(0, 6)
     lastPrompt.value = topic
+    activeLens.value = null
 
     if (!customPrompt) {
       input.value = ''
@@ -489,6 +515,7 @@ onMounted(async () => {
   restoreThread()
   restoreStarredIdeas()
   restoreCollapsedSessions()
+  restoreLockedLens()
   await nextTick()
   adjustInputHeight()
 })
@@ -504,8 +531,43 @@ interface TarotCard {
 }
 
 function handleTarotCard(card: TarotCard) {
+  activeLens.value = { name: card.name, meaning: card.meaning }
   const prompt = `${card.name}: ${card.meaning}`
   handleGenerate(prompt)
+}
+
+function handleLensLocked(lens: { name: string; meaning: string }) {
+  lockedLens.value = lens
+  saveLockedLens()
+  playSound('whoosh')
+  showToastMessage(`Lens locked: ${lens.name}`)
+}
+
+function handleLensUnlocked() {
+  lockedLens.value = null
+  saveLockedLens()
+  playSound('whoosh')
+  showToastMessage('Lens unlocked')
+}
+
+function saveLockedLens() {
+  if (typeof window === 'undefined') return
+  if (lockedLens.value) {
+    window.localStorage.setItem(LOCKED_LENS_KEY, JSON.stringify(lockedLens.value))
+  } else {
+    window.localStorage.removeItem(LOCKED_LENS_KEY)
+  }
+}
+
+function restoreLockedLens() {
+  if (typeof window === 'undefined') return
+  const stored = window.localStorage.getItem(LOCKED_LENS_KEY)
+  if (!stored) return
+  try {
+    lockedLens.value = JSON.parse(stored)
+  } catch {
+    // ignore
+  }
 }
 
 async function resumeFromHistory(runId: string) {
@@ -588,7 +650,7 @@ watch(
   inset: 0;
   background: radial-gradient(
     ellipse 80% 50% at 50% 0%,
-    hsla(165, 75%, 58%, 0.06) 0%,
+    hsla(185, 75%, 55%, 0.08) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -620,16 +682,35 @@ watch(
     box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.input-inner {
-  flex: 1;
+.spark-input-section {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
 }
 
 .spark-input-wrapper:focus-within {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+
+.spark-input-wrapper.input-empty {
+  animation: inputBreath 4s ease-in-out infinite;
+}
+
+.spark-input-wrapper.input-empty:focus-within {
+  animation: none;
+}
+
+@keyframes inputBreath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 20px hsla(185, 75%, 55%, 0.15);
+  }
 }
 
 .spark-input {
@@ -746,13 +827,13 @@ watch(
 
 .filter-toggle:hover {
   color: var(--color-text);
-  background: hsla(165, 75%, 58%, 0.08);
+  background: hsla(185, 75%, 55%, 0.08);
 }
 
 .filter-toggle.active {
   color: var(--color-primary);
-  border-color: hsla(165, 75%, 58%, 0.3);
-  background: hsla(165, 75%, 58%, 0.08);
+  border-color: hsla(185, 75%, 55%, 0.3);
+  background: hsla(185, 75%, 55%, 0.08);
 }
 
 .loading-card {
@@ -764,37 +845,54 @@ watch(
   gap: var(--space-4);
 }
 
-.loading-dots {
+.spark-kindling {
+  position: relative;
+  width: 40px;
+  height: 40px;
   display: flex;
-  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
 }
 
-.loading-dots .dot {
-  width: 6px;
-  height: 6px;
+.kindle-core {
+  position: absolute;
+  width: 8px;
+  height: 8px;
   background: var(--color-primary);
   border-radius: 50%;
-  animation: dotPulse 1.4s ease-in-out infinite;
+  animation: kindleCore 1.5s ease-in-out infinite;
 }
 
-.loading-dots .dot:nth-child(2) {
-  animation-delay: 0.2s;
+.kindle-glow {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle, var(--color-glow-spark) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: kindleGlow 1.5s ease-in-out infinite;
 }
 
-.loading-dots .dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes dotPulse {
+@keyframes kindleCore {
   0%,
-  80%,
   100% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-  40% {
-    opacity: 1;
     transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+@keyframes kindleGlow {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
   }
 }
 
@@ -803,6 +901,28 @@ watch(
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   letter-spacing: 0.02em;
+}
+
+.loading-lens {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.lens-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.lens-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  color: var(--color-oracle);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px var(--color-glow-oracle);
 }
 
 .session-feed {
@@ -819,7 +939,7 @@ watch(
 }
 
 .session-entry.latest {
-  border-color: hsla(165, 75%, 58%, 0.3);
+  border-color: hsla(185, 75%, 55%, 0.3);
 }
 
 .session-header {
@@ -836,7 +956,7 @@ watch(
 }
 
 .session-header:hover {
-  background: hsla(165, 75%, 58%, 0.03);
+  background: hsla(185, 75%, 55%, 0.03);
 }
 
 .session-toggle {
@@ -893,11 +1013,11 @@ watch(
 }
 
 .idea-row:hover {
-  background: hsla(165, 75%, 58%, 0.05);
+  background: hsla(185, 75%, 55%, 0.05);
 }
 
 .idea-row.starred {
-  background: hsla(165, 75%, 58%, 0.08);
+  background: hsla(185, 75%, 55%, 0.08);
 }
 
 .star-btn {
@@ -1049,10 +1169,15 @@ watch(
     opacity: 1;
   }
 
-  .loading-dots .dot,
-  .btn-dots .dot {
+  .btn-dots .dot,
+  .kindle-core,
+  .kindle-glow {
     animation: none;
     opacity: 0.6;
+  }
+
+  .spark-input-wrapper.input-empty {
+    animation: none;
   }
 }
 </style>

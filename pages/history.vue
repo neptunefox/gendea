@@ -310,7 +310,7 @@ function resumeThread(id: string) {
   padding: var(--space-2) var(--space-5);
   background: transparent;
   color: var(--color-primary);
-  border: 1px solid hsla(165, 75%, 58%, 0.4);
+  border: 1px solid hsla(185, 75%, 55%, 0.4);
   font-family: var(--font-heading);
   font-size: var(--text-xs);
   font-weight: 400;
@@ -326,9 +326,9 @@ function resumeThread(id: string) {
 }
 
 .resurrect-btn:hover {
-  background: hsla(165, 75%, 58%, 0.15);
+  background: hsla(185, 75%, 55%, 0.15);
   border-color: var(--color-primary);
-  box-shadow: 0 0 25px hsla(165, 75%, 58%, 0.2);
+  box-shadow: 0 0 25px hsla(185, 75%, 55%, 0.2);
 }
 
 .graveyard-state {

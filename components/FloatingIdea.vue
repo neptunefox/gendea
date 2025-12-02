@@ -83,7 +83,7 @@ const isFrozen = computed(() => props.isSelected || isDragging.value)
 const timerRingStyle = computed(() => {
   const frozenColor = 'hsl(200, 70%, 72%)'
   const urgentColor = 'hsl(0, 65%, 60%)'
-  const normalColor = 'hsl(165, 75%, 58%)'
+  const normalColor = 'hsl(185, 75%, 55%)'
   const activeColor = isFrozen.value ? frozenColor : isUrgent.value ? urgentColor : normalColor
   const bgColor = 'hsl(220, 18%, 10%)'
   const deg = timerProgress.value * 360

@@ -115,7 +115,7 @@ function handleNavHover(event: MouseEvent, variant: 'spark' | 'cauldron' | 'orac
   const rect = target.getBoundingClientRect()
 
   const colors: Record<string, string> = {
-    spark: 'hsla(165, 75%, 58%, 0.6)',
+    spark: 'hsla(185, 75%, 55%, 0.6)',
     cauldron: 'hsla(140, 60%, 45%, 0.6)',
     oracle: 'hsla(200, 70%, 72%, 0.6)',
     history: 'hsla(260, 15%, 55%, 0.5)'
@@ -240,7 +240,7 @@ onUnmounted(() => {
 }
 
 .nav-link.router-link-active:not(.cauldron):not(.oracle):not(.history)::before {
-  border-color: hsla(165, 75%, 58%, 0.3);
+  border-color: hsla(185, 75%, 55%, 0.3);
   box-shadow: 0 0 20px var(--color-glow-spark);
 }
 
@@ -333,7 +333,7 @@ onUnmounted(() => {
   }
 
   .app-nav-mobile .nav-link.router-link-active:not(.cauldron):not(.oracle):not(.history)::before {
-    border-color: hsla(165, 75%, 58%, 0.3);
+    border-color: hsla(185, 75%, 55%, 0.3);
     box-shadow: 0 0 20px var(--color-glow-spark);
   }
 

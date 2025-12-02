@@ -30,17 +30,17 @@ const vignetteColor = computed(() => {
   --color-text-secondary: hsl(200, 20%, 78%);
   --color-text-tertiary: hsl(200, 12%, 60%);
 
-  --color-primary: hsl(165, 75%, 58%);
-  --color-primary-hover: hsl(165, 80%, 65%);
-  --color-primary-subtle: hsla(165, 75%, 58%, 0.18);
-  --color-primary-ring: hsla(165, 75%, 58%, 0.3);
+  --color-primary: hsl(185, 75%, 55%);
+  --color-primary-hover: hsl(185, 80%, 62%);
+  --color-primary-subtle: hsla(185, 75%, 55%, 0.18);
+  --color-primary-ring: hsla(185, 75%, 55%, 0.3);
 
   --color-border: hsla(200, 25%, 94%, 0.1);
   --color-border-strong: hsla(200, 25%, 94%, 0.18);
 
-  --color-success: hsl(165, 75%, 58%);
-  --color-success-subtle: hsla(165, 75%, 58%, 0.25);
-  --color-success-bg: hsla(165, 75%, 58%, 0.12);
+  --color-success: hsl(185, 75%, 55%);
+  --color-success-subtle: hsla(185, 75%, 55%, 0.25);
+  --color-success-bg: hsla(185, 75%, 55%, 0.12);
   --color-warning: hsl(45, 80%, 60%);
   --color-error: hsl(0, 65%, 60%);
   --color-error-subtle: hsla(0, 65%, 60%, 0.25);
@@ -50,25 +50,26 @@ const vignetteColor = computed(() => {
 
   --color-cauldron: hsl(140, 60%, 45%);
   --color-oracle: hsl(200, 70%, 72%);
-  --color-spark: hsl(165, 75%, 58%);
+  --color-spark: hsl(185, 75%, 55%);
   --color-history: hsl(260, 15%, 55%);
 
-  --color-glow-spark: hsla(165, 75%, 58%, 0.5);
+  --color-glow-spark: hsla(185, 75%, 55%, 0.5);
   --color-glow-cauldron: hsla(140, 60%, 45%, 0.5);
   --color-glow-oracle: hsla(200, 70%, 72%, 0.5);
   --color-glow-history: hsla(260, 15%, 55%, 0.4);
 
   --color-oracle-subtle: hsla(200, 70%, 72%, 0.18);
   --color-cauldron-subtle: hsla(140, 60%, 45%, 0.18);
-  --color-spark-subtle: hsla(165, 75%, 58%, 0.18);
+  --color-spark-subtle: hsla(185, 75%, 55%, 0.18);
   --color-history-subtle: hsla(260, 15%, 55%, 0.15);
 
   --color-surface-translucent: hsla(220, 18%, 10%, 0.95);
   --color-border-subtle: hsla(200, 25%, 94%, 0.05);
   --color-hover-bg: hsla(200, 25%, 94%, 0.08);
 
+  --text-2xl: 1.75rem;
   --text-xl: 1.5rem;
-  --text-lg: 1.125rem;
+  --text-lg: 1.25rem;
   --text-base: 1rem;
   --text-sm: 0.9375rem;
   --text-xs: 0.8125rem;
