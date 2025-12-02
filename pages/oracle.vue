@@ -95,12 +95,13 @@ onMounted(async () => {
 
 <style scoped>
 .oracle-page {
-  min-height: 100vh;
+  height: 100vh;
   background: var(--color-bg);
   color: var(--color-text);
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: hidden;
 }
 
 .oracle-page > :deep(.flow-guidance-banner) {
@@ -117,9 +118,11 @@ onMounted(async () => {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse 50% 30% at 50% 100%, hsla(200, 70%, 72%, 0.06) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, hsla(200, 70%, 72%, 0.03) 0%, transparent 40%);
+  background: radial-gradient(
+    ellipse 50% 30% at 50% 100%,
+    hsla(200, 70%, 72%, 0.06) 0%,
+    transparent 60%
+  );
   pointer-events: none;
 }
 

@@ -19,35 +19,30 @@
     </div>
 
     <div class="input-area">
-      <textarea
-        ref="inputField"
-        v-model="inputText"
-        class="message-input"
-        rows="1"
-        placeholder="What's on your mind?"
-        @keydown.enter.exact.prevent="handleSend"
-      />
-      <button
-        class="send-btn"
-        :class="{ ready: canSend && !isLoading }"
-        :disabled="!canSend || isLoading"
-        @click="handleSend"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M8 3v10M8 3l4 4M8 3L4 7"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
+      <div class="input-wrapper">
+        <textarea
+          ref="inputField"
+          v-model="inputText"
+          class="message-input"
+          rows="1"
+          placeholder="What's on your mind?"
+          @keydown.enter.exact.prevent="handleSend"
+        />
+        <button
+          class="send-btn"
+          :class="{ ready: canSend && !isLoading }"
+          :disabled="!canSend || isLoading"
+          @click="handleSend"
+        >
+          <ArrowUp :size="16" />
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ArrowUp } from 'lucide-vue-next'
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 
 import OracleMessage from '~/components/OracleMessage.vue'
@@ -146,7 +141,10 @@ async function handleSend() {
 
 function scrollToBottom() {
   if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+    messagesContainer.value.scrollTo({
+      top: messagesContainer.value.scrollHeight,
+      behavior: 'smooth'
+    })
   }
 }
 
@@ -186,13 +184,20 @@ onMounted(async () => {
   margin: 0 auto;
   width: 100%;
   padding: 0 var(--space-6);
+  min-height: 0;
 }
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
   padding-top: var(--space-8);
-  padding-bottom: 100px;
+  padding-bottom: 140px;
+  min-height: 0;
+  scrollbar-width: none;
+}
+
+.messages-container::-webkit-scrollbar {
+  display: none;
 }
 
 .context-intro {
@@ -239,10 +244,10 @@ onMounted(async () => {
 
 .input-area {
   position: fixed;
-  bottom: var(--space-8);
+  bottom: 0;
   left: var(--nav-width);
   right: 0;
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-5) var(--space-6) var(--space-8);
   background: var(--color-bg);
   display: flex;
   justify-content: center;
@@ -251,17 +256,25 @@ onMounted(async () => {
 .input-area::before {
   content: '';
   position: absolute;
-  top: -60px;
+  top: -30px;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 30px;
   background: linear-gradient(transparent, var(--color-bg));
   pointer-events: none;
 }
 
-.message-input {
+.input-wrapper {
+  position: relative;
   width: 100%;
   max-width: 520px;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.message-input {
+  flex: 1;
   border: none;
   background: transparent;
   color: var(--color-text);
@@ -289,9 +302,7 @@ onMounted(async () => {
 }
 
 .send-btn {
-  position: absolute;
-  right: calc(50% - 280px);
-  bottom: var(--space-5);
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
   border: none;
@@ -302,6 +313,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   transition: all 0.3s var(--ease-out);
+  margin-bottom: var(--space-1);
 }
 
 .send-btn.ready {
@@ -323,16 +335,12 @@ onMounted(async () => {
   }
 
   .messages-container {
-    padding-bottom: 120px;
+    padding-bottom: 140px;
   }
 
   .input-area {
     left: 0;
     padding-bottom: calc(var(--space-5) + 64px);
-  }
-
-  .send-btn {
-    right: var(--space-6);
   }
 }
 </style>
