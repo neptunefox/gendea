@@ -24,7 +24,7 @@
         v-model="inputText"
         class="message-input"
         rows="1"
-        placeholder="Ask a question to explore this idea deeper..."
+        placeholder="What's on your mind?"
         @keydown.enter.exact.prevent="handleSend"
       />
       <button

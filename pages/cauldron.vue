@@ -3,8 +3,8 @@
     <BackgroundRunes variant="cauldron" />
     <FlowGuidanceBanner
       :visible="showGuidance && !output && ingredients.length === 0"
-      message="Combine scattered ideas to find unexpected connections"
-      hint="Drop or type 3+ ideas. The cauldron will blend them into something new."
+      message="Throw in the fragments. Pull out something whole."
+      hint="Add 3+ ideas. The cauldron finds connections you missed. Use when you have pieces but no whole."
       variant="cauldron"
       @dismiss="dismissGuidance"
     />
@@ -80,7 +80,7 @@
             <input
               v-model="manualInput"
               type="text"
-              :placeholder="output ? 'Add another idea to remix...' : 'Add your own idea...'"
+              :placeholder="output ? 'Add another idea to remix...' : 'Type an idea to throw in...'"
               class="manual-input"
               @keydown.enter="handleManualSubmit"
             />
@@ -95,13 +95,12 @@
 
           <p :class="['hint-text', { pulse: remixHintPulse }]">
             <Sparkles :size="14" />
-            <span v-if="output">Drop ideas or type above to remix your result</span>
-            <span v-else-if="isMixing">Keep adding ideas to refine</span>
+            <span v-if="output">Add more ideas to remix</span>
+            <span v-else-if="isMixing">Converging...</span>
             <span v-else-if="ingredients.length > 0"
-              >{{ 3 - ingredients.length }} more
-              {{ ingredients.length === 2 ? 'idea' : 'ideas' }} to start mixing</span
+              >{{ 3 - ingredients.length }} more to converge</span
             >
-            <span v-else>Drop or type ideas to begin</span>
+            <span v-else>Drag cards or type below</span>
           </p>
         </div>
 

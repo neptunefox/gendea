@@ -91,7 +91,7 @@ const vignetteColor = computed(() => {
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-  --nav-width: 56px;
+  --nav-width: 72px;
 
   --duration-fast: 200ms;
   --duration-normal: 300ms;

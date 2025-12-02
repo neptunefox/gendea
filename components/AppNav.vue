@@ -5,17 +5,17 @@
     </NuxtLink>
 
     <div class="nav-links">
-      <NuxtLink to="/" class="nav-link" title="Spark — Generate ideas" @mouseenter="handleNavHover($event, 'spark')">
+      <NuxtLink to="/" class="nav-link" title="Spark — Explode one idea into many" @mouseenter="handleNavHover($event, 'spark')">
         <Flame :size="18" />
-        <span class="nav-label">Spark</span>
+        <span class="nav-label">Diverge</span>
       </NuxtLink>
-      <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Combine ideas" @mouseenter="handleNavHover($event, 'cauldron')">
+      <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Blend ideas into one" @mouseenter="handleNavHover($event, 'cauldron')">
         <FlaskRound :size="18" />
-        <span class="nav-label">Combine</span>
+        <span class="nav-label">Converge</span>
       </NuxtLink>
-      <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Get unstuck" @mouseenter="handleNavHover($event, 'oracle')">
+      <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Think through what's blocking you" @mouseenter="handleNavHover($event, 'oracle')">
         <Eye :size="18" />
-        <span class="nav-label">Refine</span>
+        <span class="nav-label">Dialogue</span>
       </NuxtLink>
       <NuxtLink to="/history" class="nav-link history" title="History — Past explorations" @mouseenter="handleNavHover($event, 'history')">
         <Scroll :size="18" />
@@ -47,17 +47,17 @@
   </nav>
 
   <nav class="app-nav-mobile">
-    <NuxtLink to="/" class="nav-link" title="Spark">
+    <NuxtLink to="/" class="nav-link" title="Spark — Diverge">
       <Flame :size="20" />
-      <span class="nav-label">Spark</span>
+      <span class="nav-label">Diverge</span>
     </NuxtLink>
-    <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron">
+    <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Converge">
       <FlaskRound :size="20" />
-      <span class="nav-label">Combine</span>
+      <span class="nav-label">Converge</span>
     </NuxtLink>
-    <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle">
+    <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Dialogue">
       <Eye :size="20" />
-      <span class="nav-label">Refine</span>
+      <span class="nav-label">Dialogue</span>
     </NuxtLink>
     <NuxtLink to="/history" class="nav-link history" title="History">
       <Scroll :size="20" />
@@ -183,7 +183,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  width: 52px;
+  width: 64px;
   height: 52px;
   color: var(--color-text-tertiary);
   text-decoration: none;
@@ -192,9 +192,9 @@ onUnmounted(() => {
 }
 
 .nav-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: var(--weight-medium);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
@@ -293,9 +293,9 @@ onUnmounted(() => {
   }
 
   .app-nav-mobile .nav-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: var(--weight-medium);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
   }
 

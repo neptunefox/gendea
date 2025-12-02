@@ -3,8 +3,8 @@
     <BackgroundRunes variant="oracle" />
     <FlowGuidanceBanner
       :visible="showGuidance && !ideaContext && sessionId !== null"
-      message="Get unstuck by exploring your ideas through questions"
-      hint="The Oracle asks questions to help you think deeper. Type your idea or question below."
+      message="Stuck? The Oracle won't give you answers — it asks better questions."
+      hint="Describe where you're blocked. Use when you know something's off but can't name it."
       variant="oracle"
       @dismiss="dismissGuidance"
     />

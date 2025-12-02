@@ -7,8 +7,8 @@
         <div class="grimoire-spine"></div>
         <div class="grimoire-page">
           <div class="page-texture"></div>
-          <p class="grimoire-whisper">Turn one idea into many</p>
-          <p class="grimoire-subtitle">AI-powered problem exploration</p>
+          <p class="grimoire-whisper">Start with one idea. Leave with many.</p>
+          <p class="grimoire-subtitle">Describe what you're working on — we'll show you angles you haven't considered</p>
           <div class="grimoire-divider">
             <span class="divider-line"></span>
             <span class="divider-symbol">✦</span>
@@ -36,7 +36,7 @@
     <div class="spark-layout">
       <div class="spark-header">
         <DailyTarot @use-prompt="handleTarotPrompt" />
-        <p class="spark-tagline">Describe a problem or idea — get multiple angles to explore</p>
+        <p class="spark-tagline">Use when you need options</p>
       </div>
       <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
         <textarea
@@ -44,7 +44,7 @@
           v-model="input"
           class="spark-input"
           rows="1"
-          placeholder="What problem are you trying to solve?"
+          placeholder="Describe an idea, problem, or challenge..."
           @keydown.enter.exact.prevent="handleGenerate()"
         />
         <button
@@ -54,17 +54,17 @@
           @click.stop="handleGenerate()"
         >
           <Loader v-if="isGenerating" :size="18" class="spin" />
-          <span v-else>Generate</span>
+          <span v-else>Diverge</span>
         </button>
       </div>
 
       <FlowGuidanceBanner
         :visible="showCauldronNudge && savedIdeas.length >= 5"
-        message="You have several ideas saved. Ready to combine them?"
-        hint="The Cauldron blends ideas together to find unexpected connections."
+        message="You have fragments. Ready to make them whole?"
+        hint="The Cauldron finds connections between your ideas and synthesizes something stronger."
         variant="cauldron"
         action-link="/cauldron"
-        action-label="Try the Cauldron"
+        action-label="Converge ideas"
         @dismiss="dismissCauldronNudge"
       />
 
@@ -103,11 +103,11 @@
               <p class="idea-text">{{ idea.text }}</p>
               <div class="idea-actions">
                 <button class="action-btn" @click="handleExploreIdea(idea.text)">
-                  Generate more
+                  Diverge more
                 </button>
                 <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
                   <HelpCircle :size="16" />
-                  Go deeper
+                  Dialogue
                 </button>
               </div>
             </div>
@@ -128,7 +128,7 @@
             <span class="selection-count">{{ selectedIdeas.size }} selected</span>
             <button class="selection-btn" @click="handleBranchSelected">
               <Split :size="16" />
-              Branch all
+              Diverge all
             </button>
             <button class="selection-btn secondary" @click="clearSelection">Clear</button>
           </div>
@@ -201,7 +201,7 @@
                   </button>
                   <button
                     class="icon-action-btn"
-                    title="Branch and explore"
+                    title="Diverge from this"
                     @click="handleBranch(idea.text, entry)"
                   >
                     <Split :size="18" />

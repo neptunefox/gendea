@@ -7,7 +7,7 @@
 
       <div class="output-card" :class="{ crystallizing: isCrystallizing }">
         <div class="card-content">
-          <h3 class="output-title">Your synthesized idea</h3>
+          <h3 class="output-title">Converged</h3>
           <p class="output-text" :class="{ 'shimmer-text': isCrystallizing }">{{ output }}</p>
           <div class="output-actions">
             <button class="action-btn primary" @click="$emit('save')">
@@ -16,11 +16,11 @@
             </button>
             <button class="action-btn oracle" @click="$emit('askOracle')">
               <HelpCircle :size="18" />
-              Ask Oracle
+              Dialogue
             </button>
             <button class="action-btn secondary" @click="$emit('reset')">
               <RotateCcw :size="18" />
-              Start fresh
+              Reset
             </button>
           </div>
         </div>
