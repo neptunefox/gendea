@@ -1,9 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <defs>
     <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ff9ad8"/>
-      <stop offset="100%" style="stop-color:#f67176"/>
+      <stop offset="0%" style="stop-color:hsl(185, 75%, 62%)"/>
+      <stop offset="100%" style="stop-color:hsl(185, 75%, 48%)"/>
     </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <path d="M16 28 C9.4 28 4 22.6 4 16 C4 9.4 9.4 4 16 4 C19.8 4 23.1 5.9 25.2 8.8 L21.2 11.2 C19.9 9.7 18 8.8 16 8.8 C12.1 8.8 8.8 12.1 8.8 16 C8.8 19.9 12.1 23.2 16 23.2 C18.5 23.2 20.7 21.9 21.9 20 L16 20 L16 16 L27.5 16 C27.6 16.3 27.6 16.7 27.6 17 C27.6 23.2 22.4 28 16 28 Z" fill="url(#g)"/>
+  <path d="M16 28 C9.4 28 4 22.6 4 16 C4 9.4 9.4 4 16 4 C19.8 4 23.1 5.9 25.2 8.8 L21.2 11.2 C19.9 9.7 18 8.8 16 8.8 C12.1 8.8 8.8 12.1 8.8 16 C8.8 19.9 12.1 23.2 16 23.2 C18.5 23.2 20.7 21.9 21.9 20 L16 20 L16 16 L27.5 16 C27.6 16.3 27.6 16.7 27.6 17 C27.6 23.2 22.4 28 16 28 Z" fill="url(#g)" filter="url(#glow)"/>
 </svg>
