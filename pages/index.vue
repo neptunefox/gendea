@@ -1,216 +1,106 @@
 <template>
   <div class="spark-page">
     <BackgroundRunes variant="spark" />
-    <div v-if="showDemo" class="demo-overlay" @click="dismissDemo">
-      <div class="demo-ambient"></div>
-      <div class="grimoire-container" @click.stop>
-        <div class="grimoire-spine"></div>
-        <div class="grimoire-page">
-          <div class="page-texture"></div>
-          <p class="grimoire-whisper">Start with one idea. Leave with many.</p>
-          <p class="grimoire-subtitle">
-            Describe what you're working on — we'll show you angles you haven't considered
-          </p>
-          <div class="grimoire-divider">
-            <span class="divider-line"></span>
-            <span class="divider-symbol">✦</span>
-            <span class="divider-line"></span>
-          </div>
-          <p class="demo-label">Example</p>
-          <p class="demo-prompt">"{{ DEMO_ENTRY.prompt }}"</p>
-          <p class="demo-result-label">generates ideas like:</p>
-          <div class="demo-ideas">
-            <div
-              v-for="(idea, index) in DEMO_ENTRY.coreIdeas"
-              :key="index"
-              class="demo-idea"
-              :style="{ animationDelay: `${0.6 + index * 0.12}s` }"
-            >
-              <span class="card-numeral">{{ ['I', 'II', 'III', 'IV', 'V'][index] }}</span>
-              <p>{{ idea.text }}</p>
-            </div>
-          </div>
-          <button class="demo-cta" @click="dismissDemo">Try it yourself</button>
-        </div>
-      </div>
-    </div>
 
     <div class="spark-layout">
-      <div class="spark-header">
-        <DailyTarot @use-prompt="handleTarotPrompt" />
-        <p class="spark-tagline">Use when you need options</p>
-      </div>
       <div ref="inputSection" class="spark-input-wrapper" @click="focusInput">
-        <textarea
-          ref="inputField"
-          v-model="input"
-          class="spark-input"
-          rows="1"
-          placeholder="Describe an idea, problem, or challenge..."
-          @keydown.enter.exact.prevent="handleGenerate()"
-        />
+        <div class="input-inner">
+          <DailyTarot v-if="!input.trim() && !isGenerating" @card-selected="handleTarotCard" />
+          <textarea
+            ref="inputField"
+            v-model="input"
+            class="spark-input"
+            rows="1"
+            placeholder="What do you want to explore?"
+            @keydown.enter.exact.prevent="handleGenerate()"
+          />
+        </div>
         <button
           class="generate-btn"
           type="button"
           :disabled="!canGenerate || isGenerating"
           @click.stop="handleGenerate()"
         >
-          <Loader v-if="isGenerating" :size="18" class="spin" />
+          <span v-if="isGenerating" class="btn-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </span>
           <span v-else>Diverge</span>
         </button>
       </div>
 
-      <FlowGuidanceBanner
-        :visible="showCauldronNudge && savedIdeas.length >= 5"
-        message="You have fragments. Ready to make them whole?"
-        hint="The Cauldron finds connections between your ideas and synthesizes something stronger."
-        variant="cauldron"
-        action-link="/cauldron"
-        action-label="Converge ideas"
-        @dismiss="dismissCauldronNudge"
-      />
-
-      <section v-if="savedIdeas.length > 0" class="ideas-collection">
-        <button class="collection-header" @click="ideasCollapsed = !ideasCollapsed">
-          <h2 class="collection-title">Your ideas</h2>
-          <span class="collection-count">{{ savedIdeas.length }}</span>
-          <ChevronDown :size="18" class="collapse-icon" :class="{ collapsed: ideasCollapsed }" />
-        </button>
-        <div v-show="!ideasCollapsed" class="collection-content">
-          <div class="ideas-grid-wrapper">
-            <transition-group name="idea-list" tag="div" class="ideas-grid">
-              <div
-                v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
-                :key="idea.id"
-                class="idea-card"
-                :class="{ dragging: isDraggingIdea === idea.id }"
-                draggable="true"
-                @dragstart="e => handleIdeaDragStart(e, idea)"
-                @dragend="handleIdeaDragEnd"
-              >
-                <span class="tarot-corner top-left" />
-                <span class="tarot-corner top-right" />
-                <span class="tarot-corner bottom-left" />
-                <span class="tarot-corner bottom-right" />
-                <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path
-                      d="M12 4L4 12M4 4l8 8"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                </button>
-                <p class="idea-text">{{ idea.text }}</p>
-                <div class="idea-actions">
-                  <button class="action-btn" @click="handleExploreIdea(idea.text)">
-                    Diverge more
-                  </button>
-                  <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
-                    <HelpCircle :size="16" />
-                    Dialogue
-                  </button>
-                </div>
-              </div>
-            </transition-group>
-          </div>
-          <div v-if="savedIdeas.length > 6" class="collection-footer">
-            <button class="expand-btn" @click="showAllIdeas = !showAllIdeas">
-              {{ showAllIdeas ? 'Show less' : `View all ${savedIdeas.length}` }}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section v-if="entries.length > 0 || isGenerating" class="recent-runs">
-        <div class="runs-header">
-          <h2 class="section-title">Recent explorations</h2>
-          <div v-if="selectedIdeas.size > 0" class="selection-actions">
-            <span class="selection-count">{{ selectedIdeas.size }} selected</span>
-            <button class="selection-btn" @click="handleBranchSelected">
-              <Split :size="16" />
-              Diverge all
-            </button>
-            <button class="selection-btn secondary" @click="clearSelection">Clear</button>
-          </div>
-        </div>
-        <div v-if="isGenerating" ref="loadingCard" class="loading-card">
-          <Loader :size="28" class="spin" />
-          <p>Generating ideas...</p>
-        </div>
-
-        <div v-else class="journal-feed">
-          <article
-            v-for="(entry, index) in entries"
-            :key="entry.id"
-            class="journal-entry"
-            :class="{ latest: index === 0, branched: !!entry.parentPrompt }"
+      <section v-if="entries.length > 0 || isGenerating" class="session-list">
+        <div v-if="starredCount > 0 && !isGenerating" class="filter-bar">
+          <button
+            class="filter-toggle"
+            :class="{ active: showStarredOnly }"
+            @click="toggleStarredFilter"
           >
-            <div v-if="entry.parentPrompt" class="branch-indicator">
-              <CornerDownRight :size="16" />
-              <span>{{ entry.parentPrompt }}</span>
-            </div>
-            <div class="entry-header">
-              <div class="entry-prompt-wrapper">
-                <p
-                  class="entry-prompt"
-                  :class="{ truncated: !entry.expanded && entry.prompt.length > 150 }"
-                >
-                  {{
-                    entry.expanded || entry.prompt.length <= 150
-                      ? entry.prompt
-                      : entry.prompt.slice(0, 150) + '...'
-                  }}
-                </p>
-                <button
-                  v-if="entry.prompt.length > 150"
-                  class="expand-prompt-btn"
-                  @click.stop="togglePromptExpansion(entry.id)"
-                >
-                  {{ entry.expanded ? 'Show less' : 'Show more' }}
-                </button>
-              </div>
-              <div class="entry-meta">
-                <span v-if="index === 0" class="new-badge">New</span>
-                <span class="entry-time">{{ formatFull(entry.timestamp) }}</span>
-              </div>
-            </div>
+            <Star :size="14" />
+            <span>{{ showStarredOnly ? 'Show all' : `Starred (${starredCount})` }}</span>
+          </button>
+        </div>
 
-            <div class="idea-deck">
+        <div v-if="isGenerating" ref="loadingCard" class="loading-card">
+          <div class="loading-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <p class="loading-text">Summoning ideas</p>
+        </div>
+
+        <div v-else class="session-feed">
+          <article
+            v-for="(entry, entryIndex) in entries"
+            v-show="!showStarredOnly || getSessionStarredCount(entry) > 0"
+            :key="entry.id"
+            class="session-entry"
+            :class="{ latest: entryIndex === 0 && !showStarredOnly }"
+          >
+            <button class="session-header" @click="toggleSessionExpansion(entry.id)">
+              <ChevronDown
+                :size="16"
+                class="session-toggle"
+                :class="{ collapsed: collapsedSessions.has(entry.id) }"
+              />
+              <span class="session-prompt">{{ truncatePrompt(entry.prompt) }}</span>
+              <span v-if="getSessionStarredCount(entry) > 0" class="session-starred-count">
+                <Star :size="12" />
+                {{ getSessionStarredCount(entry) }}
+              </span>
+              <span class="session-time">{{ formatRelative(entry.timestamp) }}</span>
+            </button>
+
+            <div v-show="!collapsedSessions.has(entry.id)" class="session-ideas">
               <div
-                v-for="(idea, ideaIndex) in entry.coreIdeas"
-                :key="`${entry.id}-core-${ideaIndex}`"
-                class="idea-pill"
+                v-for="(idea, ideaIndex) in getFilteredIdeas(entry)"
+                :key="`${entry.id}-${ideaIndex}`"
+                class="idea-row"
                 :class="{
-                  selected: selectedIdeas.has(`${entry.id}-${ideaIndex}`),
-                  'card-deal-animate': shouldAnimateCard(entry.id)
+                  'card-deal-animate': shouldAnimateCard(entry.id),
+                  starred: isIdeaStarred(idea.text)
                 }"
                 :style="
                   getCardDealDelay(entry.id, ideaIndex)
                     ? { animationDelay: getCardDealDelay(entry.id, ideaIndex) }
                     : undefined
                 "
-                @click="toggleIdeaSelection(`${entry.id}-${ideaIndex}`, idea.text, entry)"
               >
-                <div class="pill-checkbox">
-                  <Check v-if="selectedIdeas.has(`${entry.id}-${ideaIndex}`)" :size="14" />
-                </div>
-                <p>{{ idea.text }}</p>
-                <div class="pill-actions" @click.stop>
-                  <button
-                    class="icon-action-btn"
-                    title="Save to collection"
-                    @click="handleSaveIdea(idea.text)"
-                  >
-                    <BookmarkPlus :size="18" />
-                  </button>
-                  <button
-                    class="icon-action-btn"
-                    title="Diverge from this"
-                    @click="handleBranch(idea.text, entry)"
-                  >
-                    <Split :size="18" />
+                <button
+                  class="star-btn"
+                  :class="{ active: isIdeaStarred(idea.text) }"
+                  title="Star idea"
+                  @click="toggleStarIdea(idea.text)"
+                >
+                  <Star :size="14" />
+                </button>
+                <p class="idea-text">{{ idea.text }}</p>
+                <div class="idea-hover-actions">
+                  <button class="hover-action" @click="navigateToBrew(idea.text)">Mix</button>
+                  <button class="hover-action" @click="navigateToConsult(idea.text)">
+                    Discuss
                   </button>
                 </div>
               </div>
@@ -224,11 +114,6 @@
       <div v-if="showToast" ref="toastRef" class="toast">
         <Check :size="20" />
         {{ toastMessage }}
-        <SealAnimation
-          color="hsl(165, 75%, 58%)"
-          :active="showSealAnimation"
-          @complete="showSealAnimation = false"
-        />
       </div>
     </transition>
 
@@ -247,31 +132,15 @@
         }"
       />
     </div>
-
-    <button v-if="savedIdeas.length > 6" class="floating-input-btn" @click="scrollToInput">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
-    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  Loader,
-  Check,
-  BookmarkPlus,
-  CornerDownRight,
-  Split,
-  HelpCircle,
-  ChevronDown
-} from 'lucide-vue-next'
+import { Check, ChevronDown, Star } from 'lucide-vue-next'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
-import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import SealAnimation from '~/components/SealAnimation.vue'
 import { useParticles } from '~/composables/useParticles'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
@@ -317,58 +186,24 @@ interface SparkRunRecord {
   createdAt: string
 }
 
-interface SavedIdea {
-  id: string
-  text: string
-  createdAt: string
-}
-
 const STORAGE_KEY = 'spark-thread-journal'
-const DEMO_DISMISSED_KEY = 'spark-demo-dismissed'
-
-const DEMO_ENTRY: JournalEntry = {
-  id: 'demo',
-  prompt: 'A morning routine app that actually sticks',
-  timestamp: Date.now(),
-  coreIdeas: [
-    {
-      text: 'Start with just one habit — the keystone — and let users unlock more only after a 7-day streak.'
-    },
-    {
-      text: 'Replace reminders with a "morning score" that decays if you skip, gamifying consistency without nagging.'
-    },
-    { text: 'Partner mode: two friends see each other\'s streaks and can "nudge" once per day.' },
-    {
-      text: 'Build it as an Apple Watch complication that shows a single emoji reflecting your week.'
-    },
-    {
-      text: 'Anti-feature: no stats dashboard. Just today, yesterday, and a binary "on track" or "rebuild."'
-    }
-  ],
-  lenses: [],
-  nudges: []
-}
+const STARRED_KEY = 'spark-starred-ideas'
+const COLLAPSED_KEY = 'spark-collapsed-sessions'
 
 const input = ref('')
 const entries = ref<JournalEntry[]>([])
-const savedIdeas = ref<SavedIdea[]>([])
+const starredIdeas = ref<Set<string>>(new Set())
+const collapsedSessions = ref<Set<string>>(new Set())
+const showStarredOnly = ref(false)
 const isGenerating = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 const lastPrompt = ref('')
 const resumingRunId = ref<string | null>(null)
-const showAllIdeas = ref(false)
-const ideasCollapsed = ref(false)
-const selectedIdeas = ref<Map<string, { text: string; entry: JournalEntry }>>(new Map())
 const inputSection = ref<HTMLElement | null>(null)
 const inputField = ref<HTMLTextAreaElement | null>(null)
 const loadingCard = ref<HTMLElement | null>(null)
-const showDemo = ref(false)
-const showCauldronNudge = ref(false)
 const toastRef = ref<HTMLElement | null>(null)
-const showSealAnimation = ref(false)
-
-const CAULDRON_NUDGE_KEY = 'spark-cauldron-nudge-dismissed'
 
 const INPUT_HEIGHT_LIMIT = 100
 
@@ -378,11 +213,10 @@ const prefersReducedMotion = useReducedMotion()
 const { play: playSound } = useSound()
 const { particles, spawnSmokeParticles } = useParticles()
 
-const isDraggingIdea = ref<string | null>(null)
-const generationCount = ref(0)
 const latestEntryId = ref<string | null>(null)
 
 const canGenerate = computed(() => input.value.trim().length > 0)
+const starredCount = computed(() => starredIdeas.value.size)
 const historyPayload = computed(() =>
   entries.value.map(entry => ({
     prompt: entry.prompt,
@@ -392,6 +226,21 @@ const historyPayload = computed(() =>
     ]
   }))
 )
+
+function getFilteredIdeas(entry: JournalEntry): FlatIdea[] {
+  const all = getAllIdeas(entry)
+  if (!showStarredOnly.value) return all
+  return all.filter(idea => starredIdeas.value.has(idea.text))
+}
+
+function getSessionStarredCount(entry: JournalEntry): number {
+  const all = getAllIdeas(entry)
+  return all.filter(idea => starredIdeas.value.has(idea.text)).length
+}
+
+function toggleStarredFilter() {
+  showStarredOnly.value = !showStarredOnly.value
+}
 
 function getCardDealDelay(entryId: string, index: number): string | undefined {
   if (prefersReducedMotion.value) return undefined
@@ -403,44 +252,101 @@ function shouldAnimateCard(entryId: string): boolean {
   return !prefersReducedMotion.value && entryId === latestEntryId.value
 }
 
-function toggleIdeaSelection(key: string, text: string, entry: JournalEntry) {
-  if (selectedIdeas.value.has(key)) {
-    selectedIdeas.value.delete(key)
+interface FlatIdea {
+  text: string
+}
+
+function getAllIdeas(entry: JournalEntry): FlatIdea[] {
+  return entry.coreIdeas.map(idea => ({ text: idea.text }))
+}
+
+function truncatePrompt(prompt: string, maxLength = 80): string {
+  if (prompt.length <= maxLength) return prompt
+  return prompt.slice(0, maxLength) + '...'
+}
+
+function formatRelative(timestamp: number): string {
+  const now = Date.now()
+  const diff = now - timestamp
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  if (hours < 24) return `${hours}h ago`
+  return `${days}d ago`
+}
+
+function toggleSessionExpansion(entryId: string) {
+  if (collapsedSessions.value.has(entryId)) {
+    collapsedSessions.value.delete(entryId)
   } else {
-    selectedIdeas.value.set(key, { text, entry })
+    collapsedSessions.value.add(entryId)
   }
-  selectedIdeas.value = new Map(selectedIdeas.value)
+  collapsedSessions.value = new Set(collapsedSessions.value)
+  saveCollapsedSessions()
 }
 
-function clearSelection() {
-  selectedIdeas.value = new Map()
+function saveCollapsedSessions() {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...collapsedSessions.value]))
 }
 
-function handleIdeaDragStart(event: DragEvent, idea: SavedIdea) {
-  isDraggingIdea.value = idea.id
-  event.dataTransfer?.setData(
-    'application/json',
-    JSON.stringify({
-      id: idea.id,
-      text: idea.text,
-      source: 'saved'
-    })
-  )
+function restoreCollapsedSessions() {
+  if (typeof window === 'undefined') return
+  const stored = window.localStorage.getItem(COLLAPSED_KEY)
+  if (!stored) return
+  try {
+    const parsed = JSON.parse(stored) as string[]
+    if (Array.isArray(parsed)) {
+      collapsedSessions.value = new Set(parsed)
+    }
+  } catch {
+    // ignore
+  }
 }
 
-function handleIdeaDragEnd() {
-  isDraggingIdea.value = null
+function isIdeaStarred(text: string): boolean {
+  return starredIdeas.value.has(text)
 }
 
-async function handleBranchSelected() {
-  if (selectedIdeas.value.size === 0) return
+function toggleStarIdea(text: string) {
+  if (starredIdeas.value.has(text)) {
+    starredIdeas.value.delete(text)
+  } else {
+    starredIdeas.value.add(text)
+    playSound('chime')
+  }
+  starredIdeas.value = new Set(starredIdeas.value)
+  saveStarredIdeas()
+}
 
-  const selectedTexts = Array.from(selectedIdeas.value.values()).map(s => s.text)
-  const combinedPrompt = selectedTexts.join(' + ')
-  const firstEntry = Array.from(selectedIdeas.value.values())[0].entry
+function saveStarredIdeas() {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(STARRED_KEY, JSON.stringify([...starredIdeas.value]))
+}
 
-  clearSelection()
-  await handleGenerate(combinedPrompt, firstEntry)
+function restoreStarredIdeas() {
+  if (typeof window === 'undefined') return
+  const stored = window.localStorage.getItem(STARRED_KEY)
+  if (!stored) return
+  try {
+    const parsed = JSON.parse(stored) as string[]
+    if (Array.isArray(parsed)) {
+      starredIdeas.value = new Set(parsed)
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function navigateToBrew(text: string) {
+  router.push({ path: '/cauldron', query: { add: text } })
+}
+
+function navigateToConsult(text: string) {
+  router.push({ path: '/oracle', query: { context: text } })
 }
 
 async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry) {
@@ -484,8 +390,6 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
     if (!customPrompt) {
       input.value = ''
     }
-
-    generationCount.value++
   } catch (error: unknown) {
     console.error('Failed to generate ideas:', error)
     const message =
@@ -498,50 +402,10 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
   }
 }
 
-async function handleSaveIdea(text: string) {
-  try {
-    const response = await $fetch<{ idea: SavedIdea }>('/api/saved-ideas', {
-      method: 'POST',
-      body: {
-        text,
-        source: 'ai',
-        status: 'exploring'
-      }
-    })
-
-    savedIdeas.value = [response.idea, ...savedIdeas.value]
-    playSound('chime')
-    showToastMessage('Saved to your collection')
-  } catch (error) {
-    console.error('Failed to save idea:', error)
-    showToastMessage('Failed to save')
-  }
-}
-
-async function handleDeleteIdea(ideaId: string) {
-  try {
-    await $fetch(`/api/saved-ideas/${ideaId}`, { method: 'DELETE' })
-    savedIdeas.value = savedIdeas.value.filter(i => i.id !== ideaId)
-    showToastMessage('Removed from collection')
-  } catch (error) {
-    console.error('Failed to delete idea:', error)
-    showToastMessage('Failed to remove')
-  }
-}
-
-function scrollToInput() {
-  inputSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
 function focusInput() {
   nextTick(() => {
     inputField.value?.focus()
   })
-}
-
-function handleBranch(text: string, parentEntry?: JournalEntry) {
-  input.value = text
-  handleGenerate(text, parentEntry)
 }
 
 watch(
@@ -588,24 +452,9 @@ function clearQueryParam(key: string) {
   router.replace({ query: nextQuery })
 }
 
-function formatFull(timestamp: number) {
-  const formatter = new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-  })
-  return formatter.format(timestamp)
-}
-
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
-
-  if (message.toLowerCase().includes('saved')) {
-    showSealAnimation.value = true
-  }
-
   setTimeout(() => {
     showToast.value = false
   }, 2200)
@@ -619,13 +468,6 @@ function handleToastLeave() {
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2
   spawnSmokeParticles(centerX, centerY)
-}
-
-function togglePromptExpansion(entryId: string) {
-  const entry = entries.value.find(e => e.id === entryId)
-  if (entry) {
-    entry.expanded = !entry.expanded
-  }
 }
 
 function restoreThread() {
@@ -643,74 +485,27 @@ function restoreThread() {
   }
 }
 
-function checkShowDemo() {
-  if (typeof window === 'undefined') return
-  const dismissed = window.localStorage.getItem(DEMO_DISMISSED_KEY)
-  if (dismissed) return
-  if (entries.value.length === 0 && savedIdeas.value.length === 0) {
-    showDemo.value = true
-  }
-}
-
-function dismissDemo() {
-  showDemo.value = false
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(DEMO_DISMISSED_KEY, 'true')
-  }
-  nextTick(() => inputField.value?.focus())
-}
-
-function dismissCauldronNudge() {
-  showCauldronNudge.value = false
-  if (typeof window !== 'undefined') {
-    window.localStorage.setItem(CAULDRON_NUDGE_KEY, 'true')
-  }
-}
-
-function checkCauldronNudge() {
-  if (typeof window === 'undefined') return
-  const dismissed = window.localStorage.getItem(CAULDRON_NUDGE_KEY)
-  if (dismissed) return
-  if (savedIdeas.value.length >= 5) {
-    showCauldronNudge.value = true
-  }
-}
-
 onMounted(async () => {
   restoreThread()
-  await fetchSavedIdeas()
-  checkShowDemo()
-  checkCauldronNudge()
+  restoreStarredIdeas()
+  restoreCollapsedSessions()
   await nextTick()
   adjustInputHeight()
 })
 
-async function fetchSavedIdeas() {
-  try {
-    const response = await $fetch<{ ideas: SavedIdea[] }>('/api/saved-ideas')
-    savedIdeas.value = response.ideas.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-  } catch (error) {
-    console.error('Failed to fetch saved ideas:', error)
-  }
+interface TarotCard {
+  id: string
+  name: string
+  numeral: string
+  archetype: string
+  keywords: string[]
+  meaning: string
+  creativePrompt: string
 }
 
-function handleExploreIdea(text: string) {
-  input.value = text
-  handleGenerate(text)
-}
-
-function navigateToOracle(ideaId: string) {
-  router.push(`/oracle?idea=${ideaId}`)
-}
-
-function handleTarotPrompt(prompt: string) {
-  input.value = prompt
-  nextTick(() => {
-    inputField.value?.focus()
-    inputField.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  })
+function handleTarotCard(card: TarotCard) {
+  const prompt = `${card.name}: ${card.meaning}`
+  handleGenerate(prompt)
 }
 
 async function resumeFromHistory(runId: string) {
@@ -799,22 +594,6 @@ watch(
   pointer-events: none;
 }
 
-.spark-header {
-  text-align: center;
-  margin-bottom: var(--space-2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.spark-tagline {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  letter-spacing: 0.01em;
-}
-
 .spark-layout {
   max-width: 1100px;
   margin: 0 auto;
@@ -826,7 +605,7 @@ watch(
 
 .spark-input-wrapper {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: var(--space-3);
   width: 100%;
   max-width: 640px;
@@ -839,6 +618,13 @@ watch(
   transition:
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.input-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .spark-input-wrapper:focus-within {
@@ -868,7 +654,7 @@ watch(
 }
 
 .spark-input::placeholder {
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
 }
 
 .generate-btn {
@@ -899,559 +685,284 @@ watch(
   cursor: not-allowed;
 }
 
-.ideas-collection {
+.btn-dots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.btn-dots .dot {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: btnDotPulse 1s ease-in-out infinite;
+}
+
+.btn-dots .dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.btn-dots .dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes btnDotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.4;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+.session-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.collection-header {
+.filter-bar {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  text-align: left;
-  width: 100%;
-}
-
-.collection-header:hover .collapse-icon {
-  color: var(--color-text-secondary);
-}
-
-.collection-title {
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: var(--color-text);
-  margin: 0;
-}
-
-.collection-count {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  font-weight: var(--weight-normal);
-}
-
-.collapse-icon {
-  margin-left: auto;
-  color: var(--color-text-tertiary);
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
-}
-
-.collapse-icon.collapsed {
-  transform: rotate(-90deg);
-}
-
-.collection-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.expand-btn {
-  border: none;
-  background: none;
-  color: var(--color-primary);
-  font-weight: var(--weight-medium);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  transition: background var(--duration-fast) var(--ease-out);
-}
-
-.expand-btn:hover {
-  background: var(--color-primary-subtle);
-}
-
-.ideas-grid-wrapper {
-  position: relative;
-}
-
-.ideas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-6);
-}
-
-.idea-card {
-  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.95) 0%, hsla(220, 20%, 8%, 0.98) 100%);
-  border: 2px solid hsla(165, 75%, 58%, 0.3);
-  border-radius: 4px;
-  padding: var(--space-6);
-  padding-top: var(--space-8);
-  transition: all var(--duration-slow) var(--ease-out);
-  position: relative;
-  cursor: grab;
-  min-height: 220px;
-  display: flex;
-  flex-direction: column;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 0 60px hsla(165, 75%, 58%, 0.03);
-}
-
-.idea-card::before {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border: 1px solid hsla(165, 75%, 58%, 0.2);
-  pointer-events: none;
-}
-
-.idea-card::after {
-  content: '✦';
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--color-primary);
-  opacity: 0.7;
-  letter-spacing: 0.5em;
-}
-
-.idea-card .tarot-corner {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-color: hsla(165, 75%, 58%, 0.25);
-  border-style: solid;
-  border-width: 0;
-}
-
-.idea-card .tarot-corner.top-left {
-  top: 16px;
-  left: 16px;
-  border-top-width: 1px;
-  border-left-width: 1px;
-}
-
-.idea-card .tarot-corner.top-right {
-  top: 16px;
-  right: 16px;
-  border-top-width: 1px;
-  border-right-width: 1px;
-}
-
-.idea-card .tarot-corner.bottom-left {
-  bottom: 16px;
-  left: 16px;
-  border-bottom-width: 1px;
-  border-left-width: 1px;
-}
-
-.idea-card .tarot-corner.bottom-right {
-  bottom: 16px;
-  right: 16px;
-  border-bottom-width: 1px;
-  border-right-width: 1px;
-}
-
-.idea-card:hover {
-  border-color: var(--color-primary);
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.6),
-    0 0 40px hsla(165, 75%, 58%, 0.15),
-    inset 0 0 80px hsla(165, 75%, 58%, 0.05),
-    inset 0 0 20px hsla(165, 75%, 58%, 0.12);
-  transform: translateY(-8px);
-}
-
-.idea-card.dragging {
-  opacity: 0.7;
-  cursor: grabbing;
-  transform: rotate(3deg) scale(1.03);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 30px hsla(165, 75%, 58%, 0.2);
-}
-
-.unpin-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 20px;
-  height: 20px;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: all 0.3s var(--ease-out);
-  color: var(--color-text-tertiary);
-  z-index: 10;
-}
-
-.idea-card:hover .unpin-btn {
-  opacity: 0.6;
-}
-
-.unpin-btn:hover {
-  opacity: 1;
-  color: var(--color-error);
-  transform: scale(1.1);
-}
-
-.idea-text {
-  margin: var(--space-2) 0 var(--space-4) 0;
+  justify-content: flex-end;
   padding: 0 var(--space-2);
-  color: var(--color-text);
-  line-height: 1.7;
-  font-size: var(--text-sm);
-  flex: 1;
-  text-align: center;
 }
 
-.idea-actions {
+.filter-toggle {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--space-2);
-  opacity: 0;
-  transition: opacity 0.3s var(--ease-out);
-  margin-top: auto;
-  padding-top: var(--space-3);
-}
-
-.idea-card:hover .idea-actions {
-  opacity: 1;
-}
-
-.action-btn {
   padding: var(--space-2) var(--space-3);
-  border: 1px solid hsla(165, 75%, 58%, 0.25);
   background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
-  font-family: var(--font-heading);
-  font-weight: 400;
   font-size: var(--text-xs);
-  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.3s var(--ease-out);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
-.action-btn:hover {
-  background: hsla(165, 75%, 58%, 0.1);
-  border-color: hsla(165, 75%, 58%, 0.5);
-  color: var(--color-primary);
-}
-
-.action-btn.oracle-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  border-color: hsla(200, 70%, 72%, 0.25);
-}
-
-.action-btn.oracle-btn:hover {
-  background: hsla(200, 70%, 72%, 0.1);
-  border-color: hsla(200, 70%, 72%, 0.5);
-  color: var(--color-oracle);
-}
-
-.collection-footer {
-  display: flex;
-  justify-content: center;
-  padding-top: var(--space-4);
-}
-
-.recent-runs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.runs-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.section-title {
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
+.filter-toggle:hover {
   color: var(--color-text);
-  margin: 0;
+  background: hsla(165, 75%, 58%, 0.08);
 }
 
-.selection-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.selection-count {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-medium);
-}
-
-.selection-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: white;
-  font-weight: var(--weight-medium);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out);
-}
-
-.selection-btn:hover {
-  background: var(--color-primary-hover);
-}
-
-.selection-btn.secondary {
-  background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-.selection-btn.secondary:hover {
-  background: var(--color-hover-bg);
+.filter-toggle.active {
+  color: var(--color-primary);
+  border-color: hsla(165, 75%, 58%, 0.3);
+  background: hsla(165, 75%, 58%, 0.08);
 }
 
 .loading-card {
   text-align: center;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-10) var(--space-4);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
-  color: var(--color-text-secondary);
-}
-
-.journal-feed {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-4);
 }
 
-.journal-entry {
-  padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+.loading-dots {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.journal-entry.branched {
-  border-left: 3px solid var(--color-primary);
-}
-
-.branch-indicator {
-  display: flex;
-  align-items: center;
   gap: var(--space-2);
+}
+
+.loading-dots .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.loading-text {
+  margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
 }
 
-.branch-indicator svg {
+.session-feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.session-entry {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.session-entry.latest {
+  border-color: hsla(165, 75%, 58%, 0.3);
+}
+
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.session-header:hover {
+  background: hsla(165, 75%, 58%, 0.03);
+}
+
+.session-toggle {
   flex-shrink: 0;
-  color: var(--color-primary);
+  color: var(--color-text-secondary);
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
-.branch-indicator span {
+.session-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.session-prompt {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
-.entry-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-
-.entry-prompt-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.entry-prompt {
-  margin: 0;
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  color: var(--color-text);
-  line-height: 1.5;
-}
-
-.expand-prompt-btn {
-  align-self: flex-start;
-  border: none;
-  background: transparent;
-  color: var(--color-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  cursor: pointer;
-  padding: 0;
-}
-
-.expand-prompt-btn:hover {
-  text-decoration: underline;
-}
-
-.entry-meta {
+.session-starred-count {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-
-.new-badge {
-  background: var(--color-primary);
-  color: white;
+  gap: 4px;
   font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  color: var(--color-primary);
 }
 
-.entry-time {
-  color: var(--color-text-tertiary);
-  font-size: var(--text-sm);
-  white-space: nowrap;
+.session-time {
+  flex-shrink: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
-.idea-deck {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--space-4);
-}
-
-.idea-pill {
-  border-radius: 4px;
-  padding: var(--space-5);
-  padding-top: var(--space-6);
-  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.9) 0%, hsla(220, 20%, 8%, 0.95) 100%);
-  border: 1.5px solid hsla(165, 75%, 58%, 0.25);
+.session-ideas {
+  padding: 0 var(--space-4) var(--space-4);
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
+}
+
+.idea-row {
+  display: flex;
+  align-items: flex-start;
   gap: var(--space-3);
-  transition: all var(--duration-slow) var(--ease-out);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast) var(--ease-out);
   position: relative;
+}
+
+.idea-row:hover {
+  background: hsla(165, 75%, 58%, 0.05);
+}
+
+.idea-row.starred {
+  background: hsla(165, 75%, 58%, 0.08);
+}
+
+.star-btn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  min-height: 180px;
-  box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.4),
-    inset 0 0 40px hsla(165, 75%, 58%, 0.02);
-}
-
-.idea-pill::before {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1px solid hsla(165, 75%, 58%, 0.15);
-  pointer-events: none;
-}
-
-.idea-pill::after {
-  content: '◆';
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 8px;
-  color: var(--color-primary);
-  opacity: 0.5;
-}
-
-.idea-pill.selected {
-  border-color: var(--color-primary);
-  background: linear-gradient(180deg, hsla(165, 75%, 58%, 0.1) 0%, hsla(220, 20%, 8%, 0.95) 100%);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.5),
-    0 0 30px hsla(165, 75%, 58%, 0.2),
-    inset 0 0 60px hsla(165, 75%, 58%, 0.05);
-}
-
-.idea-pill:hover {
-  border-color: hsla(165, 75%, 58%, 0.5);
-  box-shadow:
-    0 10px 36px rgba(0, 0, 0, 0.45),
-    0 0 20px hsla(165, 75%, 58%, 0.1);
-  transform: translateY(-4px);
-}
-
-.pill-checkbox {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  width: 20px;
-  height: 20px;
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface);
-  color: transparent;
+  opacity: 0.5;
   transition: all var(--duration-fast) var(--ease-out);
 }
 
-.idea-pill.selected .pill-checkbox {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: var(--color-bg);
-  box-shadow: 0 0 8px var(--color-glow-spark);
+.idea-row:hover .star-btn {
+  opacity: 0.8;
 }
 
-.idea-pill p {
+.star-btn:hover {
+  opacity: 1;
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.star-btn.active {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.idea-text {
+  flex: 1;
   margin: 0;
-  line-height: 1.6;
-  padding-right: calc(20px + var(--space-2));
   font-size: var(--text-sm);
   color: var(--color-text);
-  flex: 1;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
 }
 
-.pill-actions {
+.idea-hover-actions {
   display: flex;
   gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-3);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
-.icon-action-btn {
+.idea-row:hover .idea-hover-actions {
+  opacity: 1;
+}
+
+.hover-action {
+  padding: var(--space-1) var(--space-2);
   background: transparent;
-  border: 1px solid hsla(165, 75%, 58%, 0.2);
-  padding: var(--space-2);
-  color: var(--color-text-tertiary);
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
   cursor: pointer;
-  min-width: 36px;
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s var(--ease-out);
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
-.icon-action-btn:hover {
-  background: hsla(165, 75%, 58%, 0.1);
-  border-color: hsla(165, 75%, 58%, 0.4);
+.hover-action:hover {
   color: var(--color-primary);
 }
 
@@ -1507,457 +1018,41 @@ watch(
   pointer-events: none;
 }
 
-.floating-input-btn {
-  position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  width: 48px;
-  height: 48px;
-  border: none;
-  background: var(--color-primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  transition: all var(--duration-fast) var(--ease-out);
-  z-index: 100;
-}
-
-.floating-input-btn:hover {
-  background: var(--color-primary-hover);
-  transform: scale(1.05);
-}
-
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.idea-list-enter-active {
-  transition: all var(--duration-normal) var(--ease-out);
-}
-
-.idea-list-leave-active {
-  transition: all var(--duration-fast) var(--ease-out);
-}
-
-.idea-list-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.idea-list-leave-to {
-  opacity: 0;
-}
-
-.idea-list-move {
-  transition: transform var(--duration-normal) var(--ease-out);
-}
-
 @media (max-width: 640px) {
   .spark-page {
     padding: var(--space-4);
   }
 
-  .ideas-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .idea-deck {
-    grid-template-columns: 1fr;
-  }
-
-  .runs-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .selection-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .floating-input-btn {
-    bottom: 80px;
-  }
-}
-
-.demo-overlay {
-  position: fixed;
-  inset: 0;
-  background: hsla(220, 20%, 4%, 0.97);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: var(--space-4);
-  animation: overlayReveal 1.2s var(--ease-out);
-}
-
-@keyframes overlayReveal {
-  0% {
-    opacity: 0;
-  }
-  100% {
+  .idea-hover-actions {
     opacity: 1;
-  }
-}
-
-.demo-ambient {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 50%, hsla(165, 75%, 58%, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 20% 80%, hsla(140, 60%, 45%, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, hsla(200, 70%, 72%, 0.04) 0%, transparent 35%);
-  opacity: 1;
-  pointer-events: none;
-  animation: ambientBreath 6s ease-in-out infinite;
-}
-
-@keyframes ambientBreath {
-  0%,
-  100% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.grimoire-container {
-  position: relative;
-  display: flex;
-  animation: grimoireOpen 1s var(--ease-out) 0.3s both;
-}
-
-@keyframes grimoireOpen {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) rotateX(10deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotateX(0);
-  }
-}
-
-.grimoire-spine {
-  width: 20px;
-  background: linear-gradient(
-    90deg,
-    hsl(220, 25%, 16%) 0%,
-    hsl(220, 22%, 20%) 30%,
-    hsl(220, 25%, 14%) 70%,
-    hsl(220, 25%, 12%) 100%
-  );
-  border-radius: 4px 0 0 4px;
-  box-shadow:
-    inset -4px 0 8px rgba(0, 0, 0, 0.4),
-    2px 0 4px rgba(0, 0, 0, 0.3);
-}
-
-.grimoire-page {
-  position: relative;
-  max-width: 580px;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: var(--space-8) var(--space-8);
-  text-align: center;
-  background: linear-gradient(
-    135deg,
-    hsla(220, 18%, 12%, 0.98) 0%,
-    hsla(220, 18%, 10%, 0.99) 50%,
-    hsla(220, 18%, 11%, 0.98) 100%
-  );
-  border: 2px solid hsla(165, 75%, 58%, 0.25);
-  border-left: none;
-  border-radius: 0 4px 4px 0;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    inset 0 0 100px hsla(165, 75%, 58%, 0.03);
-}
-
-.page-texture {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.03;
-  pointer-events: none;
-}
-
-.grimoire-whisper {
-  margin: 0 0 var(--space-2);
-  font-family: var(--font-heading);
-  font-size: 2.25rem;
-  font-weight: 400;
-  color: var(--color-text);
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  animation: whisperReveal 1.5s var(--ease-out) 0.8s both;
-  text-shadow:
-    0 0 60px hsla(165, 75%, 58%, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.08),
-    0 -1px 0 rgba(0, 0, 0, 0.3);
-}
-
-.grimoire-subtitle {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  letter-spacing: 0.05em;
-  animation: whisperReveal 1.5s var(--ease-out) 1s both;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06),
-    0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-
-@keyframes whisperReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-    filter: blur(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-.grimoire-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
-  animation: dividerReveal 1s var(--ease-out) 1.2s both;
-}
-
-@keyframes dividerReveal {
-  0% {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  100% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-.divider-line {
-  width: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, hsla(165, 75%, 58%, 0.4), transparent);
-}
-
-.divider-symbol {
-  color: var(--color-primary);
-  font-size: 12px;
-  opacity: 0.6;
-}
-
-.demo-label {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--color-text-tertiary);
-  font-weight: var(--weight-medium);
-  animation: labelReveal 0.8s var(--ease-out) 1.4s both;
-}
-
-@keyframes labelReveal {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.demo-prompt {
-  margin: 0 0 var(--space-3);
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--color-text);
-  line-height: 1.4;
-  animation: promptReveal 0.8s var(--ease-out) 1.5s both;
-}
-
-.demo-result-label {
-  margin: 0 0 var(--space-5);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  animation: promptReveal 0.8s var(--ease-out) 1.6s both;
-}
-
-@keyframes promptReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.demo-ideas {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  text-align: left;
-  margin-bottom: var(--space-6);
-  max-height: 320px;
-  overflow-y: auto;
-}
-
-.demo-idea {
-  padding: var(--space-3) var(--space-4);
-  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.7) 0%, hsla(220, 20%, 8%, 0.8) 100%);
-  border: 1px solid hsla(165, 75%, 58%, 0.15);
-  border-radius: 4px;
-  opacity: 0;
-  animation: cardDeal 0.5s var(--ease-out) forwards;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.card-numeral {
-  font-family: var(--font-heading);
-  font-size: var(--text-sm);
-  color: var(--color-primary);
-  opacity: 0.6;
-  flex-shrink: 0;
-  min-width: 20px;
-}
-
-@keyframes cardDeal {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px) rotate(-2deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) rotate(0);
-  }
-}
-
-.demo-idea p {
-  margin: 0;
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  color: var(--color-text);
-}
-
-.demo-cta {
-  display: inline-block;
-  padding: var(--space-4) var(--space-8);
-  background: transparent;
-  color: var(--color-primary);
-  border: 1.5px solid hsla(165, 75%, 58%, 0.4);
-  border-radius: 4px;
-  font-family: var(--font-heading);
-  font-size: var(--text-base);
-  font-weight: 400;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 0.4s var(--ease-out);
-  animation: ctaReveal 0.8s var(--ease-out) 1.8s both;
-}
-
-@keyframes ctaReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.demo-cta:hover {
-  background: hsla(165, 75%, 58%, 0.1);
-  border-color: var(--color-primary);
-  box-shadow: 0 0 30px hsla(165, 75%, 58%, 0.2);
-  transform: translateY(-2px);
-}
-
-@media (max-width: 640px) {
-  .grimoire-spine {
-    display: none;
-  }
-
-  .grimoire-page {
-    border-radius: 4px;
-    border-left: 2px solid hsla(165, 75%, 58%, 0.25);
-    padding: var(--space-6);
-  }
-
-  .grimoire-whisper {
-    font-size: 1.75rem;
-  }
-
-  .demo-prompt {
-    font-size: 1.25rem;
   }
 }
 
 @keyframes card-deal {
   0% {
     opacity: 0;
-    transform: scale(0.8) rotate(-3deg);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.02) rotate(1deg);
+    transform: translateX(-8px);
   }
   100% {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: translateX(0);
   }
 }
 
-.idea-pill.card-deal-animate {
-  animation: card-deal 0.4s var(--ease-out) backwards;
+.idea-row.card-deal-animate {
+  animation: card-deal 0.3s var(--ease-out) backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .demo-overlay,
-  .grimoire-container,
-  .grimoire-whisper,
-  .grimoire-divider,
-  .demo-idea,
-  .demo-cta,
-  .demo-ambient {
+  .idea-row.card-deal-animate {
     animation: none;
-  }
-
-  .demo-idea,
-  .grimoire-whisper,
-  .grimoire-divider,
-  .demo-cta {
     opacity: 1;
   }
 
-  .idea-pill.card-deal-animate {
+  .loading-dots .dot,
+  .btn-dots .dot {
     animation: none;
-    opacity: 1;
+    opacity: 0.6;
   }
 }
 </style>

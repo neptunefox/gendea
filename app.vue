@@ -70,8 +70,8 @@ const vignetteColor = computed(() => {
   --text-xl: 1.5rem;
   --text-lg: 1.125rem;
   --text-base: 1rem;
-  --text-sm: 0.875rem;
-  --text-xs: 0.75rem;
+  --text-sm: 0.9375rem;
+  --text-xs: 0.8125rem;
 
   --weight-normal: 400;
   --weight-medium: 500;
@@ -107,7 +107,7 @@ const vignetteColor = computed(() => {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-mystical: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-heading: 'Cinzel', Georgia, serif;
 
   font-family: var(--font-body);
