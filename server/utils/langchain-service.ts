@@ -67,6 +67,8 @@ class LangChainService {
         model: this.config.model,
         temperature: this.config.temperature,
         numCtx: 4096,
+        numGpu: 99,
+        numBatch: 512,
         keepAlive: '5m'
       })
     }
@@ -116,6 +118,8 @@ class LangChainService {
         temperature: this.config.temperature,
         format: toOllamaSchema(schema),
         numCtx: 4096,
+        numGpu: 99,
+        numBatch: 512,
         keepAlive: '5m'
       })
       const response = await ollamaModel.invoke(messages)

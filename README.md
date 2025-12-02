@@ -56,6 +56,30 @@ LLM_API_KEY=your-key-here
 - [OpenRouter](https://openrouter.ai/keys)
 - Or use [Ollama](https://ollama.com) locally (no key needed)
 
+**Using Ollama locally:**
+
+1. Install [Ollama](https://ollama.com)
+
+2. Add performance flags to your shell profile (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+export OLLAMA_FLASH_ATTENTION=1
+export OLLAMA_NUM_PARALLEL=4
+```
+
+3. Restart your terminal, then pull a model:
+
+```bash
+ollama pull ministral-3:3b  # or ministral-3:8b for better quality
+```
+
+4. Configure `.env`:
+
+```
+LLM_PROVIDER=ollama
+LLM_MODEL=ministral-3:3b
+```
+
 ### 4. Run
 
 ```bash
