@@ -82,15 +82,14 @@ function repositionRune(rune: Rune) {
   rune.duration = 20 + Math.random() * 20
 }
 
-
 let observer: IntersectionObserver | null = null
 
 function setupObserver() {
   if (reducedMotion.value || !import.meta.client) return
 
   observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
+    entries => {
+      entries.forEach(entry => {
         if (!entry.isIntersecting) {
           const index = runeRefs.value.indexOf(entry.target as HTMLElement)
           if (index !== -1 && runes.value[index]) {
@@ -102,7 +101,7 @@ function setupObserver() {
     { rootMargin: '50px' }
   )
 
-  runeRefs.value.forEach((el) => {
+  runeRefs.value.forEach(el => {
     if (el) observer?.observe(el)
   })
 }
@@ -123,7 +122,7 @@ onUnmounted(() => {
   cleanupObserver()
 })
 
-watch(reducedMotion, (isReduced) => {
+watch(reducedMotion, isReduced => {
   if (isReduced) {
     cleanupObserver()
   } else {
@@ -143,7 +142,7 @@ function setRuneRef(el: HTMLElement | null, index: number) {
     <span
       v-for="(rune, index) in runes"
       :key="rune.id"
-      :ref="(el) => setRuneRef(el as HTMLElement, index)"
+      :ref="el => setRuneRef(el as HTMLElement, index)"
       class="rune"
       :class="[`rune--${rune.direction}`, { 'rune--paused': reducedMotion }]"
       :style="{

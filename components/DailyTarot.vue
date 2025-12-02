@@ -73,7 +73,10 @@
                     <h2 class="card-name">{{ chosenCard?.name }}</h2>
                     <p class="card-archetype">{{ chosenCard?.archetype }}</p>
 
-                    <div class="interpretation-container" :class="{ visible: phase === 'revealed' }">
+                    <div
+                      class="interpretation-container"
+                      :class="{ visible: phase === 'revealed' }"
+                    >
                       <div class="card-divider">
                         <span class="divider-line"></span>
                         <span class="divider-symbol">◆</span>
@@ -93,8 +96,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
 import { X } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
 
 interface TarotCard {
   id: string
@@ -117,7 +120,7 @@ const selectingCard = ref<string | null>(null)
 
 const hasReading = computed(() => !!chosenCard.value)
 const unchosenCards = computed(() =>
-  cardOptions.value.filter((card) => card.id !== chosenCard.value?.id)
+  cardOptions.value.filter(card => card.id !== chosenCard.value?.id)
 )
 
 function getVisitorId(): string {
@@ -173,7 +176,7 @@ async function selectCard(cardId: string) {
 
   selectingCard.value = cardId
 
-  const selectedCard = cardOptions.value.find((c) => c.id === cardId)
+  const selectedCard = cardOptions.value.find(c => c.id === cardId)
   if (selectedCard) {
     chosenCard.value = selectedCard
   }

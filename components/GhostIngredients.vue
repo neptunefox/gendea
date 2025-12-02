@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface Props {
@@ -86,7 +87,8 @@ const ghosts = computed(() => [
 }
 
 @keyframes ghost-bob {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
     opacity: 0.6;
   }

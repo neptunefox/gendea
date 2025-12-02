@@ -104,7 +104,7 @@ export default defineEventHandler(async event => {
           `data: ${JSON.stringify({ done: true, messageId: oracleMessage.id, question: fullText })}\n\n`
         )
         controller.close()
-      } catch (error) {
+      } catch {
         const fallbackQuestion =
           'What would change if you approached this from the opposite direction?'
 

@@ -51,11 +51,13 @@ interface BackgroundRunesProps {
 ```
 
 **Symbol Sets:**
+
 - Spark: `✦ ◇ ⟡ ✧ ⊛ ❋`
 - Cauldron: `☿ ⚗ ∞ ◎ ⊕ ☽`
 - Oracle: `★ ☆ ✶ ⊹ ◐ ☾`
 
 **Animation Strategy:**
+
 - Each symbol gets a random starting position and drift direction
 - CSS `@keyframes` handles the drift animation (20-40s duration)
 - When a symbol exits viewport, it's repositioned to the opposite edge via JS
@@ -73,6 +75,7 @@ interface ConstellationLinesProps {
 ```
 
 **Line Calculation:**
+
 - Uses `getBoundingClientRect()` to get card positions
 - Connects each card to its nearest 1-2 neighbors
 - Lines are drawn as SVG `<line>` elements with gradient strokes
@@ -89,6 +92,7 @@ interface VignetteOverlayProps {
 ```
 
 **Implementation:**
+
 - CSS `radial-gradient` positioned at corners
 - Color transitions via CSS custom properties
 - 300ms transition on color change
@@ -104,6 +108,7 @@ interface OraclePendulumProps {
 ```
 
 **Animation:**
+
 - Single pendulum element with `transform-origin` at top
 - CSS `@keyframes` for swing motion (2s ease-in-out)
 - Glow trail via `box-shadow` animation
@@ -120,6 +125,7 @@ interface SealAnimationProps {
 ```
 
 **Animation Sequence:**
+
 1. Scale from 1.5 to 1.0 (stamp down)
 2. Brief opacity pulse
 3. Settle with slight bounce
@@ -135,6 +141,7 @@ interface GhostIngredientsProps {
 ```
 
 **Implementation:**
+
 - 2-3 blurred, semi-transparent card shapes
 - CSS `@keyframes` for gentle bobbing motion
 - Fade out transition when `visible` becomes false
@@ -171,51 +178,61 @@ const SOUNDS: Record<string, SoundAsset> = {
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 Based on the prework analysis, most requirements are visual/animation-based and not amenable to property-based testing. The testable properties focus on state management and conditional rendering:
 
 ### Property 1: Rune Recycling Maintains Count
-*For any* set of rune elements, when a rune drifts off-screen and is recycled, the total count of visible runes SHALL remain constant.
+
+_For any_ set of rune elements, when a rune drifts off-screen and is recycled, the total count of visible runes SHALL remain constant.
 **Validates: Requirements 1.4**
 
 ### Property 2: Constellation Lines Scale with Cards
-*For any* number of idea cards N >= 2, the constellation system SHALL render between N-1 and 2N connecting lines.
+
+_For any_ number of idea cards N >= 2, the constellation system SHALL render between N-1 and 2N connecting lines.
 **Validates: Requirements 2.1**
 
 ### Property 3: Staggered Animation Delay Ordering
-*For any* list of idea pills with indices 0 to N, the animation delay for pill at index i SHALL equal i * 80ms.
+
+_For any_ list of idea pills with indices 0 to N, the animation delay for pill at index i SHALL equal i \* 80ms.
 **Validates: Requirements 3.1**
 
 ### Property 4: Crystallization Particle Count
-*For any* crystallization event, the number of emitted sparkle particles SHALL be between 8 and 12 inclusive.
+
+_For any_ crystallization event, the number of emitted sparkle particles SHALL be between 8 and 12 inclusive.
 **Validates: Requirements 4.3**
 
 ### Property 5: Seal Color Matches Feature
-*For any* save action on a feature page, the seal animation color SHALL match that feature's accent color (amber for Spark, purple for Cauldron, teal for Oracle).
+
+_For any_ save action on a feature page, the seal animation color SHALL match that feature's accent color (amber for Spark, purple for Cauldron, teal for Oracle).
 **Validates: Requirements 7.3**
 
 ### Property 6: Toast Smoke Particle Count
-*For any* toast dismissal with particles enabled, the number of smoke particles SHALL be between 3 and 5 inclusive.
+
+_For any_ toast dismissal with particles enabled, the number of smoke particles SHALL be between 3 and 5 inclusive.
 **Validates: Requirements 9.2**
 
 ### Property 7: Ghost Ingredient Count
-*For any* empty cauldron state, the number of ghost ingredient elements SHALL be between 2 and 3 inclusive.
+
+_For any_ empty cauldron state, the number of ghost ingredient elements SHALL be between 2 and 3 inclusive.
 **Validates: Requirements 11.1**
 
 ## Error Handling
 
 ### Sound Loading Failures
+
 - If a sound file fails to load, log a warning and continue without sound
 - The sound toggle should still function, just with no audio output
 - Use `HTMLAudioElement.onerror` to catch loading failures
 
 ### Animation Performance
+
 - If frame rate drops below 30fps, reduce particle counts by 50%
 - Use `requestAnimationFrame` for JS-driven animations
 - Implement cleanup in `onUnmounted` to prevent memory leaks
 
 ### Reduced Motion
+
 - Check `window.matchMedia('(prefers-reduced-motion: reduce)')` on mount
 - Listen for changes via `matchMedia.addEventListener('change', ...)`
 - Provide `useReducedMotion` composable for consistent access
@@ -225,17 +242,20 @@ Based on the prework analysis, most requirements are visual/animation-based and 
 Since this feature is primarily visual/animation-based, testing focuses on:
 
 ### Manual Visual Testing
+
 - Test each animation in isolation
 - Verify reduced-motion behavior
 - Check performance on lower-end devices
 - Validate color accuracy across features
 
 ### Accessibility Testing
+
 - Verify all animations respect `prefers-reduced-motion`
 - Ensure sound toggle is keyboard accessible
 - Check that visual effects don't interfere with content readability
 
 ### Browser Compatibility
+
 - Test CSS animations in Chrome, Firefox, Safari
 - Verify Web Audio API support for sound system
 - Check SVG rendering for constellation lines

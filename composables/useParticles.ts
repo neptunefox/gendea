@@ -19,17 +19,8 @@ export interface UseParticlesReturn {
     targetY: number,
     count?: number
   ) => void
-  spawnSparkles: (
-    centerX: number,
-    centerY: number,
-    width: number,
-    height: number
-  ) => void
-  spawnSmokeParticles: (
-    sourceX: number,
-    sourceY: number,
-    count?: number
-  ) => void
+  spawnSparkles: (centerX: number, centerY: number, width: number, height: number) => void
+  spawnSmokeParticles: (sourceX: number, sourceY: number, count?: number) => void
   updateParticles: () => void
   clearParticles: () => void
 }
@@ -91,7 +82,7 @@ export function useParticles(): UseParticlesReturn {
     const fadeSpeed = 0.015
 
     particles.value = particles.value
-      .map((particle) => {
+      .map(particle => {
         const dx = particle.targetX - particle.x
         const dy = particle.targetY - particle.y
         const distance = Math.sqrt(dx * dx + dy * dy)
@@ -115,7 +106,7 @@ export function useParticles(): UseParticlesReturn {
           }
         }
       })
-      .filter((particle) => particle.opacity > 0 && particle.size > 0.5)
+      .filter(particle => particle.opacity > 0 && particle.size > 0.5)
   }
 
   function startAnimationLoop(): void {
@@ -132,19 +123,14 @@ export function useParticles(): UseParticlesReturn {
     animationFrameId = requestAnimationFrame(loop)
   }
 
-  function spawnSparkles(
-    centerX: number,
-    centerY: number,
-    width: number,
-    height: number
-  ): void {
+  function spawnSparkles(centerX: number, centerY: number, width: number, height: number): void {
     const count = 8 + Math.floor(Math.random() * 5)
     const newParticles: Particle[] = []
 
     for (let i = 0; i < count; i++) {
       const startX = centerX + (Math.random() - 0.5) * width
       const startY = centerY + (Math.random() - 0.5) * height
-      
+
       const angle = Math.random() * Math.PI * 2
       const distance = 50 + Math.random() * 100
       const targetX = startX + Math.cos(angle) * distance
@@ -178,11 +164,7 @@ export function useParticles(): UseParticlesReturn {
     }
   }
 
-  function spawnSmokeParticles(
-    sourceX: number,
-    sourceY: number,
-    count: number = 4
-  ): void {
+  function spawnSmokeParticles(sourceX: number, sourceY: number, _count: number = 4): void {
     const particleCount = 3 + Math.floor(Math.random() * 3)
     const actualCount = Math.min(Math.max(particleCount, 3), 5)
     const newParticles: Particle[] = []
@@ -190,7 +172,7 @@ export function useParticles(): UseParticlesReturn {
     for (let i = 0; i < actualCount; i++) {
       const startX = sourceX + (Math.random() - 0.5) * 40
       const startY = sourceY
-      
+
       const targetX = startX + (Math.random() - 0.5) * 60
       const targetY = startY - 80 - Math.random() * 40
 

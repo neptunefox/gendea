@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { HelpCircle, Save, RotateCcw } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
+
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface Props {
@@ -322,7 +323,7 @@ function getSteamStyle(index: number) {
   .output-card.crystallizing {
     animation: none;
   }
-  
+
   .shimmer-text {
     animation: none;
     background: none;

@@ -70,7 +70,7 @@ What themes, interests, or directions do these ingredients reveal? Create a synt
 
         controller.enqueue(`data: ${JSON.stringify({ done: true, output: fullText })}\n\n`)
         controller.close()
-      } catch (error) {
+      } catch {
         controller.enqueue(`data: ${JSON.stringify({ error: 'Generation failed' })}\n\n`)
         controller.close()
       }

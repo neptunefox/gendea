@@ -1,9 +1,9 @@
-import { defineEventHandler, getQuery } from 'h3'
 import { eq, and } from 'drizzle-orm'
+import { defineEventHandler, getQuery } from 'h3'
 
-import { tarotReadings, savedIdeas, sparkRuns } from '../../../db/schema'
-import { db } from '../../db'
+import { tarotReadings } from '../../../db/schema'
 import { getRandomCards, getCardById } from '../../data/tarot-deck'
+import { db } from '../../db'
 
 export default defineEventHandler(async event => {
   const query = getQuery(event)

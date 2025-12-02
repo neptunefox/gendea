@@ -16,7 +16,10 @@
       </div>
 
       <template v-else>
-        <div class="floating-ideas-container" :class="{ 'is-dragging': !!draggedIdea, 'has-dissolving': hasDissolving }">
+        <div
+          class="floating-ideas-container"
+          :class="{ 'is-dragging': !!draggedIdea, 'has-dissolving': hasDissolving }"
+        >
           <TransitionGroup name="idea-fade">
             <FloatingIdea
               v-for="(idea, index) in displayedIdeas"
@@ -39,7 +42,6 @@
             />
           </TransitionGroup>
         </div>
-
 
         <div class="particles-container">
           <div
@@ -550,11 +552,11 @@ async function handleAskOracle() {
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
-  
+
   if (message.toLowerCase().includes('saved')) {
     showSealAnimation.value = true
   }
-  
+
   setTimeout(() => {
     showToast.value = false
   }, 2200)
@@ -563,7 +565,7 @@ function showToastMessage(message: string) {
 function handleToastLeave() {
   if (reducedMotion.value) return
   if (!toastRef.value) return
-  
+
   const rect = toastRef.value.getBoundingClientRect()
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2
@@ -579,7 +581,7 @@ function triggerRemixHintPulse() {
 
 function handleCrystallized() {
   if (reducedMotion.value) return
-  
+
   if (cauldronOutputRef.value) {
     const rect = cauldronOutputRef.value.getBoundingClientRect()
     spawnSparkles(
@@ -589,12 +591,7 @@ function handleCrystallized() {
       rect.height * 0.6
     )
   } else {
-    spawnSparkles(
-      cauldronCenter.value.x,
-      cauldronCenter.value.y - 50,
-      300,
-      150
-    )
+    spawnSparkles(cauldronCenter.value.x, cauldronCenter.value.y - 50, 300, 150)
   }
 }
 
@@ -614,7 +611,7 @@ function checkGuidanceDismissed() {
   }
 }
 
-async function streamMix(sessionId: string, isRemix = false) {
+async function streamMix(sessionId: string, _isRemix = false) {
   isMixing.value = true
   streamingText.value = ''
   playSound('bubble')

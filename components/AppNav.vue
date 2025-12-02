@@ -5,19 +5,39 @@
     </NuxtLink>
 
     <div class="nav-links">
-      <NuxtLink to="/" class="nav-link" title="Spark — Explode one idea into many" @mouseenter="handleNavHover($event, 'spark')">
+      <NuxtLink
+        to="/"
+        class="nav-link"
+        title="Spark — Explode one idea into many"
+        @mouseenter="handleNavHover($event, 'spark')"
+      >
         <Flame :size="18" />
         <span class="nav-label">Diverge</span>
       </NuxtLink>
-      <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Blend ideas into one" @mouseenter="handleNavHover($event, 'cauldron')">
+      <NuxtLink
+        to="/cauldron"
+        class="nav-link cauldron"
+        title="Cauldron — Blend ideas into one"
+        @mouseenter="handleNavHover($event, 'cauldron')"
+      >
         <FlaskRound :size="18" />
         <span class="nav-label">Converge</span>
       </NuxtLink>
-      <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Think through what's blocking you" @mouseenter="handleNavHover($event, 'oracle')">
+      <NuxtLink
+        to="/oracle"
+        class="nav-link oracle"
+        title="Oracle — Think through what's blocking you"
+        @mouseenter="handleNavHover($event, 'oracle')"
+      >
         <Eye :size="18" />
         <span class="nav-label">Dialogue</span>
       </NuxtLink>
-      <NuxtLink to="/history" class="nav-link history" title="History — Past explorations" @mouseenter="handleNavHover($event, 'history')">
+      <NuxtLink
+        to="/history"
+        class="nav-link history"
+        title="History — Past explorations"
+        @mouseenter="handleNavHover($event, 'history')"
+      >
         <Scroll :size="18" />
         <span class="nav-label">History</span>
       </NuxtLink>
@@ -68,8 +88,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
 import { Flame, FlaskRound, Eye, Scroll } from 'lucide-vue-next'
+import { ref, onUnmounted } from 'vue'
+
 import SoundToggle from '~/components/SoundToggle.vue'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
@@ -89,17 +110,17 @@ let cleanupTimeout: ReturnType<typeof setTimeout> | null = null
 
 function handleNavHover(event: MouseEvent, variant: 'spark' | 'cauldron' | 'oracle' | 'history') {
   if (prefersReducedMotion.value) return
-  
+
   const target = event.currentTarget as HTMLElement
   const rect = target.getBoundingClientRect()
-  
+
   const colors: Record<string, string> = {
     spark: 'rgba(212, 165, 116, 0.6)',
     cauldron: 'rgba(149, 117, 205, 0.6)',
     oracle: 'rgba(126, 184, 201, 0.6)',
     history: 'rgba(232, 228, 224, 0.4)'
   }
-  
+
   const count = 3
   for (let i = 0; i < count; i++) {
     navParticles.value.push({
@@ -111,7 +132,7 @@ function handleNavHover(event: MouseEvent, variant: 'spark' | 'cauldron' | 'orac
       color: colors[variant]
     })
   }
-  
+
   if (cleanupTimeout) clearTimeout(cleanupTimeout)
   cleanupTimeout = setTimeout(() => {
     navParticles.value = []

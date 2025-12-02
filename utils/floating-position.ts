@@ -79,7 +79,7 @@ export function generateArcPosition(
   const displayedCards = Math.min(totalCards, maxCards)
   const centerX = viewport.width / 2 - 30
   const cauldronTopY = viewport.height * 0.35
-  
+
   let angle: number
   if (displayedCards === 1) {
     angle = 0

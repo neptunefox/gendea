@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Flame, FlaskRound, Eye, Lightbulb, X, ArrowRight } from 'lucide-vue-next'
+import { computed } from 'vue'
 
 interface Props {
   visible: boolean
@@ -36,6 +36,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   variant: 'neutral',
   dismissable: true,
+  hint: undefined,
+  actionLink: undefined,
   actionLabel: 'Go there'
 })
 

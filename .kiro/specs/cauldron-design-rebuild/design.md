@@ -21,23 +21,24 @@ graph TD
         POT[CauldronPot.vue]
         POS[floating-position.ts]
     end
-    
+
     CP --> FI
     CP --> POT
     FI --> POS
-    
+
     subgraph "New Systems"
         ARC[Arc Position Calculator]
         PARCH[Parchment Styles]
         PARTICLE[Particle System]
     end
-    
+
     POS --> ARC
     FI --> PARCH
     FI --> PARTICLE
 ```
 
 The architecture maintains the existing component structure while introducing:
+
 - Enhanced position calculation in `floating-position.ts`
 - New CSS styles for parchment aesthetics
 - Particle animation system for dissolution effects
@@ -50,19 +51,19 @@ The architecture maintains the existing component structure while introducing:
 // utils/floating-position.ts
 
 export interface ArcLayoutConfig {
-  arcRadius: number           // Distance from cauldron center to arc
-  arcStartAngle: number       // Starting angle in degrees (e.g., -60)
-  arcEndAngle: number         // Ending angle in degrees (e.g., 60)
-  maxCards: number            // Maximum cards to display (5)
-  cardWidth: number           // Card width for overlap calculation
-  cardHeight: number          // Card height
+  arcRadius: number // Distance from cauldron center to arc
+  arcStartAngle: number // Starting angle in degrees (e.g., -60)
+  arcEndAngle: number // Ending angle in degrees (e.g., 60)
+  maxCards: number // Maximum cards to display (5)
+  cardWidth: number // Card width for overlap calculation
+  cardHeight: number // Card height
 }
 
 export interface ArcPosition {
-  x: number                   // X coordinate
-  y: number                   // Y coordinate
-  rotation: number            // Rotation in degrees (-5 to 5 + tangent)
-  scale: number               // Scale factor for depth effect
+  x: number // X coordinate
+  y: number // Y coordinate
+  rotation: number // Rotation in degrees (-5 to 5 + tangent)
+  scale: number // Scale factor for depth effect
 }
 
 export function generateArcPosition(
@@ -72,9 +73,7 @@ export function generateArcPosition(
   config?: Partial<ArcLayoutConfig>
 ): ArcPosition
 
-export function calculateArcTangentRotation(
-  angle: number
-): number
+export function calculateArcTangentRotation(angle: number): number
 ```
 
 ### Particle System
@@ -117,14 +116,14 @@ export function useParticles(): UseParticlesReturn
 interface Props {
   idea: FloatingIdea
   index: number
-  totalCards: number          // NEW: Total cards for arc calculation
+  totalCards: number // NEW: Total cards for arc calculation
   duration?: number
   isSelected?: boolean
-  cauldronCenter?: { x: number, y: number }  // NEW: For particle targeting
+  cauldronCenter?: { x: number; y: number } // NEW: For particle targeting
 }
 
 // New emits
-emit('dissolveStart', idea)   // Triggers particle spawn
+emit('dissolveStart', idea) // Triggers particle spawn
 ```
 
 ## Data Models
@@ -133,9 +132,9 @@ emit('dissolveStart', idea)   // Triggers particle spawn
 
 ```typescript
 const DEFAULT_ARC_CONFIG: ArcLayoutConfig = {
-  arcRadius: 280,             // Pixels from cauldron center
-  arcStartAngle: -70,         // Degrees from vertical
-  arcEndAngle: 70,            // Degrees from vertical
+  arcRadius: 280, // Pixels from cauldron center
+  arcStartAngle: -70, // Degrees from vertical
+  arcEndAngle: 70, // Degrees from vertical
   maxCards: 5,
   cardWidth: 200,
   cardHeight: 100
@@ -156,58 +155,58 @@ const DEFAULT_ARC_CONFIG: ArcLayoutConfig = {
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
 
 ### Property 1: Valid Arc Layout Structure
 
-*For any* viewport dimensions and card count (1-5), all generated card positions SHALL lie on a valid arc curve above the viewport's vertical center, with the arc centered horizontally on the cauldron position.
+_For any_ viewport dimensions and card count (1-5), all generated card positions SHALL lie on a valid arc curve above the viewport's vertical center, with the arc centered horizontally on the cauldron position.
 
 **Validates: Requirements 1.1, 4.1**
 
 ### Property 2: Even Angular Distribution
 
-*For any* number of cards N (where N >= 2), the angular spacing between adjacent cards SHALL be equal within a tolerance of 0.1 degrees.
+_For any_ number of cards N (where N >= 2), the angular spacing between adjacent cards SHALL be equal within a tolerance of 0.1 degrees.
 
 **Validates: Requirements 1.2**
 
 ### Property 3: Proportional Spacing Preservation
 
-*For any* card count less than the maximum, the ratio of used arc span to total arc span SHALL equal the ratio of displayed cards to maximum cards.
+_For any_ card count less than the maximum, the ratio of used arc span to total arc span SHALL equal the ratio of displayed cards to maximum cards.
 
 **Validates: Requirements 1.3**
 
 ### Property 4: Responsive Arc Recalculation
 
-*For any* viewport resize event, all card positions SHALL be recalculated such that they remain on a valid arc relative to the new viewport center.
+_For any_ viewport resize event, all card positions SHALL be recalculated such that they remain on a valid arc relative to the new viewport center.
 
 **Validates: Requirements 1.4**
 
 ### Property 5: Rotation Bounds
 
-*For any* card in the arc layout, its rotation value SHALL fall within the range of -10 to 10 degrees (base rotation -5 to 5 plus tangent adjustment).
+_For any_ card in the arc layout, its rotation value SHALL fall within the range of -10 to 10 degrees (base rotation -5 to 5 plus tangent adjustment).
 
 **Validates: Requirements 2.4**
 
 ### Property 6: Particle Drift Direction
 
-*For any* spawned dissolution particle, its position over time SHALL move closer to the cauldron center until reaching the target.
+_For any_ spawned dissolution particle, its position over time SHALL move closer to the cauldron center until reaching the target.
 
 **Validates: Requirements 3.3**
 
 ### Property 7: Maximum Display Count
 
-*For any* set of available floating ideas, the number of ideas displayed in the arc SHALL not exceed 5.
+_For any_ set of available floating ideas, the number of ideas displayed in the arc SHALL not exceed 5.
 
 **Validates: Requirements 5.1**
 
 ## Error Handling
 
-| Scenario | Handling |
-|----------|----------|
-| Zero floating ideas | Display empty cauldron with "gather ingredients" prompt |
-| Viewport too small for arc | Fall back to stacked vertical layout |
-| Particle system overload | Cap particles at 50, remove oldest first |
-| Invalid arc configuration | Use DEFAULT_ARC_CONFIG fallback |
+| Scenario                   | Handling                                                |
+| -------------------------- | ------------------------------------------------------- |
+| Zero floating ideas        | Display empty cauldron with "gather ingredients" prompt |
+| Viewport too small for arc | Fall back to stacked vertical layout                    |
+| Particle system overload   | Cap particles at 50, remove oldest first                |
+| Invalid arc configuration  | Use DEFAULT_ARC_CONFIG fallback                         |
 
 ## Testing Strategy
 
@@ -216,6 +215,7 @@ const DEFAULT_ARC_CONFIG: ArcLayoutConfig = {
 The implementation will use **fast-check** for property-based testing in TypeScript/JavaScript.
 
 Each property-based test MUST:
+
 - Run a minimum of 100 iterations
 - Be tagged with a comment referencing the correctness property: `**Feature: cauldron-design-rebuild, Property {number}: {property_text}**`
 - Generate random but valid inputs (viewport sizes, card counts, positions)
@@ -223,6 +223,7 @@ Each property-based test MUST:
 ### Unit Testing
 
 Unit tests will cover:
+
 - Arc position calculation edge cases (1 card, 5 cards, viewport boundaries)
 - Particle lifecycle (spawn, update, cleanup)
 - Rotation calculation accuracy
@@ -235,4 +236,3 @@ utils/
 composables/
   useParticles.test.ts          # Particle system tests
 ```
-

@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { Volume2, VolumeX } from 'lucide-vue-next'
+
 import { useSound } from '~/composables/useSound'
 
 const { enabled, toggle } = useSound()

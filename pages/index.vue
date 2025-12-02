@@ -8,7 +8,9 @@
         <div class="grimoire-page">
           <div class="page-texture"></div>
           <p class="grimoire-whisper">Start with one idea. Leave with many.</p>
-          <p class="grimoire-subtitle">Describe what you're working on — we'll show you angles you haven't considered</p>
+          <p class="grimoire-subtitle">
+            Describe what you're working on — we'll show you angles you haven't considered
+          </p>
           <div class="grimoire-divider">
             <span class="divider-line"></span>
             <span class="divider-symbol">✦</span>
@@ -78,7 +80,7 @@
           <div class="ideas-grid-wrapper">
             <transition-group name="idea-list" tag="div" class="ideas-grid">
               <div
-                v-for="(idea, index) in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
+                v-for="idea in showAllIdeas ? savedIdeas : savedIdeas.slice(0, 6)"
                 :key="idea.id"
                 class="idea-card"
                 :class="{ dragging: isDraggingIdea === idea.id }"
@@ -86,31 +88,31 @@
                 @dragstart="e => handleIdeaDragStart(e, idea)"
                 @dragend="handleIdeaDragEnd"
               >
-              <span class="tarot-corner top-left" />
-              <span class="tarot-corner top-right" />
-              <span class="tarot-corner bottom-left" />
-              <span class="tarot-corner bottom-right" />
-              <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path
-                    d="M12 4L4 12M4 4l8 8"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </button>
-              <p class="idea-text">{{ idea.text }}</p>
-              <div class="idea-actions">
-                <button class="action-btn" @click="handleExploreIdea(idea.text)">
-                  Diverge more
+                <span class="tarot-corner top-left" />
+                <span class="tarot-corner top-right" />
+                <span class="tarot-corner bottom-left" />
+                <span class="tarot-corner bottom-right" />
+                <button class="unpin-btn" title="Remove" @click="handleDeleteIdea(idea.id)">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M12 4L4 12M4 4l8 8"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
                 </button>
-                <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
-                  <HelpCircle :size="16" />
-                  Dialogue
-                </button>
+                <p class="idea-text">{{ idea.text }}</p>
+                <div class="idea-actions">
+                  <button class="action-btn" @click="handleExploreIdea(idea.text)">
+                    Diverge more
+                  </button>
+                  <button class="action-btn oracle-btn" @click="navigateToOracle(idea.id)">
+                    <HelpCircle :size="16" />
+                    Dialogue
+                  </button>
+                </div>
               </div>
-            </div>
             </transition-group>
           </div>
           <div v-if="savedIdeas.length > 6" class="collection-footer">
@@ -184,7 +186,11 @@
                   selected: selectedIdeas.has(`${entry.id}-${ideaIndex}`),
                   'card-deal-animate': shouldAnimateCard(entry.id)
                 }"
-                :style="getCardDealDelay(entry.id, ideaIndex) ? { animationDelay: getCardDealDelay(entry.id, ideaIndex) } : undefined"
+                :style="
+                  getCardDealDelay(entry.id, ideaIndex)
+                    ? { animationDelay: getCardDealDelay(entry.id, ideaIndex) }
+                    : undefined
+                "
                 @click="toggleIdeaSelection(`${entry.id}-${ideaIndex}`, idea.text, entry)"
               >
                 <div class="pill-checkbox">
@@ -266,9 +272,9 @@ import { useRouter, useRoute } from 'vue-router'
 import DailyTarot from '~/components/DailyTarot.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import SealAnimation from '~/components/SealAnimation.vue'
+import { useParticles } from '~/composables/useParticles'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
-import { useParticles } from '~/composables/useParticles'
 
 interface SparkIdea {
   text: string
@@ -595,11 +601,11 @@ function formatFull(timestamp: number) {
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
-  
+
   if (message.toLowerCase().includes('saved')) {
     showSealAnimation.value = true
   }
-  
+
   setTimeout(() => {
     showToast.value = false
   }, 2200)
@@ -608,7 +614,7 @@ function showToastMessage(message: string) {
 function handleToastLeave() {
   if (prefersReducedMotion.value) return
   if (!toastRef.value) return
-  
+
   const rect = toastRef.value.getBoundingClientRect()
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2

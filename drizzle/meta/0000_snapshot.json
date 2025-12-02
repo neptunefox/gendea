@@ -64,12 +64,8 @@
           "name": "cauldron_ingredients_session_id_cauldron_sessions_id_fk",
           "tableFrom": "cauldron_ingredients",
           "tableTo": "cauldron_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -192,12 +188,8 @@
           "name": "oracle_messages_session_id_oracle_sessions_id_fk",
           "tableFrom": "oracle_messages",
           "tableTo": "oracle_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -253,12 +245,8 @@
           "name": "oracle_sessions_idea_id_saved_ideas_id_fk",
           "tableFrom": "oracle_sessions",
           "tableTo": "saved_ideas",
-          "columnsFrom": [
-            "idea_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["idea_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

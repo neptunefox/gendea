@@ -7,16 +7,16 @@
     - Implement `calculateArcTangentRotation()` for card rotation along arc
     - Add random rotation offset (-5 to 5 degrees) per card
     - _Requirements: 1.1, 1.2, 1.3, 2.4_
-  - [ ]* 1.2 Write property test for arc layout structure
+  - [ ]\* 1.2 Write property test for arc layout structure
     - **Property 1: Valid Arc Layout Structure**
     - **Validates: Requirements 1.1, 4.1**
-  - [ ]* 1.3 Write property test for even angular distribution
+  - [ ]\* 1.3 Write property test for even angular distribution
     - **Property 2: Even Angular Distribution**
     - **Validates: Requirements 1.2**
-  - [ ]* 1.4 Write property test for proportional spacing
+  - [ ]\* 1.4 Write property test for proportional spacing
     - **Property 3: Proportional Spacing Preservation**
     - **Validates: Requirements 1.3**
-  - [ ]* 1.5 Write property test for rotation bounds
+  - [ ]\* 1.5 Write property test for rotation bounds
     - **Property 5: Rotation Bounds**
     - **Validates: Requirements 2.4**
 
@@ -26,7 +26,7 @@
     - Update `positionStyle` computed to include rotation from arc calculation
     - Update `updatePositionForViewport()` to call `generateArcPosition()`
     - _Requirements: 1.1, 1.4, 2.4_
-  - [ ]* 2.2 Write property test for responsive arc recalculation
+  - [ ]\* 2.2 Write property test for responsive arc recalculation
     - **Property 4: Responsive Arc Recalculation**
     - **Validates: Requirements 1.4**
 
@@ -47,7 +47,7 @@
     - Add particle drift toward cauldron center
     - Implement cleanup and particle cap (max 50)
     - _Requirements: 3.3, 3.4_
-  - [ ]* 4.2 Write property test for particle drift direction
+  - [ ]\* 4.2 Write property test for particle drift direction
     - **Property 6: Particle Drift Direction**
     - **Validates: Requirements 3.3**
 
@@ -67,7 +67,7 @@
     - Add indicator for hidden ideas count
     - Position cauldron as central focal point
     - _Requirements: 4.1, 5.1, 5.2, 5.3_
-  - [ ]* 6.2 Write property test for maximum display count
+  - [ ]\* 6.2 Write property test for maximum display count
     - **Property 7: Maximum Display Count**
     - **Validates: Requirements 5.1**
 
@@ -79,4 +79,3 @@
 
 - [ ] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
-

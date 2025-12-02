@@ -17,11 +17,13 @@ A creative workbench with a mystical interface. Capture ideas, combine them, ref
 ### 1. Install Bun
 
 **macOS / Linux:**
+
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
 **Windows:**
+
 ```powershell
 powershell -c "irm bun.sh/install.ps1 | iex"
 ```
@@ -49,6 +51,7 @@ LLM_API_KEY=your-key-here
 ```
 
 **Get a free API key:**
+
 - [Google AI Studio](https://aistudio.google.com/apikey) (recommended)
 - [OpenRouter](https://openrouter.ai/keys)
 - Or use [Ollama](https://ollama.com) locally (no key needed)

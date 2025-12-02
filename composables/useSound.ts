@@ -95,7 +95,7 @@ export function useSound() {
   }
 
   function stopAll() {
-    audioElements.forEach((audio) => {
+    audioElements.forEach(audio => {
       audio.pause()
       audio.currentTime = 0
     })

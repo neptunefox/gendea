@@ -68,4 +68,3 @@ This feature redesigns the Cauldron page to embrace a mystical, grimoire-inspire
 1. WHEN the cauldron page loads THEN the Cauldron page SHALL display a maximum of 5 floating ideas in the arc
 2. WHEN a user wants more ideas THEN the Cauldron page SHALL provide a gesture or button to fan out additional ideas from below
 3. WHEN ideas are hidden THEN the Cauldron page SHALL indicate that more ideas are available without cluttering the view
-

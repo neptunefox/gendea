@@ -1,10 +1,10 @@
-import { createError, defineEventHandler, readBody } from 'h3'
 import { eq, desc } from 'drizzle-orm'
+import { createError, defineEventHandler, readBody } from 'h3'
 import { z } from 'zod'
 
 import { tarotReadings, savedIdeas, sparkRuns } from '../../../db/schema'
-import { db } from '../../db'
 import { getCardById } from '../../data/tarot-deck'
+import { db } from '../../db'
 import { useLangChainService } from '../../utils/langchain-service'
 
 const TarotInterpretationSchema = z.object({
@@ -21,10 +21,9 @@ Output JSON: {"interpretation":"2-3 poetic sentences connecting card to their wo
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { readingId, cardId, visitorId } = body as {
+  const { readingId, cardId } = body as {
     readingId: string
     cardId: string
-    visitorId?: string
   }
 
   if (!readingId || !cardId) {

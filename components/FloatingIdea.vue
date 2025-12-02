@@ -99,10 +99,10 @@ const computedZIndex = computed(() => {
 const positionStyle = computed(() => {
   const rotation = isDragging.value ? 0 : (arcPosition.value?.rotation ?? 0)
   const baseScale = arcPosition.value?.scale ?? 1
-  
+
   let scale = baseScale
   let transform = ''
-  
+
   if (isDragging.value) {
     if (isNearCauldron.value) {
       scale = 1.08
@@ -114,10 +114,10 @@ const positionStyle = computed(() => {
   } else {
     transform = `rotate(${rotation}deg) scale(${scale})`
   }
-  
-  const bobDuration = 2.5 + (props.index * 0.3)
+
+  const bobDuration = 2.5 + props.index * 0.3
   const bobDelay = props.index * 0.4
-  
+
   return {
     left: `${position.value.x}px`,
     top: `${position.value.y}px`,
@@ -208,7 +208,7 @@ function updatePosition(clientX: number, clientY: number) {
     x: clientX - dragOffset.value.x,
     y: clientY - dragOffset.value.y
   }
-  
+
   if (props.cauldronCenter) {
     const distX = clientX - props.cauldronCenter.x
     const distY = clientY - props.cauldronCenter.y
@@ -277,7 +277,7 @@ function dissolve() {
     const centerY = rect.top + rect.height / 2
     emit('dissolveStart', props.idea, { x: centerX, y: centerY })
   }
-  
+
   isDissolving.value = true
   setTimeout(() => {
     emit('dissolved', props.idea)
@@ -350,14 +350,14 @@ onUnmounted(() => {
   position: absolute;
   width: 220px;
   padding: var(--space-4);
-  background: 
-    linear-gradient(135deg, 
-      var(--parchment-bg) 0%, 
-      var(--parchment-bg-dark) 50%, 
-      var(--parchment-bg) 100%
-    );
+  background: linear-gradient(
+    135deg,
+    var(--parchment-bg) 0%,
+    var(--parchment-bg-dark) 50%,
+    var(--parchment-bg) 100%
+  );
   border: none;
-  box-shadow: 
+  box-shadow:
     0 2px 8px var(--parchment-shadow),
     inset 0 0 20px rgba(201, 184, 150, 0.3);
   cursor: grab;
@@ -365,10 +365,65 @@ onUnmounted(() => {
   pointer-events: auto;
   opacity: 0.85;
   clip-path: polygon(
-    0% 2%, 3% 0%, 8% 1%, 15% 0%, 22% 2%, 30% 0%, 38% 1%, 45% 0%, 52% 2%, 60% 0%, 68% 1%, 75% 0%, 82% 2%, 90% 0%, 95% 1%, 100% 0%,
-    100% 3%, 99% 10%, 100% 18%, 99% 25%, 100% 33%, 99% 40%, 100% 48%, 99% 55%, 100% 63%, 99% 70%, 100% 78%, 99% 85%, 100% 92%, 99% 100%,
-    97% 100%, 90% 99%, 82% 100%, 75% 98%, 68% 100%, 60% 99%, 52% 100%, 45% 98%, 38% 100%, 30% 99%, 22% 100%, 15% 98%, 8% 100%, 3% 99%, 0% 100%,
-    0% 97%, 1% 90%, 0% 82%, 1% 75%, 0% 68%, 1% 60%, 0% 52%, 1% 45%, 0% 38%, 1% 30%, 0% 22%, 1% 15%, 0% 8%, 1% 3%
+    0% 2%,
+    3% 0%,
+    8% 1%,
+    15% 0%,
+    22% 2%,
+    30% 0%,
+    38% 1%,
+    45% 0%,
+    52% 2%,
+    60% 0%,
+    68% 1%,
+    75% 0%,
+    82% 2%,
+    90% 0%,
+    95% 1%,
+    100% 0%,
+    100% 3%,
+    99% 10%,
+    100% 18%,
+    99% 25%,
+    100% 33%,
+    99% 40%,
+    100% 48%,
+    99% 55%,
+    100% 63%,
+    99% 70%,
+    100% 78%,
+    99% 85%,
+    100% 92%,
+    99% 100%,
+    97% 100%,
+    90% 99%,
+    82% 100%,
+    75% 98%,
+    68% 100%,
+    60% 99%,
+    52% 100%,
+    45% 98%,
+    38% 100%,
+    30% 99%,
+    22% 100%,
+    15% 98%,
+    8% 100%,
+    3% 99%,
+    0% 100%,
+    0% 97%,
+    1% 90%,
+    0% 82%,
+    1% 75%,
+    0% 68%,
+    1% 60%,
+    0% 52%,
+    1% 45%,
+    0% 38%,
+    1% 30%,
+    0% 22%,
+    1% 15%,
+    0% 8%,
+    1% 3%
   );
   transition:
     box-shadow var(--duration-normal) var(--ease-out),
@@ -399,7 +454,7 @@ onUnmounted(() => {
 
 .floating-idea:hover:not(.dragging) {
   opacity: 1;
-  box-shadow: 
+  box-shadow:
     0 6px 20px var(--parchment-shadow),
     inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
@@ -425,7 +480,7 @@ onUnmounted(() => {
 .floating-idea.selected {
   width: 260px;
   opacity: 1;
-  box-shadow: 
+  box-shadow:
     0 6px 20px var(--parchment-shadow),
     0 0 8px var(--color-glow-amber),
     inset 0 0 20px rgba(201, 184, 150, 0.4);
@@ -498,7 +553,8 @@ onUnmounted(() => {
 }
 
 @keyframes ambient-bob {
-  0%, 100% {
+  0%,
+  100% {
     translate: 0 0;
   }
   50% {

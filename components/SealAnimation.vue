@@ -1,5 +1,10 @@
 <template>
-  <div v-if="visible" class="seal-animation" :class="{ 'reduced-motion': reducedMotion }" :style="{ '--seal-color': color }">
+  <div
+    v-if="visible"
+    class="seal-animation"
+    :class="{ 'reduced-motion': reducedMotion }"
+    :style="{ '--seal-color': color }"
+  >
     <div class="seal-stamp">
       <svg viewBox="0 0 48 48" class="seal-icon">
         <circle cx="24" cy="24" r="20" fill="currentColor" />
@@ -14,15 +19,19 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
-const props = withDefaults(defineProps<{
-  color?: string
-  active?: boolean
-}>(), {
-  color: '#d4a574',
-  active: false
-})
+const props = withDefaults(
+  defineProps<{
+    color?: string
+    active?: boolean
+  }>(),
+  {
+    color: '#d4a574',
+    active: false
+  }
+)
 
 const emit = defineEmits<{
   complete: []
@@ -40,11 +49,14 @@ function triggerAnimation() {
   }, duration)
 }
 
-watch(() => props.active, (newVal) => {
-  if (newVal) {
-    triggerAnimation()
+watch(
+  () => props.active,
+  newVal => {
+    if (newVal) {
+      triggerAnimation()
+    }
   }
-})
+)
 
 onMounted(() => {
   if (props.active) {
@@ -81,7 +93,7 @@ onMounted(() => {
     opacity: 0;
   }
   40% {
-    transform: scale(1.0) rotate(0deg);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
   50% {
@@ -93,7 +105,7 @@ onMounted(() => {
     opacity: 1;
   }
   100% {
-    transform: scale(1.0) rotate(0deg);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
 }
