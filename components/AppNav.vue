@@ -8,29 +8,29 @@
       <NuxtLink
         to="/"
         class="nav-link"
-        title="Spark — Explode one idea into many"
+        title="Spark — Generate many ideas from one"
         @mouseenter="handleNavHover($event, 'spark')"
       >
         <Flame :size="18" />
-        <span class="nav-label">Diverge</span>
+        <span class="nav-label">Spark</span>
       </NuxtLink>
       <NuxtLink
         to="/cauldron"
         class="nav-link cauldron"
-        title="Cauldron — Blend ideas into one"
+        title="Brew — Combine ideas into one"
         @mouseenter="handleNavHover($event, 'cauldron')"
       >
         <FlaskRound :size="18" />
-        <span class="nav-label">Converge</span>
+        <span class="nav-label">Brew</span>
       </NuxtLink>
       <NuxtLink
         to="/oracle"
         class="nav-link oracle"
-        title="Oracle — Think through what's blocking you"
+        title="Consult — Talk through what's blocking you"
         @mouseenter="handleNavHover($event, 'oracle')"
       >
         <Eye :size="18" />
-        <span class="nav-label">Dialogue</span>
+        <span class="nav-label">Consult</span>
       </NuxtLink>
       <NuxtLink
         to="/history"
@@ -67,17 +67,17 @@
   </nav>
 
   <nav class="app-nav-mobile">
-    <NuxtLink to="/" class="nav-link" title="Spark — Diverge">
+    <NuxtLink to="/" class="nav-link" title="Spark">
       <Flame :size="20" />
-      <span class="nav-label">Diverge</span>
+      <span class="nav-label">Spark</span>
     </NuxtLink>
-    <NuxtLink to="/cauldron" class="nav-link cauldron" title="Cauldron — Converge">
+    <NuxtLink to="/cauldron" class="nav-link cauldron" title="Brew">
       <FlaskRound :size="20" />
-      <span class="nav-label">Converge</span>
+      <span class="nav-label">Brew</span>
     </NuxtLink>
-    <NuxtLink to="/oracle" class="nav-link oracle" title="Oracle — Dialogue">
+    <NuxtLink to="/oracle" class="nav-link oracle" title="Consult">
       <Eye :size="20" />
-      <span class="nav-label">Dialogue</span>
+      <span class="nav-label">Consult</span>
     </NuxtLink>
     <NuxtLink to="/history" class="nav-link history" title="History">
       <Scroll :size="20" />
@@ -115,10 +115,10 @@ function handleNavHover(event: MouseEvent, variant: 'spark' | 'cauldron' | 'orac
   const rect = target.getBoundingClientRect()
 
   const colors: Record<string, string> = {
-    spark: 'rgba(212, 165, 116, 0.6)',
-    cauldron: 'rgba(149, 117, 205, 0.6)',
-    oracle: 'rgba(126, 184, 201, 0.6)',
-    history: 'rgba(232, 228, 224, 0.4)'
+    spark: 'hsla(165, 75%, 58%, 0.6)',
+    cauldron: 'hsla(140, 60%, 45%, 0.6)',
+    oracle: 'hsla(200, 70%, 72%, 0.6)',
+    history: 'hsla(260, 15%, 55%, 0.5)'
   }
 
   const count = 3
@@ -151,7 +151,7 @@ onUnmounted(() => {
   top: 0;
   bottom: 0;
   width: var(--nav-width);
-  background: linear-gradient(180deg, var(--color-surface) 0%, rgba(26, 24, 22, 0.98) 100%);
+  background: linear-gradient(180deg, var(--color-surface) 0%, hsla(220, 20%, 6%, 0.98) 100%);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
@@ -175,13 +175,13 @@ onUnmounted(() => {
 
 .logo:hover {
   transform: scale(1.1);
-  filter: drop-shadow(0 0 12px var(--color-glow-amber));
+  filter: drop-shadow(0 0 12px var(--color-glow-spark));
 }
 
 .logo-icon {
   width: 22px;
   height: 22px;
-  filter: drop-shadow(0 0 8px var(--color-glow-amber));
+  filter: drop-shadow(0 0 8px var(--color-glow-spark));
 }
 
 .nav-links {
@@ -232,47 +232,43 @@ onUnmounted(() => {
 }
 
 .nav-link:hover::before {
-  border-color: rgba(232, 228, 224, 0.1);
+  border-color: hsla(200, 25%, 94%, 0.1);
 }
 
-/* Spark - amber */
 .nav-link.router-link-active:not(.cauldron):not(.oracle):not(.history) {
   color: var(--color-primary);
 }
 
 .nav-link.router-link-active:not(.cauldron):not(.oracle):not(.history)::before {
-  border-color: rgba(212, 165, 116, 0.3);
-  box-shadow: 0 0 20px var(--color-glow-amber);
+  border-color: hsla(165, 75%, 58%, 0.3);
+  box-shadow: 0 0 20px var(--color-glow-spark);
 }
 
-/* Cauldron - purple */
 .nav-link.cauldron.router-link-active {
   color: var(--color-cauldron);
 }
 
 .nav-link.cauldron.router-link-active::before {
-  border-color: rgba(149, 117, 205, 0.3);
-  box-shadow: 0 0 20px var(--color-glow-purple);
+  border-color: hsla(140, 60%, 45%, 0.3);
+  box-shadow: 0 0 20px var(--color-glow-cauldron);
 }
 
-/* Oracle - teal */
 .nav-link.oracle.router-link-active {
   color: var(--color-oracle);
 }
 
 .nav-link.oracle.router-link-active::before {
-  border-color: rgba(126, 184, 201, 0.3);
-  box-shadow: 0 0 20px var(--color-glow-teal);
+  border-color: hsla(200, 70%, 72%, 0.3);
+  box-shadow: 0 0 20px var(--color-glow-oracle);
 }
 
-/* History - muted */
 .nav-link.history.router-link-active {
-  color: var(--color-text-secondary);
+  color: var(--color-history);
 }
 
 .nav-link.history.router-link-active::before {
-  border-color: rgba(232, 228, 224, 0.15);
-  box-shadow: 0 0 15px rgba(232, 228, 224, 0.1);
+  border-color: hsla(260, 15%, 55%, 0.3);
+  box-shadow: 0 0 15px var(--color-glow-history);
 }
 
 .app-nav-mobile {
@@ -290,7 +286,7 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     height: 72px;
-    background: linear-gradient(0deg, var(--color-surface) 0%, rgba(36, 33, 32, 0.98) 100%);
+    background: linear-gradient(0deg, var(--color-surface) 0%, hsla(220, 18%, 10%, 0.98) 100%);
     border-top: 1px solid var(--color-border);
     display: flex;
     align-items: center;
@@ -337,8 +333,8 @@ onUnmounted(() => {
   }
 
   .app-nav-mobile .nav-link.router-link-active:not(.cauldron):not(.oracle):not(.history)::before {
-    border-color: rgba(212, 165, 116, 0.3);
-    box-shadow: 0 0 20px var(--color-glow-amber);
+    border-color: hsla(165, 75%, 58%, 0.3);
+    box-shadow: 0 0 20px var(--color-glow-spark);
   }
 
   .app-nav-mobile .nav-link.cauldron.router-link-active {
@@ -346,8 +342,8 @@ onUnmounted(() => {
   }
 
   .app-nav-mobile .nav-link.cauldron.router-link-active::before {
-    border-color: rgba(149, 117, 205, 0.3);
-    box-shadow: 0 0 20px var(--color-glow-purple);
+    border-color: hsla(140, 60%, 45%, 0.3);
+    box-shadow: 0 0 20px var(--color-glow-cauldron);
   }
 
   .app-nav-mobile .nav-link.oracle.router-link-active {
@@ -355,17 +351,17 @@ onUnmounted(() => {
   }
 
   .app-nav-mobile .nav-link.oracle.router-link-active::before {
-    border-color: rgba(126, 184, 201, 0.3);
-    box-shadow: 0 0 20px var(--color-glow-teal);
+    border-color: hsla(200, 70%, 72%, 0.3);
+    box-shadow: 0 0 20px var(--color-glow-oracle);
   }
 
   .app-nav-mobile .nav-link.history.router-link-active {
-    color: var(--color-text-secondary);
+    color: var(--color-history);
   }
 
   .app-nav-mobile .nav-link.history.router-link-active::before {
-    border-color: rgba(232, 228, 224, 0.15);
-    box-shadow: 0 0 15px rgba(232, 228, 224, 0.1);
+    border-color: hsla(260, 15%, 55%, 0.3);
+    box-shadow: 0 0 15px var(--color-glow-history);
   }
 
   .app-nav-mobile .mobile-sound-toggle {

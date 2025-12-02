@@ -1,16 +1,20 @@
 <script setup lang="ts">
 interface Props {
-  color?: 'amber' | 'purple' | 'teal'
+  color?: 'spark' | 'cauldron' | 'oracle' | 'history' | 'purple' | 'teal' | 'amber'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color: 'amber'
+  color: 'spark'
 })
 
-const colorMap = {
+const colorMap: Record<string, string> = {
+  spark: 'var(--color-spark)',
   amber: 'var(--color-spark)',
+  cauldron: 'var(--color-cauldron)',
   purple: 'var(--color-cauldron)',
-  teal: 'var(--color-oracle)'
+  oracle: 'var(--color-oracle)',
+  teal: 'var(--color-oracle)',
+  history: 'var(--color-history)'
 }
 
 const currentColor = computed(() => colorMap[props.color])

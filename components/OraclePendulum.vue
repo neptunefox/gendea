@@ -31,8 +31,8 @@ const reducedMotion = useReducedMotion()
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(126, 184, 201, 0.3) 20%,
-    rgba(126, 184, 201, 0.5)
+    hsla(200, 70%, 72%, 0.3) 20%,
+    hsla(200, 70%, 72%, 0.5)
   );
   transform-origin: top center;
   position: relative;
@@ -50,11 +50,11 @@ const reducedMotion = useReducedMotion()
   transform: translateX(-50%);
   width: 16px;
   height: 16px;
-  background: radial-gradient(circle at 30% 30%, var(--color-oracle), rgba(126, 184, 201, 0.6));
+  background: radial-gradient(circle at 30% 30%, var(--color-oracle), hsla(200, 70%, 72%, 0.6));
   border-radius: 50%;
   box-shadow:
-    0 0 12px var(--color-glow-teal),
-    0 0 24px rgba(126, 184, 201, 0.3);
+    0 0 12px var(--color-glow-oracle),
+    0 0 24px hsla(200, 70%, 72%, 0.3);
 }
 
 .active .pendulum-bob {
@@ -84,21 +84,21 @@ const reducedMotion = useReducedMotion()
 @keyframes pendulumGlow {
   0% {
     box-shadow:
-      0 0 12px var(--color-glow-teal),
-      0 0 24px rgba(126, 184, 201, 0.3),
-      -8px 0 16px rgba(126, 184, 201, 0.2);
+      0 0 12px var(--color-glow-oracle),
+      0 0 24px hsla(200, 70%, 72%, 0.3),
+      -8px 0 16px hsla(200, 70%, 72%, 0.2);
   }
   50% {
     box-shadow:
-      0 0 12px var(--color-glow-teal),
-      0 0 24px rgba(126, 184, 201, 0.3),
-      8px 0 16px rgba(126, 184, 201, 0.2);
+      0 0 12px var(--color-glow-oracle),
+      0 0 24px hsla(200, 70%, 72%, 0.3),
+      8px 0 16px hsla(200, 70%, 72%, 0.2);
   }
   100% {
     box-shadow:
-      0 0 12px var(--color-glow-teal),
-      0 0 24px rgba(126, 184, 201, 0.3),
-      -8px 0 16px rgba(126, 184, 201, 0.2);
+      0 0 12px var(--color-glow-oracle),
+      0 0 24px hsla(200, 70%, 72%, 0.3),
+      -8px 0 16px hsla(200, 70%, 72%, 0.2);
   }
 }
 

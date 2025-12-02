@@ -118,8 +118,8 @@ onMounted(async () => {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 50% 30% at 50% 100%, rgba(126, 184, 201, 0.06) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(126, 184, 201, 0.03) 0%, transparent 40%);
+    radial-gradient(ellipse 50% 30% at 50% 100%, hsla(200, 70%, 72%, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, hsla(200, 70%, 72%, 0.03) 0%, transparent 40%);
   pointer-events: none;
 }
 
@@ -138,7 +138,7 @@ onMounted(async () => {
   background: var(--color-oracle);
   border-radius: 50%;
   animation: oraclePulse 3s ease-in-out infinite;
-  box-shadow: 0 0 30px var(--color-glow-teal);
+  box-shadow: 0 0 30px var(--color-glow-oracle);
 }
 
 @keyframes oraclePulse {
@@ -146,12 +146,12 @@ onMounted(async () => {
   100% {
     opacity: 0.2;
     transform: scale(1);
-    box-shadow: 0 0 20px var(--color-glow-teal);
+    box-shadow: 0 0 20px var(--color-glow-oracle);
   }
   50% {
     opacity: 0.9;
     transform: scale(1.8);
-    box-shadow: 0 0 40px var(--color-glow-teal);
+    box-shadow: 0 0 40px var(--color-glow-oracle);
   }
 }
 
@@ -178,7 +178,7 @@ onMounted(async () => {
   padding: var(--space-3) var(--space-6);
   background: transparent;
   color: var(--color-oracle);
-  border: 1px solid rgba(126, 184, 201, 0.4);
+  border: 1px solid hsla(200, 70%, 72%, 0.4);
   font-family: var(--font-heading);
   font-size: var(--text-sm);
   font-weight: 400;
@@ -189,7 +189,7 @@ onMounted(async () => {
 
 .retry-btn:hover {
   border-color: var(--color-oracle);
-  background: rgba(126, 184, 201, 0.1);
-  box-shadow: 0 0 25px rgba(126, 184, 201, 0.15);
+  background: hsla(200, 70%, 72%, 0.1);
+  box-shadow: 0 0 25px hsla(200, 70%, 72%, 0.15);
 }
 </style>

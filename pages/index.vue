@@ -225,7 +225,7 @@
         <Check :size="20" />
         {{ toastMessage }}
         <SealAnimation
-          :color="'#d4a574'"
+          color="hsl(165, 75%, 58%)"
           :active="showSealAnimation"
           @complete="showSealAnimation = false"
         />
@@ -793,7 +793,7 @@ watch(
   inset: 0;
   background: radial-gradient(
     ellipse 80% 50% at 50% 0%,
-    rgba(212, 165, 116, 0.06) 0%,
+    hsla(165, 75%, 58%, 0.06) 0%,
     transparent 50%
   );
   pointer-events: none;
@@ -981,8 +981,8 @@ watch(
 }
 
 .idea-card {
-  background: linear-gradient(180deg, rgba(42, 36, 32, 0.95) 0%, rgba(26, 22, 20, 0.98) 100%);
-  border: 2px solid rgba(212, 165, 116, 0.3);
+  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.95) 0%, hsla(220, 20%, 8%, 0.98) 100%);
+  border: 2px solid hsla(165, 75%, 58%, 0.3);
   border-radius: 4px;
   padding: var(--space-6);
   padding-top: var(--space-8);
@@ -994,14 +994,14 @@ watch(
   flex-direction: column;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 0 60px rgba(212, 165, 116, 0.03);
+    inset 0 0 60px hsla(165, 75%, 58%, 0.03);
 }
 
 .idea-card::before {
   content: '';
   position: absolute;
   inset: 8px;
-  border: 1px solid rgba(212, 165, 116, 0.2);
+  border: 1px solid hsla(165, 75%, 58%, 0.2);
   pointer-events: none;
 }
 
@@ -1021,7 +1021,7 @@ watch(
   position: absolute;
   width: 20px;
   height: 20px;
-  border-color: rgba(212, 165, 116, 0.25);
+  border-color: hsla(165, 75%, 58%, 0.25);
   border-style: solid;
   border-width: 0;
 }
@@ -1058,9 +1058,9 @@ watch(
   border-color: var(--color-primary);
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(212, 165, 116, 0.15),
-    inset 0 0 80px rgba(212, 165, 116, 0.05),
-    inset 0 0 20px rgba(212, 165, 116, 0.12);
+    0 0 40px hsla(165, 75%, 58%, 0.15),
+    inset 0 0 80px hsla(165, 75%, 58%, 0.05),
+    inset 0 0 20px hsla(165, 75%, 58%, 0.12);
   transform: translateY(-8px);
 }
 
@@ -1070,7 +1070,7 @@ watch(
   transform: rotate(3deg) scale(1.03);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 30px rgba(212, 165, 116, 0.2);
+    0 0 30px hsla(165, 75%, 58%, 0.2);
 }
 
 .unpin-btn {
@@ -1127,7 +1127,7 @@ watch(
 
 .action-btn {
   padding: var(--space-2) var(--space-3);
-  border: 1px solid rgba(212, 165, 116, 0.25);
+  border: 1px solid hsla(165, 75%, 58%, 0.25);
   background: transparent;
   color: var(--color-text-secondary);
   font-family: var(--font-heading);
@@ -1139,8 +1139,8 @@ watch(
 }
 
 .action-btn:hover {
-  background: rgba(212, 165, 116, 0.1);
-  border-color: rgba(212, 165, 116, 0.5);
+  background: hsla(165, 75%, 58%, 0.1);
+  border-color: hsla(165, 75%, 58%, 0.5);
   color: var(--color-primary);
 }
 
@@ -1149,12 +1149,12 @@ watch(
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  border-color: rgba(126, 184, 201, 0.25);
+  border-color: hsla(200, 70%, 72%, 0.25);
 }
 
 .action-btn.oracle-btn:hover {
-  background: rgba(126, 184, 201, 0.1);
-  border-color: rgba(126, 184, 201, 0.5);
+  background: hsla(200, 70%, 72%, 0.1);
+  border-color: hsla(200, 70%, 72%, 0.5);
   color: var(--color-oracle);
 }
 
@@ -1346,8 +1346,8 @@ watch(
   border-radius: 4px;
   padding: var(--space-5);
   padding-top: var(--space-6);
-  background: linear-gradient(180deg, rgba(42, 36, 32, 0.9) 0%, rgba(26, 22, 20, 0.95) 100%);
-  border: 1.5px solid rgba(212, 165, 116, 0.25);
+  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.9) 0%, hsla(220, 20%, 8%, 0.95) 100%);
+  border: 1.5px solid hsla(165, 75%, 58%, 0.25);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -1357,14 +1357,14 @@ watch(
   min-height: 180px;
   box-shadow:
     0 6px 24px rgba(0, 0, 0, 0.4),
-    inset 0 0 40px rgba(212, 165, 116, 0.02);
+    inset 0 0 40px hsla(165, 75%, 58%, 0.02);
 }
 
 .idea-pill::before {
   content: '';
   position: absolute;
   inset: 6px;
-  border: 1px solid rgba(212, 165, 116, 0.15);
+  border: 1px solid hsla(165, 75%, 58%, 0.15);
   pointer-events: none;
 }
 
@@ -1381,18 +1381,18 @@ watch(
 
 .idea-pill.selected {
   border-color: var(--color-primary);
-  background: linear-gradient(180deg, rgba(212, 165, 116, 0.1) 0%, rgba(26, 22, 20, 0.95) 100%);
+  background: linear-gradient(180deg, hsla(165, 75%, 58%, 0.1) 0%, hsla(220, 20%, 8%, 0.95) 100%);
   box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(212, 165, 116, 0.2),
-    inset 0 0 60px rgba(212, 165, 116, 0.05);
+    0 0 30px hsla(165, 75%, 58%, 0.2),
+    inset 0 0 60px hsla(165, 75%, 58%, 0.05);
 }
 
 .idea-pill:hover {
-  border-color: rgba(212, 165, 116, 0.5);
+  border-color: hsla(165, 75%, 58%, 0.5);
   box-shadow:
     0 10px 36px rgba(0, 0, 0, 0.45),
-    0 0 20px rgba(212, 165, 116, 0.1);
+    0 0 20px hsla(165, 75%, 58%, 0.1);
   transform: translateY(-4px);
 }
 
@@ -1416,7 +1416,7 @@ watch(
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-bg);
-  box-shadow: 0 0 8px var(--color-glow-amber);
+  box-shadow: 0 0 8px var(--color-glow-spark);
 }
 
 .idea-pill p {
@@ -1437,7 +1437,7 @@ watch(
 
 .icon-action-btn {
   background: transparent;
-  border: 1px solid rgba(212, 165, 116, 0.2);
+  border: 1px solid hsla(165, 75%, 58%, 0.2);
   padding: var(--space-2);
   color: var(--color-text-tertiary);
   cursor: pointer;
@@ -1450,8 +1450,8 @@ watch(
 }
 
 .icon-action-btn:hover {
-  background: rgba(212, 165, 116, 0.1);
-  border-color: rgba(212, 165, 116, 0.4);
+  background: hsla(165, 75%, 58%, 0.1);
+  border-color: hsla(165, 75%, 58%, 0.4);
   color: var(--color-primary);
 }
 
@@ -1593,7 +1593,7 @@ watch(
 .demo-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 8, 6, 0.97);
+  background: hsla(220, 20%, 4%, 0.97);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1615,9 +1615,9 @@ watch(
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(212, 165, 116, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 20% 80%, rgba(149, 117, 205, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, rgba(126, 184, 201, 0.04) 0%, transparent 35%);
+    radial-gradient(ellipse 60% 40% at 50% 50%, hsla(165, 75%, 58%, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, hsla(140, 60%, 45%, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, hsla(200, 70%, 72%, 0.04) 0%, transparent 35%);
   opacity: 1;
   pointer-events: none;
   animation: ambientBreath 6s ease-in-out infinite;
@@ -1654,10 +1654,10 @@ watch(
   width: 20px;
   background: linear-gradient(
     90deg,
-    rgba(60, 45, 35, 1) 0%,
-    rgba(80, 60, 45, 1) 30%,
-    rgba(50, 38, 28, 1) 70%,
-    rgba(40, 30, 22, 1) 100%
+    hsl(220, 25%, 16%) 0%,
+    hsl(220, 22%, 20%) 30%,
+    hsl(220, 25%, 14%) 70%,
+    hsl(220, 25%, 12%) 100%
   );
   border-radius: 4px 0 0 4px;
   box-shadow:
@@ -1675,16 +1675,16 @@ watch(
   text-align: center;
   background: linear-gradient(
     135deg,
-    rgba(35, 30, 25, 0.98) 0%,
-    rgba(28, 24, 20, 0.99) 50%,
-    rgba(32, 27, 22, 0.98) 100%
+    hsla(220, 18%, 12%, 0.98) 0%,
+    hsla(220, 18%, 10%, 0.99) 50%,
+    hsla(220, 18%, 11%, 0.98) 100%
   );
-  border: 2px solid rgba(212, 165, 116, 0.25);
+  border: 2px solid hsla(165, 75%, 58%, 0.25);
   border-left: none;
   border-radius: 0 4px 4px 0;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.7),
-    inset 0 0 100px rgba(212, 165, 116, 0.03);
+    inset 0 0 100px hsla(165, 75%, 58%, 0.03);
 }
 
 .page-texture {
@@ -1705,7 +1705,7 @@ watch(
   letter-spacing: 0.02em;
   animation: whisperReveal 1.5s var(--ease-out) 0.8s both;
   text-shadow:
-    0 0 60px rgba(212, 165, 116, 0.3),
+    0 0 60px hsla(165, 75%, 58%, 0.3),
     0 1px 0 rgba(255, 255, 255, 0.08),
     0 -1px 0 rgba(0, 0, 0, 0.3);
 }
@@ -1757,7 +1757,7 @@ watch(
 .divider-line {
   width: 60px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, hsla(165, 75%, 58%, 0.4), transparent);
 }
 
 .divider-symbol {
@@ -1825,8 +1825,8 @@ watch(
 
 .demo-idea {
   padding: var(--space-3) var(--space-4);
-  background: linear-gradient(180deg, rgba(42, 36, 32, 0.7) 0%, rgba(26, 22, 20, 0.8) 100%);
-  border: 1px solid rgba(212, 165, 116, 0.15);
+  background: linear-gradient(180deg, hsla(220, 18%, 14%, 0.7) 0%, hsla(220, 20%, 8%, 0.8) 100%);
+  border: 1px solid hsla(165, 75%, 58%, 0.15);
   border-radius: 4px;
   opacity: 0;
   animation: cardDeal 0.5s var(--ease-out) forwards;
@@ -1869,7 +1869,7 @@ watch(
   padding: var(--space-4) var(--space-8);
   background: transparent;
   color: var(--color-primary);
-  border: 1.5px solid rgba(212, 165, 116, 0.4);
+  border: 1.5px solid hsla(165, 75%, 58%, 0.4);
   border-radius: 4px;
   font-family: var(--font-heading);
   font-size: var(--text-base);
@@ -1892,9 +1892,9 @@ watch(
 }
 
 .demo-cta:hover {
-  background: rgba(212, 165, 116, 0.1);
+  background: hsla(165, 75%, 58%, 0.1);
   border-color: var(--color-primary);
-  box-shadow: 0 0 30px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 0 30px hsla(165, 75%, 58%, 0.2);
   transform: translateY(-2px);
 }
 
@@ -1905,7 +1905,7 @@ watch(
 
   .grimoire-page {
     border-radius: 4px;
-    border-left: 2px solid rgba(212, 165, 116, 0.25);
+    border-left: 2px solid hsla(165, 75%, 58%, 0.25);
     padding: var(--space-6);
   }
 

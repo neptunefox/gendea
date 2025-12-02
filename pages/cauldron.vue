@@ -117,7 +117,7 @@
         <Check :size="20" />
         {{ toastMessage }}
         <SealAnimation
-          :color="'#9575cd'"
+          color="hsl(270, 55%, 65%)"
           :active="showSealAnimation"
           @complete="showSealAnimation = false"
         />
@@ -693,7 +693,7 @@ onMounted(async () => {
   inset: 0;
   background: radial-gradient(
     ellipse 50% 50% at 50% 60%,
-    rgba(149, 117, 205, 0.04) 0%,
+    hsla(140, 60%, 45%, 0.04) 0%,
     transparent 50%
   );
   pointer-events: none;

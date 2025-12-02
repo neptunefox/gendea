@@ -10,8 +10,8 @@
           <h3 class="output-title">Converged</h3>
           <p class="output-text" :class="{ 'shimmer-text': isCrystallizing }">{{ output }}</p>
           <div class="output-actions">
-            <button class="action-btn primary" @click="$emit('save')">
-              <Save :size="18" />
+            <button class="action-btn save" @click="$emit('save')">
+              <BookmarkPlus :size="18" />
               Save
             </button>
             <button class="action-btn oracle" @click="$emit('askOracle')">
@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { HelpCircle, Save, RotateCcw } from 'lucide-vue-next'
+import { HelpCircle, BookmarkPlus, RotateCcw } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
 import { useReducedMotion } from '~/composables/useReducedMotion'
@@ -120,8 +120,8 @@ function getSteamStyle(index: number) {
   height: 30px;
   background: radial-gradient(
     circle,
-    rgba(149, 117, 205, 0.6) 0%,
-    var(--color-glow-purple) 50%,
+    hsla(140, 60%, 45%, 0.6) 0%,
+    var(--color-glow-cauldron) 50%,
     transparent 100%
   );
   border-radius: 50%;
@@ -156,7 +156,7 @@ function getSteamStyle(index: number) {
   max-width: 480px;
   width: 100%;
   box-shadow:
-    0 0 30px var(--color-glow-purple),
+    0 0 30px var(--color-glow-cauldron),
     var(--shadow-xl);
   z-index: 2;
 }
@@ -203,15 +203,15 @@ function getSteamStyle(index: number) {
   gap: var(--space-1);
 }
 
-.action-btn.primary {
-  background: var(--color-primary);
-  color: white;
-  box-shadow: var(--shadow-md);
+.action-btn.save {
+  background: var(--color-cauldron-subtle);
+  color: var(--color-cauldron);
+  border: 1px solid var(--color-cauldron);
 }
 
-.action-btn.primary:hover {
-  background: var(--color-primary-hover);
-  box-shadow: var(--shadow-lg);
+.action-btn.save:hover {
+  background: var(--color-cauldron);
+  color: white;
 }
 
 .action-btn.oracle {
@@ -283,18 +283,18 @@ function getSteamStyle(index: number) {
 @keyframes crystallize-glow {
   0% {
     box-shadow:
-      0 0 30px var(--color-glow-purple),
+      0 0 30px var(--color-glow-cauldron),
       var(--shadow-xl);
   }
   50% {
     box-shadow:
-      0 0 50px var(--color-glow-purple),
-      0 0 80px rgba(149, 117, 205, 0.4),
+      0 0 50px var(--color-glow-cauldron),
+      0 0 80px hsla(140, 60%, 45%, 0.4),
       var(--shadow-xl);
   }
   100% {
     box-shadow:
-      0 0 30px var(--color-glow-purple),
+      0 0 30px var(--color-glow-cauldron),
       var(--shadow-xl);
   }
 }
@@ -308,7 +308,7 @@ function getSteamStyle(index: number) {
     90deg,
     var(--color-text) 0%,
     var(--color-text) 40%,
-    rgba(149, 117, 205, 0.8) 50%,
+    hsla(140, 60%, 45%, 0.8) 50%,
     var(--color-text) 60%,
     var(--color-text) 100%
   );

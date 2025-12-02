@@ -227,23 +227,23 @@ onMounted(() => {
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   background: transparent;
-  border: 1px solid rgba(212, 165, 116, 0.2);
+  border: 1px solid hsla(200, 70%, 72%, 0.2);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s var(--ease-out);
 }
 
 .tarot-trigger:hover {
-  border-color: rgba(212, 165, 116, 0.4);
-  background: rgba(212, 165, 116, 0.05);
+  border-color: hsla(200, 70%, 72%, 0.4);
+  background: hsla(200, 70%, 72%, 0.05);
 }
 
 .trigger-card {
   width: 28px;
   height: 40px;
   border-radius: 3px;
-  background: linear-gradient(135deg, rgba(42, 36, 32, 0.95) 0%, rgba(26, 22, 20, 0.98) 100%);
-  border: 1px solid rgba(212, 165, 116, 0.3);
+  background: linear-gradient(135deg, hsl(220, 18%, 12%) 0%, hsl(220, 20%, 8%) 100%);
+  border: 1px solid hsla(200, 70%, 72%, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -251,13 +251,13 @@ onMounted(() => {
 .card-back-pattern {
   position: absolute;
   inset: 3px;
-  border: 1px solid rgba(212, 165, 116, 0.2);
+  border: 1px solid hsla(200, 70%, 72%, 0.2);
   background: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 2px,
-    rgba(212, 165, 116, 0.05) 2px,
-    rgba(212, 165, 116, 0.05) 4px
+    hsla(200, 70%, 72%, 0.05) 2px,
+    hsla(200, 70%, 72%, 0.05) 4px
   );
 }
 
@@ -273,24 +273,24 @@ onMounted(() => {
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  background: rgba(212, 165, 116, 0.05);
-  border: 1px solid rgba(212, 165, 116, 0.25);
+  background: hsla(200, 70%, 72%, 0.05);
+  border: 1px solid hsla(200, 70%, 72%, 0.25);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.3s var(--ease-out);
 }
 
 .tarot-summary:hover {
-  border-color: rgba(212, 165, 116, 0.4);
-  background: rgba(212, 165, 116, 0.1);
+  border-color: hsla(200, 70%, 72%, 0.4);
+  background: hsla(200, 70%, 72%, 0.1);
 }
 
 .summary-card {
   width: 28px;
   height: 40px;
   border-radius: 3px;
-  background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(26, 22, 20, 0.95) 100%);
-  border: 1px solid rgba(212, 165, 116, 0.4);
+  background: linear-gradient(135deg, hsla(200, 70%, 72%, 0.15) 0%, hsl(220, 20%, 8%) 100%);
+  border: 1px solid hsla(200, 70%, 72%, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,7 +299,7 @@ onMounted(() => {
 .summary-card .card-numeral {
   font-family: var(--font-heading);
   font-size: 10px;
-  color: var(--color-primary);
+  color: var(--color-oracle);
 }
 
 .summary-content {
@@ -322,7 +322,7 @@ onMounted(() => {
 .tarot-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 8, 6, 0.95);
+  background: hsla(220, 20%, 6%, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -337,8 +337,8 @@ onMounted(() => {
   max-height: 90vh;
   overflow-y: auto;
   padding: var(--space-8);
-  background: linear-gradient(135deg, rgba(35, 30, 25, 0.98) 0%, rgba(28, 24, 20, 0.99) 100%);
-  border: 2px solid rgba(212, 165, 116, 0.25);
+  background: linear-gradient(135deg, hsl(220, 18%, 10%) 0%, hsl(220, 20%, 8%) 100%);
+  border: 2px solid hsla(200, 70%, 72%, 0.25);
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
@@ -422,8 +422,8 @@ onMounted(() => {
 .card-back {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(42, 36, 32, 0.95) 0%, rgba(26, 22, 20, 0.98) 100%);
-  border: 2px solid rgba(212, 165, 116, 0.35);
+  background: linear-gradient(180deg, hsl(220, 18%, 12%) 0%, hsl(220, 20%, 8%) 100%);
+  border: 2px solid hsla(200, 70%, 72%, 0.35);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -434,7 +434,7 @@ onMounted(() => {
 .back-border {
   position: absolute;
   inset: 6px;
-  border: 1px solid rgba(212, 165, 116, 0.25);
+  border: 1px solid hsla(200, 70%, 72%, 0.25);
 }
 
 .back-pattern {
@@ -445,21 +445,21 @@ onMounted(() => {
       45deg,
       transparent,
       transparent 4px,
-      rgba(212, 165, 116, 0.04) 4px,
-      rgba(212, 165, 116, 0.04) 8px
+      hsla(200, 70%, 72%, 0.04) 4px,
+      hsla(200, 70%, 72%, 0.04) 8px
     ),
     repeating-linear-gradient(
       -45deg,
       transparent,
       transparent 4px,
-      rgba(212, 165, 116, 0.04) 4px,
-      rgba(212, 165, 116, 0.04) 8px
+      hsla(200, 70%, 72%, 0.04) 4px,
+      hsla(200, 70%, 72%, 0.04) 8px
     );
 }
 
 .back-sigil {
   font-size: 24px;
-  color: var(--color-primary);
+  color: var(--color-oracle);
   opacity: 0.5;
   z-index: 1;
 }
@@ -556,27 +556,27 @@ onMounted(() => {
 }
 
 .card-face {
-  background: linear-gradient(180deg, rgba(42, 36, 32, 0.95) 0%, rgba(26, 22, 20, 0.98) 100%);
-  border: 2px solid rgba(212, 165, 116, 0.4);
+  background: linear-gradient(180deg, hsl(220, 18%, 12%) 0%, hsl(220, 20%, 8%) 100%);
+  border: 2px solid hsla(200, 70%, 72%, 0.4);
   border-radius: 8px;
   padding: var(--space-6);
   text-align: center;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.5),
-    0 0 40px rgba(212, 165, 116, 0.1);
+    0 0 40px hsla(200, 70%, 72%, 0.1);
   transition: box-shadow 0.6s var(--ease-out);
 }
 
 .chosen-card.complete .card-face {
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.5),
-    0 0 60px rgba(212, 165, 116, 0.2);
+    0 0 60px hsla(200, 70%, 72%, 0.2);
 }
 
 .card-numeral-large {
   font-family: var(--font-heading);
   font-size: 1.75rem;
-  color: var(--color-primary);
+  color: var(--color-oracle);
   opacity: 0.6;
   letter-spacing: 0.1em;
 }
@@ -643,11 +643,11 @@ onMounted(() => {
 .card-divider .divider-line {
   width: 40px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, hsla(200, 70%, 72%, 0.4), transparent);
 }
 
 .card-divider .divider-symbol {
-  color: var(--color-primary);
+  color: var(--color-oracle);
   font-size: 8px;
   opacity: 0.6;
 }

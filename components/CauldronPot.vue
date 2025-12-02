@@ -261,13 +261,18 @@ defineExpose({
 .cauldron-pot {
   width: 320px;
   height: 160px;
-  background: linear-gradient(180deg, #5a4a6a 0%, #3d3050 60%, #2a2040 100%);
+  background: linear-gradient(
+    180deg,
+    hsl(220, 20%, 22%) 0%,
+    hsl(220, 25%, 16%) 60%,
+    hsl(220, 30%, 12%) 100%
+  );
   border-radius: 50% / 30% 30% 70% 70%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 16px 40px rgba(149, 117, 205, 0.35),
+    0 16px 40px hsla(140, 60%, 45%, 0.35),
     inset 0 -20px 30px rgba(0, 0, 0, 0.3),
     inset 0 8px 12px rgba(255, 255, 255, 0.05);
   position: relative;
@@ -323,10 +328,10 @@ defineExpose({
 .cauldron-pot.drag-over {
   transform: scale(1.03);
   box-shadow:
-    0 16px 36px rgba(149, 117, 205, 0.4),
+    0 16px 36px hsla(140, 60%, 45%, 0.4),
     inset 0 -20px 30px rgba(0, 0, 0, 0.3),
     inset 0 8px 12px rgba(255, 255, 255, 0.05),
-    0 0 0 4px var(--color-glow-purple);
+    0 0 0 4px var(--color-glow-cauldron);
 }
 
 .cauldron-pot.mixing {
@@ -358,11 +363,11 @@ defineExpose({
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(147, 51, 234, 0.6) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 60%, rgba(236, 72, 153, 0.5) 0%, transparent 45%),
-    radial-gradient(ellipse at 50% 30%, rgba(59, 130, 246, 0.5) 0%, transparent 40%),
-    radial-gradient(ellipse at 60% 70%, rgba(16, 185, 129, 0.4) 0%, transparent 35%),
-    linear-gradient(180deg, #0f0a1e 0%, #1a0a2e 50%, #0d1b2a 100%);
+    radial-gradient(ellipse at 30% 40%, hsla(140, 70%, 40%, 0.7) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, hsla(120, 60%, 35%, 0.5) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 30%, hsla(100, 50%, 45%, 0.5) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 70%, hsla(160, 60%, 40%, 0.4) 0%, transparent 35%),
+    linear-gradient(180deg, hsl(140, 40%, 6%) 0%, hsl(120, 50%, 8%) 50%, hsl(160, 40%, 6%) 100%);
   animation: nebula-shift 8s ease-in-out infinite;
 }
 
@@ -464,7 +469,7 @@ defineExpose({
   left: 20%;
   right: 20%;
   height: 16px;
-  background: linear-gradient(180deg, rgba(200, 160, 220, 0.7) 0%, rgba(100, 60, 120, 0.3) 100%);
+  background: linear-gradient(180deg, hsla(140, 60%, 55%, 0.7) 0%, hsla(140, 50%, 30%, 0.3) 100%);
   border-radius: 50%;
   z-index: 5;
 }
@@ -474,7 +479,7 @@ defineExpose({
   top: 10px;
   left: 18%;
   right: 18%;
-  background: linear-gradient(180deg, rgba(220, 180, 240, 0.8) 0%, rgba(120, 80, 160, 0.4) 100%);
+  background: linear-gradient(180deg, hsla(140, 65%, 60%, 0.8) 0%, hsla(140, 50%, 35%, 0.4) 100%);
 }
 
 .pot-body {
@@ -564,7 +569,11 @@ defineExpose({
 
 .bubble {
   position: absolute;
-  background: radial-gradient(circle at 30% 30%, rgba(196, 181, 253, 0.6), rgba(147, 51, 234, 0.3));
+  background: radial-gradient(
+    circle at 30% 30%,
+    hsla(140, 70%, 70%, 0.6),
+    hsla(140, 60%, 45%, 0.3)
+  );
   border-radius: 50%;
   pointer-events: none;
   z-index: 6;
@@ -591,7 +600,11 @@ defineExpose({
 
 .mixing-bubble {
   position: absolute;
-  background: radial-gradient(circle at 30% 30%, rgba(165, 243, 252, 0.5), rgba(59, 130, 246, 0.3));
+  background: radial-gradient(
+    circle at 30% 30%,
+    hsla(120, 70%, 65%, 0.5),
+    hsla(140, 60%, 50%, 0.3)
+  );
   border-radius: 50%;
   pointer-events: none;
   z-index: 6;
@@ -672,8 +685,8 @@ defineExpose({
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(147, 51, 234, 0.15) 0%,
-    rgba(236, 72, 153, 0.1) 50%,
+    hsla(140, 60%, 45%, 0.2) 0%,
+    hsla(120, 50%, 40%, 0.1) 50%,
     transparent 70%
   );
   animation: gentle-glow 2s ease-in-out infinite;

@@ -3,9 +3,10 @@ const route = useRoute()
 
 const vignetteColor = computed(() => {
   const path = route.path
-  if (path.startsWith('/cauldron')) return 'purple'
-  if (path.startsWith('/oracle')) return 'teal'
-  return 'amber'
+  if (path.startsWith('/cauldron')) return 'cauldron'
+  if (path.startsWith('/oracle')) return 'oracle'
+  if (path.startsWith('/history')) return 'history'
+  return 'spark'
 })
 </script>
 
@@ -21,46 +22,50 @@ const vignetteColor = computed(() => {
 
 <style>
 :root {
-  --color-bg: #1a1816;
-  --color-surface: #242120;
-  --color-surface-raised: #2d2926;
+  --color-bg: hsl(220, 20%, 6%);
+  --color-surface: hsl(220, 18%, 10%);
+  --color-surface-raised: hsl(220, 16%, 14%);
 
-  --color-text: #e8e4e0;
-  --color-text-secondary: rgba(232, 228, 224, 0.7);
-  --color-text-tertiary: #9a9590;
+  --color-text: hsl(200, 25%, 94%);
+  --color-text-secondary: hsl(200, 20%, 78%);
+  --color-text-tertiary: hsl(200, 12%, 60%);
 
-  --color-primary: #d4a574;
-  --color-primary-hover: #e0b585;
-  --color-primary-subtle: rgba(212, 165, 116, 0.15);
-  --color-primary-ring: rgba(212, 165, 116, 0.25);
+  --color-primary: hsl(165, 75%, 58%);
+  --color-primary-hover: hsl(165, 80%, 65%);
+  --color-primary-subtle: hsla(165, 75%, 58%, 0.18);
+  --color-primary-ring: hsla(165, 75%, 58%, 0.3);
 
-  --color-border: rgba(232, 228, 224, 0.08);
-  --color-border-strong: rgba(232, 228, 224, 0.15);
+  --color-border: hsla(200, 25%, 94%, 0.1);
+  --color-border-strong: hsla(200, 25%, 94%, 0.18);
 
-  --color-success: #6b9b7a;
-  --color-success-subtle: rgba(107, 155, 122, 0.25);
-  --color-success-bg: rgba(107, 155, 122, 0.1);
-  --color-warning: #d4a574;
-  --color-error: #c27a74;
-  --color-error-subtle: rgba(194, 122, 116, 0.25);
-  --color-error-bg: rgba(194, 122, 116, 0.1);
-  --color-info: #7eb8c9;
-  --color-info-subtle: rgba(126, 184, 201, 0.25);
+  --color-success: hsl(165, 75%, 58%);
+  --color-success-subtle: hsla(165, 75%, 58%, 0.25);
+  --color-success-bg: hsla(165, 75%, 58%, 0.12);
+  --color-warning: hsl(45, 80%, 60%);
+  --color-error: hsl(0, 65%, 60%);
+  --color-error-subtle: hsla(0, 65%, 60%, 0.25);
+  --color-error-bg: hsla(0, 65%, 60%, 0.12);
+  --color-info: hsl(200, 70%, 72%);
+  --color-info-subtle: hsla(200, 70%, 72%, 0.25);
 
-  --color-cauldron: #9575cd;
-  --color-oracle: #7eb8c9;
-  --color-spark: #d4a574;
+  --color-cauldron: hsl(140, 60%, 45%);
+  --color-oracle: hsl(200, 70%, 72%);
+  --color-spark: hsl(165, 75%, 58%);
+  --color-history: hsl(260, 15%, 55%);
 
-  --color-glow-amber: rgba(212, 165, 116, 0.4);
-  --color-glow-purple: rgba(149, 117, 205, 0.4);
-  --color-glow-teal: rgba(126, 184, 201, 0.4);
+  --color-glow-spark: hsla(165, 75%, 58%, 0.5);
+  --color-glow-cauldron: hsla(140, 60%, 45%, 0.5);
+  --color-glow-oracle: hsla(200, 70%, 72%, 0.5);
+  --color-glow-history: hsla(260, 15%, 55%, 0.4);
 
-  --color-oracle-subtle: rgba(126, 184, 201, 0.15);
-  --color-cauldron-subtle: rgba(149, 117, 205, 0.15);
+  --color-oracle-subtle: hsla(200, 70%, 72%, 0.18);
+  --color-cauldron-subtle: hsla(140, 60%, 45%, 0.18);
+  --color-spark-subtle: hsla(165, 75%, 58%, 0.18);
+  --color-history-subtle: hsla(260, 15%, 55%, 0.15);
 
-  --color-surface-translucent: rgba(36, 33, 32, 0.95);
-  --color-border-subtle: rgba(232, 228, 224, 0.04);
-  --color-hover-bg: rgba(232, 228, 224, 0.06);
+  --color-surface-translucent: hsla(220, 18%, 10%, 0.95);
+  --color-border-subtle: hsla(200, 25%, 94%, 0.05);
+  --color-hover-bg: hsla(200, 25%, 94%, 0.08);
 
   --text-xl: 1.5rem;
   --text-lg: 1.125rem;
@@ -130,7 +135,7 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   opacity: 0.02;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 50;
 }
 
 * {

@@ -4,8 +4,8 @@
 
     <header class="graveyard-hero">
       <p class="hero-label">Archives</p>
-      <h1>Ideas at Rest</h1>
-      <p class="hero-subtitle">Resurrect past explorations from the beyond</p>
+      <h1>Past Explorations</h1>
+      <p class="hero-subtitle">Pick up where you left off</p>
       <div class="hero-divider">
         <span class="divider-line"></span>
         <span class="divider-symbol">✦</span>
@@ -19,8 +19,8 @@
     <div v-else-if="threadsError" class="graveyard-state error">{{ threadsError }}</div>
     <div v-else-if="threadCards.length === 0" class="graveyard-state empty">
       <div class="empty-sigil">✦</div>
-      <p>The graveyard stands empty</p>
-      <p class="hint">Your explorations will be laid to rest here</p>
+      <p>Nothing here yet</p>
+      <p class="hint">Your past explorations will appear here</p>
       <div class="empty-divider">
         <span class="divider-line"></span>
         <span class="divider-dot"></span>
@@ -41,10 +41,10 @@
           </div>
           <div class="tombstone-footer">
             <span class="death-date">{{ formatThreadDate(thread.createdAt) }}</span>
-            <span class="idea-count">{{ thread.totalIdeas }} spirits</span>
+            <span class="idea-count">{{ thread.totalIdeas }} ideas</span>
           </div>
         </div>
-        <button class="resurrect-btn" @click.stop="resumeThread(thread.id)">Resurrect</button>
+        <button class="resurrect-btn" @click.stop="resumeThread(thread.id)">Continue</button>
       </article>
     </div>
   </div>
@@ -122,22 +122,10 @@ function resumeThread(id: string) {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 100% 50% at 50% 100%, rgba(122, 117, 112, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 20% 80%, rgba(122, 117, 112, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(122, 117, 112, 0.06) 0%, transparent 35%);
-  animation: mistDrift 25s ease-in-out infinite;
-}
-
-@keyframes mistDrift {
-  0%,
-  100% {
-    opacity: 0.5;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translateX(-30px);
-  }
+    radial-gradient(ellipse 100% 50% at 50% 100%, hsla(260, 15%, 50%, 0.1) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, hsla(260, 15%, 50%, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 90%, hsla(260, 15%, 50%, 0.05) 0%, transparent 35%);
+  opacity: 0.6;
 }
 
 .graveyard-hero {
@@ -183,7 +171,7 @@ function resumeThread(id: string) {
 .divider-line {
   width: 60px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(122, 117, 112, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, hsla(200, 15%, 50%, 0.4), transparent);
 }
 
 .divider-symbol {
@@ -214,9 +202,9 @@ function resumeThread(id: string) {
 
 .tombstone-top {
   height: 50px;
-  background: linear-gradient(180deg, rgba(45, 41, 38, 0.95) 0%, rgba(36, 33, 32, 0.98) 100%);
+  background: linear-gradient(180deg, hsla(220, 18%, 16%, 0.95) 0%, hsla(220, 18%, 12%, 0.98) 100%);
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  border: 2px solid rgba(122, 117, 112, 0.2);
+  border: 2px solid hsla(200, 15%, 50%, 0.2);
   border-bottom: none;
   position: relative;
 }
@@ -230,7 +218,7 @@ function resumeThread(id: string) {
   width: 60%;
   height: 30px;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  border: 1px solid rgba(122, 117, 112, 0.15);
+  border: 1px solid hsla(200, 15%, 50%, 0.15);
   border-bottom: none;
 }
 
@@ -246,8 +234,8 @@ function resumeThread(id: string) {
 }
 
 .tombstone-body {
-  background: linear-gradient(180deg, rgba(36, 33, 32, 0.98) 0%, rgba(42, 38, 36, 0.95) 100%);
-  border: 2px solid rgba(122, 117, 112, 0.2);
+  background: linear-gradient(180deg, hsla(220, 18%, 12%, 0.98) 0%, hsla(220, 18%, 15%, 0.95) 100%);
+  border: 2px solid hsla(200, 15%, 50%, 0.2);
   border-top: none;
   padding: var(--space-6) var(--space-5);
   min-height: 180px;
@@ -255,19 +243,19 @@ function resumeThread(id: string) {
   flex-direction: column;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.5),
-    inset 0 0 60px rgba(122, 117, 112, 0.02);
+    inset 0 0 60px hsla(200, 15%, 50%, 0.02);
 }
 
 .tombstone:hover .tombstone-body {
-  border-color: rgba(122, 117, 112, 0.35);
+  border-color: hsla(200, 15%, 50%, 0.35);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(122, 117, 112, 0.1),
-    inset 0 0 80px rgba(122, 117, 112, 0.03);
+    0 0 40px hsla(200, 15%, 50%, 0.1),
+    inset 0 0 80px hsla(200, 15%, 50%, 0.03);
 }
 
 .tombstone:hover .tombstone-top {
-  border-color: rgba(122, 117, 112, 0.35);
+  border-color: hsla(200, 15%, 50%, 0.35);
 }
 
 .epitaph {
@@ -298,7 +286,7 @@ function resumeThread(id: string) {
   align-items: center;
   gap: var(--space-2);
   padding-top: var(--space-4);
-  border-top: 1px solid rgba(122, 117, 112, 0.15);
+  border-top: 1px solid hsla(200, 15%, 50%, 0.15);
 }
 
 .death-date {
@@ -322,7 +310,7 @@ function resumeThread(id: string) {
   padding: var(--space-2) var(--space-5);
   background: transparent;
   color: var(--color-primary);
-  border: 1px solid rgba(212, 165, 116, 0.4);
+  border: 1px solid hsla(165, 75%, 58%, 0.4);
   font-family: var(--font-heading);
   font-size: var(--text-xs);
   font-weight: 400;
@@ -338,9 +326,9 @@ function resumeThread(id: string) {
 }
 
 .resurrect-btn:hover {
-  background: rgba(212, 165, 116, 0.15);
+  background: hsla(165, 75%, 58%, 0.15);
   border-color: var(--color-primary);
-  box-shadow: 0 0 25px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 0 25px hsla(165, 75%, 58%, 0.2);
 }
 
 .graveyard-state {
@@ -405,7 +393,7 @@ function resumeThread(id: string) {
 .empty-divider .divider-line {
   width: 40px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(122, 117, 112, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, hsla(200, 15%, 50%, 0.3), transparent);
 }
 
 .empty-divider .divider-dot {
@@ -423,7 +411,7 @@ function resumeThread(id: string) {
   border-radius: 50%;
   margin: 0 auto;
   animation: spiritFloat 3s ease-in-out infinite;
-  box-shadow: 0 0 15px rgba(122, 117, 112, 0.3);
+  box-shadow: 0 0 15px hsla(200, 15%, 50%, 0.3);
 }
 
 @keyframes spiritFloat {

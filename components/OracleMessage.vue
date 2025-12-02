@@ -51,7 +51,7 @@ defineProps<Props>()
   color: var(--color-text);
   font-size: var(--text-lg);
   font-weight: var(--weight-medium);
-  text-shadow: 0 0 12px var(--color-glow-teal);
+  text-shadow: 0 0 12px var(--color-glow-oracle);
 }
 
 @media (max-width: 768px) {

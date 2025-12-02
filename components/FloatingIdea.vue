@@ -81,8 +81,11 @@ const isUrgent = computed(() => timeRemaining.value <= URGENT_THRESHOLD)
 const timerProgress = computed(() => timeRemaining.value / props.duration)
 const isFrozen = computed(() => props.isSelected || isDragging.value)
 const timerRingStyle = computed(() => {
-  const activeColor = isFrozen.value ? '#7eb8c9' : isUrgent.value ? '#c27a74' : '#d4a574'
-  const bgColor = '#242120'
+  const frozenColor = 'hsl(200, 70%, 72%)'
+  const urgentColor = 'hsl(0, 65%, 60%)'
+  const normalColor = 'hsl(165, 75%, 58%)'
+  const activeColor = isFrozen.value ? frozenColor : isUrgent.value ? urgentColor : normalColor
+  const bgColor = 'hsl(220, 18%, 10%)'
   const deg = timerProgress.value * 360
   return {
     background: `conic-gradient(${activeColor} ${deg}deg, ${bgColor} ${deg}deg)`
@@ -472,8 +475,8 @@ onUnmounted(() => {
   opacity: 1;
   box-shadow:
     0 16px 40px var(--parchment-shadow),
-    0 0 24px rgba(149, 117, 205, 0.6),
-    0 0 48px rgba(149, 117, 205, 0.3),
+    0 0 24px hsla(140, 60%, 45%, 0.6),
+    0 0 48px hsla(140, 60%, 45%, 0.3),
     inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
@@ -482,7 +485,7 @@ onUnmounted(() => {
   opacity: 1;
   box-shadow:
     0 6px 20px var(--parchment-shadow),
-    0 0 8px var(--color-glow-amber),
+    0 0 8px var(--color-glow-spark),
     inset 0 0 20px rgba(201, 184, 150, 0.4);
 }
 
@@ -502,8 +505,8 @@ onUnmounted(() => {
     transform: scale(1);
     box-shadow:
       0 6px 20px var(--parchment-shadow),
-      0 0 32px rgba(149, 117, 205, 0.8),
-      0 0 64px rgba(149, 117, 205, 0.5),
+      0 0 32px hsla(140, 60%, 45%, 0.8),
+      0 0 64px hsla(140, 60%, 45%, 0.5),
       inset 0 0 20px rgba(201, 184, 150, 0.4);
   }
   30% {
@@ -511,8 +514,8 @@ onUnmounted(() => {
     transform: scale(1.05) translateY(-10px);
     box-shadow:
       0 12px 32px var(--parchment-shadow),
-      0 0 48px rgba(149, 117, 205, 1),
-      0 0 80px rgba(149, 117, 205, 0.7),
+      0 0 48px hsla(140, 60%, 45%, 1),
+      0 0 80px hsla(140, 60%, 45%, 0.7),
       inset 0 0 20px rgba(201, 184, 150, 0.4);
   }
   60% {
@@ -520,8 +523,8 @@ onUnmounted(() => {
     transform: scale(0.7) translateY(-25px);
     box-shadow:
       0 8px 24px var(--parchment-shadow),
-      0 0 24px rgba(149, 117, 205, 0.6),
-      0 0 48px rgba(149, 117, 205, 0.3);
+      0 0 24px hsla(140, 60%, 45%, 0.6),
+      0 0 48px hsla(140, 60%, 45%, 0.3);
   }
   100% {
     opacity: 0;
