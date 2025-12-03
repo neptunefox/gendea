@@ -1,5 +1,10 @@
 <template>
   <div class="cauldron-page" @click="handleBackgroundClick">
+    <div class="cauldron-scene-container">
+      <ClientOnly>
+        <CauldronScene />
+      </ClientOnly>
+    </div>
     <BackgroundRunes variant="cauldron" />
     <FlowGuidanceBanner
       :visible="showGuidance && !output && ingredients.length === 0"
@@ -148,6 +153,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronPot from '~/components/CauldronPot.vue'
+import CauldronScene from '~/components/CauldronScene.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
 import SealAnimation from '~/components/SealAnimation.vue'
@@ -701,6 +707,13 @@ onMounted(async () => {
   padding: 0;
   position: relative;
   overflow-x: hidden;
+}
+
+.cauldron-scene-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .cauldron-page::before {

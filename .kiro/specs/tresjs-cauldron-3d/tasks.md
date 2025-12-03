@@ -73,8 +73,8 @@
     - **Property 3: Reduced motion disables animations**
     - **Validates: Requirements 5.1**
 
-- [ ] 7. Integrate CauldronScene into cauldron page
-  - [ ] 7.1 Add CauldronScene to cauldron.vue page
+- [x] 7. Integrate CauldronScene into cauldron page
+  - [x] 7.1 Add CauldronScene to cauldron.vue page
     - Import and render CauldronScene component
     - Position appropriately within page layout
     - Ensure client-only rendering
