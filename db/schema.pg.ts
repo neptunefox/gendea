@@ -57,7 +57,7 @@ export const cauldronIngredients = pgTable('cauldron_ingredients', {
     .notNull()
     .references(() => cauldronSessions.id),
   sourceType: text('source_type', { enum: ['saved', 'spark', 'user'] }).notNull(),
-  sourceId: uuidRef('source_id'),
+  sourceId: text('source_id'),
   content: text('content').notNull(),
   order: integer('order').notNull(),
   addedAt: timestamp('added_at').notNull().defaultNow()

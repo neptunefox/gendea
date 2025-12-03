@@ -123,9 +123,10 @@ export default defineEventHandler(async event => {
       : []
 
   const seenIdeas = buildHistorySet(normalizedHistory)
-  const coreIdeas = await generateSparkIdeas(input, normalizedHistory, seenIdeas)
-  coreIdeas.forEach(idea => seenIdeas.add(normalizeIdea(idea.text)))
-  const lenses = await generateResearchLanes(input, normalizedHistory, seenIdeas)
+  const [coreIdeas, lenses] = await Promise.all([
+    generateSparkIdeas(input, normalizedHistory, seenIdeas),
+    generateResearchLanes(input, normalizedHistory, seenIdeas)
+  ])
   const nudges = buildNudges(input)
 
   const runId = await persistSparkRun({ prompt: input, coreIdeas, lenses, nudges })
