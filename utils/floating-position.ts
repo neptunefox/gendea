@@ -77,8 +77,7 @@ export function generateArcPosition(
   }
 
   const displayedCards = Math.min(totalCards, maxCards)
-  const centerX = viewport.width / 2 - 30
-  const cauldronTopY = viewport.height * 0.22
+  const centerX = viewport.width / 2 - 90
 
   let angle: number
   if (displayedCards === 1) {
@@ -92,9 +91,9 @@ export function generateArcPosition(
 
   const angleRad = (angle * Math.PI) / 180
   const x = centerX + arcRadius * Math.sin(angleRad) - cardWidth / 2
-  const baseY = cauldronTopY - 200
-  const arcOffset = Math.abs(angle) * 1.5
-  const y = baseY + arcOffset - cardHeight / 2
+  const baseY = 1
+  const arcOffset = Math.abs(angle) * 1.3
+  const y = baseY + arcOffset
 
   const tangentRotation = calculateArcTangentRotation(angle)
   const randomOffset = (seededRandom(cardIndex + 1) - 0.5) * 10

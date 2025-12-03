@@ -705,10 +705,10 @@ onMounted(async () => {
 
 .floating-ideas-container {
   position: absolute;
-  top: 0;
+  top: 25%;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 50%;
   pointer-events: none;
   z-index: 10;
 }
@@ -759,9 +759,12 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
   padding: var(--space-6);
-  position: relative;
+  position: fixed;
+  top: 52%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 20;
   min-width: 420px;
   pointer-events: none;
