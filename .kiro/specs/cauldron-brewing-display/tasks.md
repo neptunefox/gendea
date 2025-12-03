@@ -1,14 +1,14 @@
 # Implementation Plan
 
-- [ ] 1. Create core utilities and types
-  - [ ] 1.1 Create brewing card types and interfaces
+- [x] 1. Create core utilities and types
+  - [x] 1.1 Create brewing card types and interfaces
     - Define `BrewingCardDisplay`, `BrewingCardPosition`, `CauldronStreamState` interfaces
     - Create `truncateText()` utility function with 50 char limit
     - _Requirements: 1.3_
   - [ ]* 1.2 Write property test for text truncation
     - **Property 3: Text truncation correctness**
     - **Validates: Requirements 1.3**
-  - [ ] 1.3 Create card layout algorithm
+  - [x] 1.3 Create card layout algorithm
     - Implement `calculateCardPositions()` for elliptical arrangement
     - Handle 1-6 cards with non-overlapping positions
     - _Requirements: 1.2_
