@@ -1,9 +1,10 @@
 import { eq, and } from 'drizzle-orm'
 import { defineEventHandler, getQuery } from 'h3'
 
-import { tarotReadings } from '../../../db/schema'
 import { getRandomCards, getCardById } from '../../data/tarot-deck'
-import { db } from '../../db'
+import { db, schema } from '../../db'
+
+const { tarotReadings } = schema
 
 export default defineEventHandler(async event => {
   const query = getQuery(event)

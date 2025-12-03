@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 
-import { oracleMessages } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import { validateRequired, validateUUID } from '../../utils/validation'
+
+const { oracleMessages } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

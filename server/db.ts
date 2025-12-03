@@ -49,3 +49,5 @@ export const db = new Proxy({} as Database, {
 })
 
 export const isPostgres = () => _isPostgres
+
+export const schema = DATABASE_URL ? pgSchema : sqliteSchema

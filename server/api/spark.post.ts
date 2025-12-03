@@ -1,9 +1,10 @@
 import { createError, defineEventHandler, readBody } from 'h3'
 import { z } from 'zod'
 
-import { sparkRuns } from '../../db/schema'
-import { db } from '../db'
+import { db, schema } from '../db'
 import { useLangChainService } from '../utils/langchain-service'
+
+const { sparkRuns } = schema
 
 const SparkIdeaSchema = z.object({
   text: z.string().min(10)

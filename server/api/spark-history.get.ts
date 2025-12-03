@@ -1,7 +1,8 @@
 import { desc } from 'drizzle-orm'
 
-import { sparkRuns } from '../../db/schema'
-import { db } from '../db'
+import { db, schema } from '../db'
+
+const { sparkRuns } = schema
 
 export default defineEventHandler(async () => {
   const runs = await db.select().from(sparkRuns).orderBy(desc(sparkRuns.createdAt)).limit(30)

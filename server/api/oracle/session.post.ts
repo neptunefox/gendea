@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 
-import { oracleSessions, savedIdeas } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import { validateUUID } from '../../utils/validation'
+
+const { oracleSessions, savedIdeas } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

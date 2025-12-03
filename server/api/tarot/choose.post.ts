@@ -2,11 +2,12 @@ import { eq, desc } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody } from 'h3'
 import { z } from 'zod'
 
-import { tarotReadings, savedIdeas, sparkRuns } from '../../../db/schema'
 import { getCardById } from '../../data/tarot-deck'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import { TAROT_SYSTEM_PROMPT } from '../../utils/langchain-prompts'
 import { useLangChainService } from '../../utils/langchain-service'
+
+const { tarotReadings, savedIdeas, sparkRuns } = schema
 
 const TarotInterpretationSchema = z.object({
   interpretation: z.string().min(20),

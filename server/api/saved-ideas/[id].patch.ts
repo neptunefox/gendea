@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { savedIdeas } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
+
+const { savedIdeas } = schema
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')

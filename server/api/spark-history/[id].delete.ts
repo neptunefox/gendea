@@ -1,14 +1,9 @@
 import { eq, inArray } from 'drizzle-orm'
 
-import {
-  sparkRuns,
-  savedIdeas,
-  oracleSessions,
-  oracleMessages,
-  cauldronIngredients
-} from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import { validateRequired, validateUUID } from '../../utils/validation'
+
+const { sparkRuns, savedIdeas, oracleSessions, oracleMessages, cauldronIngredients } = schema
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')

@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { sparkRuns } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
+
+const { sparkRuns } = schema
 
 export default defineEventHandler(async event => {
   const id = event.context.params?.id

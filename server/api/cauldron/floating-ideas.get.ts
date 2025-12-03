@@ -1,7 +1,9 @@
 import { desc } from 'drizzle-orm'
 
-import { savedIdeas, sparkRuns, type SparkRunIdea, type SparkRunLens } from '../../../db/schema'
-import { db } from '../../db'
+import type { SparkRunIdea, SparkRunLens } from '../../../db/schema'
+import { db, schema } from '../../db'
+
+const { savedIdeas, sparkRuns } = schema
 
 interface FloatingIdea {
   id: string

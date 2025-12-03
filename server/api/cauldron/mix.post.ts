@@ -1,8 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { createError } from 'h3'
 
-import { cauldronIngredients, cauldronSessions } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import {
   CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
   buildCauldronSynthesisPrompt
@@ -10,6 +9,8 @@ import {
 import { CauldronOutputSchema } from '../../utils/langchain-schemas'
 import { useLangChainService } from '../../utils/langchain-service'
 import { validateRequired, validateUUID } from '../../utils/validation'
+
+const { cauldronIngredients, cauldronSessions } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

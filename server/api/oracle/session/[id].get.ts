@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 
-import { oracleSessions, oracleMessages, savedIdeas } from '../../../../db/schema'
-import { db } from '../../../db'
+import { db, schema } from '../../../db'
 import { validateRequired, validateUUID } from '../../../utils/validation'
+
+const { oracleSessions, oracleMessages, savedIdeas } = schema
 
 export default defineEventHandler(async event => {
   const id = getRouterParam(event, 'id')

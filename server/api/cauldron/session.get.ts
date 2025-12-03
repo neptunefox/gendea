@@ -1,7 +1,8 @@
 import { desc, eq } from 'drizzle-orm'
 
-import { cauldronSessions, cauldronIngredients } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
+
+const { cauldronSessions, cauldronIngredients } = schema
 
 export default defineEventHandler(async event => {
   const query = getQuery(event)

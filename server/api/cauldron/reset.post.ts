@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 
-import { cauldronIngredients } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
 import { validateRequired, validateUUID } from '../../utils/validation'
+
+const { cauldronIngredients } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

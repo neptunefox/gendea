@@ -1,5 +1,6 @@
-import { savedIdeas } from '../../db/schema'
-import { db } from '../db'
+import { db, schema } from '../db'
+
+const { savedIdeas } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)

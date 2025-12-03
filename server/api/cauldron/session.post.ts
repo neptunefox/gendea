@@ -1,7 +1,8 @@
 import { createError } from 'h3'
 
-import { cauldronSessions } from '../../../db/schema'
-import { db } from '../../db'
+import { db, schema } from '../../db'
+
+const { cauldronSessions } = schema
 
 export default defineEventHandler(async event => {
   const body = await readBody(event)
