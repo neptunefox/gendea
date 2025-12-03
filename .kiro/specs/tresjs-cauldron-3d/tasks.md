@@ -9,14 +9,14 @@
     - Add `@tresjs/nuxt` to modules in nuxt.config.ts
     - _Requirements: 5.3_
 
-- [ ] 2. Create the base CauldronScene component
-  - [ ] 2.1 Create CauldronScene.vue with TresCanvas setup
+- [x] 2. Create the base CauldronScene component
+  - [x] 2.1 Create CauldronScene.vue with TresCanvas setup
     - Create `components/CauldronScene.vue`
     - Set up TresCanvas with dark background (#0a0f0f)
     - Add PerspectiveCamera at elevated front angle position [0, 2, 5]
     - Add OrbitControls for development (optional, can remove later)
     - _Requirements: 4.1, 4.3, 5.3_
-  - [ ] 2.2 Add lighting setup
+  - [x] 2.2 Add lighting setup
     - Add ambient light with low intensity (0.1)
     - Add point light above cauldron with cyan tint (#00ffcc)
     - _Requirements: 4.2_
