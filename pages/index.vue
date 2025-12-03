@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 import { Check, ChevronDown, Star } from 'lucide-vue-next'
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
@@ -549,7 +549,7 @@ onMounted(async () => {
 
 watch(
   () => router.currentRoute.value.path,
-  (newPath) => {
+  newPath => {
     if (newPath === '/') {
       syncFromLocalStorage()
     }

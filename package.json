@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:push:pg": "DATABASE_URL=$DATABASE_URL drizzle-kit push"
   },
   "dependencies": {
     "@langchain/community": "^1.0.4",
@@ -21,11 +22,13 @@
     "better-sqlite3": "^12.5.0",
     "langchain": "^1.0.6",
     "lucide-vue-next": "^0.553.0",
+    "pg": "^8.16.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.10.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/pg": "^8.15.6",
     "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.44.7",
     "eslint": "^9.39.1",
