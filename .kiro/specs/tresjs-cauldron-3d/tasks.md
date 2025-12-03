@@ -1,11 +1,11 @@
 # Implementation Plan
 
-- [ ] 1. Install TresJS dependencies and configure Nuxt
-  - [ ] 1.1 Install TresJS packages (three, @tresjs/nuxt, @tresjs/cientos)
+- [x] 1. Install TresJS dependencies and configure Nuxt
+  - [x] 1.1 Install TresJS packages (three, @tresjs/nuxt, @tresjs/cientos)
     - Run: `bun add three @tresjs/nuxt @tresjs/cientos`
     - Run: `bun add -D @types/three`
     - _Requirements: 1.1, 5.3_
-  - [ ] 1.2 Configure Nuxt module for TresJS
+  - [x] 1.2 Configure Nuxt module for TresJS
     - Add `@tresjs/nuxt` to modules in nuxt.config.ts
     - _Requirements: 5.3_
 
