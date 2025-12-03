@@ -21,13 +21,13 @@
     - Add point light above cauldron with cyan tint (#00ffcc)
     - _Requirements: 4.2_
 
-- [ ] 3. Implement the cauldron pot geometry
-  - [ ] 3.1 Create cauldron pot mesh using LatheGeometry
+- [x] 3. Implement the cauldron pot geometry
+  - [x] 3.1 Create cauldron pot mesh using LatheGeometry
     - Define pot profile points (rim, body curve, base, legs)
     - Create LatheGeometry from profile
     - Apply dark metallic material (#0a1a1a)
     - _Requirements: 1.1, 1.2_
-  - [ ] 3.2 Add circuit pattern shader to cauldron
+  - [x] 3.2 Add circuit pattern shader to cauldron
     - Create custom ShaderMaterial for circuit glow effect
     - Use UV coordinates to draw glowing line patterns
     - Set emissive cyan color (#00ffcc) for circuit lines
