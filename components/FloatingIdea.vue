@@ -41,12 +41,14 @@ interface Props {
   duration?: number
   isSelected?: boolean
   cauldronCenter?: { x: number; y: number }
+  cauldronRadius?: { x: number; y: number }
 }
 
 const props = withDefaults(defineProps<Props>(), {
   duration: 15000,
   isSelected: false,
-  cauldronCenter: undefined
+  cauldronCenter: undefined,
+  cauldronRadius: undefined
 })
 const emit = defineEmits<{
   dragStart: [idea: FloatingIdea]
@@ -71,7 +73,6 @@ const dragOffset = ref({ x: 0, y: 0 })
 const hasDragged = ref(false)
 const dragStartPos = ref({ x: 0, y: 0 })
 const DRAG_THRESHOLD = 5
-const CAULDRON_PROXIMITY_THRESHOLD = 180
 
 const timeRemaining = ref(props.duration)
 const URGENT_THRESHOLD = 5000
@@ -212,11 +213,13 @@ function updatePosition(clientX: number, clientY: number) {
     y: clientY - dragOffset.value.y
   }
 
-  if (props.cauldronCenter) {
+  if (props.cauldronCenter && props.cauldronRadius) {
     const distX = clientX - props.cauldronCenter.x
     const distY = clientY - props.cauldronCenter.y
-    const distance = Math.sqrt(distX * distX + distY * distY)
-    isNearCauldron.value = distance < CAULDRON_PROXIMITY_THRESHOLD
+    const normalizedDist =
+      (distX * distX) / (props.cauldronRadius.x * props.cauldronRadius.x) +
+      (distY * distY) / (props.cauldronRadius.y * props.cauldronRadius.y)
+    isNearCauldron.value = normalizedDist < 1
   }
 }
 

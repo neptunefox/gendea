@@ -91,7 +91,7 @@ export function generateArcPosition(
 
   const angleRad = (angle * Math.PI) / 180
   const x = centerX + arcRadius * Math.sin(angleRad) - cardWidth / 2
-  const baseY = 1
+  const baseY = -40
   const arcOffset = Math.abs(angle) * 1.3
   const y = baseY + arcOffset
 

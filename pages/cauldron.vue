@@ -36,6 +36,7 @@
               :duration="15000"
               :is-selected="selectedIdeaId === idea.id"
               :cauldron-center="cauldronCenter"
+              :cauldron-radius="cauldronRadius"
               @drag-start="handleIdeaDragStart"
               @drag-end="handleIdeaDragEnd"
               @dissolve-start="handleDissolveStart"
@@ -141,7 +142,7 @@
 
 <script setup lang="ts">
 import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronScene from '~/components/CauldronScene.vue'
@@ -213,11 +214,20 @@ const reducedMotion = useReducedMotion()
 
 const MAX_DISPLAYED_IDEAS = 5
 
+const viewportSize = ref({ width: 0, height: 0 })
+
 const cauldronCenter = computed(() => {
-  if (typeof window === 'undefined') return { x: 0, y: 0 }
   return {
-    x: window.innerWidth / 2,
-    y: window.innerHeight * 0.6
+    x: viewportSize.value.width / 2,
+    y: viewportSize.value.height * 0.52
+  }
+})
+
+const cauldronRadius = computed(() => {
+  const baseSize = Math.min(viewportSize.value.width, viewportSize.value.height)
+  return {
+    x: baseSize * 0.22,
+    y: baseSize * 0.18
   }
 })
 
@@ -626,10 +636,20 @@ watch(
   }
 )
 
+function updateViewportSize() {
+  viewportSize.value = { width: window.innerWidth, height: window.innerHeight }
+}
+
 onMounted(async () => {
+  updateViewportSize()
+  window.addEventListener('resize', updateViewportSize)
   checkGuidanceDismissed()
   await loadSession()
   await loadFloatingIdeas()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateViewportSize)
 })
 </script>
 
