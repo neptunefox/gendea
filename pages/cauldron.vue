@@ -65,14 +65,6 @@
         </div>
 
         <div class="cauldron-center">
-          <CauldronPot
-            ref="cauldronPotRef"
-            :ingredients="ingredients"
-            :is-mixing="isMixing && !output"
-            :streaming-text="streamingText"
-            @drop="handleDrop"
-          />
-
           <CauldronOutput
             v-if="output"
             ref="cauldronOutputRef"
@@ -152,7 +144,6 @@ import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
 import { ref, onMounted, watch, computed } from 'vue'
 
 import CauldronOutput from '~/components/CauldronOutput.vue'
-import CauldronPot from '~/components/CauldronPot.vue'
 import CauldronScene from '~/components/CauldronScene.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
@@ -197,7 +188,6 @@ const ingredients = ref<CauldronIngredient[]>([])
 const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
 const output = ref<string | null>(null)
-const streamingText = ref('')
 const manualInput = ref('')
 const isLoading = ref(true)
 const showToast = ref(false)
@@ -214,7 +204,6 @@ const GUIDANCE_DISMISSED_KEY = 'cauldron-guidance-dismissed'
 const ideaRefs = ref<
   Map<string, { dissolve: () => void; resetTimer: (duration?: number) => void }>
 >(new Map())
-const cauldronPotRef = ref<{ triggerManualAddAnimation: () => void } | null>(null)
 const cauldronOutputRef = ref<HTMLElement | null>(null)
 
 const { particles, spawnDissolutionParticles, spawnSparkles } = useParticles()
@@ -355,13 +344,6 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
     ideaRef.dissolve()
   }
 
-  if (
-    cauldronPotRef.value &&
-    typeof cauldronPotRef.value.triggerManualAddAnimation === 'function'
-  ) {
-    cauldronPotRef.value.triggerManualAddAnimation()
-  }
-
   playSound('splash')
 
   try {
@@ -387,43 +369,6 @@ async function handleIdeaDropped(idea: FloatingIdea, _event: { clientX: number; 
 
 async function handleIdeaThrow(idea: FloatingIdea) {
   await handleIdeaDropped(idea, { clientX: 0, clientY: 0 })
-}
-
-async function handleDrop(_event: DragEvent) {
-  if (!draggedIdea.value || !currentSession.value) return
-  if (pendingDrops.value.has(draggedIdea.value.id)) return
-
-  const droppedIdea = draggedIdea.value
-  pendingDrops.value.add(droppedIdea.id)
-  draggedIdea.value = null
-
-  const ideaRef = ideaRefs.value.get(droppedIdea.id)
-
-  if (ideaRef && typeof ideaRef.dissolve === 'function') {
-    ideaRef.dissolve()
-  }
-
-  playSound('splash')
-
-  try {
-    await $fetch('/api/cauldron/add-ingredient', {
-      method: 'POST',
-      body: {
-        sessionId: currentSession.value.id,
-        sourceType: droppedIdea.source,
-        sourceId: droppedIdea.id,
-        content: droppedIdea.text
-      }
-    })
-
-    await loadSession()
-    showToastMessage('Idea added to cauldron')
-  } catch (error) {
-    console.error('Failed to add ingredient:', error)
-    showToastMessage('Failed to add idea')
-  } finally {
-    pendingDrops.value.delete(droppedIdea.id)
-  }
 }
 
 function handleDissolveStart(_idea: FloatingIdea, position: { x: number; y: number }) {
@@ -476,13 +421,6 @@ function handleIdeaExpired(idea: FloatingIdea) {
 async function handleManualSubmit() {
   const text = manualInput.value.trim()
   if (!text || !currentSession.value) return
-
-  if (
-    cauldronPotRef.value &&
-    typeof cauldronPotRef.value.triggerManualAddAnimation === 'function'
-  ) {
-    cauldronPotRef.value.triggerManualAddAnimation()
-  }
 
   playSound('splash')
 
@@ -635,7 +573,6 @@ function checkGuidanceDismissed() {
 
 async function streamMix(sessionId: string, _isRemix = false) {
   isMixing.value = true
-  streamingText.value = ''
   playSound('bubble')
 
   try {
@@ -655,9 +592,6 @@ async function streamMix(sessionId: string, _isRemix = false) {
       const lines = value.split('\n').filter(line => line.startsWith('data: '))
       for (const line of lines) {
         const data = JSON.parse(line.slice(6))
-        if (data.token) {
-          streamingText.value += data.token
-        }
         if (data.done) {
           output.value = data.output
           stopSound('bubble')
@@ -675,7 +609,6 @@ async function streamMix(sessionId: string, _isRemix = false) {
     showToastMessage('Failed to mix ideas')
   } finally {
     isMixing.value = false
-    streamingText.value = ''
   }
 }
 

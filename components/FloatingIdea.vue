@@ -244,7 +244,8 @@ function endDrag(clientX: number, clientY: number) {
   }
 
   const dropTarget = document.elementFromPoint(clientX, clientY)
-  const cauldronPot = dropTarget?.closest('.cauldron-pot')
+  const cauldronCenter = dropTarget?.closest('.cauldron-center')
+  const wasNearCauldron = isNearCauldron.value
 
   if (ideaRef.value) {
     ideaRef.value.style.pointerEvents = ''
@@ -255,7 +256,7 @@ function endDrag(clientX: number, clientY: number) {
   isNearCauldron.value = false
   zIndex.value = 10 + props.index
 
-  if (cauldronPot) {
+  if (cauldronCenter || wasNearCauldron) {
     emit('dropped', props.idea, { clientX, clientY })
   } else {
     position.value = { ...originalPosition.value }
