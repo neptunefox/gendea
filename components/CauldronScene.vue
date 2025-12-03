@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
 import { OrbitControls } from '@tresjs/cientos'
-import { LatheGeometry, ShaderMaterial, Vector2, Mesh, DoubleSide } from 'three'
+import { LatheGeometry, ShaderMaterial, Vector2, Mesh, DoubleSide, CircleGeometry } from 'three'
+
+const reducedMotion = useReducedMotion()
 
 const cauldronProfile = [
   new Vector2(0.8, 1.2),
@@ -57,6 +59,43 @@ const fragmentShader = `
   }
 `
 
+const liquidVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const liquidFragmentShader = `
+  uniform float uTime;
+  varying vec2 vUv;
+
+  void main() {
+    vec2 center = vUv - 0.5;
+    float angle = atan(center.y, center.x) + uTime * 0.5;
+    float dist = length(center);
+    
+    vec2 swirlUv = vec2(
+      cos(angle) * dist + 0.5,
+      sin(angle) * dist + 0.5
+    );
+    
+    float swirl = sin(swirlUv.x * 10.0 + uTime) * sin(swirlUv.y * 10.0 + uTime * 0.7);
+    swirl = swirl * 0.5 + 0.5;
+    
+    float glow = 1.0 - dist * 1.5;
+    glow = max(0.0, glow);
+    
+    vec3 baseColor = vec3(0.0, 0.3, 0.3);
+    vec3 glowColor = vec3(0.0, 1.0, 0.8);
+    vec3 finalColor = baseColor + glowColor * (swirl * 0.4 + glow * 0.6);
+    
+    float alpha = smoothstep(0.5, 0.3, dist);
+    gl_FragColor = vec4(finalColor, alpha);
+  }
+`
+
 const cauldronGeometry = new LatheGeometry(cauldronProfile, 32)
 const cauldronMaterial = new ShaderMaterial({
   vertexShader,
@@ -64,11 +103,30 @@ const cauldronMaterial = new ShaderMaterial({
   side: DoubleSide,
 })
 const cauldronMesh = new Mesh(cauldronGeometry, cauldronMaterial)
+
+const liquidGeometry = new CircleGeometry(0.75, 32)
+const liquidMaterial = new ShaderMaterial({
+  vertexShader: liquidVertexShader,
+  fragmentShader: liquidFragmentShader,
+  uniforms: {
+    uTime: { value: 0 },
+  },
+  transparent: true,
+  side: DoubleSide,
+})
+const liquidMesh = new Mesh(liquidGeometry, liquidMaterial)
+liquidMesh.rotation.x = -Math.PI / 2
+liquidMesh.position.y = 1.1
+
+function onLoop({ elapsed }: { elapsed: number }) {
+  if (reducedMotion.value) return
+  liquidMaterial.uniforms.uTime.value = elapsed
+}
 </script>
 
 <template>
   <ClientOnly>
-    <TresCanvas :clear-color="'#0a0f0f'">
+    <TresCanvas :clear-color="'#0a0f0f'" @loop="onLoop">
       <TresPerspectiveCamera :position="[0, 2, 5]" :look-at="[0, 0, 0]" />
       <OrbitControls :enable-damping="true" />
 
@@ -76,6 +134,7 @@ const cauldronMesh = new Mesh(cauldronGeometry, cauldronMaterial)
       <TresPointLight :position="[0, 2, 0]" :color="'#00ffcc'" :intensity="2" />
 
       <primitive :object="cauldronMesh" />
+      <primitive :object="liquidMesh" />
     </TresCanvas>
   </ClientOnly>
 </template>

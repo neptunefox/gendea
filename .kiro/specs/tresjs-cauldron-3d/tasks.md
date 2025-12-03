@@ -33,13 +33,13 @@
     - Set emissive cyan color (#00ffcc) for circuit lines
     - _Requirements: 1.3_
 
-- [ ] 4. Implement the liquid surface
-  - [ ] 4.1 Create liquid mesh with glow effect
+- [x] 4. Implement the liquid surface
+  - [x] 4.1 Create liquid mesh with glow effect
     - Add CircleGeometry at pot opening
     - Create ShaderMaterial with emissive glow
     - Position at top of cauldron
     - _Requirements: 2.1, 2.3_
-  - [ ] 4.2 Add swirling animation to liquid
+  - [x] 4.2 Add swirling animation to liquid
     - Use useRenderLoop to animate shader uniforms
     - Rotate UV coordinates for swirl effect
     - Respect reduced motion preference
