@@ -13,23 +13,23 @@ interface SoundAsset {
 }
 
 const SOUNDS: Record<string, SoundAsset> = {
-  chime: { id: 'chime', src: '/sounds/chimes.mp3', loop: false, volume: 0.4 },
-  bubble: { id: 'bubble', src: '/sounds/bubbles.mp3', loop: true, volume: 0.2 },
-  crystal: { id: 'crystal', src: '/sounds/crystal.mp3', loop: false, volume: 0.3 },
-  cardFlip: { id: 'cardFlip', src: '/sounds/card-flip.mp3', loop: false, volume: 0.5 },
-  splash: { id: 'splash', src: '/sounds/splash.mp3', loop: false, volume: 0.35 },
-  arrive: { id: 'arrive', src: '/sounds/arrive.mp3', loop: false, volume: 0.4 },
-  whoosh: { id: 'whoosh', src: '/sounds/whoosh.mp3', loop: false, volume: 0.25 },
-  whisper: { id: 'whisper', src: '/sounds/whisper.mp3', loop: false, volume: 0.3 }
+  chime: { id: 'chime', src: '/sounds/chimes.mp3', loop: false, volume: 0.7 },
+  bubble: { id: 'bubble', src: '/sounds/bubbles.mp3', loop: true, volume: 0.5 },
+  crystal: { id: 'crystal', src: '/sounds/crystal.mp3', loop: false, volume: 0.6 },
+  cardFlip: { id: 'cardFlip', src: '/sounds/card-flip.mp3', loop: false, volume: 0.8 },
+  splash: { id: 'splash', src: '/sounds/splash.mp3', loop: false, volume: 0.65 },
+  arrive: { id: 'arrive', src: '/sounds/arrive.mp3', loop: false, volume: 0.7 },
+  whoosh: { id: 'whoosh', src: '/sounds/whoosh.mp3', loop: false, volume: 0.55 },
+  whisper: { id: 'whisper', src: '/sounds/whisper.mp3', loop: false, volume: 0.6 }
 }
 
 const audioElements = new Map<string, HTMLAudioElement>()
 const soundEnabled = ref(true)
-const soundVolume = ref(0.3)
+const soundVolume = ref(0.6)
 
 function loadPreferences(): SoundPreferences {
   if (typeof window === 'undefined') {
-    return { enabled: true, volume: 0.3 }
+    return { enabled: true, volume: 0.6 }
   }
   try {
     const stored = window.localStorage.getItem(SOUND_STORAGE_KEY)
@@ -39,7 +39,7 @@ function loadPreferences(): SoundPreferences {
   } catch {
     // ignore
   }
-  return { enabled: true, volume: 0.3 }
+  return { enabled: true, volume: 0.6 }
 }
 
 function savePreferences(prefs: SoundPreferences) {

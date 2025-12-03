@@ -32,8 +32,22 @@
         v-for="thread in threadCards"
         :key="thread.id"
         class="tombstone"
+        :class="{ confirming: confirmingId === thread.id }"
         @click="resumeThread(thread.id)"
       >
+        <div v-if="confirmingId === thread.id" class="bury-confirm" @click.stop>
+          <p class="confirm-text">Bury forever?</p>
+          <div class="confirm-actions">
+            <button class="confirm-yes" @click.stop="confirmDelete(thread.id)">
+              <Skull :size="12" />
+              Bury
+            </button>
+            <button class="confirm-no" @click.stop="cancelDelete">Keep</button>
+          </div>
+        </div>
+        <button v-else class="bury-btn" title="Bury forever" @click.stop="startDelete(thread.id)">
+          <Skull :size="14" />
+        </button>
         <div class="tombstone-top"></div>
         <div class="tombstone-body">
           <div class="epitaph">
@@ -51,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+import { Skull } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 
 interface SparkRun {
@@ -70,6 +85,7 @@ interface ThreadCard {
 const threadCards = ref<ThreadCard[]>([])
 const threadsLoading = ref(true)
 const threadsError = ref<string | null>(null)
+const confirmingId = ref<string | null>(null)
 
 onMounted(async () => {
   await fetchThreads()
@@ -106,6 +122,58 @@ function resumeThread(id: string) {
       resume: id
     }
   })
+}
+
+function startDelete(id: string) {
+  confirmingId.value = id
+}
+
+function cancelDelete() {
+  confirmingId.value = null
+}
+
+const SPARK_STORAGE_KEY = 'spark-thread-journal'
+const SPARK_STARRED_KEY = 'spark-starred-ideas'
+
+function clearFromLocalStorage(id: string, ideaTexts: string[]) {
+  if (typeof window === 'undefined') return
+
+  try {
+    const stored = window.localStorage.getItem(SPARK_STORAGE_KEY)
+    if (stored) {
+      const entries = JSON.parse(stored) as Array<{ id: string }>
+      const filtered = entries.filter(e => e.id !== id)
+      window.localStorage.setItem(SPARK_STORAGE_KEY, JSON.stringify(filtered))
+    }
+
+    if (ideaTexts.length > 0) {
+      const starredStored = window.localStorage.getItem(SPARK_STARRED_KEY)
+      if (starredStored) {
+        const starred = JSON.parse(starredStored) as string[]
+        const filtered = starred.filter(t => !ideaTexts.includes(t))
+        window.localStorage.setItem(SPARK_STARRED_KEY, JSON.stringify(filtered))
+      }
+    }
+  } catch {
+    // ignore localStorage errors
+  }
+}
+
+async function confirmDelete(id: string) {
+  try {
+    const { run } = await $fetch<{ run: SparkRun }>(`/api/spark-history/${id}`)
+    const ideaTexts = run?.coreIdeas?.map(i => i.text) ?? []
+
+    await $fetch(`/api/spark-history/${id}`, { method: 'DELETE' })
+    threadCards.value = threadCards.value.filter(t => t.id !== id)
+
+    clearFromLocalStorage(id, ideaTexts)
+    window.dispatchEvent(new CustomEvent('spark-entries-changed'))
+  } catch (e) {
+    console.error('Failed to delete thread:', e)
+  } finally {
+    confirmingId.value = null
+  }
 }
 </script>
 
@@ -329,6 +397,118 @@ function resumeThread(id: string) {
   background: hsla(185, 75%, 55%, 0.15);
   border-color: var(--color-primary);
   box-shadow: 0 0 25px hsla(185, 75%, 55%, 0.2);
+}
+
+.bury-btn {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 26px;
+  height: 26px;
+  border: 1px solid hsla(260, 20%, 40%, 0.3);
+  background: hsla(260, 20%, 15%, 0.8);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: all 0.3s var(--ease-out);
+  z-index: 10;
+}
+
+.tombstone:hover .bury-btn {
+  opacity: 0.6;
+}
+
+.bury-btn:hover {
+  opacity: 1;
+  background: hsla(260, 25%, 20%, 0.9);
+  border-color: hsla(260, 30%, 50%, 0.5);
+  color: hsla(260, 40%, 70%, 1);
+}
+
+.bury-confirm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: hsla(260, 20%, 10%, 0.95);
+  border: 2px solid hsla(260, 30%, 40%, 0.4);
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  z-index: 20;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-text {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  color: hsla(260, 30%, 70%, 1);
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.confirm-yes,
+.confirm-no {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.confirm-yes {
+  background: hsla(260, 30%, 25%, 0.8);
+  border: 1px solid hsla(260, 40%, 50%, 0.5);
+  color: hsla(260, 50%, 75%, 1);
+}
+
+.confirm-yes:hover {
+  background: hsla(260, 35%, 30%, 0.9);
+  border-color: hsla(260, 50%, 60%, 0.7);
+  box-shadow: 0 0 20px hsla(260, 40%, 50%, 0.3);
+}
+
+.confirm-no {
+  background: transparent;
+  border: 1px solid hsla(200, 15%, 40%, 0.4);
+  color: var(--color-text-secondary);
+}
+
+.confirm-no:hover {
+  border-color: hsla(200, 15%, 50%, 0.6);
+  color: var(--color-text);
+}
+
+.tombstone.confirming {
+  transform: none;
+}
+
+.tombstone.confirming:hover {
+  transform: none;
+}
+
+.tombstone.confirming .tombstone-top,
+.tombstone.confirming .tombstone-body {
+  opacity: 0.3;
 }
 
 .graveyard-state {

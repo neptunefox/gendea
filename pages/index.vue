@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 import { Check, ChevronDown, Star } from 'lucide-vue-next'
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import DailyTarot from '~/components/DailyTarot.vue'
@@ -366,8 +366,21 @@ function navigateToBrew(text: string) {
   router.push({ path: '/cauldron', query: { add: text } })
 }
 
-function navigateToConsult(text: string) {
-  router.push({ path: '/oracle', query: { context: text } })
+async function navigateToConsult(text: string) {
+  try {
+    const { idea } = await $fetch<{ idea: { id: string } }>('/api/saved-ideas', {
+      method: 'POST',
+      body: {
+        text,
+        source: 'spark',
+        status: 'exploring'
+      }
+    })
+    router.push({ path: '/oracle', query: { idea: idea.id } })
+  } catch (error) {
+    console.error('Failed to save idea for Oracle:', error)
+    showToastMessage('Failed to start discussion')
+  }
 }
 
 async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry) {
@@ -383,6 +396,7 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
 
   try {
     const response = await $fetch<{
+      id?: string
       coreIdeas: SparkIdea[]
       lenses: SparkLens[]
       nudges: SparkNudge[]
@@ -398,7 +412,7 @@ async function handleGenerate(customPrompt?: string, parentEntry?: JournalEntry)
     })
 
     const entry: JournalEntry = {
-      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`,
+      id: response.id || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`),
       prompt: topic,
       timestamp: Date.now(),
       coreIdeas: response.coreIdeas,
@@ -499,26 +513,48 @@ function handleToastLeave() {
 function restoreThread() {
   if (typeof window === 'undefined') return
   const stored = window.localStorage.getItem(STORAGE_KEY)
-  if (!stored) return
+  if (!stored) {
+    entries.value = []
+    lastPrompt.value = ''
+    return
+  }
   try {
     const parsed = JSON.parse(stored) as JournalEntry[]
-    if (Array.isArray(parsed) && parsed.length > 0) {
+    if (Array.isArray(parsed)) {
       entries.value = parsed
       lastPrompt.value = parsed[0]?.prompt || ''
+    } else {
+      entries.value = []
+      lastPrompt.value = ''
     }
   } catch (error) {
     console.warn('Failed to restore thread history', error)
+    entries.value = []
+    lastPrompt.value = ''
   }
 }
 
-onMounted(async () => {
+function syncFromLocalStorage() {
   restoreThread()
   restoreStarredIdeas()
   restoreCollapsedSessions()
   restoreLockedLens()
+}
+
+onMounted(async () => {
+  syncFromLocalStorage()
   await nextTick()
   adjustInputHeight()
 })
+
+watch(
+  () => router.currentRoute.value.path,
+  (newPath) => {
+    if (newPath === '/') {
+      syncFromLocalStorage()
+    }
+  }
+)
 
 interface TarotCard {
   id: string

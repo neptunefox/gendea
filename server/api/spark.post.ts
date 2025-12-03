@@ -127,9 +127,9 @@ export default defineEventHandler(async event => {
   const lenses = await generateResearchLanes(input, normalizedHistory, seenIdeas)
   const nudges = buildNudges(input)
 
-  await persistSparkRun({ prompt: input, coreIdeas, lenses, nudges })
+  const runId = await persistSparkRun({ prompt: input, coreIdeas, lenses, nudges })
 
-  return { coreIdeas, lenses, nudges }
+  return { id: runId, coreIdeas, lenses, nudges }
 })
 
 async function generateSparkIdeas(
@@ -287,15 +287,20 @@ async function persistSparkRun(entry: {
   coreIdeas: SparkIdea[]
   lenses: LensResult[]
   nudges: SparkNudge[]
-}) {
+}): Promise<string | undefined> {
   try {
-    await db.insert(sparkRuns).values({
-      prompt: entry.prompt,
-      coreIdeas: entry.coreIdeas,
-      lenses: entry.lenses,
-      nudges: entry.nudges
-    })
+    const [result] = await db
+      .insert(sparkRuns)
+      .values({
+        prompt: entry.prompt,
+        coreIdeas: entry.coreIdeas,
+        lenses: entry.lenses,
+        nudges: entry.nudges
+      })
+      .returning({ id: sparkRuns.id })
+    return result?.id
   } catch (error) {
     console.error('Failed to persist spark run:', error)
+    return undefined
   }
 }
