@@ -71,7 +71,7 @@ const dragOffset = ref({ x: 0, y: 0 })
 const hasDragged = ref(false)
 const dragStartPos = ref({ x: 0, y: 0 })
 const DRAG_THRESHOLD = 5
-const CAULDRON_PROXIMITY_THRESHOLD = 150
+const CAULDRON_PROXIMITY_THRESHOLD = 180
 
 const timeRemaining = ref(props.duration)
 const URGENT_THRESHOLD = 5000

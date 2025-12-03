@@ -217,7 +217,7 @@ const cauldronCenter = computed(() => {
   if (typeof window === 'undefined') return { x: 0, y: 0 }
   return {
     x: window.innerWidth / 2,
-    y: window.innerHeight / 2
+    y: window.innerHeight * 0.6
   }
 })
 

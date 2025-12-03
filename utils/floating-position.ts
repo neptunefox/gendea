@@ -48,9 +48,9 @@ export interface ArcPosition {
 }
 
 export const DEFAULT_ARC_CONFIG: ArcLayoutConfig = {
-  arcRadius: 380,
-  arcStartAngle: -75,
-  arcEndAngle: 75,
+  arcRadius: 340,
+  arcStartAngle: -70,
+  arcEndAngle: 70,
   maxCards: 5,
   cardWidth: 200,
   cardHeight: 100
@@ -78,7 +78,7 @@ export function generateArcPosition(
 
   const displayedCards = Math.min(totalCards, maxCards)
   const centerX = viewport.width / 2 - 30
-  const cauldronTopY = viewport.height * 0.35
+  const cauldronTopY = viewport.height * 0.22
 
   let angle: number
   if (displayedCards === 1) {
