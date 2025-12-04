@@ -10,7 +10,6 @@ import {
   CircleGeometry,
   BufferGeometry,
   Float32BufferAttribute,
-  PointsMaterial,
   Points,
   AdditiveBlending
 } from 'three'
@@ -124,6 +123,82 @@ const liquidMesh = new Mesh(liquidGeometry, liquidMaterial)
 liquidMesh.rotation.x = -Math.PI / 2
 liquidMesh.position.y = 1.1
 
+const emberVertexShader = `
+  varying vec2 vUv;
+  varying vec3 vPosition;
+  void main() {
+    vUv = uv;
+    vPosition = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const emberFragmentShader = `
+  uniform float uTime;
+  varying vec2 vUv;
+  varying vec3 vPosition;
+
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+  }
+
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
+      f.y
+    );
+  }
+
+  void main() {
+    vec2 center = (vUv - 0.5) * 2.3;
+    float dist = length(center);
+    
+    float n1 = noise(center * 4.0 + uTime * 0.18);
+    float n2 = noise(center * 8.0 - uTime * 0.12);
+    float n3 = noise(center * 2.0 + vec2(uTime * 0.08, -uTime * 0.1));
+    float combined = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
+    
+    float pulse = 0.85 + 0.15 * sin(uTime * 1.2 + dist * 2.5);
+    float flicker = 0.92 + 0.08 * sin(uTime * 4.0 + combined * 7.0);
+    
+    vec3 hotCore = vec3(1.0, 0.9, 0.5);
+    vec3 midGlow = vec3(1.0, 0.4, 0.1);
+    vec3 outerGlow = vec3(0.6, 0.1, 0.02);
+    vec3 darkCoal = vec3(0.15, 0.02, 0.0);
+    
+    float intensity = combined * pulse * flicker;
+    intensity *= smoothstep(1.2, 0.4, dist);
+    
+    vec3 color = mix(darkCoal, outerGlow, smoothstep(0.2, 0.4, intensity));
+    color = mix(color, midGlow, smoothstep(0.4, 0.6, intensity));
+    color = mix(color, hotCore, smoothstep(0.7, 0.9, intensity));
+    
+    float edgeFade = smoothstep(1.2, 0.7, dist);
+    float alpha = edgeFade * (0.8 + intensity * 0.4);
+    
+    gl_FragColor = vec4(color * (0.8 + intensity * 0.5), alpha);
+  }
+`
+
+const emberGeometry = new CircleGeometry(1.15, 32)
+const emberMaterial = new ShaderMaterial({
+  vertexShader: emberVertexShader,
+  fragmentShader: emberFragmentShader,
+  uniforms: {
+    uTime: { value: 0 }
+  },
+  transparent: true,
+  blending: AdditiveBlending,
+  depthWrite: false
+})
+const emberMesh = new Mesh(emberGeometry, emberMaterial)
+emberMesh.rotation.x = -Math.PI / 2
+emberMesh.position.y = -0.35
+
 const SPARK_COUNT = 50
 
 const sparkVertexShader = `
@@ -224,6 +299,7 @@ sparkPoints.renderOrder = 1
 function onLoop({ elapsed }: { elapsed: number }) {
   liquidMaterial.uniforms.uTime.value = elapsed
   sparkMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
+  emberMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
 }
 </script>
 
@@ -235,7 +311,9 @@ function onLoop({ elapsed }: { elapsed: number }) {
 
       <TresAmbientLight :intensity="0.08" />
       <TresPointLight :position="[0, 2.5, 0]" :color="'#00ccaa'" :intensity="1.5" />
+      <TresPointLight :position="[0, -0.3, 0]" :color="'#ff4400'" :intensity="2" :distance="2" />
 
+      <primitive :object="emberMesh" />
       <primitive :object="cauldronMesh" />
       <primitive :object="liquidMesh" />
       <primitive :object="sparkPoints" />
