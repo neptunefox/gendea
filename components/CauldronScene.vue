@@ -92,9 +92,9 @@ const liquidFragmentShader = `
     float glow = 1.0 - dist * 1.8;
     glow = max(0.0, glow);
     
-    vec3 baseColor = vec3(0.0, 0.18, 0.15);
-    vec3 glowColor = vec3(0.0, 0.7, 0.55);
-    vec3 finalColor = baseColor + glowColor * (swirl * 0.3 + glow * 0.5);
+    vec3 baseColor = vec3(0.4, 0.25, 0.0);
+    vec3 glowColor = vec3(1.0, 0.8, 0.0);
+    vec3 finalColor = baseColor + glowColor * (swirl * 0.3 + glow * 0.6);
     
     float alpha = smoothstep(0.5, 0.25, dist);
     gl_FragColor = vec4(finalColor, alpha);
@@ -165,10 +165,10 @@ const emberFragmentShader = `
     float pulse = 0.85 + 0.15 * sin(uTime * 1.2 + dist * 2.5);
     float flicker = 0.92 + 0.08 * sin(uTime * 4.0 + combined * 7.0);
     
-    vec3 hotCore = vec3(1.0, 0.9, 0.5);
-    vec3 midGlow = vec3(1.0, 0.4, 0.1);
-    vec3 outerGlow = vec3(0.6, 0.1, 0.02);
-    vec3 darkCoal = vec3(0.15, 0.02, 0.0);
+    vec3 hotCore = vec3(1.0, 0.3, 0.5);
+    vec3 midGlow = vec3(0.9, 0.1, 0.3);
+    vec3 outerGlow = vec3(0.6, 0.0, 0.15);
+    vec3 darkCoal = vec3(0.2, 0.0, 0.05);
     
     float intensity = combined * pulse * flicker;
     intensity *= smoothstep(1.2, 0.4, dist);
@@ -248,9 +248,9 @@ const sparkFragmentShader = `
     float innerGlow = 1.0 - smoothstep(0.0, 0.3, dist);
     float outerGlow = 1.0 - smoothstep(0.0, 0.5, dist);
     
-    vec3 coreColor = vec3(1.0, 1.0, 1.0);
-    vec3 glowColor = vec3(0.0, 1.0, 0.85);
-    vec3 outerColor = vec3(0.0, 0.6, 0.5);
+    vec3 coreColor = vec3(1.0, 0.9, 0.6);
+    vec3 glowColor = vec3(1.0, 0.5, 0.2);
+    vec3 outerColor = vec3(0.8, 0.2, 0.1);
     
     vec3 color = coreColor * core + glowColor * innerGlow * 0.6 + outerColor * outerGlow * 0.3;
     float alpha = (core + innerGlow * 0.7 + outerGlow * 0.3) * vAlpha;
@@ -310,8 +310,8 @@ function onLoop({ elapsed }: { elapsed: number }) {
       <OrbitControls :enable-damping="true" :enable-zoom="false" :target="[0, 0.5, 0]" />
 
       <TresAmbientLight :intensity="0.08" />
-      <TresPointLight :position="[0, 2.5, 0]" :color="'#00ccaa'" :intensity="1.5" />
-      <TresPointLight :position="[0, -0.3, 0]" :color="'#ff4400'" :intensity="2" :distance="2" />
+      <TresPointLight :position="[0, 2.5, 0]" :color="'#ffaa00'" :intensity="1.5" />
+      <TresPointLight :position="[0, -0.3, 0]" :color="'#ff1a4d'" :intensity="2" :distance="2" />
 
       <primitive :object="emberMesh" />
       <primitive :object="cauldronMesh" />
