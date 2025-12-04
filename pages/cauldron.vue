@@ -671,7 +671,7 @@ onUnmounted(() => {
 <style scoped>
 .cauldron-page {
   min-height: 100vh;
-  background: var(--color-bg);
+  background: hsl(180, 12%, 10%);
   padding: 0;
   position: relative;
   overflow-x: hidden;
@@ -692,11 +692,27 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   background: radial-gradient(
-    ellipse 50% 50% at 50% 60%,
-    hsla(140, 60%, 45%, 0.04) 0%,
-    transparent 50%
+    ellipse 45% 40% at 50% 55%,
+    hsla(170, 50%, 40%, 0.12) 0%,
+    transparent 60%
   );
   pointer-events: none;
+  z-index: 2;
+}
+
+.cauldron-page::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 85% 85% at 50% 50%,
+    transparent 25%,
+    hsla(180, 15%, 6%, 0.4) 55%,
+    hsla(180, 15%, 4%, 0.7) 80%,
+    hsl(180, 15%, 2%) 100%
+  );
+  pointer-events: none;
+  z-index: 3;
 }
 
 .cauldron-page > :deep(.flow-guidance-banner) {

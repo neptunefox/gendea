@@ -54,12 +54,12 @@ const fragmentShader = `
     float diag1 = circuitLine((uv.x + uv.y) * 6.0, 0.015, 1.0);
     float diag2 = circuitLine((uv.x - uv.y) * 6.0, 0.015, 1.0);
     float nodes = smoothstep(0.08, 0.0, length(fract(uv * 4.0) - 0.5));
-    return max(max(max(hLines, vLines), max(diag1, diag2)), nodes) * 0.6;
+    return max(max(max(hLines, vLines), max(diag1, diag2)), nodes) * 0.35;
   }
 
   void main() {
-    vec3 baseColor = vec3(0.04, 0.1, 0.1);
-    vec3 glowColor = vec3(0.0, 1.0, 0.8);
+    vec3 baseColor = vec3(0.03, 0.07, 0.07);
+    vec3 glowColor = vec3(0.0, 0.75, 0.6);
     float circuit = circuitPattern(vUv);
     vec3 finalColor = baseColor + glowColor * circuit;
     gl_FragColor = vec4(finalColor, 1.0);
@@ -80,7 +80,7 @@ const liquidFragmentShader = `
 
   void main() {
     vec2 center = vUv - 0.5;
-    float angle = atan(center.y, center.x) + uTime * 0.3;
+    float angle = atan(center.y, center.x) + uTime * 0.2;
     float dist = length(center);
     
     vec2 swirlUv = vec2(
@@ -88,17 +88,17 @@ const liquidFragmentShader = `
       sin(angle) * dist + 0.5
     );
     
-    float swirl = sin(swirlUv.x * 10.0 + uTime * 0.6) * sin(swirlUv.y * 10.0 + uTime * 0.4);
+    float swirl = sin(swirlUv.x * 10.0 + uTime * 0.5) * sin(swirlUv.y * 10.0 + uTime * 0.3);
     swirl = swirl * 0.5 + 0.5;
     
-    float glow = 1.0 - dist * 1.5;
+    float glow = 1.0 - dist * 1.8;
     glow = max(0.0, glow);
     
-    vec3 baseColor = vec3(0.0, 0.3, 0.3);
-    vec3 glowColor = vec3(0.0, 1.0, 0.8);
-    vec3 finalColor = baseColor + glowColor * (swirl * 0.4 + glow * 0.6);
+    vec3 baseColor = vec3(0.0, 0.18, 0.15);
+    vec3 glowColor = vec3(0.0, 0.7, 0.55);
+    vec3 finalColor = baseColor + glowColor * (swirl * 0.3 + glow * 0.5);
     
-    float alpha = smoothstep(0.5, 0.3, dist);
+    float alpha = smoothstep(0.5, 0.25, dist);
     gl_FragColor = vec4(finalColor, alpha);
   }
 `
@@ -166,9 +166,9 @@ const sparkFragmentShader = `
     if (dist > 0.35) discard;
     
     float glow = 1.0 - smoothstep(0.0, 0.35, dist);
-    vec3 color = vec3(1.0, 1.0, 1.0);
+    vec3 color = vec3(0.7, 1.0, 0.95);
     
-    gl_FragColor = vec4(color, glow * vAlpha);
+    gl_FragColor = vec4(color, glow * vAlpha * 0.8);
   }
 `
 
@@ -217,12 +217,12 @@ function onLoop({ elapsed }: { elapsed: number }) {
 
 <template>
   <ClientOnly>
-    <TresCanvas :clear-color="'#0a0f0f'" @loop="onLoop">
+    <TresCanvas :clear-color="'#0c1414'" @loop="onLoop">
       <TresPerspectiveCamera :position="[0, 3.5, 5]" :look-at="[0, 0.5, 0]" />
       <OrbitControls :enable-damping="true" :enable-zoom="false" :target="[0, 0.5, 0]" />
 
-      <TresAmbientLight :intensity="0.1" />
-      <TresPointLight :position="[0, 2.5, 0]" :color="'#00ffcc'" :intensity="2" />
+      <TresAmbientLight :intensity="0.08" />
+      <TresPointLight :position="[0, 2.5, 0]" :color="'#00ccaa'" :intensity="1.5" />
 
       <primitive :object="cauldronMesh" />
       <primitive :object="liquidMesh" />
