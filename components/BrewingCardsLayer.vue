@@ -51,7 +51,7 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
     </div>
 
     <div v-if="streamingText" class="streaming-text">
-      {{ streamingText }}
+      {{ streamingText }}...
     </div>
   </div>
 </template>
@@ -110,10 +110,9 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
 
 .streaming-text {
   position: absolute;
-  bottom: 100%;
+  bottom: 85%;
   left: 50%;
   transform: translateX(-50%);
-  margin-bottom: var(--space-0);
   padding: var(--space-3) var(--space-4);
   background: hsla(180, 60%, 10%, 0.85);
   border: 1px solid hsla(170, 80%, 50%, 0.4);
@@ -121,15 +120,14 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
   color: hsla(170, 80%, 70%, 1);
   font-size: var(--text-sm);
   width: 220px;
-  max-height: 100px;
+  max-height: calc(1.4em * 3 + var(--space-3) * 2);
   overflow: hidden;
   text-align: center;
   text-shadow: 0 0 8px hsla(170, 80%, 50%, 0.6);
   box-shadow: 0 0 20px hsla(170, 80%, 50%, 0.2);
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
   line-height: 1.4;
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
 }
 
 .card-enter-active {
