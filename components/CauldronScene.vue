@@ -103,19 +103,6 @@ const fragmentShader = `
       pattern += node * 0.5;
     }
     
-    if (h3 > 0.8) {
-      float dotSize = 0.025;
-      float d1 = length(cellUv - vec2(0.0, 0.5));
-      float d2 = length(cellUv - vec2(1.0, 0.5));
-      float d3 = length(cellUv - vec2(0.5, 0.0));
-      float d4 = length(cellUv - vec2(0.5, 1.0));
-      float dot1 = smoothstep(dotSize + aa, dotSize, d1);
-      float dot2 = smoothstep(dotSize + aa, dotSize, d2);
-      float dot3 = smoothstep(dotSize + aa, dotSize, d3);
-      float dot4 = smoothstep(dotSize + aa, dotSize, d4);
-      pattern += (dot1 + dot2 + dot3 + dot4) * 0.4;
-    }
-    
     return min(pattern, 1.0);
   }
 
