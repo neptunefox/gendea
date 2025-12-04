@@ -367,7 +367,13 @@ function onLoop({ elapsed }: { elapsed: number }) {
   <ClientOnly>
     <TresCanvas :clear-color="'#0c1414'" @loop="onLoop">
       <TresPerspectiveCamera :position="[0, 3.5, 5]" :look-at="[0, 0.5, 0]" />
-      <OrbitControls :enable-damping="true" :enable-zoom="false" :target="[0, 0.5, 0]" />
+      <OrbitControls
+        :enable-damping="true"
+        :enable-zoom="false"
+        :target="[0, 0.5, 0]"
+        :min-polar-angle="Math.PI / 3"
+        :max-polar-angle="Math.PI / 3"
+      />
 
       <TresAmbientLight :intensity="0.08" />
       <TresPointLight :position="[0, 2.5, 0]" :color="'#ffaa00'" :intensity="1.5" />
