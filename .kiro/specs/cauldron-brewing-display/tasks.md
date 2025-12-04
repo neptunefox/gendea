@@ -72,12 +72,12 @@
 - [ ] 6. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Integrate with cauldron page
+- [x] 7. Integrate with cauldron page
   - [x] 7.1 Update cauldron.vue to capture streaming tokens
     - Modify streamMix() to accumulate tokens in state
     - Pass streaming text to BrewingCardsLayer
     - _Requirements: 2.2_
-  - [-] 7.2 Wire up BrewingCardsLayer component
+  - [x] 7.2 Wire up BrewingCardsLayer component
     - Add BrewingCardsLayer to cauldron page template
     - Pass ingredients, isMixing, and streamingText props
     - _Requirements: 1.1, 2.1_
