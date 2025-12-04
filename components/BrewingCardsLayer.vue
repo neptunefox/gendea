@@ -113,17 +113,23 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-0);
   padding: var(--space-3) var(--space-4);
   background: hsla(180, 60%, 10%, 0.85);
   border: 1px solid hsla(170, 80%, 50%, 0.4);
   border-radius: var(--radius-lg);
   color: hsla(170, 80%, 70%, 1);
   font-size: var(--text-sm);
-  max-width: 350px;
+  width: 220px;
+  max-height: 100px;
+  overflow: hidden;
   text-align: center;
   text-shadow: 0 0 8px hsla(170, 80%, 50%, 0.6);
   box-shadow: 0 0 20px hsla(170, 80%, 50%, 0.2);
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
 }
 
 .card-enter-active {
