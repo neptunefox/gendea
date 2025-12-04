@@ -53,23 +53,29 @@ const fragmentShader = `
 
   float circuitLines(vec2 uv) {
     float pattern = 0.0;
-    float lineWidth = 0.008;
     
     float cols = 16.0;
     float rows = 10.0;
-    vec2 cell = vec2(floor(uv.x * cols), floor(uv.y * rows));
-    vec2 cellUv = vec2(fract(uv.x * cols), fract(uv.y * rows));
+    vec2 scaledUv = uv * vec2(cols, rows);
+    float aa = fwidth(scaledUv.x) * 1.5;
+    
+    vec2 cell = floor(scaledUv);
+    vec2 cellUv = fract(scaledUv);
+    
+    float lineWidth = 0.008;
     
     float h = hash(cell);
     float h2 = hash(cell + 50.0);
     float h3 = hash(cell + 150.0);
     
-    float vLine = smoothstep(lineWidth, 0.0, abs(cellUv.x - 0.5));
+    float vDist = abs(cellUv.x - 0.5);
+    float vLine = smoothstep(lineWidth + aa, lineWidth, vDist);
     if (h > 0.4) {
       pattern += vLine;
     }
     
-    float hLine = smoothstep(lineWidth, 0.0, abs(cellUv.y - 0.5));
+    float hDist = abs(cellUv.y - 0.5);
+    float hLine = smoothstep(lineWidth + aa, lineWidth, hDist);
     if (h2 > 0.5) {
       pattern += hLine;
     }
@@ -78,30 +84,35 @@ const fragmentShader = `
       float bendX = h3 > 0.5 ? 0.25 : 0.75;
       float bendY = h3 > 0.5 ? 0.75 : 0.25;
       
-      float seg1 = smoothstep(lineWidth, 0.0, abs(cellUv.x - bendX));
-      seg1 *= step(cellUv.y, bendY);
+      float seg1 = smoothstep(lineWidth + aa, lineWidth, abs(cellUv.x - bendX));
+      seg1 *= smoothstep(bendY + aa, bendY, cellUv.y);
       
-      float seg2 = smoothstep(lineWidth, 0.0, abs(cellUv.y - bendY));
-      seg2 *= step(bendX, cellUv.x);
+      float seg2 = smoothstep(lineWidth + aa, lineWidth, abs(cellUv.y - bendY));
+      seg2 *= smoothstep(bendX, bendX + aa, cellUv.x);
       
-      float seg3 = smoothstep(lineWidth, 0.0, abs(cellUv.x - 1.0));
-      seg3 *= step(bendY, cellUv.y);
+      float seg3 = smoothstep(lineWidth + aa, lineWidth, abs(cellUv.x - 1.0));
+      seg3 *= smoothstep(bendY, bendY + aa, cellUv.y);
       
       pattern += (seg1 + seg2 + seg3) * 0.8;
     }
     
     if (h2 > 0.7) {
       float nodeSize = 0.06;
-      float node = 1.0 - smoothstep(nodeSize - 0.02, nodeSize, length(cellUv - 0.5));
+      float nodeDist = length(cellUv - 0.5);
+      float node = smoothstep(nodeSize + aa, nodeSize - 0.02, nodeDist);
       pattern += node * 0.5;
     }
     
     if (h3 > 0.8) {
       float dotSize = 0.025;
-      float dot1 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.0, 0.5)));
-      float dot2 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(1.0, 0.5)));
-      float dot3 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.5, 0.0)));
-      float dot4 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.5, 1.0)));
+      float d1 = length(cellUv - vec2(0.0, 0.5));
+      float d2 = length(cellUv - vec2(1.0, 0.5));
+      float d3 = length(cellUv - vec2(0.5, 0.0));
+      float d4 = length(cellUv - vec2(0.5, 1.0));
+      float dot1 = smoothstep(dotSize + aa, dotSize, d1);
+      float dot2 = smoothstep(dotSize + aa, dotSize, d2);
+      float dot3 = smoothstep(dotSize + aa, dotSize, d3);
+      float dot4 = smoothstep(dotSize + aa, dotSize, d4);
       pattern += (dot1 + dot2 + dot3 + dot4) * 0.4;
     }
     
@@ -120,7 +131,7 @@ const fragmentShader = `
     float vignette = smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.75, vUv.y);
     pattern *= vignette;
     
-    vec3 finalColor = baseColor + glowColor * pattern * 0.8;
+    vec3 finalColor = baseColor + glowColor * pattern * 0.75;
     
     gl_FragColor = vec4(finalColor, 1.0);
   }
