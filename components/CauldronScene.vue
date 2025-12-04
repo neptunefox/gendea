@@ -33,33 +33,65 @@ const cauldronProfile = [
 
 const vertexShader = `
   varying vec2 vUv;
+  varying float vFacing;
   void main() {
     vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vec3 worldNormal = normalize(normalMatrix * normal);
+    vec4 worldPos = modelViewMatrix * vec4(position, 1.0);
+    vFacing = dot(worldNormal, normalize(-worldPos.xyz));
+    gl_Position = projectionMatrix * worldPos;
   }
 `
 
 const fragmentShader = `
   varying vec2 vUv;
+  varying float vFacing;
 
-  float circuitLine(float coord, float width, float spacing) {
-    float line = mod(coord, spacing);
-    return smoothstep(width, 0.0, abs(line - spacing * 0.5));
+  float hash(float n) {
+    return fract(sin(n) * 43758.5453);
   }
 
-  float circuitPattern(vec2 uv) {
-    float hLines = circuitLine(uv.y * 12.0, 0.02, 1.0);
-    float vLines = circuitLine(uv.x * 8.0, 0.02, 1.0);
-    float diag1 = circuitLine((uv.x + uv.y) * 6.0, 0.015, 1.0);
-    float diag2 = circuitLine((uv.x - uv.y) * 6.0, 0.015, 1.0);
-    return max(max(hLines, vLines), max(diag1, diag2)) * 0.35;
+  float digitalRelic(vec2 uv) {
+    float pattern = 0.0;
+    
+    float scanline = smoothstep(0.015, 0.0, abs(fract(uv.y * 20.0) - 0.5));
+    float scanFade = hash(floor(uv.y * 20.0)) * 0.5 + 0.5;
+    pattern += scanline * scanFade * 0.6;
+    
+    float glitchRow = floor(uv.y * 8.0);
+    float glitchOffset = hash(glitchRow * 127.1) * 0.15 - 0.075;
+    float glitchX = uv.x + glitchOffset * step(0.7, hash(glitchRow * 311.7));
+    
+    float dataBlock = step(0.8, hash(floor(glitchX * 12.0) + glitchRow * 100.0));
+    float blockLine = smoothstep(0.04, 0.0, abs(fract(uv.y * 8.0) - 0.5));
+    pattern += dataBlock * blockLine * 0.5;
+    
+    float hexY = floor(uv.y * 6.0);
+    float hexPhase = hash(hexY * 73.1);
+    float hexLine = smoothstep(0.02, 0.0, abs(fract(uv.y * 6.0) - 0.5));
+    float hexSegment = step(0.4, fract(uv.x * 16.0 + hexPhase));
+    pattern += hexLine * hexSegment * 0.4;
+    
+    float corruption = hash(floor(uv.y * 40.0) + floor(uv.x * 30.0) * 50.0);
+    pattern += step(0.97, corruption) * 0.8;
+    
+    return pattern * 0.4;
   }
 
   void main() {
-    vec3 baseColor = vec3(0.03, 0.07, 0.07);
+    vec3 baseColor = vec3(0.02, 0.05, 0.05);
+    
+    float isOutside = step(vFacing, 0.0);
+    
     vec3 glowColor = vec3(0.0, 0.75, 0.6);
-    float circuit = circuitPattern(vUv);
-    vec3 finalColor = baseColor + glowColor * circuit;
+    
+    float pattern = digitalRelic(vUv) * isOutside;
+    
+    float vignette = smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.65, vUv.y);
+    pattern *= vignette;
+    
+    vec3 finalColor = baseColor + glowColor * pattern;
+    
     gl_FragColor = vec4(finalColor, 1.0);
   }
 `
