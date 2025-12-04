@@ -47,50 +47,80 @@ const fragmentShader = `
   varying vec2 vUv;
   varying float vFacing;
 
-  float hash(float n) {
-    return fract(sin(n) * 43758.5453);
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
   }
 
-  float digitalRelic(vec2 uv) {
+  float circuitLines(vec2 uv) {
     float pattern = 0.0;
+    float lineWidth = 0.008;
     
-    float scanline = smoothstep(0.015, 0.0, abs(fract(uv.y * 20.0) - 0.5));
-    float scanFade = hash(floor(uv.y * 20.0)) * 0.5 + 0.5;
-    pattern += scanline * scanFade * 0.6;
+    float cols = 16.0;
+    float rows = 10.0;
+    vec2 cell = vec2(floor(uv.x * cols), floor(uv.y * rows));
+    vec2 cellUv = vec2(fract(uv.x * cols), fract(uv.y * rows));
     
-    float glitchRow = floor(uv.y * 8.0);
-    float glitchOffset = hash(glitchRow * 127.1) * 0.15 - 0.075;
-    float glitchX = uv.x + glitchOffset * step(0.7, hash(glitchRow * 311.7));
+    float h = hash(cell);
+    float h2 = hash(cell + 50.0);
+    float h3 = hash(cell + 150.0);
     
-    float dataBlock = step(0.8, hash(floor(glitchX * 12.0) + glitchRow * 100.0));
-    float blockLine = smoothstep(0.04, 0.0, abs(fract(uv.y * 8.0) - 0.5));
-    pattern += dataBlock * blockLine * 0.5;
+    float vLine = smoothstep(lineWidth, 0.0, abs(cellUv.x - 0.5));
+    if (h > 0.4) {
+      pattern += vLine;
+    }
     
-    float hexY = floor(uv.y * 6.0);
-    float hexPhase = hash(hexY * 73.1);
-    float hexLine = smoothstep(0.02, 0.0, abs(fract(uv.y * 6.0) - 0.5));
-    float hexSegment = step(0.4, fract(uv.x * 16.0 + hexPhase));
-    pattern += hexLine * hexSegment * 0.4;
+    float hLine = smoothstep(lineWidth, 0.0, abs(cellUv.y - 0.5));
+    if (h2 > 0.5) {
+      pattern += hLine;
+    }
     
-    float corruption = hash(floor(uv.y * 40.0) + floor(uv.x * 30.0) * 50.0);
-    pattern += step(0.97, corruption) * 0.8;
+    if (h > 0.6) {
+      float bendX = h3 > 0.5 ? 0.25 : 0.75;
+      float bendY = h3 > 0.5 ? 0.75 : 0.25;
+      
+      float seg1 = smoothstep(lineWidth, 0.0, abs(cellUv.x - bendX));
+      seg1 *= step(cellUv.y, bendY);
+      
+      float seg2 = smoothstep(lineWidth, 0.0, abs(cellUv.y - bendY));
+      seg2 *= step(bendX, cellUv.x);
+      
+      float seg3 = smoothstep(lineWidth, 0.0, abs(cellUv.x - 1.0));
+      seg3 *= step(bendY, cellUv.y);
+      
+      pattern += (seg1 + seg2 + seg3) * 0.8;
+    }
     
-    return pattern * 0.4;
+    if (h2 > 0.7) {
+      float nodeSize = 0.06;
+      float node = 1.0 - smoothstep(nodeSize - 0.02, nodeSize, length(cellUv - 0.5));
+      pattern += node * 0.5;
+    }
+    
+    if (h3 > 0.8) {
+      float dotSize = 0.025;
+      float dot1 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.0, 0.5)));
+      float dot2 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(1.0, 0.5)));
+      float dot3 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.5, 0.0)));
+      float dot4 = 1.0 - smoothstep(dotSize, dotSize + 0.01, length(cellUv - vec2(0.5, 1.0)));
+      pattern += (dot1 + dot2 + dot3 + dot4) * 0.4;
+    }
+    
+    return min(pattern, 1.0);
   }
 
   void main() {
-    vec3 baseColor = vec3(0.02, 0.05, 0.05);
+    vec3 baseColor = vec3(0.01, 0.03, 0.04);
     
     float isOutside = step(vFacing, 0.0);
     
-    vec3 glowColor = vec3(0.0, 0.75, 0.6);
+    vec3 glowColor = vec3(0.0, 0.85, 0.75);
     
-    float pattern = digitalRelic(vUv) * isOutside;
+    float pattern = circuitLines(vUv) * isOutside;
     
-    float vignette = smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.65, vUv.y);
+    float vignette = smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.75, vUv.y);
     pattern *= vignette;
     
-    vec3 finalColor = baseColor + glowColor * pattern;
+    vec3 finalColor = baseColor + glowColor * pattern * 0.8;
     
     gl_FragColor = vec4(finalColor, 1.0);
   }
