@@ -800,7 +800,7 @@ onUnmounted(() => {
   gap: var(--space-4);
   padding: var(--space-6);
   position: fixed;
-  top: 52%;
+  bottom: var(--space-6);
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
