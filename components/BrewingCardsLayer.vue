@@ -35,13 +35,17 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
         <div
           v-for="card in brewingCards"
           :key="card.id"
-          class="brewing-card"
-          :class="{ 'is-mixing': isMixing }"
+          class="brewing-card-wrapper"
           :style="{
-            transform: `translate(-50%, -50%) translate(${card.position.x}%, ${card.position.y}%) rotate(${card.position.rotation}deg) scale(${card.position.scale})`,
+            '--card-x': `${card.position.x}%`,
+            '--card-y': `${card.position.y}%`,
+            '--card-rotation': `${card.position.rotation}deg`,
+            '--card-scale': card.position.scale,
           }"
         >
-          {{ card.displayText }}
+          <div class="brewing-card" :class="{ 'is-mixing': isMixing }">
+            {{ card.displayText }}
+          </div>
         </div>
       </TransitionGroup>
     </div>
@@ -70,10 +74,14 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
   height: 100%;
 }
 
-.brewing-card {
+.brewing-card-wrapper {
   position: absolute;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%) translate(var(--card-x), var(--card-y)) rotate(var(--card-rotation)) scale(var(--card-scale));
+}
+
+.brewing-card {
   padding: var(--space-2) var(--space-3);
   background: hsla(180, 60%, 15%, 0.9);
   border: 1px solid hsla(170, 80%, 50%, 0.5);
@@ -91,13 +99,13 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
 }
 
 @keyframes bob {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-  50% { transform: translate(-50%, -50%) translateY(-4px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 @keyframes bob-intense {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-  50% { transform: translate(-50%, -50%) translateY(-8px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .streaming-text {
@@ -128,12 +136,12 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
 
 .card-enter-from {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.5);
+  transform: translate(-50%, -50%) translate(var(--card-x), var(--card-y)) scale(0.5);
 }
 
 .card-leave-to {
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.3);
+  transform: translate(-50%, -50%) translate(var(--card-x), var(--card-y)) scale(0.3);
 }
 
 @media (prefers-reduced-motion: reduce) {
