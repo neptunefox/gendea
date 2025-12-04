@@ -248,9 +248,9 @@ const sparkFragmentShader = `
     float innerGlow = 1.0 - smoothstep(0.0, 0.3, dist);
     float outerGlow = 1.0 - smoothstep(0.0, 0.5, dist);
     
-    vec3 coreColor = vec3(1.0, 0.9, 0.6);
-    vec3 glowColor = vec3(1.0, 0.5, 0.2);
-    vec3 outerColor = vec3(0.8, 0.2, 0.1);
+    vec3 coreColor = vec3(1.0, 1.0, 1.0);
+    vec3 glowColor = vec3(0.85, 0.9, 1.0);
+    vec3 outerColor = vec3(0.6, 0.7, 0.9);
     
     vec3 color = coreColor * core + glowColor * innerGlow * 0.6 + outerColor * outerGlow * 0.3;
     float alpha = (core + innerGlow * 0.7 + outerGlow * 0.3) * vAlpha;
