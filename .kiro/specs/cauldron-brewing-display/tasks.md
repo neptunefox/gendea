@@ -20,7 +20,9 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 3. Create BrewingCardsLayer component
-  - [ ] 3.1 Implement BrewingCardsLayer component structure
+  - [x] 3.1 Implement BrewingCardsLayer component structure
+
+
     - Create component with props for ingredients, isMixing, streamingText
     - Position as overlay on cauldron scene
     - _Requirements: 1.1, 1.2_
@@ -73,15 +75,21 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Integrate with cauldron page
-  - [ ] 7.1 Update cauldron.vue to capture streaming tokens
+  - [x] 7.1 Update cauldron.vue to capture streaming tokens
+
+
     - Modify streamMix() to accumulate tokens in state
     - Pass streaming text to BrewingCardsLayer
     - _Requirements: 2.2_
-  - [ ] 7.2 Wire up BrewingCardsLayer component
+
+  - [-] 7.2 Wire up BrewingCardsLayer component
+
     - Add BrewingCardsLayer to cauldron page template
     - Pass ingredients, isMixing, and streamingText props
     - _Requirements: 1.1, 2.1_
-  - [ ] 7.3 Handle reset and state cleanup
+  - [x] 7.3 Handle reset and state cleanup
+
+
     - Clear streaming text on reset
     - Ensure proper state transitions
     - _Requirements: 1.4, 2.4_

@@ -4,6 +4,11 @@
       <ClientOnly>
         <CauldronScene />
       </ClientOnly>
+      <BrewingCardsLayer
+        :ingredients="ingredients"
+        :is-mixing="isMixing"
+        :streaming-text="streamingText"
+      />
     </div>
     <BackgroundRunes variant="cauldron" />
     <FlowGuidanceBanner
@@ -144,6 +149,7 @@
 import { Check, Loader, Plus, Sparkles } from 'lucide-vue-next'
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 
+import BrewingCardsLayer from '~/components/BrewingCardsLayer.vue'
 import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronScene from '~/components/CauldronScene.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
@@ -189,6 +195,7 @@ const ingredients = ref<CauldronIngredient[]>([])
 const currentSession = ref<CauldronSession | null>(null)
 const isMixing = ref(false)
 const output = ref<string | null>(null)
+const streamingText = ref('')
 const manualInput = ref('')
 const isLoading = ref(true)
 const showToast = ref(false)
@@ -465,6 +472,7 @@ async function handleReset() {
 
     output.value = null
     isMixing.value = false
+    streamingText.value = ''
     await createNewSession()
     showToastMessage('Cauldron reset')
   } catch (error) {
@@ -583,6 +591,7 @@ function checkGuidanceDismissed() {
 
 async function streamMix(sessionId: string, _isRemix = false) {
   isMixing.value = true
+  streamingText.value = ''
   playSound('bubble')
 
   try {
@@ -602,12 +611,17 @@ async function streamMix(sessionId: string, _isRemix = false) {
       const lines = value.split('\n').filter(line => line.startsWith('data: '))
       for (const line of lines) {
         const data = JSON.parse(line.slice(6))
+        if (data.token) {
+          streamingText.value += data.token
+        }
         if (data.done) {
           output.value = data.output
+          streamingText.value = ''
           stopSound('bubble')
           playSound('crystal')
         }
         if (data.error) {
+          streamingText.value = ''
           stopSound('bubble')
           showToastMessage('Failed to mix ideas')
         }
@@ -615,6 +629,7 @@ async function streamMix(sessionId: string, _isRemix = false) {
     }
   } catch (error) {
     console.error('Failed to mix:', error)
+    streamingText.value = ''
     stopSound('bubble')
     showToastMessage('Failed to mix ideas')
   } finally {
@@ -667,6 +682,9 @@ onUnmounted(() => {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cauldron-page::before {
