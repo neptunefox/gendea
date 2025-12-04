@@ -266,9 +266,9 @@ const sparkSpeeds = new Float32Array(SPARK_COUNT)
 
 for (let i = 0; i < SPARK_COUNT; i++) {
   const angle = Math.random() * Math.PI * 2
-  const radius = Math.random() * 0.55
+  const radius = 0.25 + Math.random() * 0.4
   sparkPositions[i * 3] = Math.cos(angle) * radius
-  sparkPositions[i * 3 + 1] = 1.15
+  sparkPositions[i * 3 + 1] = 1.12
   sparkPositions[i * 3 + 2] = Math.sin(angle) * radius
   sparkSizes[i] = 0.04 + Math.random() * 0.06
   sparkPhases[i] = Math.random() * Math.PI * 2
