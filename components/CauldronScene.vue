@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import { TresCanvas } from '@tresjs/core'
 import { OrbitControls } from '@tresjs/cientos'
-import { LatheGeometry, ShaderMaterial, Vector2, Mesh, DoubleSide, CircleGeometry } from 'three'
+import {
+  LatheGeometry,
+  ShaderMaterial,
+  Vector2,
+  Mesh,
+  DoubleSide,
+  CircleGeometry,
+  BufferGeometry,
+  Float32BufferAttribute,
+  PointsMaterial,
+  Points,
+  AdditiveBlending
+} from 'three'
 
 const reducedMotion = useReducedMotion()
 
@@ -73,7 +85,7 @@ const liquidFragmentShader = `
 
   void main() {
     vec2 center = vUv - 0.5;
-    float angle = atan(center.y, center.x) + uTime * 0.5;
+    float angle = atan(center.y, center.x) + uTime * 0.3;
     float dist = length(center);
     
     vec2 swirlUv = vec2(
@@ -81,7 +93,7 @@ const liquidFragmentShader = `
       sin(angle) * dist + 0.5
     );
     
-    float swirl = sin(swirlUv.x * 10.0 + uTime) * sin(swirlUv.y * 10.0 + uTime * 0.7);
+    float swirl = sin(swirlUv.x * 10.0 + uTime * 0.6) * sin(swirlUv.y * 10.0 + uTime * 0.4);
     swirl = swirl * 0.5 + 0.5;
     
     float glow = 1.0 - dist * 1.5;
@@ -118,9 +130,93 @@ const liquidMesh = new Mesh(liquidGeometry, liquidMaterial)
 liquidMesh.rotation.x = -Math.PI / 2
 liquidMesh.position.y = 1.1
 
+const SPARK_COUNT = 50
+
+const sparkVertexShader = `
+  attribute float aSize;
+  attribute float aPhase;
+  attribute float aSpeed;
+  uniform float uTime;
+  varying float vAlpha;
+  
+  void main() {
+    vec3 pos = position;
+    float t = uTime * aSpeed + aPhase;
+    
+    float cycle = mod(t, 4.0);
+    float rise = cycle / 4.0;
+    
+    pos.y += rise * 0.35;
+    pos.x += sin(t * 3.0 + aPhase * 5.0) * 0.12 * (1.0 - rise * 0.5);
+    pos.z += cos(t * 2.5 + aPhase * 3.0) * 0.12 * (1.0 - rise * 0.5);
+    
+    float fadeIn = smoothstep(0.0, 0.1, rise);
+    float fadeOut = 1.0 - smoothstep(0.6, 1.0, rise);
+    vAlpha = fadeIn * fadeOut;
+    
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    float sizeScale = 0.7 + 0.3 * sin(t * 5.0 + aPhase);
+    gl_PointSize = aSize * (800.0 / -mvPosition.z) * sizeScale;
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`
+
+const sparkFragmentShader = `
+  varying float vAlpha;
+  
+  void main() {
+    vec2 center = gl_PointCoord - 0.5;
+    float dist = max(abs(center.x), abs(center.y));
+    
+    if (dist > 0.35) discard;
+    
+    float glow = 1.0 - smoothstep(0.0, 0.35, dist);
+    vec3 color = vec3(1.0, 1.0, 1.0);
+    
+    gl_FragColor = vec4(color, glow * vAlpha);
+  }
+`
+
+const sparkPositions = new Float32Array(SPARK_COUNT * 3)
+const sparkSizes = new Float32Array(SPARK_COUNT)
+const sparkPhases = new Float32Array(SPARK_COUNT)
+const sparkSpeeds = new Float32Array(SPARK_COUNT)
+
+for (let i = 0; i < SPARK_COUNT; i++) {
+  const angle = Math.random() * Math.PI * 2
+  const radius = Math.random() * 0.45
+  sparkPositions[i * 3] = Math.cos(angle) * radius
+  sparkPositions[i * 3 + 1] = 1.12
+  sparkPositions[i * 3 + 2] = Math.sin(angle) * radius
+  sparkSizes[i] = 0.04 + Math.random() * 0.06
+  sparkPhases[i] = Math.random() * Math.PI * 2
+  sparkSpeeds[i] = 0.4 + Math.random() * 0.6
+}
+
+const sparkGeometry = new BufferGeometry()
+sparkGeometry.setAttribute('position', new Float32BufferAttribute(sparkPositions, 3))
+sparkGeometry.setAttribute('aSize', new Float32BufferAttribute(sparkSizes, 1))
+sparkGeometry.setAttribute('aPhase', new Float32BufferAttribute(sparkPhases, 1))
+sparkGeometry.setAttribute('aSpeed', new Float32BufferAttribute(sparkSpeeds, 1))
+
+const sparkMaterial = new ShaderMaterial({
+  vertexShader: sparkVertexShader,
+  fragmentShader: sparkFragmentShader,
+  uniforms: {
+    uTime: { value: 0 }
+  },
+  transparent: true,
+  blending: AdditiveBlending,
+  depthWrite: false
+})
+
+const sparkPoints = new Points(sparkGeometry, sparkMaterial)
+
 function onLoop({ elapsed }: { elapsed: number }) {
-  if (reducedMotion.value) return
   liquidMaterial.uniforms.uTime.value = elapsed
+  if (!reducedMotion.value) {
+    sparkMaterial.uniforms.uTime.value = elapsed
+  }
 }
 </script>
 
@@ -135,6 +231,7 @@ function onLoop({ elapsed }: { elapsed: number }) {
 
       <primitive :object="cauldronMesh" />
       <primitive :object="liquidMesh" />
+      <primitive :object="sparkPoints" />
     </TresCanvas>
   </ClientOnly>
 </template>
