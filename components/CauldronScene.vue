@@ -25,16 +25,11 @@ const cauldronProfile = [
   new Vector2(0.95, 0.8),
   new Vector2(1.0, 0.5),
   new Vector2(0.95, 0.2),
-  new Vector2(0.8, 0.0),
-  new Vector2(0.6, -0.2),
-  new Vector2(0.4, -0.3),
-  new Vector2(0.3, -0.35),
-  new Vector2(0.25, -0.4),
-  new Vector2(0.15, -0.5),
-  new Vector2(0.2, -0.55),
-  new Vector2(0.2, -0.7),
-  new Vector2(0.15, -0.75),
-  new Vector2(0.0, -0.75),
+  new Vector2(0.85, 0.0),
+  new Vector2(0.7, -0.15),
+  new Vector2(0.5, -0.25),
+  new Vector2(0.3, -0.3),
+  new Vector2(0.0, -0.32),
 ]
 
 const vertexShader = `
