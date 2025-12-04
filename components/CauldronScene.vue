@@ -132,10 +132,12 @@ const sparkVertexShader = `
   attribute float aSpeed;
   uniform float uTime;
   varying float vAlpha;
+  varying float vPhase;
   
   void main() {
     vec3 pos = position;
     float t = uTime * aSpeed + aPhase;
+    vPhase = aPhase;
     
     float cycle = mod(t, 4.0);
     float rise = cycle / 4.0;
@@ -146,28 +148,39 @@ const sparkVertexShader = `
     
     float fadeIn = smoothstep(0.0, 0.1, rise);
     float fadeOut = 1.0 - smoothstep(0.6, 1.0, rise);
-    vAlpha = fadeIn * fadeOut;
+    float flicker = 0.7 + 0.3 * sin(t * 12.0 + aPhase * 7.0);
+    vAlpha = fadeIn * fadeOut * flicker;
     
     vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    float sizeScale = 0.7 + 0.3 * sin(t * 5.0 + aPhase);
-    gl_PointSize = aSize * (800.0 / -mvPosition.z) * sizeScale;
+    float pulse = 0.8 + 0.4 * sin(t * 8.0 + aPhase * 5.0);
+    gl_PointSize = aSize * (800.0 / -mvPosition.z) * pulse * 1.5;
     gl_Position = projectionMatrix * mvPosition;
   }
 `
 
 const sparkFragmentShader = `
+  uniform float uTime;
   varying float vAlpha;
+  varying float vPhase;
   
   void main() {
     vec2 center = gl_PointCoord - 0.5;
-    float dist = max(abs(center.x), abs(center.y));
+    float dist = length(center);
     
-    if (dist > 0.35) discard;
+    if (dist > 0.5) discard;
     
-    float glow = 1.0 - smoothstep(0.0, 0.35, dist);
-    vec3 color = vec3(0.7, 1.0, 0.95);
+    float core = 1.0 - smoothstep(0.0, 0.15, dist);
+    float innerGlow = 1.0 - smoothstep(0.0, 0.3, dist);
+    float outerGlow = 1.0 - smoothstep(0.0, 0.5, dist);
     
-    gl_FragColor = vec4(color, glow * vAlpha * 0.8);
+    vec3 coreColor = vec3(1.0, 1.0, 1.0);
+    vec3 glowColor = vec3(0.0, 1.0, 0.85);
+    vec3 outerColor = vec3(0.0, 0.6, 0.5);
+    
+    vec3 color = coreColor * core + glowColor * innerGlow * 0.6 + outerColor * outerGlow * 0.3;
+    float alpha = (core + innerGlow * 0.7 + outerGlow * 0.3) * vAlpha;
+    
+    gl_FragColor = vec4(color, alpha);
   }
 `
 
@@ -178,13 +191,13 @@ const sparkSpeeds = new Float32Array(SPARK_COUNT)
 
 for (let i = 0; i < SPARK_COUNT; i++) {
   const angle = Math.random() * Math.PI * 2
-  const radius = Math.random() * 0.45
+  const radius = Math.random() * 0.55
   sparkPositions[i * 3] = Math.cos(angle) * radius
-  sparkPositions[i * 3 + 1] = 1.12
+  sparkPositions[i * 3 + 1] = 1.15
   sparkPositions[i * 3 + 2] = Math.sin(angle) * radius
   sparkSizes[i] = 0.04 + Math.random() * 0.06
   sparkPhases[i] = Math.random() * Math.PI * 2
-  sparkSpeeds[i] = 0.4 + Math.random() * 0.6
+  sparkSpeeds[i] = 0.25 + Math.random() * 0.35
 }
 
 const sparkGeometry = new BufferGeometry()
@@ -205,12 +218,12 @@ const sparkMaterial = new ShaderMaterial({
 })
 
 const sparkPoints = new Points(sparkGeometry, sparkMaterial)
+sparkPoints.position.y = -0.02
+sparkPoints.renderOrder = 1
 
 function onLoop({ elapsed }: { elapsed: number }) {
   liquidMaterial.uniforms.uTime.value = elapsed
-  if (!reducedMotion.value) {
-    sparkMaterial.uniforms.uTime.value = elapsed
-  }
+  sparkMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
 }
 </script>
 
