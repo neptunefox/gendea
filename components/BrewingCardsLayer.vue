@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { truncateText, calculateCardPositions } from '~/utils/brewing-cards'
 import type { BrewingCardDisplay } from '~/types/cauldron'
+import StreamingTextDisplay from '~/components/StreamingTextDisplay.vue'
 
 interface CauldronIngredient {
   id: string
@@ -50,9 +51,10 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
       </TransitionGroup>
     </div>
 
-    <div v-if="streamingText" class="streaming-text">
-      {{ streamingText }}...
-    </div>
+    <StreamingTextDisplay
+      :text="streamingText"
+      :is-active="isMixing"
+    />
   </div>
 </template>
 
@@ -106,28 +108,6 @@ const brewingCards = computed<BrewingCardDisplay[]>(() => {
 @keyframes bob-intense {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
-}
-
-.streaming-text {
-  position: absolute;
-  bottom: 85%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: var(--space-3) var(--space-4);
-  background: hsla(180, 60%, 10%, 0.85);
-  border: 1px solid hsla(170, 80%, 50%, 0.4);
-  border-radius: var(--radius-lg);
-  color: hsla(170, 80%, 70%, 1);
-  font-size: var(--text-sm);
-  width: 220px;
-  max-height: calc(1.4em * 3 + var(--space-3) * 2);
-  overflow: hidden;
-  text-align: center;
-  text-shadow: 0 0 8px hsla(170, 80%, 50%, 0.6);
-  box-shadow: 0 0 20px hsla(170, 80%, 50%, 0.2);
-  line-height: 1.4;
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
 }
 
 .card-enter-active {

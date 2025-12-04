@@ -48,13 +48,13 @@
 - [ ] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Create StreamingTextDisplay component
-  - [ ] 5.1 Implement StreamingTextDisplay component
+- [x] 5. Create StreamingTextDisplay component
+  - [x] 5.1 Implement StreamingTextDisplay component
     - Create component with text and isActive props
     - Position above brewing cards
     - Style with cauldron-themed glow (cyan/green)
     - _Requirements: 2.1, 4.1, 4.2_
-  - [ ] 5.2 Implement word-by-word animation
+  - [x] 5.2 Implement word-by-word animation
     - Split text into words
     - Animate each word with staggered fade-in
     - Handle text wrapping for long content
@@ -62,10 +62,10 @@
   - [ ]* 5.3 Write property test for token accumulation
     - **Property 5: Token accumulation integrity**
     - **Validates: Requirements 2.2**
-  - [ ]* 5.4 Write property test for text wrapping
+  - [x]* 5.4 Write property test for text wrapping
     - **Property 6: Long text wrapping**
     - **Validates: Requirements 4.3**
-  - [ ] 5.5 Implement fade-out on completion
+  - [x] 5.5 Implement fade-out on completion
     - Fade out streaming text when mixing completes
     - _Requirements: 2.4_
 
