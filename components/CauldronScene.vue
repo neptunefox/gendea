@@ -53,8 +53,7 @@ const fragmentShader = `
     float vLines = circuitLine(uv.x * 8.0, 0.02, 1.0);
     float diag1 = circuitLine((uv.x + uv.y) * 6.0, 0.015, 1.0);
     float diag2 = circuitLine((uv.x - uv.y) * 6.0, 0.015, 1.0);
-    float nodes = smoothstep(0.08, 0.0, length(fract(uv * 4.0) - 0.5));
-    return max(max(max(hLines, vLines), max(diag1, diag2)), nodes) * 0.35;
+    return max(max(hLines, vLines), max(diag1, diag2)) * 0.35;
   }
 
   void main() {
