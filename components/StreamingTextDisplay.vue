@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, nextTick } from 'vue'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface Props {
@@ -9,6 +9,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const reducedMotion = useReducedMotion()
+const containerRef = ref<HTMLElement | null>(null)
 
 const words = computed(() => {
   if (!props.text) return []
@@ -18,6 +19,14 @@ const words = computed(() => {
 const visibleWordCount = ref(0)
 const isVisible = ref(false)
 const isFadingOut = ref(false)
+
+function scrollToBottom() {
+  nextTick(() => {
+    if (containerRef.value) {
+      containerRef.value.scrollTop = containerRef.value.scrollHeight
+    }
+  })
+}
 
 watch(() => props.text, (newText, oldText) => {
   if (!oldText && newText) {
@@ -45,6 +54,7 @@ watch(() => props.isActive, (active) => {
 function animateNewWords(from: number, to: number) {
   if (reducedMotion.value) {
     visibleWordCount.value = to
+    scrollToBottom()
     return
   }
   
@@ -52,6 +62,7 @@ function animateNewWords(from: number, to: number) {
   for (let i = from; i < to; i++) {
     setTimeout(() => {
       visibleWordCount.value = i + 1
+      scrollToBottom()
     }, (i - from) * delay)
   }
 }
@@ -62,6 +73,7 @@ function animateNewWords(from: number, to: number) {
   <Transition name="fade">
     <div
       v-if="isVisible && words.length > 0"
+      ref="containerRef"
       class="streaming-text-display"
       :class="{ 'is-fading-out': isFadingOut }"
     >
@@ -88,17 +100,23 @@ function animateNewWords(from: number, to: number) {
   color: hsla(170, 80%, 70%, 1);
   font-size: var(--text-sm);
   width: 220px;
-  max-height: calc(1.4em * 3 + var(--space-3) * 2);
-  overflow: hidden;
+  max-height: calc(1.4em * 5 + var(--space-3) * 2);
+  overflow-y: auto;
+  overflow-x: hidden;
   text-align: center;
   text-shadow: 0 0 8px hsla(170, 80%, 50%, 0.6);
   box-shadow: 0 0 20px hsla(170, 80%, 50%, 0.2);
   line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
   transition: opacity 0.8s var(--ease-out);
+  scrollbar-width: none;
+}
+
+.streaming-text-display::-webkit-scrollbar {
+  display: none;
 }
 
 .streaming-text-display.is-fading-out {
