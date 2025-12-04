@@ -93,6 +93,10 @@ function animateNewWords(from: number, to: number) {
   bottom: 85%;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-end;
   padding: var(--space-3) var(--space-4);
   background: hsla(180, 60%, 10%, 0.85);
   border: 1px solid hsla(170, 80%, 50%, 0.4);
@@ -109,8 +113,8 @@ function animateNewWords(from: number, to: number) {
   line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+  mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
   transition: opacity 0.8s var(--ease-out);
   scrollbar-width: none;
 }
