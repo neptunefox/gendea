@@ -504,6 +504,36 @@ async function handleReset() {
   }
 }
 
+const SPARK_STORAGE_KEY = 'spark-thread-journal'
+const SPARK_STARRED_KEY = 'spark-starred-ideas'
+
+function addToSparkJournal(text: string) {
+  if (typeof window === 'undefined') return
+  try {
+    const stored = window.localStorage.getItem(SPARK_STORAGE_KEY)
+    const entries = stored ? JSON.parse(stored) : []
+    const entry = {
+      id: crypto.randomUUID(),
+      prompt: 'Cauldron convergence',
+      timestamp: Date.now(),
+      coreIdeas: [{ text }],
+      lenses: [],
+      nudges: []
+    }
+    entries.unshift(entry)
+    window.localStorage.setItem(SPARK_STORAGE_KEY, JSON.stringify(entries.slice(0, 6)))
+
+    const starredStored = window.localStorage.getItem(SPARK_STARRED_KEY)
+    const starred: string[] = starredStored ? JSON.parse(starredStored) : []
+    if (!starred.includes(text)) {
+      starred.push(text)
+      window.localStorage.setItem(SPARK_STARRED_KEY, JSON.stringify(starred))
+    }
+  } catch {
+    // ignore localStorage errors
+  }
+}
+
 async function handleSaveOutput() {
   if (!output.value || !currentSession.value) return
 
@@ -519,7 +549,8 @@ async function handleSaveOutput() {
       }
     })
 
-    showToastMessage('Saved to your collection')
+    addToSparkJournal(output.value)
+    showToastMessage('Saved to Spark')
     await handleReset()
   } catch (error) {
     console.error('Failed to save output:', error)
