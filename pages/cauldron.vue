@@ -105,7 +105,7 @@
             <span v-else-if="ingredients.length > 0"
               >{{ 3 - ingredients.length }} more to converge</span
             >
-            <span v-else>Drag cards or type above</span>
+            <span v-else>Drag or double-tap cards to brew</span>
           </p>
         </div>
 
