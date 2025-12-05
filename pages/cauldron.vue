@@ -142,11 +142,6 @@
       <div v-if="showToast" ref="toastRef" class="toast">
         <Check :size="20" />
         {{ toastMessage }}
-        <SealAnimation
-          color="hsl(270, 55%, 65%)"
-          :active="showSealAnimation"
-          @complete="showSealAnimation = false"
-        />
       </div>
     </transition>
 
@@ -177,7 +172,6 @@ import CauldronOutput from '~/components/CauldronOutput.vue'
 import CauldronScene from '~/components/CauldronScene.vue'
 import FloatingIdea from '~/components/FloatingIdea.vue'
 import FlowGuidanceBanner from '~/components/FlowGuidanceBanner.vue'
-import SealAnimation from '~/components/SealAnimation.vue'
 import { useParticles } from '~/composables/useParticles'
 import { useReducedMotion } from '~/composables/useReducedMotion'
 import { useSound } from '~/composables/useSound'
@@ -224,7 +218,6 @@ const isLoading = ref(true)
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastRef = ref<HTMLElement | null>(null)
-const showSealAnimation = ref(false)
 const remixHintPulse = ref(false)
 const draggedIdea = ref<FloatingIdea | null>(null)
 const showGuidance = ref(true)
@@ -584,10 +577,6 @@ async function handleAskOracle() {
 function showToastMessage(message: string) {
   toastMessage.value = message
   showToast.value = true
-
-  if (message.toLowerCase().includes('saved')) {
-    showSealAnimation.value = true
-  }
 
   setTimeout(() => {
     showToast.value = false
