@@ -512,15 +512,35 @@ function addToSparkJournal(text: string) {
   try {
     const stored = window.localStorage.getItem(SPARK_STORAGE_KEY)
     const entries = stored ? JSON.parse(stored) : []
-    const entry = {
-      id: crypto.randomUUID(),
-      prompt: 'Cauldron convergence',
-      timestamp: Date.now(),
-      coreIdeas: [{ text }],
-      lenses: [],
-      nudges: []
+
+    const cauldronEntry = entries.find(
+      (e: { prompt: string }) => e.prompt === 'Cauldron convergence'
+    )
+
+    if (cauldronEntry) {
+      const alreadyExists = cauldronEntry.coreIdeas.some(
+        (idea: { text: string }) => idea.text === text
+      )
+      if (!alreadyExists) {
+        cauldronEntry.coreIdeas.push({ text })
+        cauldronEntry.timestamp = Date.now()
+      }
+      const idx = entries.indexOf(cauldronEntry)
+      if (idx > 0) {
+        entries.splice(idx, 1)
+        entries.unshift(cauldronEntry)
+      }
+    } else {
+      entries.unshift({
+        id: crypto.randomUUID(),
+        prompt: 'Cauldron convergence',
+        timestamp: Date.now(),
+        coreIdeas: [{ text }],
+        lenses: [],
+        nudges: []
+      })
     }
-    entries.unshift(entry)
+
     window.localStorage.setItem(SPARK_STORAGE_KEY, JSON.stringify(entries.slice(0, 6)))
 
     const starredStored = window.localStorage.getItem(SPARK_STARRED_KEY)
