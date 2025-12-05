@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TresCanvas } from '@tresjs/core'
+import { TresCanvas, useTresContext } from '@tresjs/core'
 import { OrbitControls } from '@tresjs/cientos'
 import {
   LatheGeometry,
@@ -13,7 +13,7 @@ import {
   Points,
   AdditiveBlending
 } from 'three'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 const props = defineProps<{
   isBrewing?: boolean
@@ -376,8 +376,16 @@ const sparkPoints = new Points(sparkGeometry, sparkMaterial)
 sparkPoints.position.y = -0.02
 sparkPoints.renderOrder = 1
 
+const controlsRef = shallowRef<any>(null)
+
 const brewIntensity = ref(0)
 let lastTime = 0
+
+function onControlsChange() {
+  if (controlsRef.value?.instance) {
+    emberMesh.rotation.z = controlsRef.value.instance.getAzimuthalAngle()
+  }
+}
 
 function onLoop({ elapsed }: { elapsed: number }) {
   const delta = elapsed - lastTime
@@ -402,11 +410,13 @@ function onLoop({ elapsed }: { elapsed: number }) {
     <TresCanvas :clear-color="'#0c1414'" @loop="onLoop">
       <TresPerspectiveCamera :position="[0, 3.5, 5]" :look-at="[0, 0.5, 0]" />
       <OrbitControls
+        ref="controlsRef"
         :enable-damping="true"
         :enable-zoom="false"
         :target="[0, 0.5, 0]"
         :min-polar-angle="Math.PI / 3"
         :max-polar-angle="Math.PI / 3"
+        @change="onControlsChange"
       />
 
       <TresAmbientLight :intensity="0.08" />
