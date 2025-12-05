@@ -13,6 +13,11 @@ import {
   Points,
   AdditiveBlending
 } from 'three'
+import { ref } from 'vue'
+
+const props = defineProps<{
+  isBrewing?: boolean
+}>()
 
 const reducedMotion = useReducedMotion()
 
@@ -34,18 +39,23 @@ const cauldronProfile = [
 const vertexShader = `
   varying vec2 vUv;
   varying float vFacing;
+  varying vec3 vWorldPos;
   void main() {
     vUv = uv;
     vec3 worldNormal = normalize(normalMatrix * normal);
     vec4 worldPos = modelViewMatrix * vec4(position, 1.0);
+    vWorldPos = position;
     vFacing = dot(worldNormal, normalize(-worldPos.xyz));
     gl_Position = projectionMatrix * worldPos;
   }
 `
 
 const fragmentShader = `
+  uniform float uTime;
+  uniform float uBrewIntensity;
   varying vec2 vUv;
   varying float vFacing;
+  varying vec3 vWorldPos;
 
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -118,7 +128,13 @@ const fragmentShader = `
     float vignette = smoothstep(0.0, 0.15, vUv.y) * smoothstep(1.0, 0.75, vUv.y);
     pattern *= vignette;
     
-    vec3 finalColor = baseColor + glowColor * pattern * 0.75;
+    float pulse = 1.0 + uBrewIntensity * (0.5 + 0.5 * sin(uTime * 3.0 + vUv.y * 8.0));
+    float wave = uBrewIntensity * 0.4 * sin(uTime * 5.0 - vUv.y * 12.0 + vUv.x * 6.0);
+    
+    float glowBoost = 0.75 + uBrewIntensity * 1.5;
+    vec3 brewGlow = mix(glowColor, vec3(0.2, 1.0, 0.9), uBrewIntensity * 0.5);
+    
+    vec3 finalColor = baseColor + brewGlow * pattern * glowBoost * pulse + vec3(0.0, wave * pattern, wave * pattern * 0.8);
     
     gl_FragColor = vec4(finalColor, 1.0);
   }
@@ -165,6 +181,10 @@ const cauldronGeometry = new LatheGeometry(cauldronProfile, 32)
 const cauldronMaterial = new ShaderMaterial({
   vertexShader,
   fragmentShader,
+  uniforms: {
+    uTime: { value: 0 },
+    uBrewIntensity: { value: 0 },
+  },
   side: DoubleSide,
 })
 const cauldronMesh = new Mesh(cauldronGeometry, cauldronMaterial)
@@ -356,10 +376,24 @@ const sparkPoints = new Points(sparkGeometry, sparkMaterial)
 sparkPoints.position.y = -0.02
 sparkPoints.renderOrder = 1
 
+const brewIntensity = ref(0)
+let lastTime = 0
+
 function onLoop({ elapsed }: { elapsed: number }) {
+  const delta = elapsed - lastTime
+  lastTime = elapsed
+  
   liquidMaterial.uniforms.uTime.value = elapsed
   sparkMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
   emberMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
+
+  const target = props.isBrewing ? 1 : 0
+  const lerpSpeed = props.isBrewing ? 4 : 2.5
+  brewIntensity.value += (target - brewIntensity.value) * Math.min(delta * lerpSpeed, 1)
+  if (!props.isBrewing && brewIntensity.value < 0.01) brewIntensity.value = 0
+
+  cauldronMaterial.uniforms.uTime.value = reducedMotion.value ? 0 : elapsed
+  cauldronMaterial.uniforms.uBrewIntensity.value = reducedMotion.value ? 0 : brewIntensity.value
 }
 </script>
 

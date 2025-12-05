@@ -2,7 +2,7 @@
   <div class="cauldron-page" @click="handleBackgroundClick">
     <div class="cauldron-scene-container">
       <ClientOnly>
-        <CauldronScene />
+        <CauldronScene :is-brewing="isMixing" />
       </ClientOnly>
       <BrewingCardsLayer
         :ingredients="ingredients"
