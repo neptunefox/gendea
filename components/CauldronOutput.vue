@@ -1,20 +1,36 @@
 <template>
   <transition name="emerge" @after-enter="handleEmergenceComplete">
-    <div v-if="show" class="cauldron-output">
-      <div class="steam-container">
+    <div v-if="show" class="cauldron-output" :class="{ collapsed: isCollapsed }">
+      <div v-if="!isCollapsed" class="steam-container">
         <div v-for="i in 6" :key="i" class="steam" :style="getSteamStyle(i)"></div>
       </div>
 
-      <div class="output-card" :class="{ crystallizing: isCrystallizing }">
-        <div class="card-content">
-          <h3 class="output-title">Converged</h3>
+      <div
+        class="output-card"
+        :class="{ crystallizing: isCrystallizing, remixing: isRemixing, collapsed: isCollapsed }"
+      >
+        <button
+          class="collapse-toggle"
+          :title="isCollapsed ? 'Expand' : 'Collapse to add more ideas'"
+          @click="toggleCollapse"
+        >
+          <ChevronDown :size="16" :class="{ rotated: isCollapsed }" />
+        </button>
+
+        <div v-if="isCollapsed" class="collapsed-content" @click="toggleCollapse">
+          <span class="collapsed-label">Converged</span>
+          <span class="collapsed-preview">{{ truncatedOutput }}</span>
+        </div>
+
+        <div v-else class="card-content">
+          <h3 class="output-title">{{ isRemixing ? 'Remixing...' : 'Converged' }}</h3>
           <p class="output-text" :class="{ 'shimmer-text': isCrystallizing }">{{ output }}</p>
           <div class="output-actions">
-            <button class="action-btn save" @click="$emit('save')">
+            <button class="action-btn save" :disabled="isRemixing" @click="$emit('save')">
               <BookmarkPlus :size="18" />
               Save
             </button>
-            <button class="action-btn oracle" @click="$emit('askOracle')">
+            <button class="action-btn oracle" :disabled="isRemixing" @click="$emit('askOracle')">
               <HelpCircle :size="18" />
               Dialogue
             </button>
@@ -24,25 +40,47 @@
             </button>
           </div>
         </div>
+
+        <div v-if="$slots.remix && !isCollapsed" class="remix-slot">
+          <slot name="remix" />
+        </div>
       </div>
+
+      <p v-if="isCollapsed" class="collapsed-hint">
+        <Sparkles :size="14" />
+        Throw in more ideas to remix
+      </p>
     </div>
   </transition>
 </template>
 
 <script setup lang="ts">
-import { HelpCircle, BookmarkPlus, RotateCcw } from 'lucide-vue-next'
-import { ref, watch } from 'vue'
+import { HelpCircle, BookmarkPlus, RotateCcw, ChevronDown, Sparkles } from 'lucide-vue-next'
+import { ref, watch, computed } from 'vue'
 
 import { useReducedMotion } from '~/composables/useReducedMotion'
 
 interface Props {
   output: string | null
   isFinalized?: boolean
+  isRemixing?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isFinalized: true
+  isFinalized: true,
+  isRemixing: false
 })
+
+const isCollapsed = ref(false)
+
+const truncatedOutput = computed(() => {
+  if (!props.output) return ''
+  return props.output.length > 60 ? props.output.slice(0, 60) + '...' : props.output
+})
+
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value
+}
 
 const emit = defineEmits<{
   save: []
@@ -235,6 +273,112 @@ function getSteamStyle(index: number) {
 .action-btn.secondary:hover {
   background: var(--color-primary-ring);
   border-color: var(--color-primary);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.remix-slot {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.collapse-toggle {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.output-card.collapsed .collapse-toggle {
+  top: 50%;
+  right: var(--space-2);
+  transform: translateY(-50%);
+}
+
+.collapse-toggle:hover {
+  color: var(--color-cauldron);
+  background: hsla(140, 60%, 45%, 0.15);
+}
+
+.collapse-toggle svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.collapse-toggle svg.rotated {
+  transform: rotate(180deg);
+}
+
+.output-card.collapsed {
+  padding: var(--space-3) var(--space-4);
+}
+
+.collapsed-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  padding-right: var(--space-8);
+}
+
+.collapsed-label {
+  color: var(--color-cauldron);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.collapsed-preview {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collapsed-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-cauldron);
+  font-size: var(--text-sm);
+  opacity: 0.8;
+  margin: var(--space-2) 0 0 0;
+}
+
+.output-card.remixing {
+  animation: remix-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes remix-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 30px var(--color-glow-cauldron),
+      var(--shadow-xl);
+  }
+  50% {
+    box-shadow:
+      0 0 45px var(--color-glow-cauldron),
+      0 0 60px hsla(140, 60%, 45%, 0.3),
+      var(--shadow-xl);
+  }
 }
 
 .emerge-enter-active {

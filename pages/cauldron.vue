@@ -75,38 +75,61 @@
             v-if="output"
             ref="cauldronOutputRef"
             :output="output"
+            :is-remixing="isMixing"
             @save="handleSaveOutput"
             @ask-oracle="handleAskOracle"
             @reset="handleReset"
             @crystallized="handleCrystallized"
-          />
+          >
+            <template #remix>
+              <div class="remix-section">
+                <div class="remix-input-wrapper">
+                  <input
+                    v-model="manualInput"
+                    type="text"
+                    placeholder="Add an idea to remix..."
+                    class="remix-input"
+                    @keydown.enter="handleManualSubmit"
+                  />
+                  <button
+                    class="remix-submit-btn"
+                    :disabled="!manualInput.trim()"
+                    @click="handleManualSubmit"
+                  >
+                    <Plus :size="18" />
+                  </button>
+                </div>
+              </div>
+            </template>
+          </CauldronOutput>
 
-          <div class="manual-input-wrapper">
-            <input
-              v-model="manualInput"
-              type="text"
-              :placeholder="output ? 'Add another idea to remix...' : 'Type an idea to throw in...'"
-              class="manual-input"
-              @keydown.enter="handleManualSubmit"
-            />
-            <button
-              class="submit-manual-btn"
-              :disabled="!manualInput.trim()"
-              @click="handleManualSubmit"
-            >
-              <Plus :size="20" />
-            </button>
-          </div>
+          <template v-if="!output">
+            <div class="manual-input-wrapper">
+              <input
+                v-model="manualInput"
+                type="text"
+                placeholder="Type an idea to throw in..."
+                class="manual-input"
+                @keydown.enter="handleManualSubmit"
+              />
+              <button
+                class="submit-manual-btn"
+                :disabled="!manualInput.trim()"
+                @click="handleManualSubmit"
+              >
+                <Plus :size="20" />
+              </button>
+            </div>
 
-          <p :class="['hint-text', { pulse: remixHintPulse }]">
-            <Sparkles :size="14" />
-            <span v-if="output">Add more ideas to remix</span>
-            <span v-else-if="isMixing">Converging...</span>
-            <span v-else-if="ingredients.length > 0"
-              >{{ 3 - ingredients.length }} more to converge</span
-            >
-            <span v-else>Drag or double-tap cards to brew</span>
-          </p>
+            <p :class="['hint-text', { pulse: remixHintPulse }]">
+              <Sparkles :size="14" />
+              <span v-if="isMixing">Converging...</span>
+              <span v-else-if="ingredients.length > 0"
+                >{{ 3 - ingredients.length }} more to converge</span
+              >
+              <span v-else>Drag or double-tap cards to brew</span>
+            </p>
+          </template>
         </div>
 
         <button v-if="ingredients.length > 0 && !output" class="reset-btn" @click="handleReset">
@@ -884,28 +907,66 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
-.remix-hint-section {
+.remix-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
-  width: 380px;
+  gap: var(--space-2);
 }
 
 .remix-input-wrapper {
   display: flex;
   gap: 0;
-  background: var(--color-surface);
+  background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-md);
   transition: all var(--duration-fast) var(--ease-out);
   width: 100%;
 }
 
 .remix-input-wrapper:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-cauldron);
+  box-shadow: 0 0 0 2px var(--color-cauldron-subtle);
+}
+
+.remix-input {
+  flex: 1;
+  padding: var(--space-3) var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  background: transparent;
+  color: var(--color-text);
+}
+
+.remix-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.remix-input:focus {
+  outline: none;
+}
+
+.remix-submit-btn {
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--color-cauldron);
+  border: none;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remix-submit-btn:hover:not(:disabled) {
+  background: var(--color-cauldron-subtle);
+}
+
+.remix-submit-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .hint-text {
