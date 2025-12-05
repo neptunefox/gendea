@@ -2,7 +2,10 @@ import { eq } from 'drizzle-orm'
 import { createError, defineEventHandler, readBody, setResponseHeader } from 'h3'
 
 import { db, schema } from '../../db'
-import { CAULDRON_SYNTHESIS_SYSTEM_PROMPT } from '../../utils/langchain-prompts'
+import {
+  buildCauldronSynthesisPrompt,
+  CAULDRON_SYNTHESIS_SYSTEM_PROMPT
+} from '../../utils/langchain-prompts'
 import { useLangChainService } from '../../utils/langchain-service'
 import { validateRequired, validateUUID } from '../../utils/validation'
 
@@ -34,13 +37,7 @@ export default defineEventHandler(async event => {
     throw createError({ statusCode: 400, message: 'At least 3 ingredients required' })
   }
 
-  const ingredientsList = ingredients.map((ing, idx) => `${idx + 1}. ${ing.content}`).join('\n')
-
-  const prompt = `Analyze the patterns in these ${ingredients.length} ingredients and synthesize them into ONE compelling, actionable idea (2-3 sentences). Don't output JSON, just write the synthesis directly as plain text:
-
-${ingredientsList}
-
-What themes, interests, or directions do these ingredients reveal? Create a synthesis that captures the deeper pattern.`
+  const prompt = buildCauldronSynthesisPrompt(ingredients)
 
   setResponseHeader(event, 'Content-Type', 'text/event-stream')
   setResponseHeader(event, 'Cache-Control', 'no-cache')
@@ -54,10 +51,7 @@ What themes, interests, or directions do these ingredients reveal? Create a synt
       try {
         await langchain.streamText({
           prompt,
-          systemPrompt: CAULDRON_SYNTHESIS_SYSTEM_PROMPT.replace(
-            'OUTPUT REQUIREMENTS:\nYou must respond with a JSON object containing a "synthesis" field.\nThe synthesis must be at least 50 characters and capture the deeper pattern.',
-            'OUTPUT REQUIREMENTS:\nWrite the synthesis directly as plain text. No JSON. Just the synthesized idea.'
-          ),
+          systemPrompt: CAULDRON_SYNTHESIS_SYSTEM_PROMPT,
           onToken: (token: string) => {
             fullText += token
             controller.enqueue(`data: ${JSON.stringify({ token })}\n\n`)

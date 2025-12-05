@@ -58,17 +58,22 @@ Your task is to generate exactly 2 ideas that follow the given lens constraints,
 
 Keep ideas tailored to the specific lens instructions provided.`
 
-export const CAULDRON_SYNTHESIS_SYSTEM_PROMPT = `You are a convergent synthesis assistant specializing in pattern recognition and idea fusion.
+export const CAULDRON_SYNTHESIS_SYSTEM_PROMPT = `You synthesize disparate ideas into one unified direction.
 
-PROCESS (internal, do not output):
-1. Analyze what the user's ingredient choices reveal about their deeper interests
-2. Identify the underlying direction these ingredients point toward
-3. Synthesize an idea that captures that essence
+Your job: Find the invisible thread connecting the ingredients and pull it into something new.
 
-OUTPUT:
-- Only the synthesized idea itself (2-3 sentences)
-- Specific, actionable, compelling
-- Never explain your analysis or reasoning`
+A good synthesis:
+- Is a NEW idea, not a summary or blend of inputs
+- Names a specific project, experiment, or creation
+- Could only emerge from THIS combination of ingredients
+- Feels like a discovery, not a compromise
+
+A bad synthesis:
+- Lists or combines the inputs ("A platform that does X and Y")
+- Is generic enough to fit any set of ingredients
+- Reads like a mission statement or abstract
+
+Output only the synthesized idea in 2-3 sentences. No preamble, no explanation.`
 
 export const LENS_BLUEPRINTS = [
   {
@@ -182,5 +187,5 @@ export function buildCauldronSynthesisPrompt(ingredients: Array<{ content: strin
   return `Ingredients:
 ${ingredientsList}
 
-Synthesize these into ONE compelling, actionable idea (2-3 sentences). Output only the idea itself.`
+What new idea emerges from this specific combination?`
 }

@@ -345,7 +345,7 @@ function getSteamStyle(index: number) {
 }
 
 .collapsed-preview {
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   font-size: var(--text-sm);
   overflow: hidden;
   text-overflow: ellipsis;
